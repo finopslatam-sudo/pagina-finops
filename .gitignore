@@ -1,0 +1,82 @@
+# ============================================
+# Node / Next.js .gitignore (FULL VERSION)
+# ============================================
+
+# Node modules
+node_modules/
+
+# Output directories
+.next/
+out/
+dist/
+build/
+
+# SWC cache
+.swc/
+
+# Vercel
+.vercel/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# TypeScript cache
+*.tsbuildinfo
+
+# VSCode settings
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Mac system files
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Linux system files
+*~
+
+# Windows system files
+Desktop.ini
+
+# Optional caches
+.cache/
+.npm/
+.pnp*
+.pnp.js
+
+# Next.js telemetry cache
+/.next/static/chunks/pages/*.js.map
+
+# Local development files
+*.local
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# JetBrains IDE
+.idea/
