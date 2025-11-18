@@ -66,11 +66,9 @@ export default function Home() {
 
       {/* SOBRE MI */}
       <section id="sobre-mi" className="px-6 py-20 max-w-4xl mx-auto">
-        <h3 className="text-3xl font-bold mb-6">Quién soy</h3>
+        <h3 className="text-3xl font-bold mb-6">Quiénes somos</h3>
         <p className="text-gray-300 leading-relaxed">
-          Soy especialista FinOps certificado, con experiencia en DevOps, DataOps, AWS 
-          y optimización de costos en la nube. Mi misión es ayudar a empresas en Chile 
-          y Latam a tener control total sobre sus gastos cloud y reducir costos de forma sostenible.
+        En FinOpsLatam combinamos experiencia en FinOps, DevOps y DataOps para ayudarte a controlar tus gastos en la nube. Nuestra misión es reducir costos de manera sostenible, sin comprometer la eficiencia de tus servicios.
         </p>
       </section>
 
