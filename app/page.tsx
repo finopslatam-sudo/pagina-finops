@@ -32,7 +32,7 @@ export default function Home() {
           target="_blank"
           className="inline-block mt-8 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold px-6 py-3 rounded-xl"
         >
-          Hablar por WhatsApp
+          Hablemos por WhatsApp
         </a>
       </section>
 
@@ -82,7 +82,7 @@ export default function Home() {
           target="_blank"
           className="inline-block bg-emerald-500 hover:bg-emerald-600 text-black font-semibold px-6 py-3 rounded-xl"
         >
-          Escribir por WhatsApp
+          Hablemos por WhatsApp
         </a>
       </section>
 
