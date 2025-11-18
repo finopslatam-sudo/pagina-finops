@@ -1,24 +1,111 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
+// Componente de contador animado - VERSIÓN CORREGIDA
+function AnimatedCounter({ target, suffix = '', duration = 2000 }: { target: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const increment = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [target, duration]);
+
+  return (
+    <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
+      {suffix}{count}{suffix ? '' : '%'}
+    </span>
+  );
+}
+
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      {/* NAVBAR - Estilo con azul difuminado */}
+      {/* NAVBAR MEJORADO CON MENÚ HAMBURGUESA */}
       <header className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-white">
         <a href="/">
           <img 
             src="/logo2.png" 
             alt="FinOpsLatam Logo" 
-            className="h-20 w-auto cursor-pointer"
+            className="h-16 md:h-20 w-auto cursor-pointer"
           />
         </a>
-        <nav className="space-x-8">
+        
+        {/* Botón Hamburguesa para móvil */}
+        <button 
+          className="md:hidden p-2"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          <div className="w-6 h-0.5 bg-gray-700 mb-1.5"></div>
+          <div className="w-6 h-0.5 bg-gray-700 mb-1.5"></div>
+          <div className="w-6 h-0.5 bg-gray-700"></div>
+        </button>
+
+        {/* Navegación Desktop */}
+        <nav className="hidden md:flex space-x-8">
           <a href="/" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Inicio</a>
           <a href="/servicios" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Servicios</a>
           <a href="/quienes-somos" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Quiénes Somos</a>
           <a href="/blog" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Blog</a>
           <a href="/contacto" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Contacto</a>
         </nav>
+
+        {/* Menú Móvil */}
+        {isMenuOpen && (
+          <div className="absolute top-20 left-0 right-0 bg-white border-b border-gray-200 md:hidden z-50 shadow-lg">
+            <div className="flex flex-col space-y-0 p-4">
+              <a 
+                href="/" 
+                className="flex items-center text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span className="text-xl mr-3">🏠</span>
+                Inicio
+              </a>
+              <a 
+                href="/servicios" 
+                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Servicios
+              </a>
+              <a 
+                href="/quienes-somos" 
+                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Quiénes Somos
+              </a>
+              <a 
+                href="/blog" 
+                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Blog
+              </a>
+              <a 
+                href="/contacto" 
+                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 hover:bg-blue-50 rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contacto
+              </a>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* HERO SECTION - Ahora con el azul impactante */}
@@ -56,13 +143,13 @@ export default function Home() {
             <a
               href="https://wa.me/56947788781?text=Hola,%20quiero%20información%20sobre%20FinOpsLatam"
               target="_blank"
-              className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold px-8 py-4 rounded-lg transition-all shadow-lg hover:shadow-xl"
             >
               Hablemos por WhatsApp
             </a>
             <a
               href="/servicios"
-              className="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8 py-4 rounded-lg transition-colors"
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-4 rounded-lg transition-all shadow-lg hover:shadow-xl"
             >
               Conocer Servicios
             </a>
@@ -70,7 +157,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* El resto de la página se mantiene EXACTAMENTE igual */}
       {/* DASHBOARD SECTION - Métricas y gráficos */}
       <section className="px-6 py-16 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -136,7 +222,7 @@ export default function Home() {
 
               {/* INSIGHTS */}
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">INSIGHTS</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">PERSPECTIVAS</h3>
                 
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-white rounded-xl border border-gray-200">
@@ -161,7 +247,7 @@ export default function Home() {
               
               {/* BANK ACCOUNTS & CASH FLOW */}
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">CUENTAS BANCARIAS</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">RESUMEN DE CUENTAS</h3>
                 
                 <div className="space-y-6">
                   {/* Cash Flow */}
@@ -260,15 +346,15 @@ export default function Home() {
             </p>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
               <div className="p-4">
-                <div className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">+50%</div>
+                <AnimatedCounter target={40} suffix="+" duration={5000} />
                 <div className="text-gray-600">Ahorro en costos</div>
               </div>
               <div className="p-4">
-                <div className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">100%</div>
+                <AnimatedCounter target={99} duration={5000} />
                 <div className="text-gray-600">Clientes satisfechos</div>
               </div>
               <div className="p-4">
-                <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">24/7</div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">24/7</span>
                 <div className="text-gray-600">Monitoreo continuo</div>
               </div>
             </div>
@@ -347,10 +433,11 @@ export default function Home() {
             <div>
               <h3 className="text-white text-sm font-semibold mb-4">Navegación</h3>
               <ul className="space-y-2">
+                <li><a href="/" className="hover:text-blue-400 transition-colors">Inicio</a></li>
                 <li><a href="/servicios" className="hover:text-blue-400 transition-colors">Servicios</a></li>
-                <li><a href="/quienes-somos" className="hover:text-blue-400 transition-colors">Quiénes somos</a></li>
-                <li><a href="/contacto" className="hover:text-blue-400 transition-colors">Contacto</a></li>
+                <li><a href="/quienes-somos" className="hover:text-blue-400 transition-colors">Quiénes Somos</a></li>
                 <li><a href="/blog" className="hover:text-blue-400 transition-colors">Blog</a></li>
+                <li><a href="/contacto" className="hover:text-blue-400 transition-colors">Contacto</a></li>
               </ul>
             </div>
 
