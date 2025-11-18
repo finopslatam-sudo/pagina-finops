@@ -12,7 +12,7 @@ export default function Home() {
 	/>
         <nav className="space-x-6">
           <a href="#servicios" className="hover:text-emerald-400">Servicios</a>
-          <a href="#sobre-mi" className="hover:text-emerald-400">Quién soy</a>
+          <a href="#sobre-mi" className="hover:text-emerald-400">Quiénes somos</a>
           <a href="#contacto" className="hover:text-emerald-400">Contacto</a>
         </nav>
       </header>
@@ -127,13 +127,13 @@ export default function Home() {
       {/* LOGO + DESCRIPCION */}
       <div className="flex flex-col items-center md:items-start">
         <img 
-          src="/logo.png" 
+          src="/logo2.png" 
           alt="FinOpsLatam Logo" 
           className="h-12 w-auto mb-3"
         />
         <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
           Expertos en Optimización de Costos en la Nube, 
-          automatización FinOps y control financiero para AWS, Azure y GCP.
+          automatización FinOps y control financiero para AWS.
         </p>
       </div>
 
@@ -142,7 +142,7 @@ export default function Home() {
         <h3 className="text-white text-sm font-semibold mb-3">Navegación</h3>
         <ul className="space-y-2">
           <li><a href="#servicios" className="hover:text-emerald-400">Servicios</a></li>
-          <li><a href="#sobre-mi" className="hover:text-emerald-400">Quién soy</a></li>
+          <li><a href="#sobre-mi" className="hover:text-emerald-400">Quiénes somos</a></li>
           <li><a href="#contacto" className="hover:text-emerald-400">Contacto</a></li>
         </ul>
       </div>
@@ -152,7 +152,7 @@ export default function Home() {
         <h3 className="text-white text-sm font-semibold mb-3">Contacto</h3>
         <ul className="space-y-2">
           <li>Email: <a href="mailto:contacto@finopslatam.com" className="hover:text-emerald-400">contacto@finopslatam.com</a></li>
-          <li>WhatsApp: <a href="https://wa.me/569XXXXXXXX" className="hover:text-emerald-400">+56 9 XXXXXXXX</a></li>
+          <li>WhatsApp: <a href="https://wa.me/569XXXXXXXX" className="hover:text-emerald-400">+56 9 47788781</a></li>
           <li>LinkedIn: <a href="https://www.linkedin.com/company/finopslatam" className="hover:text-emerald-400">FinOpsLatam</a></li>
         </ul>
       </div>
