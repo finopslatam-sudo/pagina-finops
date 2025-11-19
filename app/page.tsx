@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-// Componente de contador animado - VERSIÓN CORREGIDA
+// Componente de contador animado
 function AnimatedCounter({ target, suffix = '', duration = 2000 }: { target: number; suffix?: string; duration?: number }) {
   const [count, setCount] = useState(0);
 
@@ -108,10 +108,9 @@ export default function Home() {
         )}
       </header>
 
-      {/* HERO SECTION - Ahora con el azul impactante */}
+      {/* HERO SECTION */}
       <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
-        {/* Mantengo los elementos decorativos pero con opacidad más baja para que se vean sobre el azul */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-1/4 left-1/4 w-48 h-32 bg-white rounded-lg transform rotate-6"></div>
           <div className="absolute top-1/3 right-1/4 w-56 h-40 bg-white rounded-lg transform -rotate-3"></div>
