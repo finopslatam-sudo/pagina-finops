@@ -263,7 +263,7 @@ export default function Servicios() {
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Slack/Teams para alertas
+                        Alertas enviadas por email
                       </li>
                     </ul>
                   </div>
