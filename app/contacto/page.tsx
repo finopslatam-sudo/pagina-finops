@@ -117,16 +117,16 @@ export default function Contacto() {
                     <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">WhatsApp</h4>
                     <p className="text-gray-600 mb-1 sm:mb-2 text-sm sm:text-base">Respuesta inmediata</p>
                     <a 
-                      href="https://wa.me/56947788781" 
+                      href="https://wa.me/56965090121"
                       target="_blank"
                       className="text-blue-600 hover:text-blue-700 font-semibold text-sm sm:text-base"
                     >
-                      +56 9 47788781
+                      +56 9 65090121
                     </a>
                   </div>
                 </div>
 
-                {/* Email */}
+                {/* Email*/}
                 <div className="flex items-start space-x-3 sm:space-x-4">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-blue-600 text-lg sm:text-xl">📧</span>
@@ -177,7 +177,7 @@ export default function Contacto() {
               <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl border border-blue-100">
                 <h4 className="font-semibold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">¿Necesitas una respuesta inmediata?</h4>
                 <a
-                  href="https://wa.me/56947788781?text=Hola,%20quiero%20información%20sobre%20FinOpsLatam"
+                  href="https://wa.me/56965090121?text=Hola,%20quiero%20información%20sobre%20FinOpsLatam"
                   target="_blank"
                   className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-colors text-sm sm:text-base"
                 >
@@ -400,7 +400,7 @@ export default function Contacto() {
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <a
-              href="https://wa.me/56947788781?text=Hola,%20quiero%20agendar%20una%20consultoría%20gratuita%20de%20FinOps"
+              href="https://wa.me/56965090121?text=Hola,%20quiero%20agendar%20una%20consultoría%20gratuita%20de%20FinOps"
               target="_blank"
               className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-lg transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
@@ -420,7 +420,7 @@ export default function Contacto() {
       <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
         <div className="flex justify-center gap-4 sm:gap-6 pb-6">
           <a 
-            href="https://wa.me/56947788781" 
+            href="https://wa.me/56965090121"
             target="_blank" 
             className="hover:text-blue-400 transition text-xl sm:text-2xl"
           >
@@ -472,7 +472,7 @@ export default function Contacto() {
               <h3 className="text-white text-sm font-semibold mb-3 sm:mb-4">Contacto</h3>
               <ul className="space-y-1 sm:space-y-2">
                 <li className="text-sm">Email: <a href="mailto:contacto@finopslatam.com" className="hover:text-blue-400 transition-colors">contacto@finopslatam.com</a></li>
-                <li className="text-sm">WhatsApp: <a href="https://wa.me/56947788781" className="hover:text-blue-400 transition-colors">+56 9 47788781</a></li>
+                <li className="text-sm">WhatsApp: <a href="https://wa.me/56965090121" className="hover:text-blue-400 transition-colors">+56 9 65090121</a></li>
                 <li className="text-sm">LinkedIn: <a href="https://www.linkedin.com/company/finopslatam" className="hover:text-blue-400 transition-colors">FinOpsLatam</a></li>
               </ul>
             </div>

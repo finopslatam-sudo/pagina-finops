@@ -355,7 +355,7 @@ export default function QuienesSomos() {
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <a
-              href="https://wa.me/56947788781?text=Hola,%20quiero%20más%20información%20sobre%20FinOpsLatam"
+              href="https://wa.me/56965090121?text=Hola,%20quiero%20más%20información%20sobre%20FinOpsLatam"
               target="_blank"
               className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-lg transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
@@ -375,7 +375,7 @@ export default function QuienesSomos() {
       <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
         <div className="flex justify-center gap-4 sm:gap-6 pb-6">
           <a 
-            href="https://wa.me/56947788781" 
+            href="https://wa.me/56965090121"
             target="_blank" 
             className="hover:text-blue-400 transition text-xl sm:text-2xl"
           >
@@ -427,7 +427,7 @@ export default function QuienesSomos() {
               <h3 className="text-white text-sm font-semibold mb-3 sm:mb-4">Contacto</h3>
               <ul className="space-y-1 sm:space-y-2">
                 <li className="text-sm">Email: <a href="mailto:contacto@finopslatam.com" className="hover:text-blue-400 transition-colors">contacto@finopslatam.com</a></li>
-                <li className="text-sm">WhatsApp: <a href="https://wa.me/56947788781" className="hover:text-blue-400 transition-colors">+56 9 47788781</a></li>
+                <li className="text-sm">WhatsApp: <a href="https://wa.me/56965090121" className="hover:text-blue-400 transition-colors">+56 9 65090121</a></li>
                 <li className="text-sm">LinkedIn: <a href="https://www.linkedin.com/company/finopslatam" className="hover:text-blue-400 transition-colors">FinOpsLatam</a></li>
               </ul>
             </div>

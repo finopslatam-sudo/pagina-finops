@@ -381,7 +381,7 @@ export default function Servicios() {
             Agenda una consultoría gratuita de 30 minutos y recibe un análisis preliminar de tus costos AWS.
           </p>
           <a
-            href="https://wa.me/56947788781?text=Hola,%20quiero%20una%20consultoría%20gratuita%20sobre%20servicios%20FinOps"
+            href="https://wa.me/56965090121?text=Hola,%20quiero%20una%20consultoría%20gratuita%20sobre%20servicios%20FinOps"
             target="_blank"
             className="inline-block bg-[#2CA01C] hover:bg-[#238015] text-white font-semibold px-8 py-4 rounded-lg transition-colors"
           >
@@ -394,7 +394,7 @@ export default function Servicios() {
       <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
         <div className="flex justify-center gap-6 pb-6">
           <a 
-            href="https://wa.me/56947788781" 
+            href="https://wa.me/56965090121"
             target="_blank" 
             className="hover:text-blue-400 transition text-2xl"
           >
@@ -446,7 +446,7 @@ export default function Servicios() {
               <h3 className="text-white text-sm font-semibold mb-4">Contacto</h3>
               <ul className="space-y-2">
                 <li>Email: <a href="mailto:contacto@finopslatam.com" className="hover:text-blue-400 transition-colors">contacto@finopslatam.com</a></li>
-                <li>WhatsApp: <a href="https://wa.me/56947788781" className="hover:text-blue-400 transition-colors">+56 9 47788781</a></li>
+                <li>WhatsApp: <a href="https://wa.me/56965090121" className="hover:text-blue-400 transition-colors">+56 9 65090121</a></li>
                 <li>LinkedIn: <a href="https://www.linkedin.com/company/finopslatam" className="hover:text-blue-400 transition-colors">FinOpsLatam</a></li>
               </ul>
             </div>

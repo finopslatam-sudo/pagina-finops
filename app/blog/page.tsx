@@ -203,7 +203,7 @@ export default function Blog() {
               </a>
             </div>
 
-            {/* Artículo 3 */}
+            {/* Artículo 3*/}
             <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
                 <span className="text-white text-xl sm:text-2xl">📈</span>
@@ -358,7 +358,7 @@ export default function Blog() {
       <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
         <div className="flex justify-center gap-4 sm:gap-6 pb-6">
           <a 
-            href="https://wa.me/56947788781" 
+            href="https://wa.me/56965090121"
             target="_blank" 
             className="hover:text-blue-400 transition text-xl sm:text-2xl"
           >
@@ -410,7 +410,7 @@ export default function Blog() {
               <h3 className="text-white text-sm font-semibold mb-3 sm:mb-4">Contacto</h3>
               <ul className="space-y-1 sm:space-y-2">
                 <li className="text-sm">Email: <a href="mailto:contacto@finopslatam.com" className="hover:text-blue-400 transition-colors">contacto@finopslatam.com</a></li>
-                <li className="text-sm">WhatsApp: <a href="https://wa.me/56947788781" className="hover:text-blue-400 transition-colors">+56 9 47788781</a></li>
+                <li className="text-sm">WhatsApp: <a href="https://wa.me/56965090121" className="hover:text-blue-400 transition-colors">+56 9 65090121</a></li>
                 <li className="text-sm">LinkedIn: <a href="https://www.linkedin.com/company/finopslatam" className="hover:text-blue-400 transition-colors">FinOpsLatam</a></li>
               </ul>
             </div>
