@@ -98,25 +98,28 @@ export default function Servicios() {
       {/* MENÚ DE NAVEGACIÓN INTERNA */}
       <section className="px-6 py-8 bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto">
-          <div className="flex justify-center space-x-8">
-            <a href="#auditoria" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors">
-              🔍 Auditoría
+          <div className="flex justify-center space-x-8 overflow-x-auto">
+            <a href="#assessment" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors whitespace-nowrap">
+              🔍 Cloud Assessment
             </a>
-            <a href="#dashboards" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors">
-              📊 Dashboards
+            <a href="#intelligence" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors whitespace-nowrap">
+              📊 Cloud Intelligence
             </a>
-            <a href="#gobernanza" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors">
-              🏷️ Gobernanza
+            <a href="#financial-ops" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors whitespace-nowrap">
+              💰 Cloud Financial Ops
             </a>
-            <a href="#optimizacion" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors">
-              ⚡ Optimización
+            <a href="#optimization" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors whitespace-nowrap">
+              ⚡ Cloud Optimization
+            </a>
+            <a href="#governance" className="text-gray-600 hover:text-[#1E40AF] font-medium transition-colors whitespace-nowrap">
+              🏷️ Cloud Governance
             </a>
           </div>
         </div>
       </section>
 
-      {/* SECCIÓN AUDITORÍA */}
-      <section id="auditoria" className="px-6 py-20 bg-white scroll-mt-20">
+      {/* SECCIÓN CLOUD ASSESSMENT */}
+      <section id="assessment" className="px-6 py-20 bg-white scroll-mt-20">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
             <div className="flex items-start gap-6">
@@ -127,11 +130,11 @@ export default function Servicios() {
               </div>
               <div className="flex-1">
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Auditoría Integral de Costos
+                  Cloud Assessment
                 </h2>
                 <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                  Análisis profundo de tu infraestructura cloud para identificar fugas de costos, 
-                  recursos subutilizados y oportunidades de optimización inmediata.
+                  Diagnóstico estratégico completo de tu infraestructura cloud para identificar oportunidades 
+                  de optimización inmediata y establecer tu línea base FinOps.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -140,19 +143,27 @@ export default function Servicios() {
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Análisis completo de CUR (Cost and Usage Report)
+                        Inventory completo de recursos AWS
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Identificación de Reserved Instances no utilizadas
+                        Detección de servicios no utilizados
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Recomendaciones de Spot Instances
+                        Reporte de costos por servicio/proyecto
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Resource Rightsizing específico
+                        Identificación de quick wins (20-30% ahorro)
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Dashboard básico de visibilidad
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Recomendaciones prioritarias de acción
                       </li>
                     </ul>
                   </div>
@@ -162,15 +173,19 @@ export default function Servicios() {
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        20-40% de ahorro inmediato
+                        Visibilidad 100% de tu entorno cloud
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Reporte detallado de oportunidades
+                        Roadmap claro de optimización
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Plan de implementación paso a paso
+                        Identificación de 20-40% de ahorro potencial
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Línea base para medición continua
                       </li>
                     </ul>
                   </div>
@@ -181,8 +196,8 @@ export default function Servicios() {
         </div>
       </section>
 
-      {/* SECCIÓN DASHBOARDS */}
-      <section id="dashboards" className="px-6 py-20 bg-gray-50 scroll-mt-20">
+      {/* SECCIÓN CLOUD INTELLIGENCE */}
+      <section id="intelligence" className="px-6 py-20 bg-gray-50 scroll-mt-20">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
             <div className="flex items-start gap-6">
@@ -193,50 +208,62 @@ export default function Servicios() {
               </div>
               <div className="flex-1">
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Dashboards & Reportes en Tiempo Real
+                  Cloud Intelligence
                 </h2>
                 <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                  Visualización avanzada de costos con integraciones nativas a AWS Cost Explorer, 
-                  QuickSight, Grafana y Power BI para toma de decisiones informada.
+                  Monitoreo proactivo y analytics avanzado con dashboards en tiempo real, 
+                  alertas inteligentes y forecasting para toma de decisiones informada.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Plataformas</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">¿Qué incluye?</h4>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        AWS Cost Explorer personalizado
+                        Dashboards en tiempo real personalizados
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Dashboards en Grafana
+                        Alertas de gasto anómalo y budgets
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Reportes en Power BI
+                        Budget tracking y forecasting avanzado
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Amazon QuickSight
+                        Cost allocation por tags y departamentos
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Anomaly detection automático
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Reportes automatizados ejecutivos
                       </li>
                     </ul>
                   </div>
                   
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Características</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">Plataformas & Integraciones</h4>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Alertas automáticas de costos
+                        AWS Cost Explorer avanzado
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Forecast de gastos
+                        Dashboards en Grafana & QuickSight
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Reportes por departamento
+                        Integración con Power BI & Tableau
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Slack/Teams para alertas
                       </li>
                     </ul>
                   </div>
@@ -247,58 +274,74 @@ export default function Servicios() {
         </div>
       </section>
 
-      {/* SECCIÓN GOBERNAZA */}
-      <section id="gobernanza" className="px-6 py-20 bg-white scroll-mt-20">
+      {/* SECCIÓN CLOUD FINANCIAL OPERATIONS */}
+      <section id="financial-ops" className="px-6 py-20 bg-white scroll-mt-20">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
             <div className="flex items-start gap-6">
               <div className="flex-shrink-0">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                  <span className="text-white text-2xl">🏷️</span>
+                <div className="w-16 h-16 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-xl flex items-center justify-center">
+                  <span className="text-white text-2xl">💰</span>
                 </div>
               </div>
               <div className="flex-1">
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Gobernanza & Políticas de Tagging
+                  Cloud Financial Operations
                 </h2>
                 <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                  Implementación de frameworks de etiquetado estándar y políticas de compliance 
-                  para asignación precisa de costos y control financiero.
+                  Gestión estratégica de compromisos financieros cloud con enfoque en maximizar ROI 
+                  mediante Reserved Instances, Savings Plans y estrategias de compra optimizadas.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Implementación</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">¿Qué incluye?</h4>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        AWS Tagging Policies
+                        Análisis avanzado de Reserved Instances
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Cost Allocation Tags
+                        Optimización de Savings Plans
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Automated Tag Enforcement
+                        Estrategia de compra y renovación
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        ROI analysis y garantía de ahorro
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Gestión de Spot Instances
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Ahorro garantizado: 20-60%
                       </li>
                     </ul>
                   </div>
                   
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Beneficios</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">Beneficios Financieros</h4>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        95% precisión en asignación
+                        Reducción garantizada de costos
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Cumplimiento automático
+                        Mejoramiento del ROI cloud
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Reportes por centro de costo
+                        Predictibilidad financiera
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Optimización continua de compromisos
                       </li>
                     </ul>
                   </div>
@@ -309,8 +352,8 @@ export default function Servicios() {
         </div>
       </section>
 
-      {/* SECCIÓN OPTIMIZACIÓN */}
-      <section id="optimizacion" className="px-6 py-20 bg-gray-50 scroll-mt-20">
+      {/* SECCIÓN CLOUD OPTIMIZATION */}
+      <section id="optimization" className="px-6 py-20 bg-gray-50 scroll-mt-20">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
             <div className="flex items-start gap-6">
@@ -321,46 +364,140 @@ export default function Servicios() {
               </div>
               <div className="flex-1">
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Optimización Automatizada
+                  Cloud Optimization
                 </h2>
                 <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                  Automatización de procesos FinOps mediante scripts, AWS Lambda y herramientas 
-                  especializadas para ahorro continuo sin intervención manual.
+                  Optimización técnica automatizada de recursos cloud mediante right-sizing, 
+                  auto-scaling inteligente y eficiencia operativa continua.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Automatizaciones</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">¿Qué incluye?</h4>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Auto-scaling inteligente
+                        Right-sizing automatizado de instancias
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Resource Scheduling
+                        Configuraciones de auto-scaling inteligente
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        Cost Anomaly Detection
+                        Storage tier optimization
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Container resource optimization
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Automated cost-saving actions
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Reduction garantizada: 15-40%
                       </li>
                     </ul>
                   </div>
                   
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Resultados</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">Resultados Técnicos</h4>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Ahorro continuo 24/7
+                        Mejora performance y eficiencia
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Zero intervención manual
+                        Reducción automática de waste
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Alertas proactivas
+                        Operación 24/7 optimizada
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Cero intervención manual requerida
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECCIÓN CLOUD GOVERNANCE */}
+      <section id="governance" className="px-6 py-20 bg-white scroll-mt-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+            <div className="flex items-start gap-6">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                  <span className="text-white text-2xl">🏷️</span>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Cloud Governance
+                </h2>
+                <p className="text-gray-600 mb-6 text-lg leading-relaxed">
+                  Framework completo de gobierno cloud con políticas, controles y cultura FinOps 
+                  para transformación organizacional sostenible.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-3">¿Qué incluye?</h4>
+                    <ul className="space-y-2 text-gray-600">
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Tagging strategy implementation
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Budget controls y guardrails
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Policy as Code (Terraform)
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        FinOps training team completo
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Cultura y procesos organizacionales
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Operating model completo FinOps
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-3">Transformación Organizacional</h4>
+                    <ul className="space-y-2 text-gray-600">
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Cultura de responsabilidad cloud
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Procesos estandarizados
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Team capacitado y autónomo
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Governance escalable y sostenible
                       </li>
                     </ul>
                   </div>
@@ -375,10 +512,11 @@ export default function Servicios() {
       <section className="px-6 py-16 bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">
-            ¿Necesitas Ayuda con Algún Servicio Específico?
+            ¿Listo para Transformar tu Gestión Cloud?
           </h2>
           <p className="text-gray-300 mb-8 text-lg">
-            Agenda una consultoría gratuita de 30 minutos y recibe un análisis preliminar de tus costos AWS.
+            Agenda una consultoría gratuita de 30 minutos y recibe un análisis preliminar 
+            con recomendaciones específicas para tu caso.
           </p>
           <a
             href="https://wa.me/56965090121?text=Hola,%20quiero%20una%20consultoría%20gratuita%20sobre%20servicios%20FinOps"
