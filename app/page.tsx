@@ -148,7 +148,7 @@ export default function Home() {
             </a>
             <a
               href="/servicios"
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-4 rounded-lg transition-all shadow-lg hover:shadow-xl"
+              className="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-lg transition-colors text-sm sm:text-base"
             >
               Conocer Servicios
             </a>
