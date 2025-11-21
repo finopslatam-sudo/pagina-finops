@@ -245,7 +245,6 @@ export default function Servicios() {
                       </li>
                     </ul>
                   </div>
-                  
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-3">Plataformas & Integraciones</h4>
                     <ul className="space-y-2 text-gray-600">
@@ -255,15 +254,19 @@ export default function Servicios() {
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Dashboards en Grafana & QuickSight
+                        Vistas personalizadas
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Integración con Power BI & Grafana
+                        AWS Anomaly Detection
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Alertas enviadas por email
+                        Alertas multi-nivel Email + Dashboard
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Exportación avanzada CSV, Excel, PDF
                       </li>
                     </ul>
                   </div>
