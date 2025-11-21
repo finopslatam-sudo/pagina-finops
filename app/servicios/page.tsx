@@ -259,7 +259,7 @@ export default function Servicios() {
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        Integración con Power BI & Tableau
+                        Integración con Power BI & Grafana
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
