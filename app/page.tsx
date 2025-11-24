@@ -31,41 +31,78 @@ function AnimatedCounter({ target, suffix = '', duration = 2000 }: { target: num
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      {/* NAVBAR MEJORADO CON MENÚ HAMBURGUESA */}
-      <header className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-white">
-        <a href="/">
-          <img 
-            src="/logo2.png" 
-            alt="FinOpsLatam Logo" 
-            className="h-16 md:h-20 w-auto cursor-pointer"
-          />
-        </a>
-        
-        {/* Botón Hamburguesa para móvil */}
-        <button 
-          className="md:hidden p-2"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          <div className="w-6 h-0.5 bg-gray-700 mb-1.5"></div>
-          <div className="w-6 h-0.5 bg-gray-700 mb-1.5"></div>
-          <div className="w-6 h-0.5 bg-gray-700"></div>
-        </button>
+      {/* NAVBAR MEJORADO - SOLO LOGIN CON DROPDOWN */}
+      <header className="relative bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-start">
+            {/* Logo más grande */}
+            <a href="/">
+              <img 
+                src="/logo2.png" 
+                alt="FinOpsLatam Logo" 
+                className="h-20 md:h-24 w-auto cursor-pointer"
+              />
+            </a>
+            
+            {/* Botón Login con dropdown en esquina superior derecha */}
+            <div className="relative">
+              <button 
+                onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
+                className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold px-6 py-2.5 rounded-lg transition-all shadow-sm hover:shadow-md flex items-center space-x-2"
+              >
+                <span>Login</span>
+                <svg 
+                  className={`w-4 h-4 transition-transform ${isLoginDropdownOpen ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
 
-        {/* Navegación Desktop */}
-        <nav className="hidden md:flex space-x-8">
-          <a href="/" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Inicio</a>
-          <a href="/servicios" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Servicios</a>
-          <a href="/quienes-somos" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Quiénes Somos</a>
-          <a href="/blog" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Blog</a>
-          <a href="/contacto" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Contacto</a>
-        </nav>
+              {/* Dropdown Menu */}
+              {isLoginDropdownOpen && (
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <a 
+                    href="/partner-portal" 
+                    className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition-colors rounded-t-lg"
+                    onClick={() => setIsLoginDropdownOpen(false)}
+                  >
+                    Portal de Socios
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Navegación Desktop debajo del logo y botones */}
+          <nav className="hidden md:flex justify-center items-center space-x-8 mt-4">
+            <a href="/" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Inicio</a>
+            <a href="/servicios" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Servicios</a>
+            <a href="/quienes-somos" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Quiénes Somos</a>
+            <a href="/blog" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Blog</a>
+            <a href="/contacto" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Contacto</a>
+          </nav>
+
+          {/* Botón Hamburguesa para móvil */}
+          <button 
+            className="md:hidden p-2 absolute top-4 right-20"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <div className="w-6 h-0.5 bg-gray-700 mb-1.5"></div>
+            <div className="w-6 h-0.5 bg-gray-700 mb-1.5"></div>
+            <div className="w-6 h-0.5 bg-gray-700"></div>
+          </button>
+        </div>
 
         {/* Menú Móvil */}
         {isMenuOpen && (
-          <div className="absolute top-20 left-0 right-0 bg-white border-b border-gray-200 md:hidden z-50 shadow-lg">
+          <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 md:hidden z-50 shadow-lg">
             <div className="flex flex-col space-y-0 p-4">
               <a 
                 href="/" 
@@ -98,11 +135,21 @@ export default function Home() {
               </a>
               <a 
                 href="/contacto" 
-                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 hover:bg-blue-50 rounded-lg"
+                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contacto
               </a>
+              {/* Partner Portal en menú móvil */}
+              <div className="pt-4 border-t border-gray-200">
+                <a 
+                  href="/partner-portal" 
+                  className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold py-2 px-4 rounded-lg transition-all text-center block"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Partner Portal
+                </a>
+              </div>
             </div>
           </div>
         )}

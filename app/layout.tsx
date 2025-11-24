@@ -1,4 +1,5 @@
 import './globals.css'
+import { AuthProvider } from './context/AuthContext'  // ← Ruta ajustada
 
 export const metadata = {
   title: 'FinOpsLatam - Optimización de Costos en la Nube',
@@ -12,7 +13,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>  {/* ← ENVOLVER CON AUTH PROVIDER */}
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 }
