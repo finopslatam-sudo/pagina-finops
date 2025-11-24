@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
   const { user, loading } = useAuth();
@@ -26,6 +26,10 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       const token = localStorage.getItem('finops_token');
+      if (!token) {
+        setDashboardLoading(false);
+        return;
+      }
       
       // Cargar servicios activos
       const servicesResponse = await fetch('http://api.finopslatam.com/api/protected/services', {
@@ -60,6 +64,11 @@ export default function Dashboard() {
     }
   };
 
+  // Función para navegación segura
+  const handleNavigation = (path) => {
+    router.push(path);
+  };
+
   if (loading || dashboardLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -72,7 +81,14 @@ export default function Dashboard() {
   }
 
   if (!user) {
-    return null; // Redirección manejada en useEffect
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Redirigiendo...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -163,7 +179,7 @@ export default function Dashboard() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Acciones Rápidas</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <button 
-              onClick={() => router.push('/auditoria')}
+              onClick={() => handleNavigation('/auditoria')}
               className="flex items-center justify-center p-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
               <span className="text-2xl mr-3">🔍</span>
@@ -179,7 +195,7 @@ export default function Dashboard() {
             </button>
             
             <button 
-              onClick={() => router.push('/costos')}
+              onClick={() => handleNavigation('/costos')}
               className="flex items-center justify-center p-4 border border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors"
             >
               <span className="text-2xl mr-3">📊</span>
