@@ -49,7 +49,7 @@ export default function Home() {
                 onClick={() => setIsLoginModalOpen(true)}
                 className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow-md text-sm"
               >
-                Acceder
+                Login
               </button>
             </div>
 
