@@ -77,7 +77,7 @@ export default function Home() {
                     }}
                     className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition-colors rounded-t-lg"
                   >
-                    Portal de Socio
+                    Portal de Socios
                   </button>
                 </div>
               )}
