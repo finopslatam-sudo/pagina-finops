@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import LoginModal from './components/Auth/LoginModal';
 
 // Componente de contador animado
 function AnimatedCounter({ target, suffix = '', duration = 2000 }: { target: number; suffix?: string; duration?: number }) {
@@ -32,6 +33,7 @@ function AnimatedCounter({ target, suffix = '', duration = 2000 }: { target: num
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
@@ -68,13 +70,15 @@ export default function Home() {
               {/* Dropdown Menu */}
               {isLoginDropdownOpen && (
                 <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                  <a 
-                    href="/partner-portal" 
-                    className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition-colors rounded-t-lg"
-                    onClick={() => setIsLoginDropdownOpen(false)}
+                  <button 
+                    onClick={() => {
+                      setIsLoginModalOpen(true);
+                      setIsLoginDropdownOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition-colors rounded-t-lg"
                   >
                     Portal de Socios
-                  </a>
+                  </button>
                 </div>
               )}
             </div>
@@ -142,18 +146,26 @@ export default function Home() {
               </a>
               {/* Partner Portal en menú móvil */}
               <div className="pt-4 border-t border-gray-200">
-                <a 
-                  href="/partner-portal" 
-                  className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold py-2 px-4 rounded-lg transition-all text-center block"
-                  onClick={() => setIsMenuOpen(false)}
+                <button 
+                  onClick={() => {
+                    setIsLoginModalOpen(true);
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold py-2 px-4 rounded-lg transition-all text-center"
                 >
                   Partner Portal
-                </a>
+                </button>
               </div>
             </div>
           </div>
         )}
       </header>
+
+      {/* LOGIN MODAL */}
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
 
       {/* HERO SECTION */}
       <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20">

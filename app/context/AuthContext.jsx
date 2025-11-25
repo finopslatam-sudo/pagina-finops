@@ -20,8 +20,11 @@ export function AuthProvider({ children }) {
 
   const verifyToken = async (token) => {
     try {
-      const response = await fetch('http://api.finopslatam.com/api/auth/verify', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const response = await fetch('https://api.finopslatam.com/api/auth/verify', {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (response.ok) {
@@ -40,23 +43,32 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://api.finopslatam.com/api/auth/login', {
+      const response = await fetch('https://api.finopslatam.com/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ email, password })
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
+        // Login exitoso - usar la estructura real de tu API
         localStorage.setItem('finops_token', data.access_token);
-        setUser(data.user);
+        setUser(data.client);  // Cambié data.user por data.client (como responde tu API)
         return { success: true };
       } else {
-        const error = await response.json();
-        return { success: false, error: error.message };
+        return { 
+          success: false, 
+          error: data.error || 'Error en el login' 
+        };
       }
     } catch (error) {
-      return { success: false, error: 'Error de conexión' };
+      return { 
+        success: false, 
+        error: 'Error de conexión con el servidor' 
+      };
     }
   };
 
@@ -66,7 +78,12 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );
