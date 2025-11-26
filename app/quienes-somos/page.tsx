@@ -156,7 +156,7 @@ export default function QuienesSomos() {
               </div>
               <h4 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Expertos en FinOps</h4>
               <p className="text-gray-600 text-xs sm:text-sm">
-                Certificaciones AWS, GCP y Azure. Especialistas en frameworks FinOps.
+                Certificaciones implementación práctica del Framework FinOps.
               </p>
             </div>
 
@@ -178,7 +178,7 @@ export default function QuienesSomos() {
               </div>
               <h4 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Ingenieros Cloud</h4>
               <p className="text-gray-600 text-xs sm:text-sm">
-                Arquitectos de soluciones escalables y optimizadas en la nube.
+                Profesionales de soluciones escalables y optimizadas en la nube.
               </p>
             </div>
 
@@ -218,7 +218,7 @@ export default function QuienesSomos() {
                 <div>
                   <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Expertise Comprobado</h4>
                   <p className="text-gray-600 text-sm sm:text-base">
-                    +50 proyectos exitosos en optimización de costos cloud across industrias.
+                    +10 proyectos exitosos en optimización de costos cloud across industrias.
                   </p>
                 </div>
               </div>
@@ -230,7 +230,7 @@ export default function QuienesSomos() {
                 <div>
                   <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Resultados Medibles</h4>
                   <p className="text-gray-600 text-sm sm:text-base">
-                    Promedio de 30-50% de reducción en costos cloud durante los primeros 6 meses.
+                    Promedio de 20-40% de reducción en costos cloud durante los primeros 6 meses.
                   </p>
                 </div>
               </div>
@@ -294,7 +294,7 @@ export default function QuienesSomos() {
                 <div>
                   <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Certificaciones</h4>
                   <p className="text-gray-600 text-sm sm:text-base">
-                    Equipo certificado en AWS, Azure, GCP y mejores prácticas FinOps.
+                    Equipo certificado en AWS y prácticas FinOps.
                   </p>
                 </div>
               </div>
@@ -324,15 +324,15 @@ export default function QuienesSomos() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">+50</div>
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">+10</div>
               <div className="text-blue-200 text-sm sm:text-base">Proyectos Exitosos</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">30-50%</div>
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">20-40%</div>
               <div className="text-blue-200 text-sm sm:text-base">Ahorro Promedio</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">100%</div>
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">99,9%</div>
               <div className="text-blue-200 text-sm sm:text-base">Clientes Satisfechos</div>
             </div>
             <div className="text-center">

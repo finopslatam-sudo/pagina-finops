@@ -378,10 +378,10 @@ export default function Contacto() {
 
             <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
               <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                ¿Trabajan con empresas de todos los tamaños?
+                ¿Con que tipo de empresas Trabajan?
               </h4>
               <p className="text-gray-600 text-sm sm:text-base">
-                Sí, trabajamos desde startups y pymes. Nuestras soluciones 
+                Trabajamos desde startups y pymes. Nuestras soluciones 
                 son escalables y nos adaptamos a las necesidades específicas de cada cliente. 
               </p>
             </div>

@@ -37,7 +37,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      {/* NAVBAR MEJORADO - SEPARACIÓN CLARA EN MÓVIL */}
+      {/* NAVBAR CORREGIDO - LOGO A LA IZQUIERDA EN DESKTOP */}
       <header className="relative bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           {/* Contenedor principal del navbar */}
@@ -53,13 +53,13 @@ export default function Home() {
               </button>
             </div>
 
-            {/* 🎯 LOGO - CENTRO ABSOLUTO */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
+            {/* 🎯 LOGO - CENTRO ABSOLUTO SOLO EN MÓVIL */}
+            <div className="md:hidden absolute left-1/2 transform -translate-x-1/2 z-10">
               <a href="/">
                 <img 
                   src="/logo2.png" 
                   alt="FinOpsLatam Logo" 
-                  className="h-16 md:h-24 w-auto cursor-pointer"
+                  className="h-16 w-auto cursor-pointer"
                 />
               </a>
             </div>
@@ -79,7 +79,7 @@ export default function Home() {
             {/* 💻 ESCRITORIO: LOGO + NAV + LOGIN DROPDOWN */}
             <div className="hidden md:flex md:items-center md:justify-between md:w-full">
               
-              {/* Logo para desktop */}
+              {/* Logo para desktop - A LA IZQUIERDA */}
               <a href="/" className="flex-shrink-0">
                 <img 
                   src="/logo2.png" 
@@ -88,8 +88,8 @@ export default function Home() {
                 />
               </a>
 
-              {/* Navegación Desktop */}
-              <nav className="flex items-center space-x-8 mx-8">
+              {/* Navegación Desktop - CENTRO */}
+              <nav className="flex items-center space-x-8 mx-auto">
                 <a href="/" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Inicio</a>
                 <a href="/servicios" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Servicios</a>
                 <a href="/quienes-somos" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Quiénes Somos</a>
@@ -97,7 +97,7 @@ export default function Home() {
                 <a href="/contacto" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Contacto</a>
               </nav>
 
-              {/* Login Dropdown Desktop */}
+              {/* Login Dropdown Desktop - DERECHA */}
               <div className="relative flex-shrink-0">
                 <button 
                   onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
@@ -370,7 +370,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICIOS */}
+      {/* SERVICIOS ACTUALIZADOS */}
       <section id="servicios" className="px-6 py-20 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h3 className="text-4xl font-bold mb-4 text-gray-900">Servicios FinOps</h3>
@@ -379,34 +379,64 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Cloud Assessment */}
           <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-white text-xl">📊</span>
+              <span className="text-white text-xl">🔍</span>
             </div>
-            <h4 className="text-xl font-semibold mb-4 text-gray-900">Auditoría de Costos</h4>
+            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Assessment</h4>
             <p className="text-gray-600 leading-relaxed">
-              Revisión completa de tu infraestructura para detectar fugas de costos y oportunidades de ahorro.
+              Diagnóstico estratégico completo de tu infraestructura cloud para identificar oportunidades 
+              de optimización inmediata y establecer tu línea base FinOps.
             </p>
           </div>
 
+          {/* Cloud Intelligence */}
           <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
             <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-white text-xl">📈</span>
+              <span className="text-white text-xl">📊</span>
             </div>
-            <h4 className="text-xl font-semibold mb-4 text-gray-900">Dashboards y Reportes</h4>
+            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Intelligence</h4>
             <p className="text-gray-600 leading-relaxed">
-              Integraciones con AWS, CUR, Grafana y Power BI para visibilidad en tiempo real.
+              Monitoreo proactivo y analytics avanzado con dashboards en tiempo real, alertas inteligentes 
+              y forecasting para toma de decisiones informada.
             </p>
           </div>
 
+          {/* Cloud Financial Operations */}
           <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
             <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg mb-4 flex items-center justify-center">
+              <span className="text-white text-xl">💰</span>
+            </div>
+            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Financial Operations</h4>
+            <p className="text-gray-600 leading-relaxed">
+              Gestión estratégica de compromisos financieros cloud con enfoque en maximizar ROI mediante 
+              Reserved Instances, Savings Plans y estrategias de compra optimizadas.
+            </p>
+          </div>
+
+          {/* Cloud Optimization */}
+          <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg mb-4 flex items-center justify-center">
+              <span className="text-white text-xl">⚡</span>
+            </div>
+            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Optimization</h4>
+            <p className="text-gray-600 leading-relaxed">
+              Optimización técnica automatizada de recursos cloud mediante right-sizing, auto-scaling 
+              inteligente y eficiencia operativa continua.
+            </p>
+          </div>
+
+          {/* Cloud Governance */}
+          <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg mb-4 flex items-center justify-center">
               <span className="text-white text-xl">🏷️</span>
             </div>
-            <h4 className="text-xl font-semibold mb-4 text-gray-900">Gobernanza & Tagging</h4>
+            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Governance</h4>
             <p className="text-gray-600 leading-relaxed">
-              Implementación de políticas de etiquetado y mejores prácticas para control financiero.
+              Framework completo de gobierno cloud con políticas, controles y cultura FinOps para 
+              transformación organizacional sostenible.
             </p>
           </div>
         </div>

@@ -287,7 +287,7 @@ export default function Blog() {
         </div>
       </section>
 
-      {/* Categorías del Blog */}
+      {/* Categorías del Blog 
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
@@ -331,7 +331,7 @@ export default function Blog() {
             </div>
           </div>
         </div>
-      </section>
+      </section>*/}
 
       {/* Newsletter */}
       <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
