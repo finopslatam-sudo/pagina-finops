@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar si hay token al cargar
+    // Verificar si hay token al cargar - PERO MANEJAR ERRORES CORS
     const token = localStorage.getItem('finops_token');
     if (token) {
       verifyToken(token);
@@ -21,31 +21,37 @@ export function AuthProvider({ children }) {
   const verifyToken = async (token) => {
     try {
       console.log('🔐 Verificando token...');
+      
       const response = await fetch('https://api.finopslatam.com/api/auth/verify', {
         method: 'GET',
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-        // ❌ REMOVIDO: credentials: 'include'
       });
       
       console.log('📋 Verify response status:', response.status);
-      console.log('📋 Verify response ok:', response.ok);
+      
+      // Si hay error CORS (status 0) o otro error, no bloquear la app
+      if (response.status === 0) {
+        console.warn('⚠️ Posible error CORS en verify, continuando...');
+        setLoading(false);
+        return;
+      }
       
       if (response.ok) {
         const userData = await response.json();
         console.log('✅ User data recibido:', userData);
         setUser(userData);
       } else {
-        console.log('❌ Token inválido, removiendo...');
+        console.log('❌ Token inválido o error, removiendo...');
         localStorage.removeItem('finops_token');
         setUser(null);
       }
     } catch (error) {
       console.error('💥 Error verifying token:', error);
-      localStorage.removeItem('finops_token');
-      setUser(null);
+      // No remover el token en caso de error de red/CORS
+      // Solo set loading false para que la app continúe
     } finally {
       setLoading(false);
     }
@@ -61,13 +67,20 @@ export function AuthProvider({ children }) {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        // ❌ REMOVIDO: credentials: 'include' o 'same-origin'
         body: JSON.stringify({ email, password })
       });
 
       console.log('📋 Login response status:', response.status);
       console.log('📋 Login response ok:', response.ok);
-      console.log('📋 Login response url:', response.url);
+      
+      // Verificar si hay error CORS
+      if (response.status === 0) {
+        console.error('❌ Error CORS detectado');
+        return { 
+          success: false, 
+          error: 'Error de CORS. Verifica la configuración del servidor.' 
+        };
+      }
       
       // Verificar si la respuesta es JSON válida
       const text = await response.text();
@@ -110,8 +123,14 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error('💥 Error completo en login:', error);
-      console.error('💥 Error message:', error.message);
-      console.error('💥 Error stack:', error.stack);
+      
+      // Detectar específicamente errores CORS
+      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+        return { 
+          success: false, 
+          error: 'Error de CORS: No se puede conectar con el servidor de autenticación' 
+        };
+      }
       
       return { 
         success: false, 
@@ -124,7 +143,6 @@ export function AuthProvider({ children }) {
     console.log('🚪 Cerrando sesión...');
     localStorage.removeItem('finops_token');
     setUser(null);
-    // Opcional: llamar a endpoint de logout del backend
   };
 
   return (
