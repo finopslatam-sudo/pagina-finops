@@ -20,22 +20,31 @@ export function AuthProvider({ children }) {
 
   const verifyToken = async (token) => {
     try {
+      console.log('Verificando token...');
       const response = await fetch('https://api.finopslatam.com/api/auth/verify', {
+        method: 'GET',
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include' // ← IMPORTANTE para CORS
       });
+      
+      console.log('Response status:', response.status);
       
       if (response.ok) {
         const userData = await response.json();
+        console.log('User data recibido:', userData);
         setUser(userData);
       } else {
+        console.log('Token inválido, removiendo...');
         localStorage.removeItem('finops_token');
+        setUser(null);
       }
     } catch (error) {
       console.error('Error verifying token:', error);
       localStorage.removeItem('finops_token');
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -43,28 +52,59 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
+      console.log('Iniciando login para:', email);
+      
       const response = await fetch('https://api.finopslatam.com/api/auth/login', {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
+        credentials: 'include', // ← IMPORTANTE para CORS
         body: JSON.stringify({ email, password })
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Login exitoso - usar la estructura real de tu API
-        localStorage.setItem('finops_token', data.access_token);
-        setUser(data.client);  // Cambié data.user por data.client (como responde tu API)
-        return { success: true };
-      } else {
+      console.log('Login response status:', response.status);
+      
+      // Verificar si la respuesta es JSON válida
+      const text = await response.text();
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (parseError) {
+        console.error('Error parseando JSON:', parseError, 'Texto:', text);
         return { 
           success: false, 
-          error: data.error || 'Error en el login' 
+          error: 'Error en la respuesta del servidor' 
+        };
+      }
+
+      console.log('Datos completos de login:', data);
+
+      if (response.ok) {
+        // Verificar estructura esperada
+        if (data.access_token && data.client) {
+          localStorage.setItem('finops_token', data.access_token);
+          setUser(data.client);
+          console.log('Login exitoso, usuario:', data.client);
+          return { success: true };
+        } else {
+          console.error('Estructura de datos incompleta:', data);
+          return { 
+            success: false, 
+            error: 'Datos de usuario incompletos' 
+          };
+        }
+      } else {
+        const errorMsg = data.error || data.message || 'Error en el login';
+        console.log('Error del servidor:', errorMsg);
+        return { 
+          success: false, 
+          error: errorMsg 
         };
       }
     } catch (error) {
+      console.error('Error completo en login:', error);
       return { 
         success: false, 
         error: 'Error de conexión con el servidor' 
@@ -73,8 +113,10 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    console.log('Cerrando sesión...');
     localStorage.removeItem('finops_token');
     setUser(null);
+    // Opcional: llamar a endpoint de logout del backend
   };
 
   return (

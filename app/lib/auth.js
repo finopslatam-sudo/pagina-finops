@@ -37,7 +37,7 @@ export const getToken = () => {
     if (!token) return false;
   
     try {
-      const response = await fetch('http://api.finopslatam.com/api/auth/verify', {
+      const response = await fetch('https://api.finopslatam.com/api/auth/verify', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       return response.ok;
