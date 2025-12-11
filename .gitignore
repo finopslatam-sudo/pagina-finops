@@ -1,11 +1,11 @@
 # ============================================
-# Node / Next.js .gitignore (FULL VERSION)
+# Node / Next.js .gitignore (Optimizado)
 # ============================================
 
 # Node modules
 node_modules/
 
-# Output directories
+# Output / build directories
 .next/
 out/
 dist/
@@ -80,3 +80,8 @@ Desktop.ini
 
 # JetBrains IDE
 .idea/
+
+# ❌ Extra recomendados: no subir
+.env.*.bak       # backups de variables de entorno
+coverage/        # reports de testing
+*.tmp            # archivos temporales
