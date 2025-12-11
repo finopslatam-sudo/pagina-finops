@@ -11,11 +11,12 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const { login, user } = useAuth(); // ← Agregar user aquí
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const { login } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -23,26 +24,21 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setLoading(true);
     setError('');
 
-    console.log('🔐 Iniciando login desde modal...');
-    
     const result = await login(email, password);
-    
-    console.log('📋 Resultado del login:', result);
-    
+
     if (result.success) {
-      console.log('✅ Login exitoso, cerrando modal y redirigiendo...');
       onClose();
-      
-      // Pequeño delay para asegurar que el estado se actualice
+
+      // Esperamos un pequeño delay para sincronizar estados
       setTimeout(() => {
         router.push('/dashboard');
-        router.refresh(); // ← IMPORTANTE: Forzar recarga
-      }, 100);
+        router.refresh();
+      }, 150);
+
     } else {
-      console.error('❌ Error en login:', result.error);
-      setError(result.error);
+      setError(result.error ?? "Error desconocido");
     }
-    
+
     setLoading(false);
   };
 
@@ -58,13 +54,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Partner Portal
-        </h2>
-        <p className="text-gray-600 mb-4">
-          Acceso exclusivo para socios de FinOpsLatam
-        </p>
-        
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Partner Portal</h2>
+        <p className="text-gray-600 mb-4">Acceso exclusivo para socios de FinOpsLatam</p>
+
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
             {error}
@@ -72,52 +64,38 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <input
-              type="email"
-              placeholder="Correo electrónico"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-              disabled={loading}
-            />
-          </div>
-          
-          <div>
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-              disabled={loading}
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={loading}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={loading}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? 'Accediendo...' : 'Acceder al Portal'}
+            {loading ? 'Accediendo…' : 'Acceder'}
           </button>
         </form>
 
-        {/* DESCOMENTAR PARA DEBUG - Credenciales de prueba */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm font-medium text-gray-700 mb-2">Credenciales de prueba:</p>
-          <div className="text-xs text-gray-600 space-y-1">
-            <p><strong>Partner:</strong> partner@finopslatam.com / partner123</p>
-            <p><strong>Cliente:</strong> cliente@techcorp.com / cliente123</p>
-          </div>
-        </div>
-
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-500">
-            ¿Problemas para acceder? Contacta al equipo de FinOpsLatam
-          </p>
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg text-xs text-gray-600">
+          <p><strong>Partner:</strong> partner@finopslatam.com / partner123</p>
+          <p><strong>Cliente:</strong> cliente@techcorp.com / cliente123</p>
         </div>
       </div>
     </Modal>
