@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import config from '@/app/lib/config';
 
 export interface User {
   id?: number;
@@ -24,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = config.API_BASE_URL;
 
   // 🔐 Cargar sesión persistida
   useEffect(() => {
@@ -38,19 +39,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      // 🛑 Protección crítica
       if (!API_URL) {
-        console.error('❌ NEXT_PUBLIC_API_URL no está definida');
+        console.error('❌ API_BASE_URL no definida');
         return {
           success: false,
-          error: 'Configuración incorrecta del frontend (API_URL)',
+          error: 'Configuración incorrecta del frontend',
         };
       }
 
       const loginUrl = `${API_URL}/api/auth/login`;
 
-      // 🔍 Log SOLO para debugging (puedes quitarlo luego)
-      console.log('➡️ Intentando login contra:', loginUrl);
+      // 🔍 Este log es CLAVE para validar el bundle
+      console.log('➡️ Login contra:', loginUrl);
 
       const res = await fetch(loginUrl, {
         method: 'POST',
@@ -69,7 +69,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await res.json();
 
-      // 🔐 Persistencia
       localStorage.setItem('finops_token', data.access_token);
       localStorage.setItem('finops_client', JSON.stringify(data.client));
 
