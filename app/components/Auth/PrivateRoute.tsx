@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ReactNode, useEffect } from "react";
-import { useAuth } from "@/app/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -11,16 +11,19 @@ interface PrivateRouteProps {
 export default function PrivateRoute({ children }: PrivateRouteProps) {
   const { user } = useAuth();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user === null) {
-      // Redirige al login si no hay usuario
-      router.push("/");
+    if (typeof window !== 'undefined') {
+      if (!user) {
+        router.push('/');
+      } else {
+        setLoading(false);
+      }
     }
   }, [user, router]);
 
-  // Mientras se carga el usuario, mostramos loader
-  if (!user) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-gray-600">Cargando...</p>

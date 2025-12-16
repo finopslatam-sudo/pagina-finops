@@ -1,29 +1,23 @@
-// Detecta ambiente automáticamente
-const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+import config from "./config";
 
-// API_URL dinámica
-export const API_URL = isLocal
-  ? "http://localhost:5001"                         // Backend local
-  : process.env.NEXT_PUBLIC_API_URL || "";          // Backend en producción
-
-// Wrapper para fetch
 export async function apiFetch(endpoint, options = {}) {
-  const url = `${API_URL}${endpoint}`;
+  const token = localStorage.getItem("token");
 
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options
+  const headers = {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+    ...options.headers,
   };
 
-  const res = await fetch(url, config);
+  const res = await fetch(`${config.API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
 
   if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`Error API ${res.status}: ${errorText}`);
+    const error = await res.json();
+    throw error;
   }
 
-  return await res.json();
+  return res.json();
 }

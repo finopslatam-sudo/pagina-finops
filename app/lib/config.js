@@ -1,2 +1,5 @@
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+const config = {
+  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || "https://api.finopslatam.com"
+};
+
+export default config;
