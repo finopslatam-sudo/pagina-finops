@@ -1,31 +1,36 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-interface Client {
-  id: number;
-  email: string;
-  name: string;
-  company_name?: string;  // ← AGREGADO
-  // agrega más campos si tu backend los devuelve
+export interface User {
+  id?: number;
+  email?: string;
+  company_name?: string;
+  contact_name?: string;
+  role?: string;
 }
 
 interface AuthContextType {
-  user: Client | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  user: User | null;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<Client | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  // Mantener sesión si ya había login previo
+  // 🔐 Cargar sesión persistida
   useEffect(() => {
-    const savedClient = localStorage.getItem("finops_client");
+    if (typeof window === 'undefined') return;
+
+    const savedClient = localStorage.getItem('finops_client');
     if (savedClient) {
       setUser(JSON.parse(savedClient));
     }
@@ -33,36 +38,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      // 🛑 Protección crítica
+      if (!API_URL) {
+        console.error('❌ NEXT_PUBLIC_API_URL no está definida');
+        return {
+          success: false,
+          error: 'Configuración incorrecta del frontend (API_URL)',
+        };
+      }
+
+      const loginUrl = `${API_URL}/api/auth/login`;
+
+      // 🔍 Log SOLO para debugging (puedes quitarlo luego)
+      console.log('➡️ Intentando login contra:', loginUrl);
+
+      const res = await fetch(loginUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ email, password }),
       });
 
-      if (response.status === 401)
-        return { success: false, error: "Credenciales inválidas" };
+      if (!res.ok) {
+        return {
+          success: false,
+          error: 'Credenciales inválidas',
+        };
+      }
 
-      if (!response.ok)
-        return { success: false, error: "Servidor " + response.status };
+      const data = await res.json();
 
-      const data = await response.json();
-
-      // Guardamos token + usuario completo
-      localStorage.setItem("finops_token", data.access_token);
-      localStorage.setItem("finops_client", JSON.stringify(data.client));
+      // 🔐 Persistencia
+      localStorage.setItem('finops_token', data.access_token);
+      localStorage.setItem('finops_client', JSON.stringify(data.client));
 
       setUser(data.client);
 
       return { success: true };
-    } catch {
-      return { success: false, error: "Error de conexión" };
+    } catch (error) {
+      console.error('❌ Error en login:', error);
+      return {
+        success: false,
+        error: 'Error de conexión con el servidor',
+      };
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("finops_token");
-    localStorage.removeItem("finops_client");
+    localStorage.removeItem('finops_token');
+    localStorage.removeItem('finops_client');
     setUser(null);
   };
 
@@ -73,12 +98,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth debe usarse dentro de AuthProvider");
+export function useAuth(): AuthContextType {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error('useAuth debe usarse dentro de AuthProvider');
   }
-
-  return context;
-};
+  return ctx;
+}
