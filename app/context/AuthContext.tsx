@@ -3,6 +3,9 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import config from '@/app/lib/config';
 
+/* =======================
+   Tipos
+======================= */
 export interface User {
   id?: number;
   email?: string;
@@ -20,23 +23,44 @@ interface AuthContextType {
   logout: () => void;
 }
 
+/* =======================
+   Contexto
+======================= */
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/* =======================
+   Provider
+======================= */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
+  /**
+   * 🔐 API URL CENTRALIZADA
+   * Esta constante queda HARDCODEADA en el bundle
+   * (gracias a config.js con fallback)
+   */
   const API_URL = config.API_BASE_URL;
 
-  // 🔐 Cargar sesión persistida
+  /* =======================
+     Cargar sesión persistida
+  ======================= */
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const savedClient = localStorage.getItem('finops_client');
-    if (savedClient) {
-      setUser(JSON.parse(savedClient));
+    try {
+      const savedClient = localStorage.getItem('finops_client');
+      if (savedClient) {
+        setUser(JSON.parse(savedClient));
+      }
+    } catch (err) {
+      console.error('❌ Error leyendo sesión guardada:', err);
+      localStorage.removeItem('finops_client');
     }
   }, []);
 
+  /* =======================
+     Login
+  ======================= */
   const login = async (email: string, password: string) => {
     try {
       if (!API_URL) {
@@ -49,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const loginUrl = `${API_URL}/api/auth/login`;
 
-      // 🔍 Este log es CLAVE para validar el bundle
+      // 🔍 LOG CLAVE (debe verse en producción)
       console.log('➡️ Login contra:', loginUrl);
 
       const res = await fetch(loginUrl, {
@@ -69,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await res.json();
 
+      // 🔐 Persistencia
       localStorage.setItem('finops_token', data.access_token);
       localStorage.setItem('finops_client', JSON.stringify(data.client));
 
@@ -84,6 +109,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  /* =======================
+     Logout
+  ======================= */
   const logout = () => {
     localStorage.removeItem('finops_token');
     localStorage.removeItem('finops_client');
@@ -97,6 +125,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/* =======================
+   Hook
+======================= */
 export function useAuth(): AuthContextType {
   const ctx = useContext(AuthContext);
   if (!ctx) {
