@@ -75,10 +75,10 @@ export default function PublicNavbar() {
                   {isLoginDropdownOpen && (
                     <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg min-w-[200px]">
                       <a
-                        href="/dashboard"
+                        href="/perfil"
                         className="block px-4 py-3 hover:bg-blue-50 border-b"
                       >
-                        Ir al Dashboard
+                        Editar mi perfil
                       </a>
                       <button
                         onClick={logout}
