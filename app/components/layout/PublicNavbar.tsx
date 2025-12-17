@@ -5,7 +5,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import LoginModal from '@/app/components/Auth/LoginModal';
 
 export default function PublicNavbar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
@@ -94,7 +94,7 @@ export default function PublicNavbar() {
                 <div className="relative">
                   <button
                     onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
-                    className="border-2 border-green-600 text-green-600 px-6 py-2.5 rounded-lg font-semibold"
+                    className="border-2 border-blue-500 text-blue-500 px-6 py-2.5 rounded-lg font-semibold"
                   >
                     Mi cuenta
                   </button>
@@ -103,16 +103,10 @@ export default function PublicNavbar() {
                     <div className="absolute right-0 -mt-1 bg-white border rounded-lg shadow-lg z-50">
                       <a
                         href="/dashboard"
-                        className="block px-4 py-3 border-b border-gray-200 hover:bg-blue-50"
+                        className="block px-4 py-3 hover:bg-blue-50"
                       >
                         Ir al Dashboard
                       </a>
-                      <button
-                        onClick={logout}
-                        className="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600"
-                      >
-                        Cerrar sesión
-                      </button>
                     </div>
                   )}
                 </div>
