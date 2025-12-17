@@ -1,87 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-
-export default function Contacto() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+export default function QuienesSomos() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      {/* NAVBAR*/}
-      <header className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-white">
-        <a href="/" className="flex items-center">
-          <img 
-            src="/logo2.png" 
-            alt="FinOpsLatam Logo" 
-            className="h-16 md:h-20 w-auto hover:opacity-80 transition-opacity"
-          />
-        </a>
-        
-        {/* Botón Hamburguesa para móvil*/}
-        <button 
-          className="md:hidden p-2"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          <div className="w-6 h-0.5 bg-gray-700 mb-1.5"></div>
-          <div className="w-6 h-0.5 bg-gray-700 mb-1.5"></div>
-          <div className="w-6 h-0.5 bg-gray-700"></div>
-        </button>
 
-        {/* Navegación Desktop */}
-        <nav className="hidden md:flex space-x-8">
-          <a href="/" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Inicio</a>
-          <a href="/servicios" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Servicios</a>
-          <a href="/quienes-somos" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Quiénes Somos</a>
-          <a href="/blog" className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors">Blog</a>
-          <a href="/contacto" className="text-[#1E40AF] font-medium">Contacto</a>
-        </nav>
-
-        {/* Menú Móvil*/}
-        {isMenuOpen && (
-          <div className="absolute top-20 left-0 right-0 bg-white border-b border-gray-200 md:hidden z-50 shadow-lg">
-            <div className="flex flex-col space-y-0 p-4">
-              <a 
-                href="/" 
-                className="flex items-center text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span className="text-xl mr-3">🏠</span>
-                Inicio
-              </a>
-              <a 
-                href="/servicios" 
-                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Servicios
-              </a>
-              <a 
-                href="/quienes-somos" 
-                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Quiénes Somos
-              </a>
-              <a 
-                href="/blog" 
-                className="text-gray-700 hover:text-[#1E40AF] font-medium transition-colors py-3 px-4 border-b border-gray-100 hover:bg-blue-50 rounded-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Blog
-              </a>
-              <a 
-                href="/contacto" 
-                className="text-[#1E40AF] font-medium transition-colors py-3 px-4 hover:bg-blue-50 rounded-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contacto
-              </a>
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Hero Section*/}
+      {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-16 sm:py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 text-center">
