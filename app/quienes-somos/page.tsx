@@ -342,7 +342,7 @@ export default function QuienesSomos() {
               <ul className="space-y-1 sm:space-y-2">
                 <li><a href="/" className="hover:text-blue-400 transition-colors text-sm">Inicio</a></li>
                 <li><a href="/servicios" className="hover:text-blue-400 transition-colors text-sm">Servicios</a></li>
-                <li><a href="/quienes-somos" className="hover:text-blue-400 transition-colors text-sm">Quiénes somos</a></li>
+                <li><a href="/quienes somos" className="hover:text-blue-400 transition-colors text-sm">Quiénes somos</a></li>
                 <li><a href="/blog" className="hover:text-blue-400 transition-colors text-sm">Blog</a></li>
                 <li><a href="/contacto" className="hover:text-blue-400 transition-colors text-sm">Contacto</a></li>
               </ul>
