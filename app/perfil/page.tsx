@@ -4,7 +4,15 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useState } from 'react';
 
 export default function PerfilPage() {
-  const { user, token } = useAuth();
+    const { user, token } = useAuth();
+
+    if (!user || !token) {
+      return (
+        <main className="min-h-screen flex items-center justify-center">
+          <p className="text-gray-600">Debes iniciar sesión</p>
+        </main>
+      );
+    }
 
   // ✅ PROTECCIÓN CORRECTA
   if (!user) {
