@@ -1,21 +1,12 @@
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function PerfilPage() {
-    const { user, token } = useAuth();
+  const { user, token } = useAuth();
 
-    if (!user || !token) {
-      return (
-        <main className="min-h-screen flex items-center justify-center">
-          <p className="text-gray-600">Debes iniciar sesión</p>
-        </main>
-      );
-    }
-
-  // ✅ PROTECCIÓN CORRECTA
-  if (!user) {
+  if (!user || !token) {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <p className="text-gray-600">Debes iniciar sesión</p>
@@ -24,13 +15,21 @@ export default function PerfilPage() {
   }
 
   const [form, setForm] = useState({
-    name: user.name,
-    email: user.email,
-    companyUrl: user.companyUrl || '',
+    name: '',
+    email: '',
+    companyUrl: '',
     password: '',
     confirmPassword: '',
   });
 
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      name: user.name,
+      email: user.email,
+      companyUrl: user.companyUrl || '',
+    }));
+  }, [user]);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
