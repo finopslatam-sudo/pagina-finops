@@ -1,5 +1,6 @@
 import './globals.css';
 import PublicNavbar from './components/layout/PublicNavbar';
+import { AuthProvider } from './context/AuthContext';
 
 export const metadata = {
   title: 'FinOpsLatam',
@@ -14,11 +15,14 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="min-h-screen bg-white">
-        {/* NAVBAR GLOBAL CON LOGIN */}
-        <PublicNavbar />
+        {/* PROVIDER GLOBAL DE AUTENTICACIÓN */}
+        <AuthProvider>
+          {/* NAVBAR GLOBAL */}
+          <PublicNavbar />
 
-        {/* CONTENIDO DE LAS PÁGINAS */}
-        {children}
+          {/* CONTENIDO DE LAS PÁGINAS */}
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
