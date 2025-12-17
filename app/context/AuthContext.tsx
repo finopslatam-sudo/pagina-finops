@@ -2,10 +2,11 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-interface User {
+export interface User {
   id: number;
+  name: string;
   email: string;
-  company_name: string;
+  companyUrl?: string;
 }
 
 interface AuthContextType {
@@ -22,7 +23,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔑 Cargar sesión SOLO UNA VEZ
   useEffect(() => {
     const storedToken = localStorage.getItem("finops_token");
     const storedUser = localStorage.getItem("finops_user");
@@ -46,12 +46,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem("finops_token");
     localStorage.removeItem("finops_user");
-
     setToken(null);
     setUser(null);
   };
 
-  if (loading) return null; // ⛔ evita parpadeo / logout falso
+  if (loading) return null;
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
