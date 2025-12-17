@@ -5,7 +5,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import LoginModal from '@/app/components/Auth/LoginModal';
 
 export default function PublicNavbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
@@ -32,11 +32,7 @@ export default function PublicNavbar() {
             {/* LOGO MOBILE */}
             <div className="md:hidden absolute left-1/2 transform -translate-x-1/2 z-10">
               <a href="/">
-                <img
-                  src="/logo2.png"
-                  alt="FinOpsLatam Logo"
-                  className="h-16 w-auto"
-                />
+                <img src="/logo2.png" alt="FinOpsLatam Logo" className="h-16 w-auto" />
               </a>
             </div>
 
@@ -83,7 +79,7 @@ export default function PublicNavbar() {
                           setIsLoginModalOpen(true);
                           setIsLoginDropdownOpen(false);
                         }}
-                        className="px-4 py-3 w-full text-left whitespace-nowrap border-b border-gray-200 hover:bg-blue-50"
+                        className="px-4 py-3 w-full text-left border-b border-gray-200 hover:bg-blue-50"
                       >
                         Portal de Socios
                       </button>
@@ -103,10 +99,19 @@ export default function PublicNavbar() {
                     <div className="absolute right-0 -mt-1 bg-white border rounded-lg shadow-lg z-50">
                       <a
                         href="/dashboard"
-                        className="block px-4 py-3 hover:bg-blue-50"
+                        className="block px-4 py-3 border-b border-gray-200 hover:bg-blue-50"
                       >
                         Ir al Dashboard
                       </a>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsLoginDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50"
+                      >
+                        Cerrar sesión
+                      </button>
                     </div>
                   )}
                 </div>
@@ -118,11 +123,7 @@ export default function PublicNavbar() {
           {isMenuOpen && (
             <div className="md:hidden mt-4 bg-white border rounded-lg shadow">
               {['/', '/servicios', '/quienes-somos', '/blog', '/contacto'].map((path, i) => (
-                <a
-                  key={i}
-                  href={path}
-                  className="block px-4 py-3 hover:bg-blue-50"
-                >
+                <a key={i} href={path} className="block px-4 py-3 hover:bg-blue-50">
                   {path === '/' ? 'Inicio' : path.replace('/', '')}
                 </a>
               ))}
