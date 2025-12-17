@@ -66,13 +66,15 @@ export default function PublicNavbar() {
                 </button>
 
                 {isLoginDropdownOpen && (
-                  <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg">
+                  <div className="absolute right-0 -mt-1 bg-white border rounded-lg shadow-lg">
                     <button
                       onClick={() => {
                         setIsLoginModalOpen(true);
                         setIsLoginDropdownOpen(false);
                       }}
-                      className="px-4 py-3 hover:bg-blue-50 w-full text-left"
+                      className="px-4 py-3 w-full text-left whitespace-nowrap
+             border-b border-gray-200
+             hover:bg-blue-50"
                     >
                       Portal de Socios
                     </button>

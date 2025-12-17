@@ -96,7 +96,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
           >
-            {loading ? "Ingresando..." : "Acceder al Portal"}
+            {loading ? "Ingresando..." : "Acceder al Portal de Socios"}
           </button>
         </form>
       </div>
