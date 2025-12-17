@@ -114,13 +114,7 @@ export default function Dashboard() {
                 : safeUser.company_name || safeUser.email
             }
             </span>
-            <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm hover:shadow-md"
-            >
-              Cerrar Sesión
-            </button>
+
           </div>
         </header>
 
