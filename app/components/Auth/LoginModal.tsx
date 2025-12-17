@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
+import { useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -11,23 +11,43 @@ interface LoginModalProps {
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { login } = useAuth();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    const result = await login(email, password);
+    try {
+      const res = await fetch("https://api.finopslatam.com/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
+      });
 
-    if (!result.success) {
-      setError(result.error || 'Credenciales incorrectas');
-    } else {
-      setError('');
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Credenciales incorrectas");
+      }
+
+      login(data); // ✅ guarda token + user
       onClose();
-      window.location.href = '/dashboard';
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      setError(err.message || "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,9 +93,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
           >
-            Acceder al Portal
+            {loading ? "Ingresando..." : "Acceder al Portal"}
           </button>
         </form>
       </div>

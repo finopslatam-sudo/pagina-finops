@@ -1,137 +1,67 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import config from '@/app/lib/config';
+import { createContext, useContext, useEffect, useState } from "react";
 
-/* =======================
-   Tipos
-======================= */
-export interface User {
-  id?: number;
-  email?: string;
-  company_name?: string;
-  contact_name?: string;
-  role?: string;
+interface User {
+  id: number;
+  email: string;
+  company_name: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (
-    email: string,
-    password: string
-  ) => Promise<{ success: boolean; error?: string }>;
+  token: string | null;
+  login: (data: any) => void;
   logout: () => void;
 }
 
-/* =======================
-   Contexto
-======================= */
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-/* =======================
-   Provider
-======================= */
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  /**
-   * 🔐 API URL CENTRALIZADA
-   * Esta constante queda HARDCODEADA en el bundle
-   * (gracias a config.js con fallback)
-   */
-  const API_URL = config.API_BASE_URL;
-
-  /* =======================
-     Cargar sesión persistida
-  ======================= */
+  // 🔑 Cargar sesión SOLO UNA VEZ
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    const storedToken = localStorage.getItem("finops_token");
+    const storedUser = localStorage.getItem("finops_user");
 
-    try {
-      const savedClient = localStorage.getItem('finops_client');
-      if (savedClient) {
-        setUser(JSON.parse(savedClient));
-      }
-    } catch (err) {
-      console.error('❌ Error leyendo sesión guardada:', err);
-      localStorage.removeItem('finops_client');
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
     }
+
+    setLoading(false);
   }, []);
 
-  /* =======================
-     Login
-  ======================= */
-  const login = async (email: string, password: string) => {
-    try {
-      if (!API_URL) {
-        console.error('❌ API_BASE_URL no definida');
-        return {
-          success: false,
-          error: 'Configuración incorrecta del frontend',
-        };
-      }
+  const login = (data: any) => {
+    localStorage.setItem("finops_token", data.access_token);
+    localStorage.setItem("finops_user", JSON.stringify(data.client));
 
-      const loginUrl = `${API_URL}/api/auth/login`;
-
-      // 🔍 LOG CLAVE (debe verse en producción)
-      console.log('➡️ Login contra:', loginUrl);
-
-      const res = await fetch(loginUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        return {
-          success: false,
-          error: 'Credenciales inválidas',
-        };
-      }
-
-      const data = await res.json();
-
-      // 🔐 Persistencia
-      localStorage.setItem('finops_token', data.access_token);
-      localStorage.setItem('finops_client', JSON.stringify(data.client));
-
-      setUser(data.client);
-
-      return { success: true };
-    } catch (error) {
-      console.error('❌ Error en login:', error);
-      return {
-        success: false,
-        error: 'Error de conexión con el servidor',
-      };
-    }
+    setToken(data.access_token);
+    setUser(data.client);
   };
 
-  /* =======================
-     Logout
-  ======================= */
   const logout = () => {
-    localStorage.removeItem('finops_token');
-    localStorage.removeItem('finops_client');
+    localStorage.removeItem("finops_token");
+    localStorage.removeItem("finops_user");
+
+    setToken(null);
     setUser(null);
   };
 
+  if (loading) return null; // ⛔ evita parpadeo / logout falso
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-/* =======================
-   Hook
-======================= */
-export function useAuth(): AuthContextType {
+export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error('useAuth debe usarse dentro de AuthProvider');
-  }
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
-}
+};
