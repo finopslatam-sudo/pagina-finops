@@ -108,7 +108,11 @@ export default function Dashboard() {
         <header className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <span className="text-gray-700 font-medium text-lg">
-              Estás en tu sesión: {safeUser.contact_name || safeUser.company_name || safeUser.email}
+            Estás en tu sesión: {
+              safeUser.contact_name
+                ? safeUser.contact_name.replace(/\s*Name\s*$/i, "")
+                : safeUser.company_name || safeUser.email
+            }
             </span>
             <button
               onClick={handleLogout}
