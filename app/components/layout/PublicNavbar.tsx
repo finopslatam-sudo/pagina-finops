@@ -79,7 +79,8 @@ export default function PublicNavbar() {
                           setIsLoginModalOpen(true);
                           setIsLoginDropdownOpen(false);
                         }}
-                        className="px-4 py-3 w-full text-left border-b border-gray-200 hover:bg-blue-50"
+                        className="px-4 py-3 w-full text-left whitespace-nowrap min-w-[180px]
+             border-b border-gray-200 hover:bg-blue-50"
                       >
                         Portal de Socios
                       </button>
