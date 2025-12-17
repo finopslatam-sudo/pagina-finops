@@ -211,53 +211,6 @@ export default function Blog() {
           </div>
         </div>
       </section>
-
-      {/* Categorías del Blog 
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Explora por Categorías</h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-              Encuentra contenido específico según tus intereses y necesidades
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-            <div className="text-center p-4 sm:p-6 bg-blue-50 rounded-lg sm:rounded-xl border border-blue-100 hover:border-blue-300 transition-colors cursor-pointer">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-lg flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                <span className="text-white text-lg sm:text-xl">📊</span>
-              </div>
-              <h4 className="font-semibold text-gray-900 text-sm sm:text-base">FinOps</h4>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">12 artículos</p>
-            </div>
-
-            <div className="text-center p-4 sm:p-6 bg-green-50 rounded-lg sm:rounded-xl border border-green-100 hover:border-green-300 transition-colors cursor-pointer">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                <span className="text-white text-lg sm:text-xl">🔧</span>
-              </div>
-              <h4 className="font-semibold text-gray-900 text-sm sm:text-base">Optimización</h4>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">8 artículos</p>
-            </div>
-
-            <div className="text-center p-4 sm:p-6 bg-purple-50 rounded-lg sm:rounded-xl border border-purple-100 hover:border-purple-300 transition-colors cursor-pointer">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                <span className="text-white text-lg sm:text-xl">🏷️</span>
-              </div>
-              <h4 className="font-semibold text-gray-900 text-sm sm:text-base">Tagging</h4>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">6 artículos</p>
-            </div>
-
-            <div className="text-center p-4 sm:p-6 bg-orange-50 rounded-lg sm:rounded-xl border border-orange-100 hover:border-orange-300 transition-colors cursor-pointer">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 rounded-lg flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                <span className="text-white text-lg sm:text-xl">📈</span>
-              </div>
-              <h4 className="font-semibold text-gray-900 text-sm sm:text-base">Dashboards</h4>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">5 artículos</p>
-            </div>
-          </div>
-        </div>
-      </section>*/}
-
       {/* Newsletter */}
       <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
