@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import PrivateRoute from '@/app/components/Auth/PrivateRoute';
+import { hasFeature } from "@/app/lib/hasFeature";
+
 
 // Tipo seguro para el usuario
 interface User {
@@ -12,7 +14,7 @@ interface User {
 }
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, features, plan } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = () => {

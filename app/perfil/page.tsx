@@ -4,7 +4,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useEffect, useState } from 'react';
 
 export default function PerfilPage() {
-  const { user, token } = useAuth();
+  const { user, token, updateUser } = useAuth();
 
   if (!user || !token) {
     return (
@@ -15,20 +15,21 @@ export default function PerfilPage() {
   }
 
   const [form, setForm] = useState({
-    name: '',
+    contact_name: '',
     email: '',
-    companyUrl: '',
+    phone: '',
     password: '',
     confirmPassword: '',
   });
 
   useEffect(() => {
-    setForm((prev) => ({
-      ...prev,
-      name: user.name,
+    setForm({
+      contact_name: user.contact_name || '',
       email: user.email,
-      companyUrl: user.companyUrl || '',
-    }));
+      phone: user.phone || '',
+      password: '',
+      confirmPassword: '',
+    });
   }, [user]);
 
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,8 @@ export default function PerfilPage() {
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,21 +54,31 @@ export default function PerfilPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://api.finopslatam.com/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          companyUrl: form.companyUrl,
-          password: form.password || undefined,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            contact_name: form.contact_name,
+            email: form.email,
+            phone: form.phone,
+            password: form.password || undefined,
+          }),
+        }
+      );
 
-      if (!res.ok) throw new Error('Error al guardar cambios');
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al guardar cambios');
+      }
+
+      // 🔥 sincroniza sesión (PASO 2)
+      updateUser(data.user);
 
       setSuccess('Perfil actualizado correctamente');
     } catch (err: any) {
@@ -79,7 +91,9 @@ export default function PerfilPage() {
   return (
     <main className="min-h-screen bg-gray-50 flex justify-center py-12 px-4">
       <div className="bg-white w-full max-w-xl rounded-xl shadow p-6">
-        <h1 className="text-2xl font-semibold mb-6">Editar mi perfil</h1>
+        <h1 className="text-2xl font-semibold mb-6">
+          Editar mi perfil
+        </h1>
 
         {error && (
           <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
@@ -95,9 +109,9 @@ export default function PerfilPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            name="name"
-            placeholder="Nombre"
-            value={form.name}
+            name="contact_name"
+            placeholder="Nombre de contacto"
+            value={form.contact_name}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg"
             required
@@ -114,9 +128,15 @@ export default function PerfilPage() {
           />
 
           <input
-            name="companyUrl"
-            placeholder="URL empresa (https://...)"
-            value={form.companyUrl}
+            value={user.company_name}
+            disabled
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+          />
+
+          <input
+            name="phone"
+            placeholder="Teléfono"
+            value={form.phone}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg"
           />

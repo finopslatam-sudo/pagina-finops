@@ -22,35 +22,16 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     e.preventDefault();
     setError("");
     setLoading(true);
-
+  
     try {
-      const res = await fetch("https://api.finopslatam.com/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Credenciales incorrectas");
-      }
-
-      login(data); // ✅ guarda token + user
-      onClose();
-      window.location.href = "/dashboard";
+      await login(email, password); // 👈 AQUÍ VA
+      onClose(); // opcional: cerrar modal al loguear
     } catch (err: any) {
-      setError(err.message || "Error al iniciar sesión");
+      setError("Credenciales inválidas");
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
