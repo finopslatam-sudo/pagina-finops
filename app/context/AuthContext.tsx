@@ -30,6 +30,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [features, setFeatures] = useState<string[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  // 🔄 REHIDRATAR SESIÓN AL RECARGAR / ABRIR NAVEGADOR
+  useEffect(() => {
+    const savedToken = localStorage.getItem("finops_token");
+    const savedUser = localStorage.getItem("finops_user");
+
+    if (!savedToken || !savedUser) return;
+
+    setToken(savedToken);
+    setUser(JSON.parse(savedUser));
+
+    // 🔹 cargar plan
+    fetch(`${API_URL}/api/me/plan`, {
+      headers: { Authorization: `Bearer ${savedToken}` },
+    })
+      .then(res => res.json())
+      .then(data => setPlan(data.plan))
+      .catch(() => logout());
+
+    // 🔹 cargar features
+    fetch(`${API_URL}/api/me/features`, {
+      headers: { Authorization: `Bearer ${savedToken}` },
+    })
+      .then(res => res.json())
+      .then(data => setFeatures(data.features))
+      .catch(() => logout());
+  }, []);
+
 
   // 🔐 LOGIN CORRECTO (firma clara)
   const login = async (email: string, password: string) => {
