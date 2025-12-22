@@ -2,7 +2,6 @@
 
 import { useAuth } from '@/app/context/AuthContext';
 import { useEffect, useState } from 'react';
-const [checkingAuth, setCheckingAuth] = useState(true);
 
 
 export default function PerfilPage() {
