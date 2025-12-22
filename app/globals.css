@@ -8,15 +8,12 @@ body {
   padding: 0;
 }
 
-/* Botón custom (ok dejarlo) */
+/* Botón custom (ok) */
 .btn-custom {
   @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
 }
 
-/* ===============================
-   TOAST / NOTIFICACIONES
-================================ */
-
+/* Toast logout */
 @keyframes fadeInOut {
   0% {
     opacity: 0;

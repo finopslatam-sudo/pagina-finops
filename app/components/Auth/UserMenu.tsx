@@ -24,7 +24,7 @@ export default function UserMenu() {
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  // 🔔 Cerrar menú al hacer click fuera
+  // Cerrar menú al hacer click fuera
   useEffect(() => {
     const close = () => setOpen(false);
     window.addEventListener("click", close);
@@ -36,8 +36,11 @@ export default function UserMenu() {
   const handleLogout = () => {
     setOpen(false);
     logout();
+
+    // mostrar toast
     setShowToast(true);
 
+    // ocultar y redirigir
     setTimeout(() => {
       setShowToast(false);
       router.push("/");
@@ -62,7 +65,7 @@ export default function UserMenu() {
         {open && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="absolute right-0 mt-2 w-56 bg-white border rounded-lg shadow-lg overflow-hidden"
+            className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden"
           >
             <Link
               href="/dashboard"
@@ -90,7 +93,7 @@ export default function UserMenu() {
         )}
       </div>
 
-      {/* 🔔 TOAST */}
+      {/* TOAST */}
       {showToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-fade-in-out">
           <div className="bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg">
