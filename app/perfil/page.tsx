@@ -3,13 +3,12 @@
 import { useAuth } from '@/app/context/AuthContext';
 import { useEffect, useState } from 'react';
 
-
 export default function PerfilPage() {
   const { user, token, updateUser } = useAuth();
 
   if (!user || !token) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="min-h-screen flex items-center justify-center bg-white">
         <p className="text-gray-600">Debes iniciar sesión</p>
       </main>
     );
@@ -27,7 +26,7 @@ export default function PerfilPage() {
     setForm({
       contact_name: user.contact_name || '',
       email: user.email,
-      phone: user.phone || '',
+      phone: '', // 👈 limpio por diseño
       password: '',
       confirmPassword: '',
     });
@@ -66,7 +65,7 @@ export default function PerfilPage() {
           body: JSON.stringify({
             contact_name: form.contact_name,
             email: form.email,
-            phone: form.phone,
+            phone: form.phone || undefined,
             password: form.password || undefined,
           }),
         }
@@ -78,9 +77,7 @@ export default function PerfilPage() {
         throw new Error(data.error || 'Error al guardar cambios');
       }
 
-      // 🔥 sincroniza sesión (PASO 2)
       updateUser(data.user);
-
       setSuccess('Perfil actualizado correctamente');
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
@@ -90,87 +87,105 @@ export default function PerfilPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex justify-center py-12 px-4">
-      <div className="bg-white w-full max-w-xl rounded-xl shadow p-6">
-        <h1 className="text-2xl font-semibold mb-6">
-          Editar mi perfil
-        </h1>
+    <main className="min-h-screen bg-white">
 
-        {error && (
-          <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
-            {error}
-          </div>
-        )}
+      {/* HERO AZUL */}
+      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-16 mb-12">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-3">
+            Mi Perfil
+          </h1>
+          <p className="text-blue-100 text-lg">
+            Gestiona tu información personal y credenciales
+          </p>
+        </div>
+      </section>
 
-        {success && (
-          <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">
-            {success}
-          </div>
-        )}
+      {/* FORM */}
+      <section className="max-w-2xl mx-auto px-4 pb-16">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            name="contact_name"
-            placeholder="Nombre de contacto"
-            value={form.contact_name}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
-            required
-          />
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            Editar información
+          </h2>
 
-          <input
-            name="email"
-            type="email"
-            placeholder="Correo"
-            value={form.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
-            required
-          />
+          {error && (
+            <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded-lg">
+              {error}
+            </div>
+          )}
 
-          <input
-            value={user.company_name}
-            disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
-          />
+          {success && (
+            <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded-lg">
+              {success}
+            </div>
+          )}
 
-          <input
-            name="phone"
-            placeholder="Teléfono"
-            value={form.phone}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
-          />
+          <form onSubmit={handleSubmit} className="space-y-5">
 
-          <hr />
+            <input
+              name="contact_name"
+              placeholder="Nombre de contacto"
+              value={form.contact_name}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              required
+            />
 
-          <input
-            name="password"
-            type="password"
-            placeholder="Nueva contraseña (opcional)"
-            value={form.password}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
-          />
+            <input
+              name="email"
+              type="email"
+              placeholder="Correo electrónico"
+              value={form.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              required
+            />
 
-          <input
-            name="confirmPassword"
-            type="password"
-            placeholder="Confirmar contraseña"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
-          />
+            <input
+              value={user.company_name}
+              disabled
+              className="w-full px-4 py-2.5 border rounded-lg bg-gray-100 text-gray-500"
+            />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
-          >
-            {loading ? 'Guardando...' : 'Guardar cambios'}
-          </button>
-        </form>
-      </div>
+            <input
+              name="phone"
+              placeholder="+56"
+              value={form.phone}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+
+            <hr className="my-6" />
+
+            <input
+              name="password"
+              type="password"
+              placeholder="Nueva contraseña (opcional)"
+              value={form.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+
+            <input
+              name="confirmPassword"
+              type="password"
+              placeholder="Confirmar nueva contraseña"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition disabled:opacity-50"
+            >
+              {loading ? 'Guardando cambios…' : 'Guardar cambios'}
+            </button>
+          </form>
+        </div>
+      </section>
     </main>
   );
 }
