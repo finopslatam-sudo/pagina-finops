@@ -9,6 +9,7 @@ export interface User {
   email: string;
   contact_name?: string;
   phone?: string;
+  role?: "admin" | "client";
 }
 
 interface AuthContextType {
