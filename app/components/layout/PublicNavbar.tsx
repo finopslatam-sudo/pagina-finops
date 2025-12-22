@@ -3,16 +3,17 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { useState } from 'react';
 import LoginModal from '@/app/components/Auth/LoginModal';
+import UserMenu from '@/app/components/Auth/UserMenu';
 
 export default function PublicNavbar() {
-  const { user, logout } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
   const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
     <>
-      <header className="relative bg-white border-b border-gray-200">
+      {/* ⬇️ z-50 para que el borde NO quede tapado */}
+      <header className="relative z-50 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between relative">
 
@@ -21,7 +22,7 @@ export default function PublicNavbar() {
               <img src="/logo2.png" className="h-24 w-auto" />
             </a>
 
-            {/* 👉 MENÚ SOLO PARA USUARIOS NO LOGEADOS */}
+            {/* MENÚ SOLO NO LOGEADOS */}
             {!user && (
               <nav className="hidden md:flex items-center space-x-8 mx-auto">
                 <a href="/" className="nav-link">Inicio</a>
@@ -32,10 +33,10 @@ export default function PublicNavbar() {
               </nav>
             )}
 
-            {/* 👉 ACCIONES DERECHA */}
+            {/* ACCIONES DERECHA */}
             <div className="relative">
 
-              {/* USUARIO NO LOGEADO */}
+              {/* NO LOGEADO */}
               {!user && (
                 <>
                   <button
@@ -46,14 +47,13 @@ export default function PublicNavbar() {
                   </button>
 
                   {isLoginDropdownOpen && (
-                    <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg">
+                    <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg z-50">
                       <button
                         onClick={() => {
                           setIsLoginModalOpen(true);
                           setIsLoginDropdownOpen(false);
                         }}
-                        className="px-4 py-3 w-full text-left whitespace-nowrap min-w-[180px]
-                                   border-b border-gray-200 hover:bg-blue-50"
+                        className="px-4 py-3 w-full text-left hover:bg-blue-50"
                       >
                         Portal de Socios
                       </button>
@@ -62,34 +62,8 @@ export default function PublicNavbar() {
                 </>
               )}
 
-              {/* USUARIO LOGEADO */}
-              {user && (
-                <div className="relative">
-                  <button
-                    onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
-                    className="border-2 border-blue-500 text-blue-500 px-6 py-2.5 rounded-lg font-semibold"
-                  >
-                    Mi cuenta
-                  </button>
-
-                  {isLoginDropdownOpen && (
-                    <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg min-w-[200px]">
-                      <a
-                        href="/perfil"
-                        className="block px-4 py-3 hover:bg-blue-50 border-b"
-                      >
-                        Editar mi perfil
-                      </a>
-                      <button
-                        onClick={logout}
-                        className="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600"
-                      >
-                        Cerrar sesión
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* LOGEADO */}
+              {user && <UserMenu />}
             </div>
           </div>
         </div>
