@@ -159,7 +159,7 @@ export default function PerfilPage() {
 
             <input
               name="phone"
-              placeholder="+56"
+              placeholder="ej: 912345678"
               value={form.phone}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg"
@@ -173,6 +173,7 @@ export default function PerfilPage() {
               placeholder="Nueva contraseña (opcional)"
               value={form.password}
               onChange={handleChange}
+              autoComplete="new-password"
               className="w-full px-4 py-2 border rounded-lg"
             />
 
@@ -182,6 +183,7 @@ export default function PerfilPage() {
               placeholder="Confirmar contraseña"
               value={form.confirmPassword}
               onChange={handleChange}
+              autoComplete="new-password"
               className="w-full px-4 py-2 border rounded-lg"
             />
 
