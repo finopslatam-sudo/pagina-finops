@@ -6,15 +6,17 @@ import { useEffect, useState } from 'react';
 export default function PerfilPage() {
   const { user, token, updateUser } = useAuth();
 
-  // ⏳ Control de hidratación
+  // ⏳ Estado para esperar hidratación
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Cuando AuthContext ya decidió user/token
-    setCheckingAuth(false);
+    // Cuando AuthContext ya fue evaluado
+    if (user !== undefined && token !== undefined) {
+      setCheckingAuth(false);
+    }
   }, [user, token]);
 
-  // ⏳ Esperar hidratación
+  // ⏳ Loader mientras se hidrata sesión
   if (checkingAuth) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -23,7 +25,7 @@ export default function PerfilPage() {
     );
   }
 
-  // ⛔ No autenticado
+  // ⛔ Ya hidratado pero sin sesión
   if (!user || !token) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -32,9 +34,9 @@ export default function PerfilPage() {
     );
   }
 
-  // ===============================
+  // =============================
   // FORMULARIO
-  // ===============================
+  // =============================
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -60,7 +62,7 @@ export default function PerfilPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,10 +101,10 @@ export default function PerfilPage() {
         throw new Error(data.error || 'Error al guardar cambios');
       }
 
-      // 🔥 sincronizar sesión
+      // 🔥 sincroniza sesión
       updateUser(data.user);
-
       setSuccess('Perfil actualizado correctamente');
+
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
