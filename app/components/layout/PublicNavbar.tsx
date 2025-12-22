@@ -4,6 +4,8 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useState } from 'react';
 import LoginModal from '@/app/components/Auth/LoginModal';
 import UserMenu from '@/app/components/Auth/UserMenu';
+import { useRouter } from "next/navigation";
+
 
 export default function PublicNavbar() {
   const { user } = useAuth();

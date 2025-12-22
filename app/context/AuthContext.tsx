@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
+
 export interface User {
   id: number;
   company_name: string;

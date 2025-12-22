@@ -31,19 +31,17 @@ export default function UserMenu() {
     return () => window.removeEventListener("click", close);
   }, []);
 
-  if (!user) return null; // ⛔ NO mostrar nada si no hay sesión
+  if (!user) return null;
 
   const handleLogout = () => {
     setOpen(false);
     logout();
 
-    // Mostrar toast
     setShowToast(true);
 
-    // Ocultar toast y redirigir
     setTimeout(() => {
       setShowToast(false);
-      router.push("/"); // 👈 volver al inicio
+      router.push("/"); // volver al inicio
     }, 1800);
   };
 
@@ -65,7 +63,7 @@ export default function UserMenu() {
         {open && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border overflow-hidden animate-fade-in"
+            className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border overflow-hidden"
           >
             <Link
               href="/dashboard"
@@ -95,42 +93,12 @@ export default function UserMenu() {
 
       {/* TOAST */}
       {showToast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in-out">
           <div className="bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg">
             ✅ Sesión cerrada con éxito
           </div>
         </div>
       )}
-
-      {/* ANIMACIONES */}
-      <style jsx>{`
-        .animate-fade-in {
-          animation: fadeIn 0.15s ease-out;
-        }
-        .animate-slide-up {
-          animation: slideUp 0.3s ease-out;
-        }
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-5px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </>
   );
 }

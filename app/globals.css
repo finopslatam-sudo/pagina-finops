@@ -8,7 +8,32 @@ body {
   padding: 0;
 }
 
-/* Prueba una clase personalizada con utilidades de Tailwind */
+/* Botón de ejemplo */
 .btn-custom {
   @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+}
+
+/* ==============================
+   ANIMACIÓN TOAST GLOBAL
+   ============================== */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.animate-fade-in-out {
+  animation: fadeInOut 1.8s ease-in-out;
 }
