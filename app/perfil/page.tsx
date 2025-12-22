@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 export default function PerfilPage() {
   const { user, token, updateUser } = useAuth();
 
+  // 🔐 Protección básica
   if (!user || !token) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-white">
@@ -22,13 +23,14 @@ export default function PerfilPage() {
     confirmPassword: '',
   });
 
+  // 🔄 Cargar datos del usuario (contraseñas SIEMPRE vacías)
   useEffect(() => {
     setForm({
       contact_name: user.contact_name || '',
       email: user.email,
-      phone: '', // 👈 limpio por diseño
-      password: '',
-      confirmPassword: '',
+      phone: '',            // 👈 siempre limpio
+      password: '',         // 👈 siempre limpio
+      confirmPassword: '',  // 👈 siempre limpio
     });
   }, [user]);
 
@@ -79,6 +81,14 @@ export default function PerfilPage() {
 
       updateUser(data.user);
       setSuccess('Perfil actualizado correctamente');
+
+      // 🔄 limpiar contraseñas tras guardar
+      setForm((prev) => ({
+        ...prev,
+        password: '',
+        confirmPassword: '',
+      }));
+
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
@@ -87,65 +97,64 @@ export default function PerfilPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white text-gray-900 flex flex-col">
 
-      {/* HERO AZUL */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-16 mb-12">
+      {/* 🔵 HERO SUPERIOR (igual estilo dashboard) */}
+      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-3">
+          <h1 className="text-4xl font-bold mb-2">
             Mi Perfil
           </h1>
-          <p className="text-blue-100 text-lg">
+          <p className="text-blue-100">
             Gestiona tu información personal y credenciales
           </p>
         </div>
       </section>
 
-      {/* FORM */}
-      <section className="max-w-2xl mx-auto px-4 pb-16">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+      {/* 🧾 FORMULARIO */}
+      <section className="flex-1 flex justify-center py-12 px-4 bg-gray-50">
+        <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6">
 
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-            Editar información
+          <h2 className="text-2xl font-semibold mb-6 text-gray-900">
+            Editar mis datos
           </h2>
 
           {error && (
-            <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded-lg">
+            <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded-lg">
+            <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">
               {success}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-
+          <form onSubmit={handleSubmit} className="space-y-4">
             <input
               name="contact_name"
               placeholder="Nombre de contacto"
               value={form.contact_name}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg"
               required
             />
 
             <input
               name="email"
               type="email"
-              placeholder="Correo electrónico"
+              placeholder="Correo"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg"
               required
             />
 
             <input
               value={user.company_name}
               disabled
-              className="w-full px-4 py-2.5 border rounded-lg bg-gray-100 text-gray-500"
+              className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
             />
 
             <input
@@ -153,10 +162,10 @@ export default function PerfilPage() {
               placeholder="+56"
               value={form.phone}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg"
             />
 
-            <hr className="my-6" />
+            <hr />
 
             <input
               name="password"
@@ -164,28 +173,59 @@ export default function PerfilPage() {
               placeholder="Nueva contraseña (opcional)"
               value={form.password}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg"
             />
 
             <input
               name="confirmPassword"
               type="password"
-              placeholder="Confirmar nueva contraseña"
+              placeholder="Confirmar contraseña"
               value={form.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg"
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition disabled:opacity-50"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
             >
-              {loading ? 'Guardando cambios…' : 'Guardar cambios'}
+              {loading ? 'Guardando...' : 'Guardar cambios'}
             </button>
           </form>
         </div>
       </section>
+
+      {/* 🔻 FOOTER (MISMO QUE DASHBOARD) */}
+      <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
+        <div className="flex justify-center gap-6 pb-6">
+          <a
+            href="https://wa.me/56965090121"
+            target="_blank"
+            className="hover:text-blue-400 transition text-2xl"
+          >
+            💬
+          </a>
+          <a
+            href="mailto:contacto@finopslatam.com"
+            className="hover:text-blue-400 transition text-2xl"
+          >
+            📧
+          </a>
+          <a
+            href="https://www.linkedin.com/company/finopslatam"
+            target="_blank"
+            className="hover:text-blue-400 transition text-2xl"
+          >
+            💼
+          </a>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 py-8 text-center text-sm text-gray-500">
+          © {new Date().getFullYear()} FinOpsLatam — Todos los derechos reservados
+        </div>
+      </footer>
+
     </main>
   );
 }
