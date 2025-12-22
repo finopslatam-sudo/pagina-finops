@@ -26,11 +26,14 @@ export default function AdminPage() {
   const [error, setError] = useState('');
 
   // 🔒 Protección por rol
-  useEffect(() => {
-    if (user && user.role && user.role !== 'admin') {
-      router.push('/dashboard');
-    }
-  }, [user, router]);
+    useEffect(() => {
+        if (!user) return;
+    
+        if (user.role !== 'admin') {
+        router.replace('/dashboard');
+        }
+    }, [user, router]);
+  
 
   // 📡 Cargar usuarios
   useEffect(() => {
