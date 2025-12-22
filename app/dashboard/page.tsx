@@ -24,7 +24,19 @@ export default function Dashboard() {
   };
 
   const safeUser: User = user || {};
-
+  const planLabelMap: Record<string, string> = {
+    cloud_assessment: "🔍 Cloud Assessment",
+    cloud_intelligence: "📊 Cloud Intelligence",
+    cloud_financial_ops: "💰 Cloud Financial Ops",
+    cloud_optimization: "⚡ Cloud Optimization",
+    cloud_governance: "🏷️ Cloud Governance",
+  };
+  
+  const planName =
+    plan?.name && planLabelMap[plan.name]
+      ? planLabelMap[plan.name]
+      : "Plan no asignado";
+  
   return (
     <PrivateRoute>
       <main className="min-h-screen bg-white text-gray-900">
@@ -32,12 +44,18 @@ export default function Dashboard() {
         {/* CABECERA BLANCA */}
         <header className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <span className="text-gray-700 font-medium text-lg">
-              Estás en tu sesión:{' '}
-              {safeUser.contact_name
-                ? safeUser.contact_name.replace(/\s*Name\s*$/i, '')
-                : safeUser.company_name || safeUser.email}
-            </span>
+            <div>
+              <span className="text-gray-700 font-medium text-lg block">
+                Estás en tu sesión:{' '}
+                {safeUser.contact_name
+                  ? safeUser.contact_name.replace(/\s*Name\s*$/i, '')
+                  : safeUser.company_name || safeUser.email}
+              </span>
+
+              <span className="text-sm text-blue-600 font-medium">
+                Plan contratado: <span className="font-semibold">{planName}</span>
+              </span>
+            </div>
           </div>
         </header>
 
