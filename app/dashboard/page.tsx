@@ -33,9 +33,9 @@ export default function Dashboard() {
   };
   
   const planName =
-    plan?.name && planLabelMap[plan.name]
-      ? planLabelMap[plan.name]
-      : "Plan no asignado";
+    plan?.code && planLabelMap[plan.code]
+     ? planLabelMap[plan.code]
+     : "Plan no asignado";
   
   return (
     <PrivateRoute>
