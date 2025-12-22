@@ -4,8 +4,6 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useState } from 'react';
 import LoginModal from '@/app/components/Auth/LoginModal';
 import UserMenu from '@/app/components/Auth/UserMenu';
-import { useRouter } from "next/navigation";
-
 
 export default function PublicNavbar() {
   const { user } = useAuth();
@@ -14,10 +12,9 @@ export default function PublicNavbar() {
 
   return (
     <>
-      {/* ⬇️ z-50 para que el borde NO quede tapado */}
       <header className="relative z-50 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between relative">
+          <div className="flex items-center justify-between">
 
             {/* LOGO */}
             <a href="/">
@@ -35,10 +32,8 @@ export default function PublicNavbar() {
               </nav>
             )}
 
-            {/* ACCIONES DERECHA */}
+            {/* ACCIONES */}
             <div className="relative">
-
-              {/* NO LOGEADO */}
               {!user && (
                 <>
                   <button
@@ -49,28 +44,21 @@ export default function PublicNavbar() {
                   </button>
 
                   {isLoginDropdownOpen && (
-                    <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg z-50 min-w-[200px]">
-                          <button
-                            onClick={() => {
-                              setIsLoginModalOpen(true);
-                              setIsLoginDropdownOpen(false);
-                            }}
-                            className="
-                              px-4 py-3 
-                              w-full 
-                              text-left 
-                              whitespace-nowrap 
-                              hover:bg-blue-50
-                            "
-                          >
-                            Portal de Socios
-                          </button>
-                        </div>
+                    <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg min-w-[200px]">
+                      <button
+                        onClick={() => {
+                          setIsLoginModalOpen(true);
+                          setIsLoginDropdownOpen(false);
+                        }}
+                        className="px-4 py-3 w-full text-left whitespace-nowrap hover:bg-blue-50"
+                      >
+                        Portal de Socios
+                      </button>
+                    </div>
                   )}
                 </>
               )}
 
-              {/* LOGEADO */}
               {user && <UserMenu />}
             </div>
           </div>
