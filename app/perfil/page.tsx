@@ -6,6 +6,24 @@ import { useEffect, useState } from 'react';
 export default function PerfilPage() {
   const { user, token, updateUser } = useAuth();
 
+  // ⏳ Control de hidratación
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    // Cuando AuthContext ya decidió user/token
+    setCheckingAuth(false);
+  }, [user, token]);
+
+  // ⏳ Esperar hidratación
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-400">Cargando sesión...</p>
+      </main>
+    );
+  }
+
+  // ⛔ No autenticado
   if (!user || !token) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -13,6 +31,10 @@ export default function PerfilPage() {
       </main>
     );
   }
+
+  // ===============================
+  // FORMULARIO
+  // ===============================
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -77,7 +99,7 @@ export default function PerfilPage() {
         throw new Error(data.error || 'Error al guardar cambios');
       }
 
-      // 🔥 sincroniza sesión (PASO 2)
+      // 🔥 sincronizar sesión
       updateUser(data.user);
 
       setSuccess('Perfil actualizado correctamente');
