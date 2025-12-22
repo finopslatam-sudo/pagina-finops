@@ -31,22 +31,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [features, setFeatures] = useState<string[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  // 🔄 REHIDRATAR SESIÓN AL RECARGAR / ABRIR NAVEGADOR
+  // REHIDRATAR SESIÓN AL RECARGAR / ABRIR NAVEGADOR
   useEffect(() => {
     const savedToken = localStorage.getItem("finops_token");
     const savedUser = localStorage.getItem("finops_user");
-
+    const savedPlan = localStorage.getItem("finops_plan");
+  
     if (!savedToken || !savedUser) return;
-
+  
     setToken(savedToken);
     setUser(JSON.parse(savedUser));
-
-    // 🔹 cargar plan
+  
+    // 🔥 rehidratar plan inmediatamente
+    if (savedPlan) {
+      setPlan(JSON.parse(savedPlan));
+    }
+  
+    // 🔹 refrescar plan desde API (fuente de verdad)
     fetch(`${API_URL}/api/me/plan`, {
       headers: { Authorization: `Bearer ${savedToken}` },
     })
       .then(res => res.json())
-      .then(data => setPlan(data.plan))
+      .then(data => {
+        setPlan(data.plan);
+        localStorage.setItem("finops_plan", JSON.stringify(data.plan));
+      })
       .catch(() => logout());
 
     // 🔹 cargar features
@@ -84,8 +93,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       headers: { Authorization: `Bearer ${data.access_token}` },
     });
     const planData = await planRes.json();
+    
+    console.log("PLAN DESDE API (login):", planData);
+    
     setPlan(planData.plan);
-
+    
+    // 🔥 guardar plan para rehidratación
+    localStorage.setItem("finops_plan", JSON.stringify(planData.plan));
+   
     // 🔹 cargar features
     const featRes = await fetch(`${API_URL}/api/me/features`, {
       headers: { Authorization: `Bearer ${data.access_token}` },

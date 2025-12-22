@@ -36,7 +36,8 @@ export default function Dashboard() {
     plan?.code && planLabelMap[plan.code]
      ? planLabelMap[plan.code]
      : "Plan no asignado";
-  
+     console.log("PLAN DESDE API:", plan);
+
   return (
     <PrivateRoute>
       <main className="min-h-screen bg-white text-gray-900">
