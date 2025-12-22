@@ -25,18 +25,18 @@ export default function Dashboard() {
 
   const safeUser: User = user || {};
   const planLabelMap: Record<string, string> = {
-    cloud_assessment: "🔍 Cloud Assessment",
-    cloud_intelligence: "📊 Cloud Intelligence",
-    cloud_financial_ops: "💰 Cloud Financial Ops",
-    cloud_optimization: "⚡ Cloud Optimization",
-    cloud_governance: "🏷️ Cloud Governance",
+    assessment: "🔍 Cloud Assessment",
+    intelligence: "📊 Cloud Intelligence",
+    financial_ops: "💰 Cloud Financial Ops",
+    optimization: "⚡ Cloud Optimization",
+    governance: "🏷️ Cloud Governance",
   };
   
   const planName =
     plan?.code && planLabelMap[plan.code]
      ? planLabelMap[plan.code]
      : "Plan no asignado";
-     console.log("PLAN DESDE API:", plan);
+     console.log("PLAN DESDE AUTHCONTEXT:", plan);
 
   return (
     <PrivateRoute>
