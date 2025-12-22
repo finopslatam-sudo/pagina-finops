@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
+
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -10,6 +12,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { login } = useAuth();
+  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,8 +27,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setLoading(true);
   
     try {
-      await login(email, password); // 👈 AQUÍ VA
-      onClose(); // opcional: cerrar modal al loguear
+      await login(email, password); 
+      onClose(); 
+      router.push("/dashboard");
     } catch (err: any) {
       setError("Credenciales inválidas");
     } finally {
