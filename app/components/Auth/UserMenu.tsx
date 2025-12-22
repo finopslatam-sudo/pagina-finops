@@ -24,7 +24,7 @@ export default function UserMenu() {
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  // 🔔 Cerrar menú si se hace click fuera
+  // 🔔 Cerrar menú al hacer click fuera
   useEffect(() => {
     const close = () => setOpen(false);
     window.addEventListener("click", close);
@@ -37,11 +37,13 @@ export default function UserMenu() {
     setOpen(false);
     logout();
 
+    // Mostrar toast
     setShowToast(true);
 
+    // Ocultar toast y redirigir
     setTimeout(() => {
       setShowToast(false);
-      router.push("/"); // volver al inicio
+      router.push("/");
     }, 1800);
   };
 
