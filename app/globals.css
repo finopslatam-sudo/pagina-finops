@@ -8,14 +8,15 @@ body {
   padding: 0;
 }
 
-/* Botón de ejemplo */
+/* Botón custom (ok dejarlo) */
 .btn-custom {
   @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
 }
 
-/* ==============================
-   ANIMACIÓN TOAST GLOBAL
-   ============================== */
+/* ===============================
+   TOAST / NOTIFICACIONES
+================================ */
+
 @keyframes fadeInOut {
   0% {
     opacity: 0;
@@ -35,5 +36,5 @@ body {
 }
 
 .animate-fade-in-out {
-  animation: fadeInOut 1.8s ease-in-out;
+  animation: fadeInOut 1.8s ease-in-out forwards;
 }

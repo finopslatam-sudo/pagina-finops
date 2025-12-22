@@ -49,17 +49,23 @@ export default function PublicNavbar() {
                   </button>
 
                   {isLoginDropdownOpen && (
-                    <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg z-50">
-                      <button
-                        onClick={() => {
-                          setIsLoginModalOpen(true);
-                          setIsLoginDropdownOpen(false);
-                        }}
-                        className="px-4 py-3 w-full text-left hover:bg-blue-50"
-                      >
-                        Portal de Socios
-                      </button>
-                    </div>
+                    <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg z-50 min-w-[200px]">
+                          <button
+                            onClick={() => {
+                              setIsLoginModalOpen(true);
+                              setIsLoginDropdownOpen(false);
+                            }}
+                            className="
+                              px-4 py-3 
+                              w-full 
+                              text-left 
+                              whitespace-nowrap 
+                              hover:bg-blue-50
+                            "
+                          >
+                            Portal de Socios
+                          </button>
+                        </div>
                   )}
                 </>
               )}
