@@ -187,17 +187,96 @@ export default function AdminPage() {
 
         {/* MODAL CREAR */}
         {mode === 'create' && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-            <div className="bg-white p-6 rounded space-y-2">
-              <h2>Crear usuario</h2>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 space-y-5">
+              
+              {/* HEADER */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Crear nuevo usuario
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Completa la información para registrar una nueva cuenta
+                </p>
+              </div>
 
-              <input placeholder="Empresa" onChange={e => setNewUser({ ...newUser, company_name: e.target.value })} />
-              <input placeholder="Email" onChange={e => setNewUser({ ...newUser, email: e.target.value })} />
-              <input placeholder="Password" type="password" onChange={e => setNewUser({ ...newUser, password: e.target.value })} />
-              <input placeholder="Contacto" onChange={e => setNewUser({ ...newUser, contact_name: e.target.value })} />
-              <input placeholder="Teléfono" onChange={e => setNewUser({ ...newUser, phone: e.target.value })} />
+              {/* FORM */}
+              <div className="space-y-3">
+                <input
+                  className="border rounded-lg p-2 w-full"
+                  placeholder="Empresa *"
+                  value={newUser.company_name}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, company_name: e.target.value })
+                  }
+                />
 
-              <button onClick={createUser}>Crear</button>
+                <input
+                  className="border rounded-lg p-2 w-full"
+                  placeholder="Email *"
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, email: e.target.value })
+                  }
+                />
+
+                <input
+                  className="border rounded-lg p-2 w-full"
+                  placeholder="Password *"
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, password: e.target.value })
+                  }
+                />
+
+                <input
+                  className="border rounded-lg p-2 w-full"
+                  placeholder="Nombre de contacto *"
+                  value={newUser.contact_name}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, contact_name: e.target.value })
+                  }
+                />
+
+                <input
+                  className="border rounded-lg p-2 w-full"
+                  placeholder="Teléfono *"
+                  value={newUser.phone}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, phone: e.target.value })
+                  }
+                />
+
+                <select
+                  className="border rounded-lg p-2 w-full"
+                  value={newUser.role}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, role: e.target.value })
+                  }
+                >
+                  <option value="client">Cliente</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
+              {/* ACTIONS */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  onClick={() => setMode('edit')}
+                  className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  onClick={createUser}
+                  className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
+                >
+                  Crear usuario
+                </button>
+              </div>
             </div>
           </div>
         )}
