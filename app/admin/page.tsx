@@ -27,18 +27,26 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // 🧩 edición
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const [mode, setMode] = useState<'edit' | 'create'>('edit');
+
+  const [newUser, setNewUser] = useState({
+    company_name: '',
+    email: '',
+    password: '',
+    contact_name: '',
+    phone: '',
+    role: 'client',
+  });
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   // 🔒 Protección por rol
   useEffect(() => {
     if (!user) return;
-    if (user.role !== 'admin') {
-      router.replace('/dashboard');
-    }
+    if (user.role !== 'admin') router.replace('/dashboard');
   }, [user, router]);
 
   // 📡 Cargar usuarios
@@ -47,39 +55,26 @@ export default function AdminPage() {
 
     setLoading(true);
     fetch(`${API_URL}/api/admin/users`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(async (res) => {
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || 'Error al cargar usuarios');
-        }
-        return res.json();
-      })
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         setUsers(data.users || []);
         setError('');
       })
-      .catch((err) => {
-        setError(err.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     fetchUsers();
   }, [token]);
 
-  // 💾 Guardar usuario editado
+  // ✏️ Guardar usuario editado
   const saveUser = async () => {
     if (!editingUser || !token) return;
 
     setSaving(true);
-
     try {
       const res = await fetch(
         `${API_URL}/api/admin/users/${editingUser.id}`,
@@ -98,10 +93,7 @@ export default function AdminPage() {
         }
       );
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Error al guardar usuario');
-      }
+      if (!res.ok) throw new Error('Error al guardar usuario');
 
       setEditingUser(null);
       fetchUsers();
@@ -112,108 +104,77 @@ export default function AdminPage() {
     }
   };
 
+  // ➕ Crear usuario (CON VALIDACIÓN)
+  const createUser = async () => {
+    if (
+      !newUser.company_name ||
+      !newUser.email ||
+      !newUser.password ||
+      !newUser.contact_name ||
+      !newUser.phone
+    ) {
+      alert('Completa todos los campos obligatorios');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      if (!res.ok) throw new Error('Error al crear usuario');
+
+      setMode('edit');
+      setNewUser({
+        company_name: '',
+        email: '',
+        password: '',
+        contact_name: '',
+        phone: '',
+        role: 'client',
+      });
+
+      fetchUsers();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   return (
     <PrivateRoute>
       <main className="min-h-screen bg-gray-50 px-6 py-10">
-        {/* HEADER */}
         <div className="max-w-7xl mx-auto mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Panel de Administración
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Gestión de usuarios y suscripciones
-          </p>
+          <h1 className="text-3xl font-bold">Panel de Administración</h1>
         </div>
 
-        {/* CONTENIDO */}
-        <div className="max-w-7xl mx-auto bg-white rounded-xl shadow border">
-          {loading && (
-            <div className="p-6 text-gray-500">
-              Cargando usuarios…
-            </div>
-          )}
-
-          {error && (
-            <div className="p-6 text-red-600">
-              {error}
-            </div>
-          )}
-
+        <div className="max-w-7xl mx-auto bg-white rounded-xl shadow border p-4">
           {!loading && !error && (
-            <table className="w-full border-collapse">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700">
-                    Empresa
-                  </th>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700">
-                    Email
-                  </th>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700">
-                    Rol
-                  </th>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700">
-                    Plan
-                  </th>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700">
-                    Estado
-                  </th>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
+            <div className="flex justify-between mb-4">
+              <h2 className="font-semibold">Usuarios</h2>
+              <button
+                onClick={() => setMode('create')}
+                className="bg-green-600 text-white px-4 py-2 rounded"
+              >
+                ➕ Crear nuevo usuario
+              </button>
+            </div>
+          )}
 
+          {/* TABLA */}
+          {!loading && !error && (
+            <table className="w-full">
               <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} className="border-t hover:bg-gray-50">
-                    <td className="px-4 py-3">{u.company_name}</td>
-
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {u.email}
-                    </td>
-
-                    <td className="px-4 py-3 text-sm">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          u.role === 'admin'
-                            ? 'bg-purple-100 text-purple-700'
-                            : 'bg-blue-100 text-blue-700'
-                        }`}
-                      >
-                        {u.role}
-                      </span>
-                    </td>
-
-                    <td className="px-4 py-3 text-sm">
-                      {u.plan ? (
-                        <span className="font-medium text-gray-800">
-                          {u.plan.name}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 italic">
-                          Sin plan
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-4 py-3 text-sm">
-                      {u.is_active ? (
-                        <span className="text-green-600 font-medium">
-                          Activo
-                        </span>
-                      ) : (
-                        <span className="text-red-600 font-medium">
-                          Inactivo
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-4 py-3 text-sm">
-                      <button
-                        onClick={() => setEditingUser(u)}
-                        className="text-blue-600 hover:underline"
-                      >
+                {users.map(u => (
+                  <tr key={u.id}>
+                    <td>{u.company_name}</td>
+                    <td>{u.email}</td>
+                    <td>
+                      <button onClick={() => setEditingUser(u)}>
                         Editar
                       </button>
                     </td>
@@ -224,80 +185,19 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* 🧩 MODAL EDITAR USUARIO */}
-        {editingUser && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md space-y-3">
-              <h2 className="text-lg font-semibold">
-                Editar usuario
-              </h2>
+        {/* MODAL CREAR */}
+        {mode === 'create' && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+            <div className="bg-white p-6 rounded space-y-2">
+              <h2>Crear usuario</h2>
 
-              <input
-                className="border p-2 w-full"
-                placeholder="Empresa"
-                value={editingUser.company_name}
-                onChange={(e) =>
-                  setEditingUser({
-                    ...editingUser,
-                    company_name: e.target.value,
-                  })
-                }
-              />
+              <input placeholder="Empresa" onChange={e => setNewUser({ ...newUser, company_name: e.target.value })} />
+              <input placeholder="Email" onChange={e => setNewUser({ ...newUser, email: e.target.value })} />
+              <input placeholder="Password" type="password" onChange={e => setNewUser({ ...newUser, password: e.target.value })} />
+              <input placeholder="Contacto" onChange={e => setNewUser({ ...newUser, contact_name: e.target.value })} />
+              <input placeholder="Teléfono" onChange={e => setNewUser({ ...newUser, phone: e.target.value })} />
 
-              <input
-                className="border p-2 w-full"
-                placeholder="Contacto"
-                value={editingUser.contact_name || ''}
-                onChange={(e) =>
-                  setEditingUser({
-                    ...editingUser,
-                    contact_name: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className="border p-2 w-full"
-                placeholder="Teléfono"
-                value={editingUser.phone || ''}
-                onChange={(e) =>
-                  setEditingUser({
-                    ...editingUser,
-                    phone: e.target.value,
-                  })
-                }
-              />
-
-              <select
-                className="border p-2 w-full"
-                value={editingUser.role}
-                disabled={editingUser.id === user?.id}
-                onChange={(e) =>
-                  setEditingUser({
-                    ...editingUser,
-                    role: e.target.value as 'admin' | 'client',
-                  })
-                }
-              >
-                <option value="client">Client</option>
-                <option value="admin">Admin</option>
-              </select>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <button
-                  onClick={() => setEditingUser(null)}
-                  className="px-4 py-2 border rounded"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={saveUser}
-                  disabled={saving}
-                  className="px-4 py-2 bg-blue-600 text-white rounded"
-                >
-                  {saving ? 'Guardando…' : 'Guardar'}
-                </button>
-              </div>
+              <button onClick={createUser}>Crear</button>
             </div>
           </div>
         )}
