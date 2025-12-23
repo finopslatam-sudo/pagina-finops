@@ -38,6 +38,9 @@ export default function AdminPage() {
     is_active: true,
     plan_id: null,
   });
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formError, setFormError] = useState('');
+
 
   // 🔒 Solo admin
   useEffect(() => {
@@ -110,6 +113,10 @@ export default function AdminPage() {
       !newUser.phone
     ) {
       alert('Completa todos los campos obligatorios');
+      return;
+    }
+    if (newUser.password !== confirmPassword) {
+      setFormError('Las contraseñas no coinciden');
       return;
     }
 
@@ -330,31 +337,98 @@ export default function AdminPage() {
         {/* 🧩 MODAL CREAR */}
         {mode === 'create' && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 space-y-6">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
 
+            {/* HEADER */}
+            <div className="p-6 border-b">
               <h2 className="text-xl font-semibold">Crear nuevo usuario</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Todos los campos son obligatorios
+              </p>
+            </div>
 
-              {[
-                { label: 'Empresa', key: 'company_name' },
-                { label: 'Email', key: 'email' },
-                { label: 'Password', key: 'password', type: 'password' },
-                { label: 'Contacto', key: 'contact_name' },
-                { label: 'Teléfono', key: 'phone' },
-              ].map((field) => (
-                <div key={field.key}>
-                  <label className="text-sm text-gray-600">{field.label}</label>
-                  <input
-                    type={field.type || 'text'}
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={(newUser as any)[field.key]}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, [field.key]: e.target.value })
-                    }
-                  />
+            {/* BODY */}
+            <div className="p-6 space-y-4 overflow-y-auto">
+
+              {formError && (
+                <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">
+                  {formError}
                 </div>
-              ))}
+              )}
 
-              {/* Rol */}
+              <div>
+                <label className="text-sm text-gray-600">Empresa</label>
+                <input
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={newUser.company_name}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, company_name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Email</label>
+                <input
+                  type="email"
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={newUser.email}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, email: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Password</label>
+                <input
+                  type="password"
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={newUser.password}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, password: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Confirmar Password</label>
+                <input
+                  type="password"
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Contacto</label>
+                <input
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={newUser.contact_name}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, contact_name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Teléfono</label>
+                <input
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={newUser.phone}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, phone: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
               <div>
                 <label className="text-sm text-gray-600">Rol</label>
                 <select
@@ -369,38 +443,41 @@ export default function AdminPage() {
                 </select>
               </div>
 
-              {/* Estado */}
               <div>
                 <label className="text-sm text-gray-600">Estado</label>
                 <select
                   className="mt-1 border rounded-lg p-2 w-full"
                   value={newUser.is_active ? 'active' : 'inactive'}
                   onChange={(e) =>
-                    setNewUser({ ...newUser, is_active: e.target.value === 'active' })
+                    setNewUser({
+                      ...newUser,
+                      is_active: e.target.value === 'active',
+                    })
                   }
                 >
                   <option value="active">Activo</option>
                   <option value="inactive">Inactivo</option>
                 </select>
               </div>
+            </div>
 
-              {/* Acciones */}
-              <div className="flex justify-end gap-3 pt-4">
-                <button
-                  onClick={() => setMode('edit')}
-                  className="px-4 py-2 border rounded-lg"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={createUser}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg"
-                >
-                  Crear usuario
-                </button>
-              </div>
+            {/* FOOTER */}
+            <div className="p-6 border-t flex justify-end gap-3">
+              <button
+                onClick={() => setMode('edit')}
+                className="px-4 py-2 border rounded-lg"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={createUser}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg"
+              >
+                Crear usuario
+              </button>
             </div>
           </div>
+        </div>
         )}
       </main>
     </PrivateRoute>
