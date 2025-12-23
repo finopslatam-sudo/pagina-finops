@@ -5,18 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 
-/**
- * Cliente autenticado
- * (se mantiene para edición de perfil futura)
- */
-export interface Client {
-  id: number;
-  email: string;
-  name?: string;
-  company_name?: string;
-  contact_name?: string;
-}
-
 export default function UserMenu() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -37,10 +25,9 @@ export default function UserMenu() {
     setOpen(false);
     setShowToast(true);
 
-    // ⏳ esperar animación
     setTimeout(() => {
-      logout();            // 👈 AHORA sí
-      router.push("/");    // volver al inicio
+      logout();
+      router.push("/");
     }, 1800);
   };
 
@@ -64,6 +51,7 @@ export default function UserMenu() {
             onClick={(e) => e.stopPropagation()}
             className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden"
           >
+            {/* Dashboard (todos) */}
             <Link
               href="/dashboard"
               className="block px-4 py-3 hover:bg-blue-50"
@@ -72,14 +60,29 @@ export default function UserMenu() {
               📊 Mi Dashboard
             </Link>
 
-            <Link
-              href="/perfil"
-              className="block px-4 py-3 hover:bg-blue-50 border-t"
-              onClick={() => setOpen(false)}
-            >
-              ✏️ Editar mi perfil
-            </Link>
+            {/* ADMIN */}
+            {user.role === 'admin' && (
+              <Link
+                href="/admin"
+                className="block px-4 py-3 hover:bg-blue-50 border-t"
+                onClick={() => setOpen(false)}
+              >
+                ✏️ Editar perfiles
+              </Link>
+            )}
 
+            {/* CLIENTES */}
+            {user.role !== 'admin' && (
+              <Link
+                href="/perfil"
+                className="block px-4 py-3 hover:bg-blue-50 border-t"
+                onClick={() => setOpen(false)}
+              >
+                ✏️ Editar mi perfil
+              </Link>
+            )}
+
+            {/* Logout (todos) */}
             <button
               onClick={handleLogout}
               className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 border-t"
