@@ -14,7 +14,7 @@ interface AdminUser {
   role: 'admin' | 'client';
   is_active: boolean;
   plan: {
-    id: number;
+    id?: number;
     code: string;
     name: string;
   } | null;
@@ -241,59 +241,85 @@ export default function AdminPage() {
 
           {!loading && (
             <table className="w-full border-collapse">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="px-4 py-3 text-left">Empresa</th>
-                  <th className="px-4 py-3 text-left">Email</th>
-                  <th className="px-4 py-3 text-left">Rol</th>
-                  <th className="px-4 py-3 text-left">Estado</th>
-                  <th className="px-4 py-3 text-right">Acciones</th>
-                </tr>
-              </thead>
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-4 py-3 text-left">Empresa</th>
+                    <th className="px-4 py-3 text-left">Email</th>
+                    <th className="px-4 py-3 text-left">Rol</th>
 
-              <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium">{u.company_name}</td>
-                    <td className="px-4 py-3">{u.email}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          u.role === 'admin'
-                            ? 'bg-purple-100 text-purple-700'
-                            : 'bg-blue-100 text-blue-700'
-                        }`}
-                      >
-                        {u.role}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          u.is_active
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
-                        }`}
-                      >
-                        {u.is_active ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => {
-                          setEditingUser(u);
-                          setSelectedPlanId(u.plan?.id || null);
-                          setMode('edit');
-                        }}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Editar
-                      </button>
-                    </td>
+                    {/* 👇 NUEVA COLUMNA PLAN */}
+                    <th className="px-4 py-3 text-left">Plan</th>
+
+                    <th className="px-4 py-3 text-left">Estado</th>
+                    <th className="px-4 py-3 text-right">Acciones</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {users.map((u) => (
+                    <tr key={u.id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium">
+                        {u.company_name}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        {u.email}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            u.role === 'admin'
+                              ? 'bg-purple-100 text-purple-700'
+                              : 'bg-blue-100 text-blue-700'
+                          }`}
+                        >
+                          {u.role === 'admin' ? 'Administrador' : 'Cliente'}
+                        </span>
+                      </td>
+
+                      {/* 👇 CELDA PLAN */}
+                      <td className="px-4 py-3">
+                        {u.plan ? (
+                          <span className="px-2 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
+                            {u.plan.name}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 italic">
+                            Sin plan
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            u.is_active
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-red-100 text-red-700'
+                          }`}
+                        >
+                          {u.is_active ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          onClick={() => {
+                            setEditingUser(u);
+                            setSelectedPlanId(u.plan?.id ?? null);
+                            setMode('edit');
+                          }}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          Editar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
           )}
         </div>
           {/* 🧩 MODAL EDITAR */}
