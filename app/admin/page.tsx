@@ -13,24 +13,20 @@ interface AdminUser {
   phone?: string;
   role: 'admin' | 'client';
   is_active: boolean;
-  plan: {
-    code: string;
-    name: string;
-  } | null;
 }
 
 export default function AdminPage() {
   const { user, token } = useAuth();
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
-  const [saving, setSaving] = useState(false);
-
   const [mode, setMode] = useState<'edit' | 'create'>('edit');
+  const [saving, setSaving] = useState(false);
 
   const [newUser, setNewUser] = useState({
     company_name: '',
@@ -41,40 +37,41 @@ export default function AdminPage() {
     role: 'client',
   });
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-  // 🔒 Protección por rol
+  // 🔒 Solo admin
   useEffect(() => {
-    if (!user) return;
-    if (user.role !== 'admin') router.replace('/dashboard');
+    if (user && user.role !== 'admin') {
+      router.replace('/dashboard');
+    }
   }, [user, router]);
 
   // 📡 Cargar usuarios
-  const fetchUsers = () => {
+  const fetchUsers = async () => {
     if (!token) return;
-
     setLoading(true);
-    fetch(`${API_URL}/api/admin/users`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(data => {
-        setUsers(data.users || []);
-        setError('');
-      })
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
+
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setUsers(data.users || []);
+      setError('');
+    } catch {
+      setError('Error al cargar usuarios');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchUsers();
   }, [token]);
 
-  // ✏️ Guardar usuario editado
+  // 💾 Guardar edición
   const saveUser = async () => {
     if (!editingUser || !token) return;
-
     setSaving(true);
+
     try {
       const res = await fetch(
         `${API_URL}/api/admin/users/${editingUser.id}`,
@@ -93,18 +90,15 @@ export default function AdminPage() {
         }
       );
 
-      if (!res.ok) throw new Error('Error al guardar usuario');
-
+      if (!res.ok) throw new Error();
       setEditingUser(null);
       fetchUsers();
-    } catch (err: any) {
-      alert(err.message);
     } finally {
       setSaving(false);
     }
   };
 
-  // ➕ Crear usuario (CON VALIDACIÓN)
+  // ➕ Crear usuario
   const createUser = async () => {
     if (
       !newUser.company_name ||
@@ -127,8 +121,7 @@ export default function AdminPage() {
         body: JSON.stringify(newUser),
       });
 
-      if (!res.ok) throw new Error('Error al crear usuario');
-
+      if (!res.ok) throw new Error();
       setMode('edit');
       setNewUser({
         company_name: '',
@@ -138,43 +131,75 @@ export default function AdminPage() {
         phone: '',
         role: 'client',
       });
-
       fetchUsers();
-    } catch (err: any) {
-      alert(err.message);
+    } catch {
+      alert('Error al crear usuario');
     }
   };
 
   return (
     <PrivateRoute>
       <main className="min-h-screen bg-gray-50 px-6 py-10">
-        <div className="max-w-7xl mx-auto mb-8">
-          <h1 className="text-3xl font-bold">Panel de Administración</h1>
-        </div>
+        <h1 className="text-3xl font-bold mb-6">Panel de Administración</h1>
 
-        <div className="max-w-7xl mx-auto bg-white rounded-xl shadow border p-4">
-          {!loading && !error && (
-            <div className="flex justify-between mb-4">
-              <h2 className="font-semibold">Usuarios</h2>
-              <button
-                onClick={() => setMode('create')}
-                className="bg-green-600 text-white px-4 py-2 rounded"
-              >
-                ➕ Crear nuevo usuario
-              </button>
-            </div>
-          )}
+        <div className="bg-white rounded-xl shadow p-6">
+          <div className="flex justify-between mb-4">
+            <h2 className="text-lg font-semibold">Usuarios</h2>
+            <button
+              onClick={() => setMode('create')}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg"
+            >
+              + Crear nuevo usuario
+            </button>
+          </div>
 
-          {/* TABLA */}
-          {!loading && !error && (
-            <table className="w-full">
+          {!loading && (
+            <table className="w-full border-collapse">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="px-4 py-3 text-left">Empresa</th>
+                  <th className="px-4 py-3 text-left">Email</th>
+                  <th className="px-4 py-3 text-left">Rol</th>
+                  <th className="px-4 py-3 text-left">Estado</th>
+                  <th className="px-4 py-3 text-right">Acciones</th>
+                </tr>
+              </thead>
+
               <tbody>
-                {users.map(u => (
-                  <tr key={u.id}>
-                    <td>{u.company_name}</td>
-                    <td>{u.email}</td>
-                    <td>
-                      <button onClick={() => setEditingUser(u)}>
+                {users.map((u) => (
+                  <tr key={u.id} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium">{u.company_name}</td>
+                    <td className="px-4 py-3">{u.email}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          u.role === 'admin'
+                            ? 'bg-purple-100 text-purple-700'
+                            : 'bg-blue-100 text-blue-700'
+                        }`}
+                      >
+                        {u.role}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          u.is_active
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {u.is_active ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => {
+                          setEditingUser(u);
+                          setMode('edit');
+                        }}
+                        className="text-blue-600 font-medium"
+                      >
                         Editar
                       </button>
                     </td>
@@ -185,109 +210,118 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* MODAL CREAR */}
+        {/* 🧩 MODAL EDITAR */}
+        {editingUser && mode === 'edit' && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">
+              <h2 className="text-xl font-semibold">Editar usuario</h2>
+
+              <input
+                className="border p-2 w-full"
+                value={editingUser.company_name}
+                onChange={(e) =>
+                  setEditingUser({ ...editingUser, company_name: e.target.value })
+                }
+              />
+
+              <input
+                className="border p-2 w-full"
+                value={editingUser.contact_name || ''}
+                onChange={(e) =>
+                  setEditingUser({ ...editingUser, contact_name: e.target.value })
+                }
+              />
+
+              <input
+                className="border p-2 w-full"
+                value={editingUser.phone || ''}
+                onChange={(e) =>
+                  setEditingUser({ ...editingUser, phone: e.target.value })
+                }
+              />
+
+              <select
+                className="border p-2 w-full"
+                value={editingUser.role}
+                onChange={(e) =>
+                  setEditingUser({
+                    ...editingUser,
+                    role: e.target.value as 'admin' | 'client',
+                  })
+                }
+              >
+                <option value="client">Cliente</option>
+                <option value="admin">Admin</option>
+              </select>
+
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setEditingUser(null)}>Cancelar</button>
+                <button
+                  onClick={saveUser}
+                  className="bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  Guardar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 🧩 MODAL CREAR */}
         {mode === 'create' && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 space-y-6">
-              
-              {/* HEADER */}
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">
-                  Crear nuevo usuario
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Registra una nueva cuenta en el sistema
-                </p>
-              </div>
+            <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">
+              <h2 className="text-xl font-semibold">Crear usuario</h2>
 
-              {/* FORM */}
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-600">Empresa *</label>
-                  <input
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.company_name}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, company_name: e.target.value })
-                    }
-                  />
-                </div>
+              <input
+                className="border p-2 w-full"
+                placeholder="Empresa"
+                value={newUser.company_name}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, company_name: e.target.value })
+                }
+              />
+              <input
+                className="border p-2 w-full"
+                placeholder="Email"
+                value={newUser.email}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, email: e.target.value })
+                }
+              />
+              <input
+                className="border p-2 w-full"
+                placeholder="Password"
+                type="password"
+                value={newUser.password}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, password: e.target.value })
+                }
+              />
+              <input
+                className="border p-2 w-full"
+                placeholder="Contacto"
+                value={newUser.contact_name}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, contact_name: e.target.value })
+                }
+              />
+              <input
+                className="border p-2 w-full"
+                placeholder="Teléfono"
+                value={newUser.phone}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, phone: e.target.value })
+                }
+              />
 
-                <div>
-                  <label className="text-sm text-gray-600">Email *</label>
-                  <input
-                    type="email"
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.email}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, email: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-600">Password *</label>
-                  <input
-                    type="password"
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.password}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, password: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-600">Contacto *</label>
-                  <input
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.contact_name}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, contact_name: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-600">Teléfono *</label>
-                  <input
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.phone}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, phone: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-600">Rol</label>
-                  <select
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.role}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, role: e.target.value })
-                    }
-                  >
-                    <option value="client">Cliente</option>
-                    <option value="admin">Administrador</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* ACTIONS */}
-              <div className="flex justify-end gap-3 pt-4">
-                <button
-                  onClick={() => setMode('edit')}
-                  className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100"
-                >
-                  Cancelar
-                </button>
-
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setMode('edit')}>Cancelar</button>
                 <button
                   onClick={createUser}
-                  className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
+                  className="bg-green-600 text-white px-4 py-2 rounded"
                 >
-                  Crear usuario
+                  Crear
                 </button>
               </div>
             </div>
