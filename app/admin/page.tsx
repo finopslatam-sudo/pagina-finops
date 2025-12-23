@@ -35,6 +35,8 @@ export default function AdminPage() {
     contact_name: '',
     phone: '',
     role: 'client',
+    is_active: true,
+    plan_id: null,
   });
 
   // 🔒 Solo admin
@@ -130,6 +132,8 @@ export default function AdminPage() {
         contact_name: '',
         phone: '',
         role: 'client',
+        is_active: true,
+        plan_id: null,
       });
       fetchUsers();
     } catch {
@@ -213,115 +217,186 @@ export default function AdminPage() {
         {/* 🧩 MODAL EDITAR */}
         {editingUser && mode === 'edit' && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 space-y-6">
+
               <h2 className="text-xl font-semibold">Editar usuario</h2>
 
-              <input
-                className="border p-2 w-full"
-                value={editingUser.company_name}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, company_name: e.target.value })
-                }
-              />
+              {/* Empresa */}
+              <div>
+                <label className="text-sm text-gray-600">Empresa</label>
+                <input
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={editingUser.company_name}
+                  onChange={(e) =>
+                    setEditingUser({ ...editingUser, company_name: e.target.value })
+                  }
+                />
+              </div>
 
-              <input
-                className="border p-2 w-full"
-                value={editingUser.contact_name || ''}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, contact_name: e.target.value })
-                }
-              />
+              {/* Email */}
+              <div>
+                <label className="text-sm text-gray-600">Email</label>
+                <input
+                  type="email"
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={editingUser.email}
+                  onChange={(e) =>
+                    setEditingUser({ ...editingUser, email: e.target.value })
+                  }
+                />
+              </div>
 
-              <input
-                className="border p-2 w-full"
-                value={editingUser.phone || ''}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, phone: e.target.value })
-                }
-              />
+              {/* Contacto */}
+              <div>
+                <label className="text-sm text-gray-600">Contacto</label>
+                <input
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={editingUser.contact_name || ''}
+                  onChange={(e) =>
+                    setEditingUser({ ...editingUser, contact_name: e.target.value })
+                  }
+                />
+              </div>
 
-              <select
-                className="border p-2 w-full"
-                value={editingUser.role}
-                onChange={(e) =>
-                  setEditingUser({
-                    ...editingUser,
-                    role: e.target.value as 'admin' | 'client',
-                  })
-                }
-              >
-                <option value="client">Cliente</option>
-                <option value="admin">Admin</option>
-              </select>
+              {/* Teléfono */}
+              <div>
+                <label className="text-sm text-gray-600">Teléfono</label>
+                <input
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={editingUser.phone || ''}
+                  onChange={(e) =>
+                    setEditingUser({ ...editingUser, phone: e.target.value })
+                  }
+                />
+              </div>
 
-              <div className="flex justify-end gap-3">
-                <button onClick={() => setEditingUser(null)}>Cancelar</button>
+              {/* Rol */}
+              <div>
+                <label className="text-sm text-gray-600">Rol</label>
+                <select
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={editingUser.role}
+                  disabled={editingUser.id === user?.id}
+                  onChange={(e) =>
+                    setEditingUser({
+                      ...editingUser,
+                      role: e.target.value as 'admin' | 'client',
+                    })
+                  }
+                >
+                  <option value="client">Cliente</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
+              {/* Estado */}
+              <div>
+                <label className="text-sm text-gray-600">Estado</label>
+                <select
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={editingUser.is_active ? 'active' : 'inactive'}
+                  onChange={(e) =>
+                    setEditingUser({
+                      ...editingUser,
+                      is_active: e.target.value === 'active',
+                    })
+                  }
+                >
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo</option>
+                </select>
+              </div>
+
+              {/* Acciones */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  onClick={() => setEditingUser(null)}
+                  className="px-4 py-2 border rounded-lg"
+                >
+                  Cancelar
+                </button>
                 <button
                   onClick={saveUser}
-                  className="bg-blue-600 text-white px-4 py-2 rounded"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg"
                 >
-                  Guardar
+                  Guardar cambios
                 </button>
               </div>
             </div>
           </div>
         )}
 
+
         {/* 🧩 MODAL CREAR */}
         {mode === 'create' && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">
-              <h2 className="text-xl font-semibold">Crear usuario</h2>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 space-y-6">
 
-              <input
-                className="border p-2 w-full"
-                placeholder="Empresa"
-                value={newUser.company_name}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, company_name: e.target.value })
-                }
-              />
-              <input
-                className="border p-2 w-full"
-                placeholder="Email"
-                value={newUser.email}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, email: e.target.value })
-                }
-              />
-              <input
-                className="border p-2 w-full"
-                placeholder="Password"
-                type="password"
-                value={newUser.password}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, password: e.target.value })
-                }
-              />
-              <input
-                className="border p-2 w-full"
-                placeholder="Contacto"
-                value={newUser.contact_name}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, contact_name: e.target.value })
-                }
-              />
-              <input
-                className="border p-2 w-full"
-                placeholder="Teléfono"
-                value={newUser.phone}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, phone: e.target.value })
-                }
-              />
+              <h2 className="text-xl font-semibold">Crear nuevo usuario</h2>
 
-              <div className="flex justify-end gap-3">
-                <button onClick={() => setMode('edit')}>Cancelar</button>
+              {[
+                { label: 'Empresa', key: 'company_name' },
+                { label: 'Email', key: 'email' },
+                { label: 'Password', key: 'password', type: 'password' },
+                { label: 'Contacto', key: 'contact_name' },
+                { label: 'Teléfono', key: 'phone' },
+              ].map((field) => (
+                <div key={field.key}>
+                  <label className="text-sm text-gray-600">{field.label}</label>
+                  <input
+                    type={field.type || 'text'}
+                    className="mt-1 border rounded-lg p-2 w-full"
+                    value={(newUser as any)[field.key]}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, [field.key]: e.target.value })
+                    }
+                  />
+                </div>
+              ))}
+
+              {/* Rol */}
+              <div>
+                <label className="text-sm text-gray-600">Rol</label>
+                <select
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={newUser.role}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, role: e.target.value })
+                  }
+                >
+                  <option value="client">Cliente</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
+              {/* Estado */}
+              <div>
+                <label className="text-sm text-gray-600">Estado</label>
+                <select
+                  className="mt-1 border rounded-lg p-2 w-full"
+                  value={newUser.is_active ? 'active' : 'inactive'}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, is_active: e.target.value === 'active' })
+                  }
+                >
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo</option>
+                </select>
+              </div>
+
+              {/* Acciones */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  onClick={() => setMode('edit')}
+                  className="px-4 py-2 border rounded-lg"
+                >
+                  Cancelar
+                </button>
                 <button
                   onClick={createUser}
-                  className="bg-green-600 text-white px-4 py-2 rounded"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg"
                 >
-                  Crear
+                  Crear usuario
                 </button>
               </div>
             </div>
