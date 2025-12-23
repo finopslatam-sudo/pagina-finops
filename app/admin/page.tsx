@@ -285,7 +285,7 @@ export default function AdminPage() {
                           setSelectedPlanId(u.plan?.id || null);
                           setMode('edit');
                         }}
-                        className="text-blue-600 font-medium"
+                        className="text-blue-600 hover:text-blue-800 font-medium"
                       >
                         Editar
                       </button>
@@ -296,172 +296,168 @@ export default function AdminPage() {
             </table>
           )}
         </div>
-        {/* 🧩 MODAL EDITAR */}
-        {editingUser && mode === 'edit' && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+          {/* 🧩 MODAL EDITAR */}
+          {editingUser && mode === 'edit' && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
 
-              {/* HEADER */}
-              <div className="p-6 border-b">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  Editar usuario
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Modifica la información del usuario
-                </p>
-              </div>
+                {/* HEADER */}
+                <div className="p-6 border-b">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Editar usuario
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    Modifica la información del usuario
+                  </p>
+                </div>
 
-              {/* BODY (SCROLL) */}
-              <div className="p-6 space-y-4 overflow-y-auto">
+                {/* BODY (SCROLL) */}
+                <div className="p-6 space-y-4 overflow-y-auto">
 
-                {/* Plan */}
-                <div>
-                  <label className="text-sm text-gray-600">
-                    Plan de suscripción
-                  </label>
-                  <select
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={selectedPlanId || ''}
-                    onChange={(e) =>
-                      setSelectedPlanId(Number(e.target.value))
-                    }
+                  {/* PLAN */}
+                  <div>
+                    <label className="text-sm text-gray-600">
+                      Plan de suscripción
+                    </label>
+                    <select
+                      className="mt-1 border rounded-lg p-2 w-full"
+                      value={selectedPlanId ?? ''}
+                      onChange={(e) =>
+                        setSelectedPlanId(
+                          e.target.value ? Number(e.target.value) : null
+                        )
+                      }
+                    >
+                      <option value="">Sin plan</option>
+                      {plans.map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* EMPRESA */}
+                  <div>
+                    <label className="text-sm text-gray-600">Empresa</label>
+                    <input
+                      className="mt-1 border rounded-lg p-2 w-full"
+                      value={editingUser.company_name}
+                      onChange={(e) =>
+                        setEditingUser({
+                          ...editingUser,
+                          company_name: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* EMAIL */}
+                  <div>
+                    <label className="text-sm text-gray-600">Email</label>
+                    <input
+                      type="email"
+                      className="mt-1 border rounded-lg p-2 w-full"
+                      value={editingUser.email}
+                      onChange={(e) =>
+                        setEditingUser({
+                          ...editingUser,
+                          email: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* CONTACTO */}
+                  <div>
+                    <label className="text-sm text-gray-600">Contacto</label>
+                    <input
+                      className="mt-1 border rounded-lg p-2 w-full"
+                      value={editingUser.contact_name || ''}
+                      onChange={(e) =>
+                        setEditingUser({
+                          ...editingUser,
+                          contact_name: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* TELÉFONO */}
+                  <div>
+                    <label className="text-sm text-gray-600">Teléfono</label>
+                    <input
+                      className="mt-1 border rounded-lg p-2 w-full"
+                      value={editingUser.phone || ''}
+                      onChange={(e) =>
+                        setEditingUser({
+                          ...editingUser,
+                          phone: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* ROL */}
+                  <div>
+                    <label className="text-sm text-gray-600">Rol</label>
+                    <select
+                      className="mt-1 border rounded-lg p-2 w-full"
+                      value={editingUser.role}
+                      disabled={editingUser.id === user?.id}
+                      onChange={(e) =>
+                        setEditingUser({
+                          ...editingUser,
+                          role: e.target.value as 'admin' | 'client',
+                        })
+                      }
+                    >
+                      <option value="client">Cliente</option>
+                      <option value="admin">Administrador</option>
+                    </select>
+                  </div>
+
+                  {/* ESTADO */}
+                  <div>
+                    <label className="text-sm text-gray-600">Estado</label>
+                    <select
+                      className="mt-1 border rounded-lg p-2 w-full"
+                      value={editingUser.is_active ? 'active' : 'inactive'}
+                      onChange={(e) =>
+                        setEditingUser({
+                          ...editingUser,
+                          is_active: e.target.value === 'active',
+                        })
+                      }
+                    >
+                      <option value="active">Activo</option>
+                      <option value="inactive">Inactivo</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* FOOTER (SIEMPRE VISIBLE) */}
+                <div className="p-6 border-t flex justify-end gap-3 bg-white">
+                  <button
+                    onClick={() => {
+                      setEditingUser(null);
+                      setSelectedPlanId(null);
+                    }}
+                    className="px-4 py-2 border rounded-lg"
                   >
-                    <option value="">Sin plan</option>
-                    {plans.map((plan) => (
-                      <option key={plan.id} value={plan.id}>
-                        {plan.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Empresa */}
-                <div>
-                  <label className="text-sm text-gray-600">Empresa</label>
-                  <input
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={editingUser.company_name}
-                    onChange={(e) =>
-                      setEditingUser({
-                        ...editingUser,
-                        company_name: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label className="text-sm text-gray-600">Email</label>
-                  <input
-                    type="email"
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={editingUser.email}
-                    onChange={(e) =>
-                      setEditingUser({
-                        ...editingUser,
-                        email: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-
-                {/* Contacto */}
-                <div>
-                  <label className="text-sm text-gray-600">Contacto</label>
-                  <input
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={editingUser.contact_name || ''}
-                    onChange={(e) =>
-                      setEditingUser({
-                        ...editingUser,
-                        contact_name: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-
-                {/* Teléfono */}
-                <div>
-                  <label className="text-sm text-gray-600">Teléfono</label>
-                  <input
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={editingUser.phone || ''}
-                    onChange={(e) =>
-                      setEditingUser({
-                        ...editingUser,
-                        phone: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-
-                {/* Rol */}
-                <div>
-                  <label className="text-sm text-gray-600">Rol</label>
-                  <select
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={editingUser.role}
-                    disabled={editingUser.id === user?.id}
-                    onChange={(e) =>
-                      setEditingUser({
-                        ...editingUser,
-                        role: e.target.value as 'admin' | 'client',
-                      })
-                    }
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={saveUser}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
                   >
-                    <option value="client">Cliente</option>
-                    <option value="admin">Administrador</option>
-                  </select>
+                    Guardar cambios
+                  </button>
                 </div>
-
-                {/* Estado */}
-                <div>
-                  <label className="text-sm text-gray-600">Estado</label>
-                  <select
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={editingUser.is_active ? 'active' : 'inactive'}
-                    onChange={(e) =>
-                      setEditingUser({
-                        ...editingUser,
-                        is_active: e.target.value === 'active',
-                      })
-                    }
-                  >
-                    <option value="active">Activo</option>
-                    <option value="inactive">Inactivo</option>
-                  </select>
-                </div>
-
               </div>
-
-              {/* FOOTER (STICKY) */}
-              <div className="p-6 border-t bg-white flex justify-end gap-3 sticky bottom-0">
-                <button
-                  onClick={() => {
-                    setEditingUser(null);
-                    setSelectedPlanId(null);
-                  }}
-                  className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100"
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  onClick={saveUser}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-                >
-                  Guardar cambios
-                </button>
-              </div>
-
             </div>
-          </div>
-        )}
+          )}
+
 
         {/* 🧩 MODAL CREAR */}
         {mode === 'create' && (
