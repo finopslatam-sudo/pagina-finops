@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 export interface User {
   id: number;
@@ -22,6 +28,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+const INACTIVITY_LIMIT = 10 * 60 * 1000; // 10 minutos
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -30,51 +37,110 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [features, setFeatures] = useState<string[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 🔄 Rehidratar sesión
-  useEffect(() => {
-    const savedToken = localStorage.getItem("finops_token");
-    const savedUser = localStorage.getItem("finops_user");
-    const savedPlan = localStorage.getItem("finops_plan");
 
-    if (!savedToken || !savedUser) return;
-
-    setToken(savedToken);
-    setUser(JSON.parse(savedUser));
-
-    if (savedPlan) {
-      try {
-        setPlan(JSON.parse(savedPlan));
-      } catch {
-        localStorage.removeItem("finops_plan");
-        setPlan(null);
+    const resetInactivityTimer = () => {
+      if (inactivityTimer.current) {
+        clearTimeout(inactivityTimer.current);
       }
-    }
+    
+      inactivityTimer.current = setTimeout(() => {
+        if (token) {
+          logout();
+        }
+      }, INACTIVITY_LIMIT);
+    };
+  
+    // 🔄 Rehidratar sesión (SOLO localStorage)
+    useEffect(() => {
+      const savedToken = localStorage.getItem("finops_token");
+      const savedUser = localStorage.getItem("finops_user");
+      const savedPlan = localStorage.getItem("finops_plan");
 
-    // 🔹 Refrescar plan desde API
+      if (!savedToken || !savedUser) return;
+
+      setToken(savedToken);
+      setUser(JSON.parse(savedUser));
+
+      if (savedPlan) {
+        try {
+          setPlan(JSON.parse(savedPlan));
+        } catch {
+          localStorage.removeItem("finops_plan");
+          setPlan(null);
+        }
+      }
+    }, []);
+
+
+    useEffect(() => {
+      if (!user) return;
+    
+      const events = [
+        "mousemove",
+        "mousedown",
+        "keydown",
+        "scroll",
+        "touchstart",
+      ];
+    
+      const handleActivity = () => {
+        resetInactivityTimer();
+      };
+    
+      events.forEach((event) =>
+        window.addEventListener(event, handleActivity)
+      );
+    
+      // ⏱️ Inicializa el timer al montar
+      resetInactivityTimer();
+    
+      return () => {
+        if (inactivityTimer.current) {
+          clearTimeout(inactivityTimer.current);
+        }
+    
+        events.forEach((event) =>
+          window.removeEventListener(event, handleActivity)
+        );
+      };
+    }, [user, token]);
+    
+
+  useEffect(() => {
+    if (!token) return;
+  
+    // 🔹 Refrescar plan
     fetch(`${API_URL}/api/me/plan`, {
-      headers: { Authorization: `Bearer ${savedToken}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.ok ? res.json() : null)
+      .then(res => (res.ok ? res.json() : null))
       .then(data => {
         if (data?.plan) {
           setPlan(data.plan);
-          localStorage.setItem("finops_plan", JSON.stringify(data.plan));
+          localStorage.setItem(
+            "finops_plan",
+            JSON.stringify(data.plan)
+          );
         }
       })
       .catch(() => {});
-
+  
     // 🔹 Refrescar features
     fetch(`${API_URL}/api/me/features`, {
-      headers: { Authorization: `Bearer ${savedToken}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.ok ? res.json() : null)
+      .then(res => (res.ok ? res.json() : null))
       .then(data => {
-        if (data?.features) setFeatures(data.features);
+        if (data?.features) {
+          setFeatures(data.features);
+        }
       })
       .catch(() => {});
-  }, []);
-
+  }, [token]);
+  
+  
   // 🔐 LOGIN
   const login = async (email: string, password: string) => {
     const res = await fetch(`${API_URL}/api/auth/login`, {
