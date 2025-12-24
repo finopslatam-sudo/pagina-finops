@@ -73,9 +73,12 @@ export default function AdminPage() {
     if (!editingUser) return;
     if (plans.length === 0) return;
   
-    // 🔑 Sincroniza el plan actual cuando los planes ya están cargados
-    setSelectedPlanId(editingUser.plan?.id ?? '');
-  }, [plans, editingUser]);
+    // Inicializa el plan solo al abrir el modal
+    setSelectedPlanId(
+      editingUser.plan?.id ?? ""
+    );
+  }, [editingUser?.id, plans.length]);
+  
    
   // 🔒 Solo admin
   useEffect(() => {
@@ -344,13 +347,10 @@ export default function AdminPage() {
                       Plan de suscripción
                     </label>
                     <select
-                      disabled={plans.length === 0}
                       className="mt-1 border rounded-lg p-2 w-full"
                       value={selectedPlanId}
                       onChange={(e) =>
-                        setSelectedPlanId(
-                          e.target.value ? Number(e.target.value) : ''
-                        )
+                        setSelectedPlanId(e.target.value === "" ? "" : Number(e.target.value))
                       }
                     >
                       <option value="">Sin plan</option>
@@ -521,13 +521,12 @@ export default function AdminPage() {
                     Plan de suscripción
                   </label>
                   <select
-                    disabled={plans.length === 0}
                     className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.plan_id ?? ''}
+                    value={newUser.plan_id ?? ""}
                     onChange={(e) =>
                       setNewUser({
                         ...newUser,
-                        plan_id: e.target.value ? Number(e.target.value) : null,
+                        plan_id: e.target.value === "" ? null : Number(e.target.value),
                       })
                     }
                     required
@@ -546,7 +545,6 @@ export default function AdminPage() {
                       Cargando planes...
                     </p>
                   )}
-
                 </div>
 
                 {/* EMPRESA */}
