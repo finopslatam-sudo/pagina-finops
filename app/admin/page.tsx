@@ -25,6 +25,7 @@ interface Plan {
   code: string;
   name: string;
 }
+
 interface NewUser {
   company_name: string;
   email: string;
@@ -35,7 +36,6 @@ interface NewUser {
   is_active: boolean;
   plan_id: number | null;
 }
-
 
 export default function AdminPage() {
   const { user, token } = useAuth();
@@ -48,7 +48,9 @@ export default function AdminPage() {
 
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [mode, setMode] = useState<'edit' | 'create'>('edit');
-  const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
+
+  // 🔧 CORREGIDO: usar number | ''
+  const [selectedPlanId, setSelectedPlanId] = useState<number | ''>('');
 
   const [saving, setSaving] = useState(false);
 
@@ -62,13 +64,10 @@ export default function AdminPage() {
     is_active: true,
     plan_id: null,
   });
-  
-  
+
   const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState('');
   const [plans, setPlans] = useState<Plan[]>([]);
-
-
 
   // 🔒 Solo admin
   useEffect(() => {
@@ -81,7 +80,6 @@ export default function AdminPage() {
   const fetchUsers = async () => {
     if (!token) return;
     setLoading(true);
-
     try {
       const res = await fetch(`${API_URL}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -95,87 +93,68 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+
   const fetchPlans = async () => {
     if (!token) return;
-  
     try {
       const res = await fetch(`${API_URL}/api/admin/plans`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-  
-      if (!res.ok) {
-        throw new Error('Error al cargar planes');
-      }
-  
       const data = await res.json();
       setPlans(data.plans || []);
     } catch (err) {
       console.error(err);
     }
   };
-  
+
   useEffect(() => {
     fetchUsers();
     fetchPlans();
   }, [token]);
 
   // 💾 Guardar edición
-    const saveUser = async () => {
-      if (!editingUser || !token) return;
-    
-      setSaving(true);
-    
-      try {
-        const res = await fetch(
-          `${API_URL}/api/admin/users/${editingUser.id}`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              company_name: editingUser.company_name,
-              contact_name: editingUser.contact_name,
-              phone: editingUser.phone,
-              role: editingUser.role,
-              is_active: editingUser.is_active,
-              email: editingUser.email,
-            }),
-          }
-        );
-    
-        if (!res.ok) {
-          throw new Error('Error al guardar usuario');
-        }
-    
-        // 🟢 PASO 2.5 — guardar plan
-        if (selectedPlanId) {
-          await fetch(
-            `${API_URL}/api/admin/users/${editingUser.id}/plan`,
-            {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ plan_id: selectedPlanId }),
-            }
-          );
-        }
-    
-        setEditingUser(null);
-        setSelectedPlanId(null);
-        fetchUsers();
-      } catch (err) {
-        alert('Error al guardar usuario');
-      } finally {
-        setSaving(false);
-      }
-    };
-  
+  const saveUser = async () => {
+    if (!editingUser || !token) return;
+    setSaving(true);
+
+    try {
+      await fetch(`${API_URL}/api/admin/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          company_name: editingUser.company_name,
+          contact_name: editingUser.contact_name,
+          phone: editingUser.phone,
+          role: editingUser.role,
+          is_active: editingUser.is_active,
+          email: editingUser.email,
+        }),
+      });
+
+      // ✅ CORREGIDO: guardar siempre el plan (incluso null)
+      await fetch(`${API_URL}/api/admin/users/${editingUser.id}/plan`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          plan_id: selectedPlanId === '' ? null : selectedPlanId,
+        }),
+      });
+
+      setEditingUser(null);
+      setSelectedPlanId('');
+      fetchUsers();
+    } catch {
+      alert('Error al guardar usuario');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // ➕ Crear usuario
   const createUser = async () => {
@@ -184,18 +163,20 @@ export default function AdminPage() {
       !newUser.email ||
       !newUser.password ||
       !newUser.contact_name ||
-      !newUser.phone
+      !newUser.phone ||
+      !newUser.plan_id
     ) {
       alert('Completa todos los campos obligatorios');
       return;
     }
+
     if (newUser.password !== confirmPassword) {
       setFormError('Las contraseñas no coinciden');
       return;
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/admin/users`, {
+      await fetch(`${API_URL}/api/admin/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -204,8 +185,9 @@ export default function AdminPage() {
         body: JSON.stringify(newUser),
       });
 
-      if (!res.ok) throw new Error();
       setMode('edit');
+      setConfirmPassword('');
+      setFormError('');
       setNewUser({
         company_name: '',
         email: '',
@@ -216,11 +198,11 @@ export default function AdminPage() {
         is_active: true,
         plan_id: null,
       });
+
       fetchUsers();
     } catch {
       alert('Error al crear usuario');
     }
-    
   };
 
   return (
@@ -307,7 +289,7 @@ export default function AdminPage() {
                         <button
                           onClick={() => {
                             setEditingUser(u);
-                            setSelectedPlanId(u.plan?.id ?? null);
+                            setSelectedPlanId(u.plan?.id ?? '');
                             setMode('edit');
                           }}
                           className="text-blue-600 hover:text-blue-800 font-medium"
@@ -350,7 +332,7 @@ export default function AdminPage() {
                       value={selectedPlanId ?? ''}
                       onChange={(e) =>
                         setSelectedPlanId(
-                          e.target.value ? Number(e.target.value) : null
+                          e.target.value ? Number(e.target.value) : ''
                         )
                       }
                     >
@@ -467,7 +449,7 @@ export default function AdminPage() {
                   <button
                     onClick={() => {
                       setEditingUser(null);
-                      setSelectedPlanId(null);
+                      setSelectedPlanId('');
                     }}
                     className="px-4 py-2 border rounded-lg"
                   >
