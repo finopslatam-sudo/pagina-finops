@@ -28,7 +28,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
-const INACTIVITY_LIMIT = 10 * 60 * 1000; // 10 minutos
+const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutos
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -154,6 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const data = await res.json();
+  
 
     setUser(data.client);
     setToken(data.access_token);
