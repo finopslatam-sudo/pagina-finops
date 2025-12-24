@@ -101,7 +101,7 @@ export default function AdminPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setPlans(data.plans || []);
+      setPlans(Array.isArray(data) ? data : data.plans || []);
     } catch (err) {
       console.error(err);
     }
@@ -328,6 +328,7 @@ export default function AdminPage() {
                       Plan de suscripción
                     </label>
                     <select
+                      disabled={plans.length === 0}
                       className="mt-1 border rounded-lg p-2 w-full"
                       value={selectedPlanId ?? ''}
                       onChange={(e) =>
@@ -343,6 +344,11 @@ export default function AdminPage() {
                         </option>
                       ))}
                     </select>
+                    {plans.length === 0 && (
+                      <p className="text-sm text-gray-400 mt-1">
+                        Cargando planes...
+                      </p>
+                    )}
                   </div>
 
                   {/* EMPRESA */}
@@ -497,6 +503,7 @@ export default function AdminPage() {
                     Plan de suscripción
                   </label>
                   <select
+                    disabled={plans.length === 0}
                     className="mt-1 border rounded-lg p-2 w-full"
                     value={newUser.plan_id || ''}
                     onChange={(e) =>
@@ -514,6 +521,11 @@ export default function AdminPage() {
                       </option>
                     ))}
                   </select>
+                  {plans.length === 0 && (
+                    <p className="text-sm text-gray-400 mt-1">
+                      Cargando planes...
+                    </p>
+                  )}
                 </div>
 
                 {/* EMPRESA */}
