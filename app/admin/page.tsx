@@ -96,17 +96,25 @@ export default function AdminPage() {
 
   const fetchPlans = async () => {
     if (!token) return;
+  
     try {
       const res = await fetch(`${API_URL}/api/admin/plans`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+  
+      if (!res.ok) throw new Error("Error al cargar planes");
+  
       const data = await res.json();
+  
       setPlans(Array.isArray(data) ? data : data.plans || []);
+  
+      console.log("Planes cargados:", data);
     } catch (err) {
-      console.error(err);
+      console.error("Error cargando planes", err);
     }
   };
-
   useEffect(() => {
     fetchUsers();
     fetchPlans();
