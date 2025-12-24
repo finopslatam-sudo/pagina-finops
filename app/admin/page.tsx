@@ -69,6 +69,14 @@ export default function AdminPage() {
   const [formError, setFormError] = useState('');
   const [plans, setPlans] = useState<Plan[]>([]);
 
+  useEffect(() => {
+    if (!editingUser) return;
+    if (plans.length === 0) return;
+  
+    // 🔑 Sincroniza el plan actual cuando los planes ya están cargados
+    setSelectedPlanId(editingUser.plan?.id ?? '');
+  }, [plans, editingUser]);
+   
   // 🔒 Solo admin
   useEffect(() => {
     if (user && user.role !== 'admin') {
@@ -513,11 +521,11 @@ export default function AdminPage() {
                   <select
                     disabled={plans.length === 0}
                     className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.plan_id || ''}
+                    value={newUser.plan_id ?? ''}
                     onChange={(e) =>
                       setNewUser({
                         ...newUser,
-                        plan_id: Number(e.target.value),
+                        plan_id: e.target.value ? Number(e.target.value) : null,
                       })
                     }
                     required
@@ -529,6 +537,7 @@ export default function AdminPage() {
                       </option>
                     ))}
                   </select>
+
                   {plans.length === 0 && (
                     <p className="text-sm text-gray-400 mt-1">
                       Cargando planes...
