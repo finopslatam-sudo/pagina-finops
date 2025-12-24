@@ -346,7 +346,7 @@ export default function AdminPage() {
                     <select
                       disabled={plans.length === 0}
                       className="mt-1 border rounded-lg p-2 w-full"
-                      value={selectedPlanId ?? ''}
+                      value={selectedPlanId}
                       onChange={(e) =>
                         setSelectedPlanId(
                           e.target.value ? Number(e.target.value) : ''
@@ -354,12 +354,14 @@ export default function AdminPage() {
                       }
                     >
                       <option value="">Sin plan</option>
+
                       {plans.map((plan) => (
                         <option key={plan.id} value={plan.id}>
                           {plan.name}
                         </option>
                       ))}
                     </select>
+
                     {plans.length === 0 && (
                       <p className="text-sm text-gray-400 mt-1">
                         Cargando planes...
@@ -531,6 +533,7 @@ export default function AdminPage() {
                     required
                   >
                     <option value="">Selecciona un plan</option>
+
                     {plans.map((plan) => (
                       <option key={plan.id} value={plan.id}>
                         {plan.name}
@@ -543,6 +546,7 @@ export default function AdminPage() {
                       Cargando planes...
                     </p>
                   )}
+
                 </div>
 
                 {/* EMPRESA */}
