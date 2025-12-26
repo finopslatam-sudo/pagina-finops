@@ -70,6 +70,8 @@ export default function AdminPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
+    console.log("🧪 ESTADO plans:", plans);
+
     if (!editingUser) return;
     if (plans.length === 0) return;
   
