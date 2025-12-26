@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [plan, setPlan] = useState<any | null>(null);
   const [features, setFeatures] = useState<string[]>([]);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
