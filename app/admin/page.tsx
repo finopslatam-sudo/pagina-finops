@@ -218,7 +218,7 @@ export default function AdminPage() {
     }
 
     try {
-      await fetch(`${API_URL}/api/admin/users`, {
+      const response = await fetch(`${API_URL}/api/admin/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -227,6 +227,15 @@ export default function AdminPage() {
         body: JSON.stringify(newUser),
       });
 
+      // 🔴 VALIDACIÓN REAL DE RESPUESTA
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Error backend:', error);
+        alert(error.error || 'Error al crear usuario');
+        return;
+      }
+
+      // ✅ SOLO SI EL BACKEND RESPONDE OK
       setMode('edit');
       setConfirmPassword('');
       setFormError('');
@@ -241,11 +250,15 @@ export default function AdminPage() {
         plan_id: null,
       });
 
-      fetchUsers();
-    } catch {
+      // 🔴 CLAVE: esperar a que se actualice la lista
+      await fetchUsers();
+
+    } catch (err) {
+      console.error('Error inesperado:', err);
       alert('Error al crear usuario');
     }
   };
+
 
   return (
     <PrivateRoute>
