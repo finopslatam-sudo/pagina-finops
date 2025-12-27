@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, INACTIVITY_LIMIT);
   };
 
-  // 🔄 Rehidratar sesión
+  //  Rehidratar sesión
   useEffect(() => {
     const savedToken = localStorage.getItem("finops_token");
     const savedUser = localStorage.getItem("finops_user");
