@@ -40,7 +40,11 @@ interface NewUser {
 export default function AdminPage() {
   const { user, token } = useAuth();
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL =
+  process.env.NEXT_PUBLIC_API_URL &&
+  process.env.NEXT_PUBLIC_API_URL.trim() !== ''
+    ? process.env.NEXT_PUBLIC_API_URL
+    : 'https://api.finopslatam.com';
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,12 +120,11 @@ export default function AdminPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+      
       if (!res.ok) throw new Error("Error al cargar planes");
-  
+      
       const data = await res.json();
-  
-      setPlans(Array.isArray(data) ? data : data.plans || []);
+      setPlans(data.plans || []);
   
       console.log("Planes cargados:", data);
     } catch (err) {
