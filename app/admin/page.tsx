@@ -370,15 +370,17 @@ export default function AdminPage() {
                       Plan de suscripción
                     </label>
                     <select
-                      className={`mt-1 border rounded-lg p-2 w-full font-semibold ${
-                        selectedPlanId ? 'bg-indigo-50 text-indigo-700 border-indigo-300' : ''
+                      className={`mt-1 border rounded-lg p-2 w-full font-semibold transition ${
+                        editingUser?.plan?.code
+                          ? planColor(editingUser.plan.code)
+                          : 'bg-gray-50'
                       }`}
                       value={selectedPlanId}
                       onChange={(e) =>
-                        setSelectedPlanId(e.target.value === '' ? '' : Number(e.target.value))
+                        setSelectedPlanId(e.target.value === "" ? "" : Number(e.target.value))
                       }
                     >
-                      {/* Solo visible si realmente NO tiene plan */}
+                      {/* Solo mostrar "Sin plan" si realmente no tiene */}
                       {!editingUser?.plan && (
                         <option value="">
                           Sin plan
