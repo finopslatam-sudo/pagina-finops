@@ -636,7 +636,7 @@ export default function AdminPage() {
 
                 {/* CONTACTO */}
                 <div>
-                  <label className="text-sm text-gray-600">Contacto</label>
+                  <label className="text-sm text-gray-600">Nombre Contacto</label>
                   <input
                     className="mt-1 border rounded-lg p-2 w-full"
                     value={newUser.contact_name}
