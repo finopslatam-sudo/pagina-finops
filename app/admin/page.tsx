@@ -46,6 +46,24 @@ export default function AdminPage() {
     ? process.env.NEXT_PUBLIC_API_URL
     : 'https://api.finopslatam.com';
 
+    const planColor = (planCode?: string) => {
+      switch (planCode) {
+        case 'assessment':
+          return 'bg-blue-50 text-blue-700 border-blue-300';
+        case 'intelligence':
+          return 'bg-green-50 text-green-700 border-green-300';
+        case 'finops':
+      
+          return 'bg-indigo-50 text-indigo-700 border-indigo-300';
+        case 'optimization':
+          return 'bg-yellow-50 text-yellow-800 border-yellow-300';
+        case 'governance':
+          return 'bg-purple-50 text-purple-700 border-purple-300';
+        default:
+          return '';
+      }
+    };
+
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -373,7 +391,7 @@ export default function AdminPage() {
                         </option>
                       ))}
                     </select>
-                    
+
                     {plans.length === 0 && (
                       <p className="text-sm text-gray-400 mt-1">
                         Cargando planes...
