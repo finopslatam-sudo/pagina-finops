@@ -352,13 +352,20 @@ export default function AdminPage() {
                       Plan de suscripción
                     </label>
                     <select
-                      className="mt-1 border rounded-lg p-2 w-full"
+                      className={`mt-1 border rounded-lg p-2 w-full font-semibold ${
+                        selectedPlanId ? 'bg-indigo-50 text-indigo-700 border-indigo-300' : ''
+                      }`}
                       value={selectedPlanId}
                       onChange={(e) =>
-                        setSelectedPlanId(e.target.value === "" ? "" : Number(e.target.value))
+                        setSelectedPlanId(e.target.value === '' ? '' : Number(e.target.value))
                       }
                     >
-                      <option value="">Sin plan</option>
+                      {/* Solo visible si realmente NO tiene plan */}
+                      {!editingUser?.plan && (
+                        <option value="">
+                          Sin plan
+                        </option>
+                      )}
 
                       {plans.map((plan) => (
                         <option key={plan.id} value={plan.id}>
@@ -366,7 +373,7 @@ export default function AdminPage() {
                         </option>
                       ))}
                     </select>
-
+                    
                     {plans.length === 0 && (
                       <p className="text-sm text-gray-400 mt-1">
                         Cargando planes...
