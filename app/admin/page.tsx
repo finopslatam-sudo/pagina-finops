@@ -102,9 +102,10 @@ export default function AdminPage() {
       return;
     }
   
-    // 👇 forzamos number | null (NO undefined)
-    setSelectedPlanId(editingUser.plan.id ?? null);
-    setOriginalPlanId(editingUser.plan.id ?? null);
+    const planId = Number(editingUser.plan.id);
+
+    setSelectedPlanId(planId);
+    setOriginalPlanId(planId);
   
   }, [editingUser?.id]);
   
