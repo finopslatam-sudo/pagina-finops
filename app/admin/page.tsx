@@ -94,16 +94,20 @@ export default function AdminPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
-    console.log("🧪 ESTADO plans:", plans);
-  
     if (!editingUser) return;
-    if (plans.length === 0) return;
   
-    // Inicializa el plan solo al abrir el modal
-    setSelectedPlanId(editingUser.plan?.id ?? null);
-    setOriginalPlanId(editingUser.plan?.id ?? null);
+    if (!editingUser.plan) {
+      setSelectedPlanId(null);
+      setOriginalPlanId(null);
+      return;
+    }
   
-  }, [editingUser?.id, plans.length]);
+    // 👇 forzamos number | null (NO undefined)
+    setSelectedPlanId(editingUser.plan.id ?? null);
+    setOriginalPlanId(editingUser.plan.id ?? null);
+  
+  }, [editingUser?.id]);
+  
 
   // 🔒 Solo admin
   useEffect(() => {
@@ -156,73 +160,58 @@ export default function AdminPage() {
   }, [token]);
 
   // 💾 Guardar edición
-    const saveUser = async () => {
-      if (!editingUser || !token) return;
-      setSaving(true);
-    
-      try {
-        // 1️⃣ Actualizar datos del usuario
-        const resUser = await fetch(
-          `${API_URL}/api/admin/users/${editingUser.id}`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              company_name: editingUser.company_name,
-              contact_name: editingUser.contact_name,
-              phone: editingUser.phone,
-              email: editingUser.email,
-              role: editingUser.role,
-              is_active: editingUser.is_active,
-            }),
-          }
-        );
-    
-        if (!resUser.ok) {
-          const err = await resUser.json();
-          throw new Error(err.error || 'Error al actualizar usuario');
-        }
-    
-        // 2️⃣ Cambiar plan SOLO si realmente cambió
-        if (
-          selectedPlanId !== null &&
-          selectedPlanId !== originalPlanId
-        ) {
-          const resPlan = await fetch(
-            `${API_URL}/api/admin/users/${editingUser.id}/plan`,
-            {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ plan_id: selectedPlanId }),
-            }
-          );
-    
-          if (!resPlan.ok) {
-            const err = await resPlan.json();
-            throw new Error(err.error || 'Error al actualizar plan');
-          }
-        }
-    
-        // 3️⃣ Cerrar modal + refrescar
-        setEditingUser(null);
-        setSelectedPlanId(null);
-        setOriginalPlanId(null);
-        await fetchUsers();
-    
-      } catch (err) {
-        console.error(err);
-        alert('Error al guardar usuario');
-      } finally {
-        setSaving(false);
+  const saveUser = async () => {
+    if (!editingUser || !token) return;
+    setSaving(true);
+  
+    try {
+      // 1️⃣ Actualizar datos del usuario
+      await fetch(`${API_URL}/api/admin/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          company_name: editingUser.company_name,
+          contact_name: editingUser.contact_name,
+          phone: editingUser.phone,
+          email: editingUser.email,
+          role: editingUser.role,
+          is_active: editingUser.is_active,
+        }),
+      });
+  
+      // 2️⃣ 🔒 AQUÍ VA (NO EN OTRO LADO)
+      const planChanged =
+        selectedPlanId !== null &&
+        originalPlanId !== null &&
+        selectedPlanId !== originalPlanId;
+  
+      if (planChanged) {
+        await fetch(`${API_URL}/api/admin/users/${editingUser.id}/plan`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ plan_id: selectedPlanId }),
+        });
       }
-    };
-
+  
+      // 3️⃣ Cerrar y refrescar
+      setEditingUser(null);
+      setSelectedPlanId(null);
+      setOriginalPlanId(null);
+      await fetchUsers();
+  
+    } catch (err) {
+      console.error(err);
+      alert('Error al guardar usuario');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // ➕ Crear usuario
   const createUser = async () => {
