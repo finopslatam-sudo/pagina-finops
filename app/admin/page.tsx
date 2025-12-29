@@ -266,7 +266,7 @@ export default function AdminPage() {
         plan_id: null,
       });
 
-      // 🔴 CLAVE: esperar a que se actualice la lista
+      //  CLAVE: esperar a que se actualice la lista
       await fetchUsers();
 
     } catch (err) {
