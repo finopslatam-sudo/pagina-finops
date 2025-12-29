@@ -360,7 +360,6 @@ export default function AdminPage() {
                         <button
                           onClick={() => {
                             setEditingUser(u);
-                            setSelectedPlanId(u.plan?.id ?? null);
                             setMode('edit');
                           }}
                           className="text-blue-600 hover:text-blue-800 font-medium"
