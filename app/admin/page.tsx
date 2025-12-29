@@ -92,6 +92,9 @@ export default function AdminPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState('');
   const [plans, setPlans] = useState<Plan[]>([]);
+  const selectedPlan = plans.find(
+    (p) => p.id === selectedPlanId
+  );
 
   useEffect(() => {
     if (!editingUser) return;
@@ -404,12 +407,12 @@ export default function AdminPage() {
                       }
                       className={`mt-1 w-full rounded-lg border p-2 font-semibold transition
                         ${
-                          editingUser?.plan?.code
-                            ? planColor(editingUser.plan.code)
-                            : "bg-gray-50"
-                        }
-                      `}
-                    >
+                          selectedPlan
+                          ? planColor(selectedPlan.code)
+                          : "bg-gray-50"
+                      }
+                    `}
+                  >
                       {/* Solo mostrar "Sin plan" si realmente no tiene */}
                       {!editingUser?.plan && (
                         <option value="">
