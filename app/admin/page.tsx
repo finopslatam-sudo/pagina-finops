@@ -183,7 +183,7 @@ export default function AdminPage() {
         }),
       });
   
-      // 2️⃣ 🔒 AQUÍ VA (NO EN OTRO LADO)
+      // 2️⃣ Actualizar plan SOLO si cambió
       const planChanged =
         selectedPlanId !== null &&
         originalPlanId !== null &&
@@ -200,15 +200,12 @@ export default function AdminPage() {
         });
       }
   
-      // 3️⃣ Cerrar y refrescar
+      // 3️⃣ cerrar modal + refrescar
       setEditingUser(null);
-      setSelectedPlanId(null);
-      setOriginalPlanId(null);
-      await fetchUsers();
+      fetchUsers();
   
     } catch (err) {
-      console.error(err);
-      alert('Error al guardar usuario');
+      alert("Error al guardar usuario");
     } finally {
       setSaving(false);
     }
@@ -399,7 +396,7 @@ export default function AdminPage() {
                       Plan de suscripción
                     </label>
                     <select
-                      value={selectedPlanId ?? ""}
+                      value={selectedPlanId !== null ? String(selectedPlanId) : ""}
                       onChange={(e) =>
                         setSelectedPlanId(
                           e.target.value === "" ? null : Number(e.target.value)
@@ -421,7 +418,7 @@ export default function AdminPage() {
                       )}
 
                       {plans.map((plan) => (
-                        <option key={plan.id} value={plan.id}>
+                        <option key={plan.id} value={String(plan.id)}>
                           {plan.name}
                         </option>
                       ))}
