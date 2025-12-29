@@ -160,6 +160,7 @@ export default function AdminPage() {
     setSaving(true);
 
     try {
+      // 1️⃣ Guardar datos del usuario
       await fetch(`${API_URL}/api/admin/users/${editingUser.id}`, {
         method: 'PUT',
         headers: {
@@ -176,27 +177,38 @@ export default function AdminPage() {
         }),
       });
 
-      // ✅ CORREGIDO: guardar siempre el plan (incluso null)
-      await fetch(`${API_URL}/api/admin/users/${editingUser.id}/plan`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          plan_id: selectedPlanId === '' ? null : selectedPlanId,
-        }),
-      });
+      // 2️⃣ Guardar plan SOLO si cambió
+      if (selectedPlanId && selectedPlanId !== editingUser.plan?.id) {
+        const resPlan = await fetch(
+          `${API_URL}/api/admin/users/${editingUser.id}/plan`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ plan_id: selectedPlanId }),
+          }
+        );
+
+        if (!resPlan.ok) {
+          const err = await resPlan.json();
+          throw new Error(err.error || 'Error al actualizar plan');
+        }
+      }
 
       setEditingUser(null);
       setSelectedPlanId('');
-      fetchUsers();
-    } catch {
+      await fetchUsers(); // 🔴 siempre await
+
+    } catch (err) {
+      console.error(err);
       alert('Error al guardar usuario');
     } finally {
       setSaving(false);
     }
   };
+
 
   // ➕ Crear usuario
   const createUser = async () => {
