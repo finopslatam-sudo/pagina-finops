@@ -404,6 +404,13 @@ export default function AdminPage() {
                           e.target.value === "" ? null : Number(e.target.value)
                         )
                       }
+                      className={`mt-1 w-full rounded-lg border p-2 font-semibold transition
+                        ${
+                          editingUser?.plan?.code
+                            ? planColor(editingUser.plan.code)
+                            : "bg-gray-50"
+                        }
+                      `}
                     >
                       {/* Solo mostrar "Sin plan" si realmente no tiene */}
                       {!editingUser?.plan && (
@@ -418,6 +425,7 @@ export default function AdminPage() {
                         </option>
                       ))}
                     </select>
+
 
                     {plans.length === 0 && (
                       <p className="text-sm text-gray-400 mt-1">
