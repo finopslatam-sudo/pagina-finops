@@ -67,12 +67,14 @@ export default function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [originalPlanId, setOriginalPlanId] = useState<number | null>(null);
 
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [mode, setMode] = useState<'edit' | 'create'>('edit');
 
   // 🔧 CORREGIDO: usar number | ''
-  const [selectedPlanId, setSelectedPlanId] = useState<number | ''>('');
+  const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
+
 
   const [saving, setSaving] = useState(false);
 
@@ -93,17 +95,16 @@ export default function AdminPage() {
 
   useEffect(() => {
     console.log("🧪 ESTADO plans:", plans);
-
+  
     if (!editingUser) return;
     if (plans.length === 0) return;
   
     // Inicializa el plan solo al abrir el modal
-    setSelectedPlanId(
-      editingUser.plan?.id ?? ""
-    );
-  }, [editingUser?.id, plans.length]);
+    setSelectedPlanId(editingUser.plan?.id ?? null);
+    setOriginalPlanId(editingUser.plan?.id ?? null);
   
-   
+  }, [editingUser?.id, plans.length]);
+
   // 🔒 Solo admin
   useEffect(() => {
     if (user && user.role !== 'admin') {
@@ -155,59 +156,72 @@ export default function AdminPage() {
   }, [token]);
 
   // 💾 Guardar edición
-  const saveUser = async () => {
-    if (!editingUser || !token) return;
-    setSaving(true);
-
-    try {
-      // 1️⃣ Guardar datos del usuario
-      await fetch(`${API_URL}/api/admin/users/${editingUser.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          company_name: editingUser.company_name,
-          contact_name: editingUser.contact_name,
-          phone: editingUser.phone,
-          role: editingUser.role,
-          is_active: editingUser.is_active,
-          email: editingUser.email,
-        }),
-      });
-
-      // 2️⃣ Guardar plan SOLO si cambió
-      if (selectedPlanId && selectedPlanId !== editingUser.plan?.id) {
-        const resPlan = await fetch(
-          `${API_URL}/api/admin/users/${editingUser.id}/plan`,
+    const saveUser = async () => {
+      if (!editingUser || !token) return;
+      setSaving(true);
+    
+      try {
+        // 1️⃣ Actualizar datos del usuario
+        const resUser = await fetch(
+          `${API_URL}/api/admin/users/${editingUser.id}`,
           {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ plan_id: selectedPlanId }),
+            body: JSON.stringify({
+              company_name: editingUser.company_name,
+              contact_name: editingUser.contact_name,
+              phone: editingUser.phone,
+              email: editingUser.email,
+              role: editingUser.role,
+              is_active: editingUser.is_active,
+            }),
           }
         );
-
-        if (!resPlan.ok) {
-          const err = await resPlan.json();
-          throw new Error(err.error || 'Error al actualizar plan');
+    
+        if (!resUser.ok) {
+          const err = await resUser.json();
+          throw new Error(err.error || 'Error al actualizar usuario');
         }
+    
+        // 2️⃣ Cambiar plan SOLO si realmente cambió
+        if (
+          selectedPlanId !== null &&
+          selectedPlanId !== originalPlanId
+        ) {
+          const resPlan = await fetch(
+            `${API_URL}/api/admin/users/${editingUser.id}/plan`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ plan_id: selectedPlanId }),
+            }
+          );
+    
+          if (!resPlan.ok) {
+            const err = await resPlan.json();
+            throw new Error(err.error || 'Error al actualizar plan');
+          }
+        }
+    
+        // 3️⃣ Cerrar modal + refrescar
+        setEditingUser(null);
+        setSelectedPlanId(null);
+        setOriginalPlanId(null);
+        await fetchUsers();
+    
+      } catch (err) {
+        console.error(err);
+        alert('Error al guardar usuario');
+      } finally {
+        setSaving(false);
       }
-
-      setEditingUser(null);
-      setSelectedPlanId('');
-      await fetchUsers(); // 🔴 siempre await
-
-    } catch (err) {
-      console.error(err);
-      alert('Error al guardar usuario');
-    } finally {
-      setSaving(false);
-    }
-  };
+    };
 
 
   // ➕ Crear usuario
@@ -356,7 +370,7 @@ export default function AdminPage() {
                         <button
                           onClick={() => {
                             setEditingUser(u);
-                            setSelectedPlanId(u.plan?.id ?? '');
+                            setSelectedPlanId(u.plan?.id ?? null);
                             setMode('edit');
                           }}
                           className="text-blue-600 hover:text-blue-800 font-medium"
@@ -395,14 +409,11 @@ export default function AdminPage() {
                       Plan de suscripción
                     </label>
                     <select
-                      className={`mt-1 border rounded-lg p-2 w-full font-semibold transition ${
-                        editingUser?.plan?.code
-                          ? planColor(editingUser.plan.code)
-                          : 'bg-gray-50'
-                      }`}
-                      value={selectedPlanId}
+                      value={selectedPlanId ?? ""}
                       onChange={(e) =>
-                        setSelectedPlanId(e.target.value === "" ? "" : Number(e.target.value))
+                        setSelectedPlanId(
+                          e.target.value === "" ? null : Number(e.target.value)
+                        )
                       }
                     >
                       {/* Solo mostrar "Sin plan" si realmente no tiene */}
@@ -530,7 +541,7 @@ export default function AdminPage() {
                   <button
                     onClick={() => {
                       setEditingUser(null);
-                      setSelectedPlanId('');
+                      setSelectedPlanId(null);
                     }}
                     className="px-4 py-2 border rounded-lg"
                   >
