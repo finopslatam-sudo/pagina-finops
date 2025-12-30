@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import ForceChangePasswordModal from '@/app/components/Auth/ForceChangePasswordModal';
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -30,6 +31,9 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
       </div>
     );
   }
-
+  // 🔐 Forzar cambio de contraseña
+  if (user?.force_password_change) {
+    return <ForceChangePasswordModal />;
+  }
   return <>{children}</>;
 }

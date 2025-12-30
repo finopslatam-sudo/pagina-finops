@@ -15,6 +15,7 @@ export interface User {
   contact_name?: string;
   phone?: string;
   role?: "admin" | "client";
+  force_password_change?: boolean;
 }
 
 interface AuthContextType {
