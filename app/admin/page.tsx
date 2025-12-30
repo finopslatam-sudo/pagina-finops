@@ -72,6 +72,11 @@ export default function AdminPage() {
 
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [mode, setMode] = useState<'edit' | 'create'>('edit');
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [resetError, setResetError] = useState('');
+
 
   // 🔧 CORREGIDO: usar number | ''
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
@@ -335,6 +340,56 @@ export default function AdminPage() {
     }
   };
 
+  // 🔐 Reset password usuario
+  const resetPassword = async () => {
+    if (!editingUser || !token) return;
+
+    if (!newPassword || !confirmNewPassword) {
+      setResetError('Completa ambos campos');
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setResetError('Las contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/admin/users/${editingUser.id}/reset-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            password: newPassword,
+            confirm_password: confirmNewPassword,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        setResetError(err.error || 'Error al resetear contraseña');
+        return;
+      }
+
+      setSuccessMessage('Contraseña reseteada correctamente');
+      setShowResetPassword(false);
+
+      setNewPassword('');
+      setConfirmNewPassword('');
+      setResetError('');
+
+      setTimeout(() => setSuccessMessage(''), 3000);
+
+    } catch (err) {
+      console.error(err);
+      setResetError('Error inesperado');
+    }
+  };
 
   return (
     <PrivateRoute>
@@ -450,8 +505,9 @@ export default function AdminPage() {
 
           )}
         </div>
-          {/* 🧩 MODAL EDITAR */}
-          {editingUser && mode === 'edit' && (
+        {editingUser && mode === 'edit' && (
+          <>
+            {/* 🧩 MODAL EDITAR */}
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
               <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
 
@@ -465,50 +521,47 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                {/* BODY (SCROLL) */}
+                {/* BODY */}
                 <div className="p-6 space-y-4 overflow-y-auto">
-                {/* PLAN */}
-                <div>
-                  <label className="text-sm text-gray-600">
-                    Plan de suscripción
-                  </label>
 
-                  {/* PLAN ACTUAL */}
-                  {editingUser?.plan && (
-                    <div className="mt-2 mb-3 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2">
-                      <span className="text-sm font-semibold text-indigo-700">
-                        Plan actual: {editingUser.plan.name}
-                      </span>
-                    </div>
-                  )}
+                  {/* PLAN */}
+                  <div>
+                    <label className="text-sm text-gray-600">
+                      Plan de suscripción
+                    </label>
 
-                  {/* SELECT */}
-                  <select
-                    value={selectedPlanId !== null ? String(selectedPlanId) : ""}
-                    onChange={(e) =>
-                      setSelectedPlanId(
-                        e.target.value === "" ? null : Number(e.target.value)
-                      )
-                    }
-                    className={`mt-1 w-full rounded-lg border p-2 font-semibold transition ${
-                      selectedPlan
-                        ? planColor(selectedPlan.code)
-                        : "bg-gray-50"
-                    }`}
-                  >
-                    {!editingUser?.plan && (
-                      <option value="">
-                        Sin plan
-                      </option>
+                    {editingUser.plan && (
+                      <div className="mt-2 mb-3 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2">
+                        <span className="text-sm font-semibold text-indigo-700">
+                          Plan actual: {editingUser.plan.name}
+                        </span>
+                      </div>
                     )}
 
-                    {plans.map((plan) => (
-                      <option key={plan.id} value={String(plan.id)}>
-                        {plan.name}
-                      </option>
-                    ))}
-                  </select>
-                                   
+                    <select
+                      value={selectedPlanId !== null ? String(selectedPlanId) : ""}
+                      onChange={(e) =>
+                        setSelectedPlanId(
+                          e.target.value === "" ? null : Number(e.target.value)
+                        )
+                      }
+                      className={`mt-1 w-full rounded-lg border p-2 font-semibold transition ${
+                        selectedPlan
+                          ? planColor(selectedPlan.code)
+                          : "bg-gray-50"
+                      }`}
+                    >
+                      {!editingUser.plan && (
+                        <option value="">Sin plan</option>
+                      )}
+
+                      {plans.map((plan) => (
+                        <option key={plan.id} value={String(plan.id)}>
+                          {plan.name}
+                        </option>
+                      ))}
+                    </select>
+
                     {plans.length === 0 && (
                       <p className="text-sm text-gray-400 mt-1">
                         Cargando planes...
@@ -523,10 +576,7 @@ export default function AdminPage() {
                       className="mt-1 border rounded-lg p-2 w-full"
                       value={editingUser.company_name}
                       onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          company_name: e.target.value,
-                        })
+                        setEditingUser({ ...editingUser, company_name: e.target.value })
                       }
                     />
                   </div>
@@ -539,10 +589,7 @@ export default function AdminPage() {
                       className="mt-1 border rounded-lg p-2 w-full"
                       value={editingUser.email}
                       onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          email: e.target.value,
-                        })
+                        setEditingUser({ ...editingUser, email: e.target.value })
                       }
                     />
                   </div>
@@ -554,10 +601,7 @@ export default function AdminPage() {
                       className="mt-1 border rounded-lg p-2 w-full"
                       value={editingUser.contact_name || ''}
                       onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          contact_name: e.target.value,
-                        })
+                        setEditingUser({ ...editingUser, contact_name: e.target.value })
                       }
                     />
                   </div>
@@ -569,10 +613,7 @@ export default function AdminPage() {
                       className="mt-1 border rounded-lg p-2 w-full"
                       value={editingUser.phone || ''}
                       onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          phone: e.target.value,
-                        })
+                        setEditingUser({ ...editingUser, phone: e.target.value })
                       }
                     />
                   </div>
@@ -595,6 +636,7 @@ export default function AdminPage() {
                       <option value="admin">Administrador</option>
                     </select>
                   </div>
+
                   {/* ESTADO */}
                   <div>
                     <label className="text-sm text-gray-600">Estado</label>
@@ -612,13 +654,29 @@ export default function AdminPage() {
                       <option value="inactive">Inactivo</option>
                     </select>
                   </div>
+
+                  {/* 🔐 ACCIÓN DE SEGURIDAD */}
+                  <div className="pt-4 border-t">
+                    <button
+                      onClick={() => {
+                        setShowResetPassword(true);
+                        setNewPassword('');
+                        setConfirmNewPassword('');
+                        setResetError('');
+                      }}
+                      className="text-orange-600 hover:text-orange-800 font-medium"
+                    >
+                      Reset Password
+                    </button>
+                  </div>
                 </div>
 
-                {/* FOOTER (SIEMPRE VISIBLE) */}
+                {/* FOOTER */}
                 <div className="p-6 border-t flex justify-end gap-3 bg-white">
                   <button
                     onClick={() => {
                       setEditingUser(null);
+                      setShowResetPassword(false);
                       setSuccessMessage('');
                     }}
                     className="px-4 py-2 border rounded-lg"
@@ -627,15 +685,69 @@ export default function AdminPage() {
                   </button>
                   <button
                     onClick={saveUser}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                    disabled={showResetPassword}
+                    className={`px-4 py-2 rounded-lg ${
+                      showResetPassword
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 text-white'
+                    }`}
                   >
                     Guardar cambios
                   </button>
                 </div>
               </div>
             </div>
-          )}
 
+            {/* 🔐 MODAL RESET PASSWORD */}
+            {showResetPassword && (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60]">
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+                  <h2 className="text-xl font-semibold mb-4">
+                    Resetear contraseña
+                  </h2>
+
+                  {resetError && (
+                    <div className="mb-4 text-sm text-red-600">
+                      {resetError}
+                    </div>
+                  )}
+
+                  <input
+                    type="password"
+                    placeholder="Nueva contraseña"
+                    className="w-full border rounded-lg p-2 mb-3"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+
+                  <input
+                    type="password"
+                    placeholder="Confirmar nueva contraseña"
+                    className="w-full border rounded-lg p-2 mb-4"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  />
+
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => setShowResetPassword(false)}
+                      className="px-4 py-2 border rounded-lg"
+                    >
+                      Cancelar
+                    </button>
+
+                    <button
+                      onClick={resetPassword}
+                      className="px-4 py-2 bg-orange-600 text-white rounded-lg"
+                    >
+                      Resetear
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
         {/* 🧩 MODAL CREAR */}
         {mode === 'create' && (
