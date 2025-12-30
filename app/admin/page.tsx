@@ -167,8 +167,9 @@ export default function AdminPage() {
   // 💾 Guardar edición
   const saveUser = async () => {
     if (!editingUser || !token) return;
+
     setSaving(true);
-  
+
     try {
       // 1️⃣ Actualizar datos del usuario
       await fetch(`${API_URL}/api/admin/users/${editingUser.id}`, {
@@ -186,13 +187,13 @@ export default function AdminPage() {
           is_active: editingUser.is_active,
         }),
       });
-    
+
       // 2️⃣ Actualizar plan SOLO si cambió
       const planChanged =
         selectedPlanId !== null &&
         originalPlanId !== null &&
         selectedPlanId !== originalPlanId;
-    
+
       if (planChanged) {
         await fetch(`${API_URL}/api/admin/users/${editingUser.id}/plan`, {
           method: 'PUT',
@@ -203,30 +204,29 @@ export default function AdminPage() {
           body: JSON.stringify({ plan_id: selectedPlanId }),
         });
       }
-    
-      // ✅ 3️⃣ ÉXITO (AQUÍ)
-      setSuccessMessage('Datos actualizados con éxito');
-    
-      // ⏱️ Opcional: que desaparezca solo
-      setTimeout(() => setSuccessMessage(''), 3000);
-    
-      // 4️⃣ refrescar lista
-      await fetchUsers();
-    
-      setSuccessMessage('Datos actualizados con éxito');
 
+      // ✅ 3️⃣ Feedback GLOBAL (fuera del modal)
+      setSuccessMessage('Usuario actualizado con éxito');
+
+      // ✅ 4️⃣ Cerrar modal inmediatamente
+      setEditingUser(null);
+
+      // ✅ 5️⃣ Refrescar lista sin bloquear la UI
+      fetchUsers();
+
+      // ✅ 6️⃣ Limpiar mensaje después de unos segundos
       setTimeout(() => {
-        setEditingUser(null);   // ✅ cierra modal
-        setSuccessMessage(''); // limpia mensaje
-      }, 1500);
-      
-    
+        setSuccessMessage('');
+      }, 3000);
+
     } catch (err) {
-      alert("Error al guardar usuario");
+      console.error(err);
+      alert('Error al guardar usuario');
     } finally {
       setSaving(false);
     }
-  }
+  };
+
   // ➕ Crear usuario
   const createUser = async () => {
     if (
@@ -293,7 +293,13 @@ export default function AdminPage() {
     <PrivateRoute>
       <main className="min-h-screen bg-gray-50 px-6 py-10">
         <h1 className="text-3xl font-bold mb-6">Panel de Administración</h1>
-
+        
+        {successMessage && (
+          <div className="mb-6 rounded-lg border border-green-300 bg-green-50 p-4 text-green-800 font-medium">
+            {successMessage}
+          </div>
+        )}
+        
         <div className="bg-white rounded-xl shadow p-6">
           <div className="flex justify-between mb-4">
             <h2 className="text-lg font-semibold">Usuarios</h2>
@@ -411,12 +417,7 @@ export default function AdminPage() {
 
                 {/* BODY (SCROLL) */}
                 <div className="p-6 space-y-4 overflow-y-auto">
-                  {/* ✅ MENSAJE DE ÉXITO (AQUÍ VA) */}
-                  {successMessage && (
-                    <div className="mb-4 rounded-lg border border-green-300 bg-green-50 p-3 text-green-700 font-medium">
-                      {successMessage}
-                    </div>
-                          )}
+
                   {/* PLAN */}
                   <div>
                     <label className="text-sm text-gray-600">
