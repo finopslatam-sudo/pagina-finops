@@ -213,8 +213,13 @@ export default function AdminPage() {
       // 4️⃣ refrescar lista
       await fetchUsers();
     
-      // ❌ NO cierres el modal inmediatamente
-      // setEditingUser(null);
+      setSuccessMessage('Datos actualizados con éxito');
+
+      setTimeout(() => {
+        setEditingUser(null);   // ✅ cierra modal
+        setSuccessMessage(''); // limpia mensaje
+      }, 1500);
+      
     
     } catch (err) {
       alert("Error al guardar usuario");
@@ -550,9 +555,6 @@ export default function AdminPage() {
                       <option value="inactive">Inactivo</option>
                     </select>
                   </div>
-                </div>
-                <div className="p-6">
-                  <h2 className="text-xl font-bold">Editar usuario</h2>
                 </div>
 
                 {/* FOOTER (SIEMPRE VISIBLE) */}
