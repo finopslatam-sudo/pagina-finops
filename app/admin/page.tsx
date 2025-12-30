@@ -704,7 +704,6 @@ export default function AdminPage() {
             </div>
 
             {/* 🔐 MODAL RESET PASSWORD */}
-            {/* 🔐 MODAL RESET PASSWORD */}
             {showResetPassword && (
               <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60]">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
@@ -713,14 +712,14 @@ export default function AdminPage() {
                     Resetear contraseña
                   </h2>
 
-                  {/* ✅ MENSAJE DE ÉXITO */}
+                  {/* ✅ MENSAJE DE ÉXITO (NUEVO, NO ROMPE NADA) */}
                   {resetSuccess && (
                     <div className="mb-4 rounded-lg border border-green-300 bg-green-50 p-3 text-green-700 font-medium">
                       {resetSuccess}
                     </div>
                   )}
 
-                  {/* ❌ MENSAJE DE ERROR */}
+                  {/* ❌ MENSAJE DE ERROR (YA EXISTÍA) */}
                   {resetError && (
                     <div className="mb-4 text-sm text-red-600">
                       {resetError}
@@ -745,13 +744,7 @@ export default function AdminPage() {
 
                   <div className="flex justify-end gap-3">
                     <button
-                      onClick={() => {
-                        setShowResetPassword(false);
-                        setResetError('');
-                        setResetSuccess('');
-                        setNewPassword('');
-                        setConfirmNewPassword('');
-                      }}
+                      onClick={() => setShowResetPassword(false)}
                       className="px-4 py-2 border rounded-lg"
                     >
                       Cancelar
@@ -768,6 +761,8 @@ export default function AdminPage() {
               </div>
             )}
 
+          </>
+        )}
 
         {/* 🧩 MODAL CREAR */}
         {mode === 'create' && (
