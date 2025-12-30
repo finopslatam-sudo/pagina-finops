@@ -144,20 +144,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-
-    if (!res.ok) {
-      throw new Error("Credenciales inválidas");
-    }
-
+    
     const data = await res.json();
-
+    
+    if (!res.ok) {
+      throw new Error(data.error || "Error al iniciar sesión");
+    }
+    
+    // ✅ Guardar sesión
     setUser(data.client);
     setToken(data.access_token);
 
     localStorage.setItem("finops_token", data.access_token);
     localStorage.setItem("finops_user", JSON.stringify(data.client));
-  };
 
+    if (data.subscription) {
+      localStorage.setItem("finops_plan", JSON.stringify(data.subscription));
+    } else {
+      localStorage.removeItem("finops_plan");
+    }
+  };
   const logout = () => {
     setUser(null);
     setToken(null);
