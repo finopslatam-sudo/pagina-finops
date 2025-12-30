@@ -38,6 +38,7 @@ interface NewUser {
 }
 
 export default function AdminPage() {
+  const [successMessage, setSuccessMessage] = useState('');
   const { user, token } = useAuth();
   const router = useRouter();
   const API_URL =
@@ -185,13 +186,13 @@ export default function AdminPage() {
           is_active: editingUser.is_active,
         }),
       });
-  
+    
       // 2️⃣ Actualizar plan SOLO si cambió
       const planChanged =
         selectedPlanId !== null &&
         originalPlanId !== null &&
         selectedPlanId !== originalPlanId;
-  
+    
       if (planChanged) {
         await fetch(`${API_URL}/api/admin/users/${editingUser.id}/plan`, {
           method: 'PUT',
@@ -202,17 +203,24 @@ export default function AdminPage() {
           body: JSON.stringify({ plan_id: selectedPlanId }),
         });
       }
-  
-      // 3️⃣ cerrar modal + refrescar
-      setEditingUser(null);
-      fetchUsers();
-  
+    
+      // ✅ 3️⃣ ÉXITO (AQUÍ)
+      setSuccessMessage('Datos actualizados con éxito');
+    
+      // ⏱️ Opcional: que desaparezca solo
+      setTimeout(() => setSuccessMessage(''), 3000);
+    
+      // 4️⃣ refrescar lista
+      await fetchUsers();
+    
+      // ❌ NO cierres el modal inmediatamente
+      // setEditingUser(null);
+    
     } catch (err) {
       alert("Error al guardar usuario");
     } finally {
       setSaving(false);
     }
-  };
 
   // ➕ Crear usuario
   const createUser = async () => {
@@ -357,15 +365,22 @@ export default function AdminPage() {
                       </td>
 
                       <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() => {
-                            setEditingUser(u);
-                            setMode('edit');
-                          }}
-                          className="text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                          Editar
-                        </button>
+                      <button
+                        onClick={() => {
+                          setEditingUser(u);
+                          setMode('edit');
+
+                          // ✅ preparar estado del plan
+                          setSelectedPlanId(u.plan?.id ?? null);
+                          setOriginalPlanId(u.plan?.id ?? null);
+
+                          // ✅ limpiar mensaje anterior
+                          setSuccessMessage('');
+                        }}
+                        className="text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Editar
+                      </button>
                       </td>
                     </tr>
                   ))}
@@ -391,7 +406,12 @@ export default function AdminPage() {
 
                 {/* BODY (SCROLL) */}
                 <div className="p-6 space-y-4 overflow-y-auto">
-
+                  {/* ✅ MENSAJE DE ÉXITO (AQUÍ VA) */}
+                  {successMessage && (
+                    <div className="mb-4 rounded-lg border border-green-300 bg-green-50 p-3 text-green-700 font-medium">
+                      {successMessage}
+                    </div>
+                          )}
                   {/* PLAN */}
                   <div>
                     <label className="text-sm text-gray-600">
@@ -513,7 +533,6 @@ export default function AdminPage() {
                       <option value="admin">Administrador</option>
                     </select>
                   </div>
-
                   {/* ESTADO */}
                   <div>
                     <label className="text-sm text-gray-600">Estado</label>
@@ -532,13 +551,16 @@ export default function AdminPage() {
                     </select>
                   </div>
                 </div>
+                <div className="p-6">
+                  <h2 className="text-xl font-bold">Editar usuario</h2>
+                </div>
 
                 {/* FOOTER (SIEMPRE VISIBLE) */}
                 <div className="p-6 border-t flex justify-end gap-3 bg-white">
                   <button
                     onClick={() => {
                       setEditingUser(null);
-                      setSelectedPlanId(null);
+                      setSuccessMessage('');
                     }}
                     className="px-4 py-2 border rounded-lg"
                   >
