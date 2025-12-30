@@ -164,6 +164,53 @@ export default function AdminPage() {
     fetchPlans();
   }, [token]);
 
+  // 🗑️ Eliminar (desactivar) usuario
+  const deleteUser = async (userId: number) => {
+    if (!token) return;
+
+    // 🔐 Evitar eliminarse a sí mismo
+    if (userId === user?.id) {
+      alert('No puedes eliminar tu propio usuario');
+      return;
+    }
+
+    const confirmed = confirm(
+      '¿Estás seguro de que deseas eliminar este usuario?\nEsta acción desactivará la cuenta.'
+    );
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/admin/users/${userId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        alert(error.error || 'Error al eliminar usuario');
+        return;
+      }
+
+      // ✅ Feedback
+      setSuccessMessage('Usuario eliminado correctamente');
+
+      // 🔄 Refrescar lista
+      fetchUsers();
+
+      // ⏱️ Limpiar mensaje
+      setTimeout(() => setSuccessMessage(''), 3000);
+
+    } catch (err) {
+      console.error(err);
+      alert('Error inesperado al eliminar usuario');
+    }
+  };
+
   // 💾 Guardar edición
   const saveUser = async () => {
     if (!editingUser || !token) return;
@@ -374,25 +421,28 @@ export default function AdminPage() {
                           {u.is_active ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-
-                      <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => {
-                          setEditingUser(u);
-                          setMode('edit');
-
-                          // ✅ preparar estado del plan
-                          setSelectedPlanId(u.plan?.id ?? null);
-                          setOriginalPlanId(u.plan?.id ?? null);
-
-                          // ✅ limpiar mensaje anterior
-                          setSuccessMessage('');
-                        }}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Editar
-                      </button>
-                      </td>
+                      <td className="px-4 py-3 text-right space-x-4">
+                        <button
+                          onClick={() => {
+                            setEditingUser(u);
+                            setMode('edit');
+                            setSelectedPlanId(u.plan?.id ?? null);
+                            setOriginalPlanId(u.plan?.id ?? null);
+                            setSuccessMessage('');
+                          }}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          Editar
+                        </button>
+                        {u.is_active && u.id !== user?.id && (
+                        <button
+                          onClick={() => deleteUser(u.id)}
+                          className="text-red-600 hover:text-red-800 font-medium"
+                        >
+                          Eliminar
+                        </button>
+                      )}
+                    </td>
                     </tr>
                   ))}
                 </tbody>
