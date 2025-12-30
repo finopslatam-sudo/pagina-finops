@@ -76,6 +76,8 @@ export default function AdminPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
+
 
 
   // 🔧 CORREGIDO: usar number | ''
@@ -343,17 +345,17 @@ export default function AdminPage() {
   // 🔐 Reset password usuario
   const resetPassword = async () => {
     if (!editingUser || !token) return;
-
+  
     if (!newPassword || !confirmNewPassword) {
-      setResetError('Completa ambos campos');
+      setResetError('Debes completar ambos campos');
       return;
     }
-
+  
     if (newPassword !== confirmNewPassword) {
       setResetError('Las contraseñas no coinciden');
       return;
     }
-
+  
     try {
       const res = await fetch(
         `${API_URL}/api/admin/users/${editingUser.id}/reset-password`,
@@ -369,25 +371,28 @@ export default function AdminPage() {
           }),
         }
       );
-
+  
+      const data = await res.json();
+  
       if (!res.ok) {
-        const err = await res.json();
-        setResetError(err.error || 'Error al resetear contraseña');
+        setResetError(data.error || 'Error al resetear contraseña');
         return;
       }
-
-      setSuccessMessage('Contraseña reseteada correctamente');
-      setShowResetPassword(false);
-
-      setNewPassword('');
-      setConfirmNewPassword('');
+  
+      // ✅ ÉXITO
       setResetError('');
-
-      setTimeout(() => setSuccessMessage(''), 3000);
-
+      setResetSuccess('Contraseña actualizada con éxito');
+  
+      // ⏱️ Cerrar modal luego de 1.5s
+      setTimeout(() => {
+        setShowResetPassword(false);
+        setResetSuccess('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+      }, 1500);
+  
     } catch (err) {
-      console.error(err);
-      setResetError('Error inesperado');
+      setResetError('Error inesperado al resetear contraseña');
     }
   };
 
@@ -699,13 +704,23 @@ export default function AdminPage() {
             </div>
 
             {/* 🔐 MODAL RESET PASSWORD */}
+            {/* 🔐 MODAL RESET PASSWORD */}
             {showResetPassword && (
               <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60]">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+
                   <h2 className="text-xl font-semibold mb-4">
                     Resetear contraseña
                   </h2>
 
+                  {/* ✅ MENSAJE DE ÉXITO */}
+                  {resetSuccess && (
+                    <div className="mb-4 rounded-lg border border-green-300 bg-green-50 p-3 text-green-700 font-medium">
+                      {resetSuccess}
+                    </div>
+                  )}
+
+                  {/* ❌ MENSAJE DE ERROR */}
                   {resetError && (
                     <div className="mb-4 text-sm text-red-600">
                       {resetError}
@@ -730,7 +745,13 @@ export default function AdminPage() {
 
                   <div className="flex justify-end gap-3">
                     <button
-                      onClick={() => setShowResetPassword(false)}
+                      onClick={() => {
+                        setShowResetPassword(false);
+                        setResetError('');
+                        setResetSuccess('');
+                        setNewPassword('');
+                        setConfirmNewPassword('');
+                      }}
                       className="px-4 py-2 border rounded-lg"
                     >
                       Cancelar
@@ -746,8 +767,7 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
-          </>
-        )}
+
 
         {/* 🧩 MODAL CREAR */}
         {mode === 'create' && (
