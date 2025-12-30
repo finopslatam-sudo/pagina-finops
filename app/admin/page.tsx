@@ -417,52 +417,48 @@ export default function AdminPage() {
 
                 {/* BODY (SCROLL) */}
                 <div className="p-6 space-y-4 overflow-y-auto">
+                {/* PLAN */}
+                <div>
+                  <label className="text-sm text-gray-600">
+                    Plan de suscripción
+                  </label>
 
-                  {/* PLAN */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      Plan de suscripción
-                    </label>
-                    <select
-                      value={selectedPlanId !== null ? String(selectedPlanId) : ""}
-                      onChange={(e) =>
-                        setSelectedPlanId(
-                          e.target.value === "" ? null : Number(e.target.value)
-                        )
-                      }
-                      className={`mt-1 w-full rounded-lg border p-2 font-semibold transition ${
-                        selectedPlan
-                          ? planColor(selectedPlan.code)
-                          : "bg-gray-50"
-                      }`}
-                    >
-                      {/* Solo mostrar "Sin plan" si realmente no tiene */}
-                      {!editingUser?.plan && (
-                        <option value="">
-                          Sin plan
-                        </option>
-                      )}
+                  {/* PLAN ACTUAL */}
+                  {editingUser?.plan && (
+                    <div className="mt-2 mb-3 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2">
+                      <span className="text-sm font-semibold text-indigo-700">
+                        Plan actual: {editingUser.plan.name}
+                      </span>
+                    </div>
+                  )}
 
-                      {plans.map((plan) => {
-                        const isCurrentPlan = plan.id === editingUser?.plan?.id;
+                  {/* SELECT */}
+                  <select
+                    value={selectedPlanId !== null ? String(selectedPlanId) : ""}
+                    onChange={(e) =>
+                      setSelectedPlanId(
+                        e.target.value === "" ? null : Number(e.target.value)
+                      )
+                    }
+                    className={`mt-1 w-full rounded-lg border p-2 font-semibold transition ${
+                      selectedPlan
+                        ? planColor(selectedPlan.code)
+                        : "bg-gray-50"
+                    }`}
+                  >
+                    {!editingUser?.plan && (
+                      <option value="">
+                        Sin plan
+                      </option>
+                    )}
 
-                        return (
-                          <option
-                            key={plan.id}
-                            value={String(plan.id)}
-                            className={
-                              isCurrentPlan
-                                ? 'font-bold text-indigo-700 bg-indigo-50'
-                                : ''
-                            }
-                          >
-                            {plan.name}
-                            {isCurrentPlan ? '  (Plan actual)' : ''}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    
+                    {plans.map((plan) => (
+                      <option key={plan.id} value={String(plan.id)}>
+                        {plan.name}
+                      </option>
+                    ))}
+                  </select>
+                                   
                     {plans.length === 0 && (
                       <p className="text-sm text-gray-400 mt-1">
                         Cargando planes...
