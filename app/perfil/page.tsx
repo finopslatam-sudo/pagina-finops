@@ -1,12 +1,11 @@
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function PerfilPage() {
   const { user, token, updateUser } = useAuth();
 
-  // 🔐 Protección básica
   if (!user || !token) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-white">
@@ -23,33 +22,63 @@ export default function PerfilPage() {
     confirmPassword: '',
   });
 
-  // 🔄 Cargar datos del usuario (contraseñas SIEMPRE vacías)
-  useEffect(() => {
-    setForm({
-      contact_name: user.contact_name || '',
-      email: user.email,
-      phone: '',            // 👈 siempre limpio
-      password: '',         // 👈 siempre limpio
-      confirmPassword: '',  // 👈 siempre limpio
-    });
-  }, [user]);
-
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    setForm({
+      contact_name: user.contact_name || '',
+      email: user.email,
+      phone: '',
+      password: '',
+      confirmPassword: '',
+    });
+  }, [user]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((p) => ({ ...p, [name]: value }));
   };
+
+  /* 🔐 REGLAS PASSWORD */
+  const rules = useMemo(() => {
+    const p = form.password;
+    return {
+      length: p.length >= 8 && p.length <= 12,
+      upper: /[A-Z]/.test(p),
+      lower: /[a-z]/.test(p),
+      number: /[0-9]/.test(p),
+      special: /[^A-Za-z0-9]/.test(p),
+      notSame: p.length > 0, // backend ya evita reutilizar hash
+    };
+  }, [form.password]);
+
+  const passwordUsed = form.password.length > 0;
+  const allValid =
+    !passwordUsed ||
+    (Object.values(rules).every(Boolean) &&
+      form.password === form.confirmPassword);
+
+  const Rule = ({ ok, text }: { ok: boolean; text: string }) => (
+    <li className="flex items-center gap-2 text-sm">
+      <span className={ok ? 'text-green-600' : 'text-gray-400'}>
+        {ok ? '✔️' : '○'}
+      </span>
+      <span className={ok ? 'text-green-700' : 'text-gray-600'}>
+        {text}
+      </span>
+    </li>
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (form.password && form.password !== form.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+    if (!allValid) {
+      setError('La contraseña no cumple los requisitos');
       return;
     }
 
@@ -74,20 +103,11 @@ export default function PerfilPage() {
       );
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Error al guardar cambios');
-      }
+      if (!res.ok) throw new Error(data.error || 'Error al guardar cambios');
 
       updateUser(data.user);
       setSuccess('Perfil actualizado correctamente');
-
-      // 🔄 limpiar contraseñas tras guardar
-      setForm((prev) => ({
-        ...prev,
-        password: '',
-        confirmPassword: '',
-      }));
+      setForm((p) => ({ ...p, password: '', confirmPassword: '' }));
 
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
@@ -97,137 +117,108 @@ export default function PerfilPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-gray-900 flex flex-col">
+    <main className="min-h-screen bg-gray-50 flex justify-center py-12 px-4">
+      <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6">
 
-      {/* 🔵 HERO SUPERIOR (igual estilo dashboard) */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-16">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-4xl font-bold mb-2">
-            Mi Perfil
-          </h1>
-          <p className="text-blue-100">
-            Gestiona tu información personal y credenciales
-          </p>
-        </div>
-      </section>
+        <h2 className="text-2xl font-semibold mb-6">
+          Editar mis datos
+        </h2>
 
-      {/* 🧾 FORMULARIO */}
-      <section className="flex-1 flex justify-center py-12 px-4 bg-gray-50">
-        <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6">
+        {error && (
+          <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
+            {error}
+          </div>
+        )}
 
-          <h2 className="text-2xl font-semibold mb-6 text-gray-900">
-            Editar mis datos
-          </h2>
+        {success && (
+          <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">
+            {success}
+          </div>
+        )}
 
-          {error && (
-            <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
-              {error}
-            </div>
-          )}
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-          {success && (
-            <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">
-              {success}
-            </div>
-          )}
+          <input
+            name="contact_name"
+            value={form.contact_name}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+            placeholder="Nombre de contacto"
+          />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              name="contact_name"
-              placeholder="Nombre de contacto"
-              value={form.contact_name}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-              required
-            />
+          <input
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+          />
 
-            <input
-              name="email"
-              type="email"
-              placeholder="Correo"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-              required
-            />
+          <input
+            value={user.company_name}
+            disabled
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+          />
 
-            <input
-              value={user.company_name}
-              disabled
-              className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
-            />
+          <input
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+            placeholder="Teléfono"
+            className="w-full px-4 py-2 border rounded-lg"
+          />
 
-            <input
-              name="phone"
-              placeholder="ej: 912345678"
-              value={form.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-            />
+          <hr />
 
-            <hr />
-
+          {/* PASSWORD */}
+          <div className="relative">
             <input
               name="password"
-              type="password"
-              placeholder="Nueva contraseña (opcional)"
+              type={showPassword ? 'text' : 'password'}
               value={form.password}
               onChange={handleChange}
-              autoComplete="new-password"
-              className="w-full px-4 py-2 border rounded-lg"
+              placeholder="Nueva contraseña (opcional)"
+              className="w-full px-4 py-2 border rounded-lg pr-12"
             />
-
-            <input
-              name="confirmPassword"
-              type="password"
-              placeholder="Confirmar contraseña"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              autoComplete="new-password"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 text-gray-500"
             >
-              {loading ? 'Guardando...' : 'Guardar cambios'}
+              👁
             </button>
-          </form>
-        </div>
-      </section>
+          </div>
 
-      {/* 🔻 FOOTER (MISMO QUE DASHBOARD) */}
-      <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
-        <div className="flex justify-center gap-6 pb-6">
-          <a
-            href="https://wa.me/56965090121"
-            target="_blank"
-            className="hover:text-blue-400 transition text-2xl"
-          >
-            💬
-          </a>
-          <a
-            href="mailto:contacto@finopslatam.com"
-            className="hover:text-blue-400 transition text-2xl"
-          >
-            📧
-          </a>
-          <a
-            href="https://www.linkedin.com/company/finopslatam"
-            target="_blank"
-            className="hover:text-blue-400 transition text-2xl"
-          >
-            💼
-          </a>
-        </div>
+          <input
+            name="confirmPassword"
+            type={showPassword ? 'text' : 'password'}
+            value={form.confirmPassword}
+            onChange={handleChange}
+            placeholder="Confirmar contraseña"
+            className="w-full px-4 py-2 border rounded-lg"
+          />
 
-        <div className="max-w-7xl mx-auto px-6 py-8 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} FinOpsLatam — Todos los derechos reservados
-        </div>
-      </footer>
+          {passwordUsed && (
+            <ul className="mt-2 space-y-1">
+              <Rule ok={rules.length} text="Entre 8 y 12 caracteres" />
+              <Rule ok={rules.upper} text="Al menos una letra mayúscula" />
+              <Rule ok={rules.lower} text="Al menos una letra minúscula" />
+              <Rule ok={rules.number} text="Al menos un número" />
+              <Rule ok={rules.special} text="Al menos un carácter especial" />
+            </ul>
+          )}
 
+          <button
+            type="submit"
+            disabled={loading || !allValid}
+            className={`w-full py-2 rounded-lg text-white font-medium
+              ${allValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}
+            `}
+          >
+            {loading ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+
+        </form>
+      </div>
     </main>
   );
 }
