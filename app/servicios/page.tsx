@@ -4,10 +4,6 @@ export default function Servicios() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
 
-      {/* cambiar desde aqui */}
-      {/* ❌ NAVBAR LOCAL ELIMINADO (ahora es global en layout.tsx) */}
-      {/* hasta aqui */}
-
       {/* HERO SERVICIOS */}
       <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>

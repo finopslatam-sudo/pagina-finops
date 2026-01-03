@@ -76,14 +76,14 @@ export default function PerfilPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
-  
-    if (form.password && form.password !== form.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+
+    if (!allValid) {
+      setError('La contraseña no cumple los requisitos');
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile`,
@@ -101,26 +101,14 @@ export default function PerfilPage() {
           }),
         }
       );
-  
+
       const data = await res.json();
-  
-      if (!res.ok) {
-        throw new Error(data.error || 'Error al guardar cambios');
-      }
-  
-      // ✅ CLAVE: NO PERDER PLAN NI FLAGS
-      updateUser({
-        ...user,
-        ...data.user,
-      });
-  
+      if (!res.ok) throw new Error(data.error || 'Error al guardar cambios');
+
+      updateUser(data.user);
       setSuccess('Perfil actualizado correctamente');
-  
-      setForm((prev) => ({
-        ...prev,
-        password: '',
-        confirmPassword: '',
-      }));
+      setForm((p) => ({ ...p, password: '', confirmPassword: '' }));
+
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
@@ -234,4 +222,3 @@ export default function PerfilPage() {
     </main>
   );
 }
-
