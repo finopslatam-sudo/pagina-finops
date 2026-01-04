@@ -10,18 +10,25 @@ import {
 
 export interface User {
   id: number;
-  company_name: string;
   email: string;
-  contact_name?: string;
-  phone?: string;
   role?: "admin" | "client";
   force_password_change?: boolean;
+  
+  company_name?: string;
+  contact_name?: string;
+  phone?: string;
+  
+  plan?: {
+    id: number;
+    code: string;
+    name: string;
+  };
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  plan: any | null;
+  plan: User["plan"] | null;
   features: string[];
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -34,14 +41,12 @@ const INACTIVITY_LIMIT = 15 * 60 * 1000;
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [plan, setPlan] = useState<any | null>(null);
+  const [plan, setPlan] = useState<User["plan"] | null>(null);
   const [features, setFeatures] = useState<string[]>([]);
 
   const API_URL =
-    process.env.NEXT_PUBLIC_API_URL &&
-    process.env.NEXT_PUBLIC_API_URL.trim() !== ""
-      ? process.env.NEXT_PUBLIC_API_URL
-      : "https://api.finopslatam.com";
+    process.env.NEXT_PUBLIC_API_URL?.trim() ||
+    "https://api.finopslatam.com";
 
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -51,30 +56,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     inactivityTimer.current = setTimeout(() => {
-      if (token) {
-        logout();
-      }
+      if (token) logout();
     }, INACTIVITY_LIMIT);
   };
 
-  //  Rehidratar sesión
+  // 🔄 Rehidratar sesión
   useEffect(() => {
-    const savedToken = localStorage.getItem("finops_token");
-    const savedUser = localStorage.getItem("finops_user");
-    const savedPlan = localStorage.getItem("finops_plan");
+    try {
+      const savedToken = localStorage.getItem("finops_token");
+      const savedUser = localStorage.getItem("finops_user");
+      const savedPlan = localStorage.getItem("finops_plan");
 
-    if (!savedToken || !savedUser) return;
+      if (savedToken && savedUser) {
+        setToken(savedToken);
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
 
-    setToken(savedToken);
-    setUser(JSON.parse(savedUser));
-
-    if (savedPlan) {
-      try {
-        setPlan(JSON.parse(savedPlan));
-      } catch {
-        localStorage.removeItem("finops_plan");
-        setPlan(null);
+        if (savedPlan) {
+          setPlan(JSON.parse(savedPlan));
+        }
       }
+    } catch {
+      localStorage.clear();
     }
   }, []);
 
@@ -82,60 +85,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!user) return;
 
-    const events = [
-      "mousemove",
-      "mousedown",
-      "keydown",
-      "scroll",
-      "touchstart",
-    ];
+    const events = ["mousemove", "mousedown", "keydown", "scroll", "touchstart"];
+    const handler = () => resetInactivityTimer();
 
-    const handleActivity = () => resetInactivityTimer();
-
-    events.forEach((event) =>
-      window.addEventListener(event, handleActivity)
-    );
-
+    events.forEach((e) => window.addEventListener(e, handler));
     resetInactivityTimer();
 
     return () => {
-      if (inactivityTimer.current) {
-        clearTimeout(inactivityTimer.current);
-      }
-
-      events.forEach((event) =>
-        window.removeEventListener(event, handleActivity)
-      );
+      if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
+      events.forEach((e) => window.removeEventListener(e, handler));
     };
   }, [user, token]);
-
-  // 🔄 Refrescar plan y features
-  useEffect(() => {
-    if (!token) return;
-
-    fetch(`${API_URL}/api/me/plan`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.plan) {
-          setPlan(data.plan);
-          localStorage.setItem("finops_plan", JSON.stringify(data.plan));
-        }
-      })
-      .catch(() => {});
-
-    fetch(`${API_URL}/api/me/features`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.features) {
-          setFeatures(data.features);
-        }
-      })
-      .catch(() => {});
-  }, [token]);
 
   // 🔐 LOGIN
   const login = async (email: string, password: string) => {
@@ -144,25 +104,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    
+
     const data = await res.json();
-    
+
     if (!res.ok) {
       throw new Error(data.error || "Error al iniciar sesión");
     }
 
-    // ✅ Guardar sesión
-    setUser(data.client);
+    setUser(data.user);
     setToken(data.access_token);
+    setPlan(data.user.plan ?? null);
 
     localStorage.setItem("finops_token", data.access_token);
-    localStorage.setItem("finops_user", JSON.stringify(data.client));
-    if (data.subscription) { 
-      localStorage.setItem("finops_plan", 
-        JSON.stringify(data.subscription)); 
-      } else { 
-        localStorage.removeItem("finops_plan"); 
-      }
+    localStorage.setItem("finops_user", JSON.stringify(data.user));
+
+    if (data.user.plan) {
+      localStorage.setItem("finops_plan", JSON.stringify(data.user.plan));
+    } else {
+      localStorage.removeItem("finops_plan");
+    }
   };
 
   const logout = () => {
@@ -170,10 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(null);
     setPlan(null);
     setFeatures([]);
-
-    localStorage.removeItem("finops_token");
-    localStorage.removeItem("finops_user");
-    localStorage.removeItem("finops_plan");
+    localStorage.clear();
   };
 
   const updateUser = (updatedUser: User) => {
