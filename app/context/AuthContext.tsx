@@ -17,7 +17,7 @@ export interface User {
   company_name?: string;
   contact_name?: string;
   phone?: string;
-  
+
   plan?: {
     id: number;
     code: string;
@@ -83,19 +83,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // ⏱️ Inactividad
   useEffect(() => {
-    if (!user) return;
+    if (!token) return;
 
-    const events = ["mousemove", "mousedown", "keydown", "scroll", "touchstart"];
-    const handler = () => resetInactivityTimer();
+    const fetchPlanAndFeatures = async () => {
+      try {
+        const planRes = await fetch(`${API_URL}/api/me/plan`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    events.forEach((e) => window.addEventListener(e, handler));
-    resetInactivityTimer();
+        if (
+          planRes.ok &&
+          planRes.headers.get("content-type")?.includes("application/json")
+        ) {
+          const planData = await planRes.json();
+          if (planData?.plan) {
+            setPlan(planData.plan);
+            localStorage.setItem("finops_plan", JSON.stringify(planData.plan));
+          }
+        }
 
-    return () => {
-      if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
-      events.forEach((e) => window.removeEventListener(e, handler));
+        const featRes = await fetch(`${API_URL}/api/me/features`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (
+          featRes.ok &&
+          featRes.headers.get("content-type")?.includes("application/json")
+        ) {
+          const featData = await featRes.json();
+          if (featData?.features) {
+            setFeatures(featData.features);
+          }
+        }
+      } catch (err) {
+        console.error("Error cargando plan/features", err);
+      }
     };
-  }, [user, token]);
+
+    fetchPlanAndFeatures();
+  }, [token]);
+
 
   // 🔐 LOGIN
   const login = async (email: string, password: string) => {
