@@ -81,50 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // ⏱️ Inactividad
-  useEffect(() => {
-    if (!token) return;
-
-    const fetchPlanAndFeatures = async () => {
-      try {
-        const planRes = await fetch(`${API_URL}/api/me/plan`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (
-          planRes.ok &&
-          planRes.headers.get("content-type")?.includes("application/json")
-        ) {
-          const planData = await planRes.json();
-          if (planData?.plan) {
-            setPlan(planData.plan);
-            localStorage.setItem("finops_plan", JSON.stringify(planData.plan));
-          }
-        }
-
-        const featRes = await fetch(`${API_URL}/api/me/features`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (
-          featRes.ok &&
-          featRes.headers.get("content-type")?.includes("application/json")
-        ) {
-          const featData = await featRes.json();
-          if (featData?.features) {
-            setFeatures(featData.features);
-          }
-        }
-      } catch (err) {
-        console.error("Error cargando plan/features", err);
-      }
-    };
-
-    fetchPlanAndFeatures();
-  }, [token]);
-
-
-  // 🔐 LOGIN
+   // 🔐 LOGIN
   const login = async (email: string, password: string) => {
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
