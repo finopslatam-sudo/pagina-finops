@@ -14,7 +14,7 @@ interface User {
 }
 
 export default function Dashboard() {
-  const { user, logout, features, plan } = useAuth();
+  const { user, logout, planState } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = () => {
@@ -32,12 +32,6 @@ export default function Dashboard() {
     governance: "🏷️ Cloud Governance",
   };
   
-  const planName =
-    plan?.code && planLabelMap[plan.code]
-     ? planLabelMap[plan.code]
-     : "Plan no asignado";
-     console.log("PLAN DESDE AUTHCONTEXT:", plan);
-
   return (
     <PrivateRoute>
       <main className="min-h-screen bg-white text-gray-900">
@@ -54,7 +48,18 @@ export default function Dashboard() {
               </span>
 
               <span className="text-sm text-blue-600 font-medium">
-                Plan contratado: <span className="font-semibold">{planName}</span>
+              Plan contratado:{" "}
+              {planState.status === "loading" && (
+                <span className="text-gray-400">Cargando plan…</span>
+              )}
+
+              {planState.status === "assigned" && (
+                <span className="font-semibold">{planState.plan.name}</span>
+              )}
+
+              {planState.status === "none" && (
+                <span className="text-red-500">Plan no asignado</span>
+              )}
               </span>
             </div>
           </div>
