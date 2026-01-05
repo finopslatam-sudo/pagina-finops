@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import ForceChangePasswordModal from '@/app/components/Auth/ForceChangePasswordModal';
@@ -12,36 +12,26 @@ interface PrivateRouteProps {
 export default function PrivateRoute({ children }: PrivateRouteProps) {
   const { user } = useAuth();
   const router = useRouter();
-  const [checking, setChecking] = useState(true);
 
+  // 🔁 Redirección si no hay sesión
   useEffect(() => {
-    // 🔐 Usuario no autenticado → redirección inmediata
     if (!user) {
       router.replace('/');
-      return;
     }
-
-    setChecking(false);
   }, [user, router]);
 
-  // ⏳ Mientras se valida sesión
-  if (checking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Cargando...</p>
-      </div>
-    );
-  }
-
-  // 🔐 Forzar cambio de contraseña (SOLO si hay usuario)
+  // 🛑 No renderizar nada hasta que Auth esté definido
   if (!user) {
-    return null; // nunca debería llegar aquí, pero satisface a TS
-  }
-  
-  if (user.force_password_change) {
-    return <ForceChangePasswordModal />;
+    return null;
   }
 
-  // ✅ Usuario válido → render normal
-  return <>{children}</>;
+  return (
+    <>
+      {/* 🔐 Overlay obligatorio si corresponde */}
+      {user.force_password_change && <ForceChangePasswordModal />}
+
+      {/* ✅ CONTENIDO SIEMPRE PRESENTE */}
+      {children}
+    </>
+  );
 }
