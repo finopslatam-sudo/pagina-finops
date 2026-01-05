@@ -1,10 +1,11 @@
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { PasswordFields } from '@/app/components/Auth/PasswordFields';
 
 export default function PerfilPage() {
-  const { user, token, updateUser } = useAuth();
+  const { user, token, updateUser, planState } = useAuth();
 
   if (!user || !token) {
     return (
@@ -16,68 +17,43 @@ export default function PerfilPage() {
 
   const [form, setForm] = useState({
     contact_name: '',
-    email: '',
     phone: '',
     password: '',
     confirmPassword: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
-
   useEffect(() => {
     setForm({
       contact_name: user.contact_name || '',
-      email: user.email,
       phone: '',
       password: '',
       confirmPassword: '',
     });
   }, [user]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((p) => ({ ...p, [name]: value }));
-  };
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
 
-  /* 🔐 REGLAS PASSWORD */
-  const rules = useMemo(() => {
-    const p = form.password;
-    return {
-      length: p.length >= 8 && p.length <= 12,
-      upper: /[A-Z]/.test(p),
-      lower: /[a-z]/.test(p),
-      number: /[0-9]/.test(p),
-      special: /[^A-Za-z0-9]/.test(p),
-      notSame: p.length > 0, // backend ya evita reutilizar hash
-    };
-  }, [form.password]);
-
-  const passwordUsed = form.password.length > 0;
-  const allValid =
-    !passwordUsed ||
-    (Object.values(rules).every(Boolean) &&
-      form.password === form.confirmPassword);
-
-  const Rule = ({ ok, text }: { ok: boolean; text: string }) => (
-    <li className="flex items-center gap-2 text-sm">
-      <span className={ok ? 'text-green-600' : 'text-gray-400'}>
-        {ok ? '✔️' : '○'}
-      </span>
-      <span className={ok ? 'text-green-700' : 'text-gray-600'}>
-        {text}
-      </span>
-    </li>
-  );
+  /* 🔐 Password reutilizable */
+  const {
+    allValid,
+    component: passwordUI,
+  } = PasswordFields({
+    password: form.password,
+    setPassword: (v: string) =>
+      setForm((p) => ({ ...p, password: v })),
+    confirm: form.confirmPassword,
+    setConfirm: (v: string) =>
+      setForm((p) => ({ ...p, confirmPassword: v })),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (!allValid) {
+    if (form.password && !allValid) {
       setError('La contraseña no cumple los requisitos');
       return;
     }
@@ -95,7 +71,6 @@ export default function PerfilPage() {
           },
           body: JSON.stringify({
             contact_name: form.contact_name,
-            email: form.email,
             phone: form.phone || undefined,
             password: form.password || undefined,
           }),
@@ -103,11 +78,18 @@ export default function PerfilPage() {
       );
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al guardar cambios');
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al guardar cambios');
+      }
 
       updateUser(data.user);
       setSuccess('Perfil actualizado correctamente');
-      setForm((p) => ({ ...p, password: '', confirmPassword: '' }));
+
+      setForm((p) => ({
+        ...p,
+        password: '',
+        confirmPassword: '',
+      }));
 
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
@@ -121,9 +103,47 @@ export default function PerfilPage() {
       <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6">
 
         <h2 className="text-2xl font-semibold mb-6">
-          Editar mis datos
+          Mi Perfil
         </h2>
 
+        {/* 🔒 INFO DE CUENTA (SOLO LECTURA) */}
+        <div className="space-y-3 mb-6">
+          <input
+            value={user.company_name}
+            disabled
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+          />
+
+          <input
+            value={user.email}
+            disabled
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+          />
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">
+              Plan actual
+            </span>
+            <span className="font-medium">
+              {planState.status === 'assigned'
+                ? planState.plan.name
+                : 'Sin plan'}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">
+              Estado de la cuenta
+            </span>
+            <span className="text-green-700 font-medium">
+              Activa
+            </span>
+          </div>
+        </div>
+
+        <hr className="mb-6" />
+
+        {/* ✏️ FORMULARIO EDITABLE */}
         {error && (
           <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
             {error}
@@ -139,80 +159,33 @@ export default function PerfilPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
 
           <input
-            name="contact_name"
-            value={form.contact_name}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
             placeholder="Nombre de contacto"
-          />
-
-          <input
-            name="email"
-            value={form.email}
-            onChange={handleChange}
+            value={form.contact_name}
+            onChange={(e) =>
+              setForm((p) => ({ ...p, contact_name: e.target.value }))
+            }
             className="w-full px-4 py-2 border rounded-lg"
+            required
           />
 
           <input
-            value={user.company_name}
-            disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
-          />
-
-          <input
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
             placeholder="Teléfono"
+            value={form.phone}
+            onChange={(e) =>
+              setForm((p) => ({ ...p, phone: e.target.value }))
+            }
             className="w-full px-4 py-2 border rounded-lg"
           />
 
           <hr />
 
-          {/* PASSWORD */}
-          <div className="relative">
-            <input
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Nueva contraseña (opcional)"
-              className="w-full px-4 py-2 border rounded-lg pr-12"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-2.5 text-gray-500"
-            >
-              👁
-            </button>
-          </div>
-
-          <input
-            name="confirmPassword"
-            type={showPassword ? 'text' : 'password'}
-            value={form.confirmPassword}
-            onChange={handleChange}
-            placeholder="Confirmar contraseña"
-            className="w-full px-4 py-2 border rounded-lg"
-          />
-
-          {passwordUsed && (
-            <ul className="mt-2 space-y-1">
-              <Rule ok={rules.length} text="Entre 8 y 12 caracteres" />
-              <Rule ok={rules.upper} text="Al menos una letra mayúscula" />
-              <Rule ok={rules.lower} text="Al menos una letra minúscula" />
-              <Rule ok={rules.number} text="Al menos un número" />
-              <Rule ok={rules.special} text="Al menos un carácter especial" />
-            </ul>
-          )}
+          {/* 🔐 Password */}
+          {passwordUI}
 
           <button
             type="submit"
-            disabled={loading || !allValid}
-            className={`w-full py-2 rounded-lg text-white font-medium
-              ${allValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}
-            `}
+            disabled={loading || (form.password.length > 0 && !allValid)}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
           >
             {loading ? 'Guardando...' : 'Guardar cambios'}
           </button>
