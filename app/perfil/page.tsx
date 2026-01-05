@@ -7,16 +7,11 @@ import { PasswordFields } from '@/app/components/Auth/PasswordFields';
 export default function PerfilPage() {
   const { user, token, updateUser, planState } = useAuth();
 
+  /* ================================
+     STATES (SIEMPRE ARRIBA)
+  ================================= */
   const [editContact, setEditContact] = useState(false);
   const [editPhone, setEditPhone] = useState(false);
-
-  if (!user || !token) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-600">Debes iniciar sesión</p>
-      </main>
-    );
-  }
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -25,7 +20,16 @@ export default function PerfilPage() {
     confirmPassword: '',
   });
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+
+  /* ================================
+     EFECTOS
+  ================================= */
   useEffect(() => {
+    if (!user) return;
+
     setForm({
       contact_name: user.contact_name || '',
       phone: user.phone || '',
@@ -34,11 +38,9 @@ export default function PerfilPage() {
     });
   }, [user]);
 
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
-
-  /* 🔐 Password reutilizable */
+  /* ================================
+     PASSWORD REUTILIZABLE
+  ================================= */
   const { allValid, component: passwordUI } = PasswordFields({
     password: form.password,
     setPassword: (v: string) =>
@@ -48,6 +50,20 @@ export default function PerfilPage() {
       setForm((p) => ({ ...p, confirmPassword: v })),
   });
 
+  /* ================================
+     GUARD (DESPUÉS DE LOS HOOKS)
+  ================================= */
+  if (!user || !token) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-gray-600">Debes iniciar sesión</p>
+      </main>
+    );
+  }
+
+  /* ================================
+     SUBMIT
+  ================================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -99,6 +115,9 @@ export default function PerfilPage() {
     }
   };
 
+  /* ================================
+     JSX
+  ================================= */
   return (
     <main className="min-h-screen bg-gray-50 flex justify-center py-12 px-4">
       <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6">
@@ -154,7 +173,7 @@ export default function PerfilPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* 👤 NOMBRE DE CONTACTO */}
+          {/* 👤 CONTACTO */}
           <div className="flex items-center gap-2">
             {!editContact ? (
               <>
@@ -179,7 +198,6 @@ export default function PerfilPage() {
                   onChange={(e) =>
                     setForm((p) => ({ ...p, contact_name: e.target.value }))
                   }
-                  placeholder="Nombre de contacto"
                   className="w-full px-4 py-2 border rounded-lg"
                   autoFocus
                 />
@@ -225,7 +243,6 @@ export default function PerfilPage() {
                   onChange={(e) =>
                     setForm((p) => ({ ...p, phone: e.target.value }))
                   }
-                  placeholder="Teléfono de contacto"
                   className="w-full px-4 py-2 border rounded-lg"
                   autoFocus
                 />
@@ -246,7 +263,7 @@ export default function PerfilPage() {
             )}
           </div>
 
-          {/* 🔐 PASSWORD — inputs siempre visibles */}
+          {/* 🔐 PASSWORD */}
           {passwordUI}
 
           <button
