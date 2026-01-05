@@ -46,7 +46,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-/* ⏱ 10 minutos */
+/* ⏱ 10 minutos exactos */
 const INACTIVITY_LIMIT = 10 * 60 * 1000;
 
 /* =====================================================
@@ -63,16 +63,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLoggingOutRef = useRef(false);
 
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL?.trim() ||
     "https://api.finopslatam.com";
 
   /* =====================================================
+     LOGOUT (BLINDADO)
+  ===================================================== */
+
+  const logout = () => {
+    if (isLoggingOutRef.current) return;
+    isLoggingOutRef.current = true;
+
+    if (inactivityTimer.current) {
+      clearTimeout(inactivityTimer.current);
+      inactivityTimer.current = null;
+    }
+
+    // ⛔️ IMPORTANTE: primero limpiar storage
+    localStorage.clear();
+
+    // ⛔️ luego limpiar estado
+    setUser(null);
+    setToken(null);
+    setPlanState({ status: "none" });
+
+    // ⛔️ salir inmediatamente
+    router.replace("/");
+  };
+
+  /* =====================================================
      INACTIVIDAD
   ===================================================== */
 
   const resetInactivityTimer = () => {
+    if (!token) return;
+
     if (inactivityTimer.current) {
       clearTimeout(inactivityTimer.current);
     }
@@ -114,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /* =====================================================
-     LISTENERS DE INACTIVIDAD
+     LISTENERS DE ACTIVIDAD
   ===================================================== */
 
   useEffect(() => {
@@ -152,6 +180,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ===================================================== */
 
   const login = async (email: string, password: string) => {
+    isLoggingOutRef.current = false;
+
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -186,23 +216,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /* =====================================================
-     LOGOUT (SEGURO)
-  ===================================================== */
-
-  const logout = () => {
-    if (inactivityTimer.current) {
-      clearTimeout(inactivityTimer.current);
-    }
-
-    setUser(null);
-    setToken(null);
-    setPlanState({ status: "none" });
-    localStorage.clear();
-
-    router.replace("/");
-  };
-
-  /* =====================================================
      UPDATE USER
   ===================================================== */
 
@@ -213,6 +226,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       JSON.stringify(updatedUser)
     );
   };
+
+  /* =====================================================
+     PROVIDER
+  ===================================================== */
 
   return (
     <AuthContext.Provider
