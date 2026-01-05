@@ -7,6 +7,9 @@ import { PasswordFields } from '@/app/components/Auth/PasswordFields';
 export default function PerfilPage() {
   const { user, token, updateUser, planState } = useAuth();
 
+  const [editContact, setEditContact] = useState(false);
+  const [editPhone, setEditPhone] = useState(false);
+
   if (!user || !token) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-white">
@@ -14,10 +17,6 @@ export default function PerfilPage() {
       </main>
     );
   }
-
-  /* ✏️ Estados de edición individuales */
-  const [editContact, setEditContact] = useState(false);
-  const [editPhone, setEditPhone] = useState(false);
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -40,10 +39,7 @@ export default function PerfilPage() {
   const [error, setError] = useState('');
 
   /* 🔐 Password reutilizable */
-  const {
-    allValid,
-    component: passwordUI,
-  } = PasswordFields({
+  const { allValid, component: passwordUI } = PasswordFields({
     password: form.password,
     setPassword: (v: string) =>
       setForm((p) => ({ ...p, password: v })),
@@ -57,7 +53,7 @@ export default function PerfilPage() {
     setError('');
     setSuccess('');
 
-    if (form.password.length > 0 && !allValid) {
+    if (form.password && !allValid) {
       setError('La contraseña no cumple los requisitos');
       return;
     }
@@ -75,18 +71,19 @@ export default function PerfilPage() {
           },
           body: JSON.stringify({
             contact_name: editContact ? form.contact_name : undefined,
-            phone: editPhone ? form.phone || undefined : undefined,
+            phone: editPhone ? form.phone : undefined,
             password: form.password || undefined,
           }),
         }
       );
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al guardar cambios');
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al guardar cambios');
+      }
 
       updateUser(data.user);
       setSuccess('Perfil actualizado correctamente');
-
       setEditContact(false);
       setEditPhone(false);
 
@@ -108,7 +105,7 @@ export default function PerfilPage() {
 
         <h2 className="text-2xl font-semibold mb-6">Mi Perfil</h2>
 
-        {/* 🔒 INFO SOLO LECTURA */}
+        {/* 🔒 INFO CUENTA */}
         <div className="space-y-3 mb-6">
           <input
             value={user.company_name || ''}
@@ -128,7 +125,7 @@ export default function PerfilPage() {
             value={
               planState.status === 'assigned'
                 ? planState.plan.name
-                : 'Sin plan'
+                : ''
             }
             disabled
             className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
@@ -155,55 +152,101 @@ export default function PerfilPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* 👤 NOMBRE CONTACTO */}
+          {/* 👤 NOMBRE DE CONTACTO */}
           <div className="flex items-center gap-2">
-            <input
-              value={form.contact_name || '—'}
-              disabled={!editContact}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, contact_name: e.target.value }))
-              }
-              className={`w-full px-4 py-2 border rounded-lg ${
-                editContact
-                  ? 'bg-white'
-                  : 'bg-gray-100 text-gray-600'
-              }`}
-            />
-            <button
-              type="button"
-              onClick={() => setEditContact((v) => !v)}
-              className="text-blue-600 text-sm whitespace-nowrap"
-            >
-              {editContact ? 'Cancelar' : 'Editar'}
-            </button>
+            {!editContact ? (
+              <>
+                <input
+                  value={user.contact_name || ''}
+                  disabled
+                  placeholder="Nombre de contacto"
+                  className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => setEditContact(true)}
+                  className="text-blue-600 text-sm"
+                >
+                  Editar
+                </button>
+              </>
+            ) : (
+              <>
+                <input
+                  value={form.contact_name}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, contact_name: e.target.value }))
+                  }
+                  placeholder="Nombre de contacto"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditContact(false);
+                    setForm((p) => ({
+                      ...p,
+                      contact_name: user.contact_name || '',
+                    }));
+                  }}
+                  className="text-gray-600 text-sm"
+                >
+                  Cancelar
+                </button>
+              </>
+            )}
           </div>
 
           {/* 📞 TELÉFONO */}
           <div className="flex items-center gap-2">
-            <input
-              value={form.phone || '—'}
-              disabled={!editPhone}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, phone: e.target.value }))
-              }
-              className={`w-full px-4 py-2 border rounded-lg ${
-                editPhone
-                  ? 'bg-white'
-                  : 'bg-gray-100 text-gray-600'
-              }`}
-            />
-            <button
-              type="button"
-              onClick={() => setEditPhone((v) => !v)}
-              className="text-blue-600 text-sm whitespace-nowrap"
-            >
-              {editPhone ? 'Cancelar' : 'Editar'}
-            </button>
+            {!editPhone ? (
+              <>
+                <input
+                  value={user.phone || ''}
+                  disabled
+                  placeholder="Teléfono de contacto"
+                  className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => setEditPhone(true)}
+                  className="text-blue-600 text-sm"
+                >
+                  Editar
+                </button>
+              </>
+            ) : (
+              <>
+                <input
+                  value={form.phone}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, phone: e.target.value }))
+                  }
+                  placeholder="Teléfono de contacto"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditPhone(false);
+                    setForm((p) => ({
+                      ...p,
+                      phone: user.phone || '',
+                    }));
+                  }}
+                  className="text-gray-600 text-sm"
+                >
+                  Cancelar
+                </button>
+              </>
+            )}
           </div>
 
-          {/* 🔐 PASSWORD (solo aparece si escribe) */}
+          {/* 🔐 PASSWORD (reglas solo si escribe) */}
           {form.password.length > 0 && passwordUI}
 
           <button
@@ -213,6 +256,7 @@ export default function PerfilPage() {
           >
             {loading ? 'Guardando...' : 'Guardar cambios'}
           </button>
+
         </form>
       </div>
     </main>
