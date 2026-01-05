@@ -25,7 +25,7 @@ export default function PerfilPage() {
   useEffect(() => {
     setForm({
       contact_name: user.contact_name || '',
-      phone: '',
+      phone: user.phone || '',
       password: '',
       confirmPassword: '',
     });
@@ -108,40 +108,40 @@ export default function PerfilPage() {
 
         {/* 🔒 INFO DE CUENTA (SOLO LECTURA) */}
         <div className="space-y-3 mb-6">
+
           <input
             value={user.company_name}
             disabled
             className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+            placeholder="Empresa"
           />
 
           <input
             value={user.email}
             disabled
             className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+            placeholder="Email"
           />
 
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">
-              Plan actual
-            </span>
-            <span className="font-medium">
-              {planState.status === 'assigned'
+          <input
+            value={
+              planState.status === 'assigned'
                 ? planState.plan.name
-                : 'Sin plan'}
-            </span>
-          </div>
+                : 'Sin plan'
+            }
+            disabled
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+            placeholder="Plan actual"
+          />
 
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">
-              Estado de la cuenta
-            </span>
-            <span className="text-green-700 font-medium">
-              Activa
-            </span>
-          </div>
-        </div>
+          <input
+            value="Activa"
+            disabled
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-green-700 font-medium"
+            placeholder="Estado"
+          />
 
-        <hr className="mb-6" />
+</div>
 
         {/* ✏️ FORMULARIO EDITABLE */}
         {error && (
