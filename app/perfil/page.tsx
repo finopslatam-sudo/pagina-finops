@@ -6,7 +6,6 @@ import { PasswordFields } from '@/app/components/Auth/PasswordFields';
 
 export default function PerfilPage() {
   const { user, token, updateUser, planState } = useAuth();
-  const [editingContact, setEditingContact] = useState(false);
 
   if (!user || !token) {
     return (
@@ -15,6 +14,10 @@ export default function PerfilPage() {
       </main>
     );
   }
+
+  /* ✏️ Estados de edición individuales */
+  const [editContact, setEditContact] = useState(false);
+  const [editPhone, setEditPhone] = useState(false);
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -54,7 +57,7 @@ export default function PerfilPage() {
     setError('');
     setSuccess('');
 
-    if (form.password && !allValid) {
+    if (form.password.length > 0 && !allValid) {
       setError('La contraseña no cumple los requisitos');
       return;
     }
@@ -71,21 +74,21 @@ export default function PerfilPage() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            contact_name: editingContact ? form.contact_name : undefined,
-            phone: editingContact ? form.phone || undefined : undefined,
+            contact_name: editContact ? form.contact_name : undefined,
+            phone: editPhone ? form.phone || undefined : undefined,
             password: form.password || undefined,
           }),
         }
       );
 
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Error al guardar cambios');
-      }
+      if (!res.ok) throw new Error(data.error || 'Error al guardar cambios');
 
       updateUser(data.user);
       setSuccess('Perfil actualizado correctamente');
-      setEditingContact(false);
+
+      setEditContact(false);
+      setEditPhone(false);
 
       setForm((p) => ({
         ...p,
@@ -105,7 +108,7 @@ export default function PerfilPage() {
 
         <h2 className="text-2xl font-semibold mb-6">Mi Perfil</h2>
 
-        {/* 🔒 INFO CUENTA (SOLO LECTURA) */}
+        {/* 🔒 INFO SOLO LECTURA */}
         <div className="space-y-3 mb-6">
           <input
             value={user.company_name || ''}
@@ -152,88 +155,56 @@ export default function PerfilPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
 
-          {/* 📇 CONTACTO */}
-          {!editingContact && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600 font-medium">
-                  Datos de contacto
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setEditingContact(true)}
-                  className="text-blue-600 text-sm hover:underline"
-                >
-                  Editar
-                </button>
-              </div>
+          {/* 👤 NOMBRE CONTACTO */}
+          <div className="flex items-center gap-2">
+            <input
+              value={form.contact_name || '—'}
+              disabled={!editContact}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, contact_name: e.target.value }))
+              }
+              className={`w-full px-4 py-2 border rounded-lg ${
+                editContact
+                  ? 'bg-white'
+                  : 'bg-gray-100 text-gray-600'
+              }`}
+            />
+            <button
+              type="button"
+              onClick={() => setEditContact((v) => !v)}
+              className="text-blue-600 text-sm whitespace-nowrap"
+            >
+              {editContact ? 'Cancelar' : 'Editar'}
+            </button>
+          </div>
 
-              <input
-                value={user.contact_name || '—'}
-                disabled
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-              />
+          {/* 📞 TELÉFONO */}
+          <div className="flex items-center gap-2">
+            <input
+              value={form.phone || '—'}
+              disabled={!editPhone}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, phone: e.target.value }))
+              }
+              className={`w-full px-4 py-2 border rounded-lg ${
+                editPhone
+                  ? 'bg-white'
+                  : 'bg-gray-100 text-gray-600'
+              }`}
+            />
+            <button
+              type="button"
+              onClick={() => setEditPhone((v) => !v)}
+              className="text-blue-600 text-sm whitespace-nowrap"
+            >
+              {editPhone ? 'Cancelar' : 'Editar'}
+            </button>
+          </div>
 
-              <input
-                value={user.phone || '—'}
-                disabled
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-              />
-            </div>
-          )}
-
-          {editingContact && (
-            <div className="space-y-4">
-              <input
-                placeholder="Nombre de contacto"
-                value={form.contact_name}
-                onChange={(e) =>
-                  setForm(p => ({ ...p, contact_name: e.target.value }))
-                }
-                className="w-full px-4 py-2 border rounded-lg"
-                required
-              />
-
-              <input
-                placeholder="Teléfono"
-                value={form.phone}
-                onChange={(e) =>
-                  setForm(p => ({ ...p, phone: e.target.value }))
-                }
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
-                >
-                  Guardar
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingContact(false);
-                    setForm({
-                      contact_name: user.contact_name || '',
-                      phone: user.phone || '',
-                      password: '',
-                      confirmPassword: '',
-                    });
-                  }}
-                  className="flex-1 border rounded-lg py-2"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* 🔐 PASSWORD */}
-          {passwordUI}
+          {/* 🔐 PASSWORD (solo aparece si escribe) */}
+          {form.password.length > 0 && passwordUI}
 
           <button
             type="submit"
@@ -242,7 +213,6 @@ export default function PerfilPage() {
           >
             {loading ? 'Guardando...' : 'Guardar cambios'}
           </button>
-
         </form>
       </div>
     </main>
