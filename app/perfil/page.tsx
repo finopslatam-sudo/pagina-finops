@@ -53,7 +53,7 @@ export default function PerfilPage() {
     setError('');
     setSuccess('');
 
-    if (form.password && !allValid) {
+    if (form.password.length > 0 && !allValid) {
       setError('La contraseña no cumple los requisitos');
       return;
     }
@@ -105,20 +105,20 @@ export default function PerfilPage() {
 
         <h2 className="text-2xl font-semibold mb-6">Mi Perfil</h2>
 
-        {/* 🔒 INFO CUENTA */}
+        {/* 🔒 DATOS DE CUENTA */}
         <div className="space-y-3 mb-6">
           <input
             value={user.company_name || ''}
             disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
             placeholder="Empresa"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
           />
 
           <input
             value={user.email}
             disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
             placeholder="Email"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
           />
 
           <input
@@ -128,15 +128,15 @@ export default function PerfilPage() {
                 : ''
             }
             disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
             placeholder="Plan actual"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
           />
 
           <input
             value="Activa"
             disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-green-700 font-medium"
             placeholder="Estado"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-green-700 font-medium"
           />
         </div>
 
@@ -246,8 +246,8 @@ export default function PerfilPage() {
             )}
           </div>
 
-          {/* 🔐 PASSWORD (reglas solo si escribe) */}
-          {form.password.length > 0 && passwordUI}
+          {/* 🔐 PASSWORD — inputs siempre visibles */}
+          {passwordUI}
 
           <button
             type="submit"
