@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/app/context/AuthContext';
 import { useEffect, useState } from 'react';
+import { PasswordFields } from '@/app/components/Auth/PasswordFields';
 
 export default function PerfilPage() {
   const { user, token, updateUser } = useAuth();
@@ -23,14 +24,14 @@ export default function PerfilPage() {
     confirmPassword: '',
   });
 
-  // 🔄 Cargar datos del usuario (contraseñas SIEMPRE vacías)
+  // 🔄 Cargar datos del usuario (passwords siempre vacías)
   useEffect(() => {
     setForm({
       contact_name: user.contact_name || '',
       email: user.email,
-      phone: '',            // 👈 siempre limpio
-      password: '',         // 👈 siempre limpio
-      confirmPassword: '',  // 👈 siempre limpio
+      phone: '',
+      password: '',
+      confirmPassword: '',
     });
   }, [user]);
 
@@ -43,13 +44,27 @@ export default function PerfilPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  /* 🔐 PASSWORD REUTILIZABLE (CAMBIO VOLUNTARIO) */
+  const {
+    allValid,
+    component: passwordUI,
+  } = PasswordFields({
+    password: form.password,
+    setPassword: (v: string) =>
+      setForm((p) => ({ ...p, password: v })),
+    confirm: form.confirmPassword,
+    setConfirm: (v: string) =>
+      setForm((p) => ({ ...p, confirmPassword: v })),
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (form.password && form.password !== form.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+    // 🔐 Si se está usando password, debe ser válida
+    if (form.password && !allValid) {
+      setError('La contraseña no cumple los requisitos');
       return;
     }
 
@@ -74,7 +89,6 @@ export default function PerfilPage() {
       );
 
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.error || 'Error al guardar cambios');
       }
@@ -99,7 +113,7 @@ export default function PerfilPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900 flex flex-col">
 
-      {/* 🔵 HERO SUPERIOR (igual estilo dashboard) */}
+      {/* 🔵 HERO */}
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-4xl font-bold mb-2">
@@ -132,6 +146,7 @@ export default function PerfilPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+
             <input
               name="contact_name"
               placeholder="Nombre de contacto"
@@ -167,38 +182,22 @@ export default function PerfilPage() {
 
             <hr />
 
-            <input
-              name="password"
-              type="password"
-              placeholder="Nueva contraseña (opcional)"
-              value={form.password}
-              onChange={handleChange}
-              autoComplete="new-password"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-
-            <input
-              name="confirmPassword"
-              type="password"
-              placeholder="Confirmar contraseña"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              autoComplete="new-password"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
+            {/* 🔐 PASSWORD (REUTILIZADO) */}
+            {passwordUI}
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (form.password.length > 0 && !allValid)}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
             >
               {loading ? 'Guardando...' : 'Guardar cambios'}
             </button>
+
           </form>
         </div>
       </section>
 
-      {/* 🔻 FOOTER (MISMO QUE DASHBOARD) */}
+      {/* 🔻 FOOTER */}
       <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
         <div className="flex justify-center gap-6 pb-6">
           <a
