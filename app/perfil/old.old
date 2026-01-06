@@ -8,10 +8,12 @@ export default function PerfilPage() {
   const { user, token, updateUser, planState } = useAuth();
 
   /* ================================
-     STATES (SIEMPRE ARRIBA)
+     STATES
   ================================= */
   const [editContact, setEditContact] = useState(false);
   const [editPhone, setEditPhone] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -39,9 +41,11 @@ export default function PerfilPage() {
   }, [user]);
 
   /* ================================
-     PASSWORD REUTILIZABLE
+     PASSWORD REUTILIZABLE (CORRECTO)
   ================================= */
   const { allValid, component: passwordUI } = PasswordFields({
+    currentPassword,
+    setCurrentPassword,
     password: form.password,
     setPassword: (v: string) =>
       setForm((p) => ({ ...p, password: v })),
@@ -51,7 +55,7 @@ export default function PerfilPage() {
   });
 
   /* ================================
-     GUARD (DESPUÉS DE LOS HOOKS)
+     GUARD
   ================================= */
   if (!user || !token) {
     return (
@@ -69,7 +73,7 @@ export default function PerfilPage() {
     setError('');
     setSuccess('');
 
-    if (form.password.length > 0 && !allValid) {
+    if (form.password && !allValid) {
       setError('La contraseña no cumple los requisitos');
       return;
     }
@@ -88,6 +92,7 @@ export default function PerfilPage() {
           body: JSON.stringify({
             contact_name: editContact ? form.contact_name : undefined,
             phone: editPhone ? form.phone : undefined,
+            current_password: form.password ? currentPassword : undefined,
             password: form.password || undefined,
           }),
         }
@@ -102,6 +107,7 @@ export default function PerfilPage() {
       setSuccess('Perfil actualizado correctamente');
       setEditContact(false);
       setEditPhone(false);
+      setCurrentPassword('');
 
       setForm((p) => ({
         ...p,
@@ -129,15 +135,13 @@ export default function PerfilPage() {
           <input
             value={user.company_name || ''}
             disabled
-            placeholder="Empresa"
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100"
           />
 
           <input
             value={user.email}
             disabled
-            placeholder="Email"
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100"
           />
 
           <input
@@ -147,14 +151,12 @@ export default function PerfilPage() {
                 : ''
             }
             disabled
-            placeholder="Plan actual"
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100"
           />
 
           <input
             value="Activa"
             disabled
-            placeholder="Estado"
             className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-green-700 font-medium"
           />
         </div>
@@ -172,96 +174,6 @@ export default function PerfilPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* 👤 CONTACTO */}
-          <div className="flex items-center gap-2">
-            {!editContact ? (
-              <>
-                <input
-                  value={user.contact_name || ''}
-                  disabled
-                  placeholder="Nombre de contacto"
-                  className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-                />
-                <button
-                  type="button"
-                  onClick={() => setEditContact(true)}
-                  className="text-blue-600 text-sm"
-                >
-                  Editar
-                </button>
-              </>
-            ) : (
-              <>
-                <input
-                  value={form.contact_name}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, contact_name: e.target.value }))
-                  }
-                  className="w-full px-4 py-2 border rounded-lg"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditContact(false);
-                    setForm((p) => ({
-                      ...p,
-                      contact_name: user.contact_name || '',
-                    }));
-                  }}
-                  className="text-gray-600 text-sm"
-                >
-                  Cancelar
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* 📞 TELÉFONO */}
-          <div className="flex items-center gap-2">
-            {!editPhone ? (
-              <>
-                <input
-                  value={user.phone || ''}
-                  disabled
-                  placeholder="Teléfono de contacto"
-                  className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-                />
-                <button
-                  type="button"
-                  onClick={() => setEditPhone(true)}
-                  className="text-blue-600 text-sm"
-                >
-                  Editar
-                </button>
-              </>
-            ) : (
-              <>
-                <input
-                  value={form.phone}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, phone: e.target.value }))
-                  }
-                  className="w-full px-4 py-2 border rounded-lg"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditPhone(false);
-                    setForm((p) => ({
-                      ...p,
-                      phone: user.phone || '',
-                    }));
-                  }}
-                  className="text-gray-600 text-sm"
-                >
-                  Cancelar
-                </button>
-              </>
-            )}
-          </div>
 
           {/* 🔐 PASSWORD */}
           {passwordUI}

@@ -3,8 +3,8 @@
 import { useMemo, useState } from 'react';
 
 interface Props {
-  currentPassword?: string;
-  setCurrentPassword?: (v: string) => void;
+  currentPassword: string;
+  setCurrentPassword: (v: string) => void;
   password: string;
   setPassword: (v: string) => void;
   confirm: string;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function PasswordFields({
-  currentPassword = '',
+  currentPassword,
   setCurrentPassword,
   password,
   setPassword,
@@ -22,8 +22,7 @@ export function PasswordFields({
   const [show, setShow] = useState(false);
 
   const rules = useMemo(() => {
-    const hasCurrent = currentPassword.length > 0;
-    const hasNew = password.length > 0;
+    const hasAll = currentPassword.length > 0 && password.length > 0;
 
     return {
       length: password.length >= 8 && password.length <= 12,
@@ -31,74 +30,51 @@ export function PasswordFields({
       lower: /[a-z]/.test(password),
       number: /[0-9]/.test(password),
       special: /[^A-Za-z0-9]/.test(password),
-
-      // 👇 regla clave: solo se evalúa si ambas existen
-      notSame:
-        !hasCurrent || !hasNew
-          ? null
-          : password !== currentPassword,
+      notSame: hasAll && password !== currentPassword,
+      match: password === confirm && confirm.length > 0,
     };
-  }, [password, currentPassword]);
+  }, [password, confirm, currentPassword]);
 
-  const allValid = Object.values(rules).every(
-    (v) => v === true || v === null
-  );
+  const allValid =
+    rules.length &&
+    rules.upper &&
+    rules.lower &&
+    rules.number &&
+    rules.special &&
+    rules.notSame &&
+    rules.match;
 
   const Rule = ({
     ok,
     text,
-    isError = false,
   }: {
-    ok: boolean | null;
+    ok: boolean;
     text: string;
-    isError?: boolean;
-  }) => {
-    if (ok === null) return null;
-
-    return (
-      <li className="flex items-center gap-2 text-sm">
-        <span
-          className={
-            ok
-              ? 'text-green-600'
-              : isError
-              ? 'text-red-600'
-              : 'text-gray-400'
-          }
-        >
-          {ok ? '✔️' : isError ? '❌' : '○'}
-        </span>
-        <span
-          className={
-            ok
-              ? 'text-green-700'
-              : isError
-              ? 'text-red-600'
-              : 'text-gray-600'
-          }
-        >
-          {text}
-        </span>
-      </li>
-    );
-  };
+  }) => (
+    <li className="flex items-center gap-2 text-sm">
+      <span className={ok ? 'text-green-600' : 'text-red-600'}>
+        {ok ? '✔️' : '❌'}
+      </span>
+      <span className={ok ? 'text-green-700' : 'text-red-600'}>
+        {text}
+      </span>
+    </li>
+  );
 
   return {
     allValid,
     component: (
       <>
-        {/* 🔐 CLAVE ACTUAL — SIEMPRE VISIBLE */}
-        {setCurrentPassword && (
-          <input
-            type={show ? 'text' : 'password'}
-            placeholder="Clave actual"
-            className="w-full border rounded-lg p-2 mb-3"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-          />
-        )}
+        {/* 🔐 CLAVE ACTUAL */}
+        <input
+          type={show ? 'text' : 'password'}
+          placeholder="Clave actual"
+          className="w-full border rounded-lg p-2 mb-3"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+        />
 
-        {/* 🔐 NUEVA CONTRASEÑA */}
+        {/* 🔐 NUEVA */}
         <div className="relative">
           <input
             type={show ? 'text' : 'password'}
@@ -132,13 +108,8 @@ export function PasswordFields({
           <Rule ok={rules.lower} text="Al menos una letra minúscula" />
           <Rule ok={rules.number} text="Al menos un número" />
           <Rule ok={rules.special} text="Al menos un carácter especial" />
-
-          {/* ❗ regla crítica */}
-          <Rule
-            ok={rules.notSame}
-            text="No puede ser igual a la actual"
-            isError
-          />
+          <Rule ok={rules.notSame} text="No puede ser igual a la actual" />
+          <Rule ok={rules.match} text="Las contraseñas coinciden" />
         </ul>
       </>
     ),
