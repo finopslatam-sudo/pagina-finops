@@ -240,12 +240,10 @@ export default function PerfilPage() {
                   {user.is_active ? "Activa" : "Inactiva"}
                 </span>
                 <span
-                  className={`text-sm font-semibold ${
-                    user.is_active ? "text-green-600" : "text-red-600"
+                  className={`inline-block w-3.5 h-3.5 rounded-full ${
+                    user.is_active ? "bg-green-600" : "bg-red-600"
                   }`}
-                >
-                  ●
-                </span>
+                ></span>
               </div>
             </div>
           </div>
@@ -272,6 +270,7 @@ export default function PerfilPage() {
                 }`}
               />
 
+              <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => {
@@ -287,6 +286,7 @@ export default function PerfilPage() {
               >
                 {editContact ? "Cancelar" : "Editar"}
               </button>
+            </div>
             </div>
 
             {/* Teléfono */}
@@ -308,6 +308,7 @@ export default function PerfilPage() {
                 }`}
               />
 
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => {
@@ -323,6 +324,7 @@ export default function PerfilPage() {
               >
                 {editPhone ? "Cancelar" : "Editar"}
               </button>
+            </div>
             </div>
 
             <button
