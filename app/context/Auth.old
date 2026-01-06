@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-
+import { useRouter } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -19,10 +18,10 @@ export interface User {
   email: string;
   role?: "admin" | "client";
   force_password_change?: boolean;
-
   company_name?: string;
   contact_name?: string;
   phone?: string;
+  is_active: boolean;
 }
 
 type PlanState =
@@ -48,13 +47,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const INACTIVITY_LIMIT = 15 * 60 * 1000;
+/* ⏱ 10 minutos exactos */
+const INACTIVITY_LIMIT = 10 * 60 * 1000;
 
 /* =====================================================
    PROVIDER
 ===================================================== */
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [planState, setPlanState] = useState<PlanState>({
@@ -62,27 +64,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLoggingOutRef = useRef(false);
 
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL?.trim() ||
     "https://api.finopslatam.com";
 
   /* =====================================================
+     LOGOUT (BLINDADO)
+  ===================================================== */
+
+  const logout = () => {
+    if (isLoggingOutRef.current) return;
+    isLoggingOutRef.current = true;
+
+    if (inactivityTimer.current) {
+      clearTimeout(inactivityTimer.current);
+      inactivityTimer.current = null;
+    }
+
+    // ⛔️ IMPORTANTE: primero limpiar storage
+    localStorage.clear();
+
+    // ⛔️ luego limpiar estado
+    setUser(null);
+    setToken(null);
+    setPlanState({ status: "none" });
+
+    // ⛔️ salir inmediatamente
+    router.replace("/");
+  };
+
+  /* =====================================================
      INACTIVIDAD
   ===================================================== */
 
   const resetInactivityTimer = () => {
+    if (!token) return;
+
     if (inactivityTimer.current) {
       clearTimeout(inactivityTimer.current);
     }
 
     inactivityTimer.current = setTimeout(() => {
-      if (token) logout();
+      logout();
     }, INACTIVITY_LIMIT);
   };
 
   /* =====================================================
-     REHIDRATAR SESIÓN (FUENTE DE VERDAD)
+     REHIDRATAR SESIÓN
   ===================================================== */
 
   useEffect(() => {
@@ -113,11 +143,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /* =====================================================
-     INACTIVIDAD (EVENTOS)
+     LISTENERS DE ACTIVIDAD
   ===================================================== */
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !token) return;
 
     const events = [
       "mousemove",
@@ -129,8 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const handleActivity = () => resetInactivityTimer();
 
-    events.forEach((event) =>
-      window.addEventListener(event, handleActivity)
+    events.forEach((e) =>
+      window.addEventListener(e, handleActivity)
     );
 
     resetInactivityTimer();
@@ -140,8 +170,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         clearTimeout(inactivityTimer.current);
       }
 
-      events.forEach((event) =>
-        window.removeEventListener(event, handleActivity)
+      events.forEach((e) =>
+        window.removeEventListener(e, handleActivity)
       );
     };
   }, [user, token]);
@@ -151,6 +181,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ===================================================== */
 
   const login = async (email: string, password: string) => {
+    isLoggingOutRef.current = false;
+
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -174,7 +206,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         status: "assigned",
         plan: data.user.plan,
       });
-
       localStorage.setItem(
         "finops_plan",
         JSON.stringify(data.user.plan)
@@ -183,17 +214,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setPlanState({ status: "none" });
       localStorage.removeItem("finops_plan");
     }
-  };
-
-  /* =====================================================
-     LOGOUT
-  ===================================================== */
-
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    setPlanState({ status: "none" });
-    localStorage.clear();
   };
 
   /* =====================================================

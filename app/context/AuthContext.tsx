@@ -16,12 +16,12 @@ import {
 export interface User {
   id: number;
   email: string;
-  role?: "admin" | "client";
-  force_password_change?: boolean;
-  company_name?: string;
-  contact_name?: string;
-  phone?: string;
+  role: "admin" | "client";
+  company_name: string;
+  contact_name: string;
+  phone: string;
   is_active: boolean;
+  force_password_change?: boolean;
 }
 
 type PlanState =
@@ -38,7 +38,7 @@ interface AuthContextType {
   planState: PlanState;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  updateUser: (user: User) => void;
+  updateUser: (partialUser: Partial<User>) => void;
 }
 
 /* =====================================================
@@ -47,7 +47,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-/* ⏱ 10 minutos exactos */
+/* ⏱ 10 minutos */
 const INACTIVITY_LIMIT = 10 * 60 * 1000;
 
 /* =====================================================
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     "https://api.finopslatam.com";
 
   /* =====================================================
-     LOGOUT (BLINDADO)
+     LOGOUT
   ===================================================== */
 
   const logout = () => {
@@ -83,15 +83,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       inactivityTimer.current = null;
     }
 
-    // ⛔️ IMPORTANTE: primero limpiar storage
     localStorage.clear();
-
-    // ⛔️ luego limpiar estado
     setUser(null);
     setToken(null);
     setPlanState({ status: "none" });
 
-    // ⛔️ salir inmediatamente
     router.replace("/");
   };
 
@@ -195,6 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(data.error || "Error al iniciar sesión");
     }
 
+    // 🔐 Guardar user COMPLETO
     setUser(data.user);
     setToken(data.access_token);
 
@@ -217,15 +214,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /* =====================================================
-     UPDATE USER
+     UPDATE USER (MERGE, NO REPLACE)
   ===================================================== */
 
-  const updateUser = (updatedUser: User) => {
-    setUser(updatedUser);
-    localStorage.setItem(
-      "finops_user",
-      JSON.stringify(updatedUser)
-    );
+  const updateUser = (partialUser: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      const merged = { ...prev, ...partialUser };
+      localStorage.setItem(
+        "finops_user",
+        JSON.stringify(merged)
+      );
+      return merged;
+    });
   };
 
   /* =====================================================
