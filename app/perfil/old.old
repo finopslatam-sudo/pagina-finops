@@ -184,129 +184,159 @@ export default function PerfilPage() {
         {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-          {/* ================= DATOS PERFIL ================= */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Datos del perfil</h3>
+          {/* ================= DATOS DEL PERFIL ================= */}
+          <div className="space-y-10">
 
-            {/* ===== Campos NO editables ===== */}
-            <div className="space-y-3 mb-6">
+          <h3 className="text-lg font-semibold">
+            Datos del perfil
+          </h3>
 
-              {/* Nombre empresa */}
+          {/* ===== NO EDITABLES ===== */}
+          <div className="space-y-5">
+
+            {/* Empresa */}
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600">
+                Nombre de la empresa
+              </label>
               <input
-                value={user.company_name || ''}
+                value={user.company_name}
                 disabled
-                placeholder="Nombre de la empresa"
                 className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
               />
-
-              {/* Correo */}
-              <input
-                value={user.email || ''}
-                disabled
-                placeholder="Correo"
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
-              />
-
-              {/* Plan */}
-              <input
-                value={planState.status === 'assigned' ? planState.plan.name : ''}
-                disabled
-                placeholder="Plan"
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
-              />
-
-              {/* Estado cuenta */}
-              <div className="flex items-center justify-between px-4 py-2 border rounded-lg bg-gray-100">
-                <span className="text-gray-700">Estado de la cuenta</span>
-                <span
-                  className={`text-sm font-semibold ${
-                    user.is_active ? 'text-green-600' : 'text-red-600'
-                  }`}
-                >
-                  {user.is_active ? 'Activa' : 'Inactiva'}
-                </span>
-              </div>
             </div>
 
-            {/* ===== Campos EDITABLES ===== */}
-            <form onSubmit={handleProfileSubmit} className="space-y-4">
+            {/* Correo */}
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600">
+                Correo
+              </label>
+              <input
+                value={user.email}
+                disabled
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+              />
+            </div>
 
-              {/* Nombre contacto */}
-              <div className="flex items-center gap-3">
-                <input
-                  value={form.contact_name}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, contact_name: e.target.value }))
-                  }
-                  disabled={!editContact}
-                  placeholder="Nombre de contacto"
-                  className={`w-full px-4 py-3 border rounded-xl ${
-                    !editContact
-                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                      : 'bg-white'
+            {/* Plan */}
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600">
+                Plan / Suscripción
+              </label>
+              <input
+                value={planState.status === "assigned" ? planState.plan.name : ""}
+                disabled
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+              />
+            </div>
+
+            {/* Estado */}
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600">
+                Estado de la cuenta
+              </label>
+              <div className="flex items-center justify-between px-4 py-2 border rounded-lg bg-gray-100">
+                <span className="text-gray-700">
+                  {user.is_active ? "Activa" : "Inactiva"}
+                </span>
+                <span
+                  className={`inline-block w-3.5 h-3.5 rounded-full ${
+                    user.is_active ? "bg-green-600" : "bg-red-600"
                   }`}
-                />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (editContact) {
-                      setForm((p) => ({
-                        ...p,
-                        contact_name: user.contact_name || '',
-                      }));
-                    }
-                    setEditContact(!editContact);
-                  }}
-                  className="text-blue-600 text-sm font-medium"
-                >
-                  {editContact ? 'Cancelar' : 'Editar'}
-                </button>
+                ></span>
               </div>
-
-              {/* Teléfono */}
-              <div className="flex items-center gap-3">
-                <input
-                  value={form.phone}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, phone: e.target.value }))
-                  }
-                  disabled={!editPhone}
-                  placeholder="Teléfono de contacto"
-                  className={`w-full px-4 py-3 border rounded-xl ${
-                    !editPhone
-                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                      : 'bg-white'
-                  }`}
-                />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (editPhone) {
-                      setForm((p) => ({
-                        ...p,
-                        phone: user.phone || '',
-                      }));
-                    }
-                    setEditPhone(!editPhone);
-                  }}
-                  className="text-blue-600 text-sm font-medium"
-                >
-                  {editPhone ? 'Cancelar' : 'Editar'}
-                </button>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loadingProfile}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
-              >
-                {loadingProfile ? 'Guardando...' : 'Guardar perfil'}
-              </button>
-            </form>
+            </div>
           </div>
 
+          {/* ===== EDITABLES ===== */}
+          <form onSubmit={handleProfileSubmit} className="space-y-8">
+
+            {/* Nombre contacto */}
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600">
+                Nombre de contacto
+              </label>
+
+              <input
+                value={form.contact_name}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, contact_name: e.target.value }))
+                }
+                disabled={!editContact}
+                className={`w-full px-4 py-3 border rounded-xl ${
+                  !editContact
+                    ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                    : "bg-white"
+                }`}
+              />
+
+              <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  if (editContact) {
+                    setForm((p) => ({
+                      ...p,
+                      contact_name: user.contact_name,
+                    }));
+                  }
+                  setEditContact(!editContact);
+                }}
+                className="text-blue-600 text-sm font-medium"
+              >
+                {editContact ? "Cancelar" : "Editar"}
+              </button>
+            </div>
+            </div>
+
+            {/* Teléfono */}
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600">
+                Teléfono de contacto
+              </label>
+
+              <input
+                value={form.phone}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, phone: e.target.value }))
+                }
+                disabled={!editPhone}
+                className={`w-full px-4 py-3 border rounded-xl ${
+                  !editPhone
+                    ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                    : "bg-white"
+                }`}
+              />
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  if (editPhone) {
+                    setForm((p) => ({
+                      ...p,
+                      phone: user.phone,
+                    }));
+                  }
+                  setEditPhone(!editPhone);
+                }}
+                className="text-blue-600 text-sm font-medium"
+              >
+                {editPhone ? "Cancelar" : "Editar"}
+              </button>
+            </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loadingProfile}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
+            >
+              {loadingProfile ? "Guardando..." : "Guardar perfil"}
+            </button>
+          </form>
+
+          </div>
 
           {/* ================= SEGURIDAD ================= */}
           <div>

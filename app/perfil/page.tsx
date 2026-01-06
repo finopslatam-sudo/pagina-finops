@@ -338,6 +338,8 @@ export default function PerfilPage() {
 
           </div>
 
+          <hr className="my-12 border-gray-200" />
+          
           {/* ================= SEGURIDAD ================= */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Seguridad</h3>
