@@ -186,126 +186,154 @@ export default function PerfilPage() {
 
           {/* ================= DATOS PERFIL ================= */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Datos del perfil</h3>
+            <h3 className="text-lg font-semibold mb-6">Datos del perfil</h3>
 
-            {/* ===== Campos NO editables ===== */}
-            <div className="space-y-3 mb-6">
+            {/* ===== NO EDITABLES ===== */}
+            <div className="space-y-5 mb-8">
 
-              {/* Nombre empresa */}
-              <input
-                value={user.company_name || ''}
-                disabled
-                placeholder="Nombre de la empresa"
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
-              />
+              {/* Empresa */}
+              <div className="space-y-1">
+                <label className="text-sm text-gray-600">
+                  Nombre de la empresa
+                </label>
+                <input
+                  value={user.company_name}
+                  disabled
+                  className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+                />
+              </div>
 
               {/* Correo */}
-              <input
-                value={user.email || ''}
-                disabled
-                placeholder="Correo"
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
-              />
+              <div className="space-y-1">
+                <label className="text-sm text-gray-600">
+                  Correo
+                </label>
+                <input
+                  value={user.email}
+                  disabled
+                  className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+                />
+              </div>
 
               {/* Plan */}
-              <input
-                value={planState.status === 'assigned' ? planState.plan.name : ''}
-                disabled
-                placeholder="Plan"
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
-              />
+              <div className="space-y-1">
+                <label className="text-sm text-gray-600">
+                  Plan / Suscripción
+                </label>
+                <input
+                  value={planState.status === "assigned" ? planState.plan.name : ""}
+                  disabled
+                  className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+                />
+              </div>
 
-              {/* Estado cuenta */}
-              <div className="flex items-center justify-between px-4 py-2 border rounded-lg bg-gray-100">
-                <span className="text-gray-700">Estado de la cuenta</span>
-                <span
-                  className={`text-sm font-semibold ${
-                    user.is_active ? 'text-green-600' : 'text-red-600'
-                  }`}
-                >
-                  {user.is_active ? 'Activa' : 'Inactiva'}
-                </span>
+              {/* Estado */}
+              <div className="space-y-1">
+                <label className="text-sm text-gray-600">
+                  Estado de la cuenta
+                </label>
+                <div className="flex items-center justify-between px-4 py-2 border rounded-lg bg-gray-100">
+                  <span className="text-gray-700">
+                    {user.is_active ? "Activa" : "Inactiva"}
+                  </span>
+                  <span
+                    className={`text-sm font-semibold ${
+                      user.is_active ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    ●
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* ===== Campos EDITABLES ===== */}
-            <form onSubmit={handleProfileSubmit} className="space-y-4">
+            {/* ===== EDITABLES ===== */}
+            <form onSubmit={handleProfileSubmit} className="space-y-6">
 
               {/* Nombre contacto */}
-              <div className="flex items-center gap-3">
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm text-gray-600">
+                    Nombre de contacto
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (editContact) {
+                        setForm((p) => ({
+                          ...p,
+                          contact_name: user.contact_name,
+                        }));
+                      }
+                      setEditContact(!editContact);
+                    }}
+                    className="text-blue-600 text-sm font-medium"
+                  >
+                    {editContact ? "Cancelar" : "Editar"}
+                  </button>
+                </div>
+
                 <input
                   value={form.contact_name}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, contact_name: e.target.value }))
                   }
                   disabled={!editContact}
-                  placeholder="Nombre de contacto"
                   className={`w-full px-4 py-3 border rounded-xl ${
                     !editContact
-                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                      : 'bg-white'
+                      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                      : "bg-white"
                   }`}
                 />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (editContact) {
-                      setForm((p) => ({
-                        ...p,
-                        contact_name: user.contact_name || '',
-                      }));
-                    }
-                    setEditContact(!editContact);
-                  }}
-                  className="text-blue-600 text-sm font-medium"
-                >
-                  {editContact ? 'Cancelar' : 'Editar'}
-                </button>
               </div>
 
               {/* Teléfono */}
-              <div className="flex items-center gap-3">
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm text-gray-600">
+                    Teléfono de contacto
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (editPhone) {
+                        setForm((p) => ({
+                          ...p,
+                          phone: user.phone,
+                        }));
+                      }
+                      setEditPhone(!editPhone);
+                    }}
+                    className="text-blue-600 text-sm font-medium"
+                  >
+                    {editPhone ? "Cancelar" : "Editar"}
+                  </button>
+                </div>
+
                 <input
                   value={form.phone}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, phone: e.target.value }))
                   }
                   disabled={!editPhone}
-                  placeholder="Teléfono de contacto"
                   className={`w-full px-4 py-3 border rounded-xl ${
                     !editPhone
-                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                      : 'bg-white'
+                      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                      : "bg-white"
                   }`}
                 />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (editPhone) {
-                      setForm((p) => ({
-                        ...p,
-                        phone: user.phone || '',
-                      }));
-                    }
-                    setEditPhone(!editPhone);
-                  }}
-                  className="text-blue-600 text-sm font-medium"
-                >
-                  {editPhone ? 'Cancelar' : 'Editar'}
-                </button>
               </div>
 
               <button
                 type="submit"
                 disabled={loadingProfile}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
               >
-                {loadingProfile ? 'Guardando...' : 'Guardar perfil'}
+                {loadingProfile ? "Guardando..." : "Guardar perfil"}
               </button>
             </form>
           </div>
+
 
 
           {/* ================= SEGURIDAD ================= */}
