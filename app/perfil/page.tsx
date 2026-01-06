@@ -188,20 +188,50 @@ export default function PerfilPage() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Datos del perfil</h3>
 
-            {/* Cuenta */}
+            {/* ===== Campos NO editables ===== */}
             <div className="space-y-3 mb-6">
-              <input value={user.company_name || ''} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
-              <input value={user.email} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
+
+              {/* Nombre empresa */}
+              <input
+                value={user.company_name || ''}
+                disabled
+                placeholder="Nombre de la empresa"
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+              />
+
+              {/* Correo */}
+              <input
+                value={user.email || ''}
+                disabled
+                placeholder="Correo"
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+              />
+
+              {/* Plan */}
               <input
                 value={planState.status === 'assigned' ? planState.plan.name : ''}
                 disabled
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                placeholder="Plan"
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
               />
+
+              {/* Estado cuenta */}
+              <div className="flex items-center justify-between px-4 py-2 border rounded-lg bg-gray-100">
+                <span className="text-gray-700">Estado de la cuenta</span>
+                <span
+                  className={`text-sm font-semibold ${
+                    user.is_active ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
+                  {user.is_active ? 'Activa' : 'Inactiva'}
+                </span>
+              </div>
             </div>
 
+            {/* ===== Campos EDITABLES ===== */}
             <form onSubmit={handleProfileSubmit} className="space-y-4">
 
-              {/* Nombre */}
+              {/* Nombre contacto */}
               <div className="flex items-center gap-3">
                 <input
                   value={form.contact_name}
@@ -216,6 +246,7 @@ export default function PerfilPage() {
                       : 'bg-white'
                   }`}
                 />
+
                 <button
                   type="button"
                   onClick={() => {
@@ -248,6 +279,7 @@ export default function PerfilPage() {
                       : 'bg-white'
                   }`}
                 />
+
                 <button
                   type="button"
                   onClick={() => {
@@ -274,6 +306,7 @@ export default function PerfilPage() {
               </button>
             </form>
           </div>
+
 
           {/* ================= SEGURIDAD ================= */}
           <div>

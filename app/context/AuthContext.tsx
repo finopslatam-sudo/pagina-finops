@@ -21,6 +21,7 @@ export interface User {
   company_name?: string;
   contact_name?: string;
   phone?: string;
+  is_active: boolean;
 }
 
 type PlanState =
