@@ -336,10 +336,8 @@ export default function PerfilPage() {
             </button>
           </form>
 
-        </div>
-          
-          <hr className="my-12 border-gray-200" />
-          
+          </div>
+
           {/* ================= SEGURIDAD ================= */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Seguridad</h3>
@@ -356,6 +354,7 @@ export default function PerfilPage() {
               </button>
             </form>
           </div>
+
         </div>
       </div>
     </main>
