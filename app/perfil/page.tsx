@@ -16,6 +16,7 @@ export default function PerfilPage() {
   const [currentPassword, setCurrentPassword] = useState('');
 
   const [form, setForm] = useState({
+    company_name: '',
     contact_name: '',
     phone: '',
     password: '',
@@ -36,6 +37,7 @@ export default function PerfilPage() {
     if (!user) return;
 
     setForm({
+      company_name: user.company_name || '',
       contact_name: user.contact_name || '',
       phone: user.phone || '',
       password: '',
@@ -190,13 +192,13 @@ export default function PerfilPage() {
 
             {/* Cuenta */}
             <div className="space-y-3 mb-6">
-              <input value={user.company_name || ''} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
-              <input value={user.email} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
-              <input
-                value={planState.status === 'assigned' ? planState.plan.name : ''}
-                disabled
-                className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-              />
+            <input
+              value={form.company_name}
+              disabled
+              placeholder="Nombre de la empresa"
+              className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+            />
+
             </div>
 
             <form onSubmit={handleProfileSubmit} className="space-y-4">

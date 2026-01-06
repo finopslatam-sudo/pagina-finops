@@ -108,7 +108,7 @@ export function PasswordFields({
           <Rule ok={rules.lower} text="Al menos una letra minúscula" />
           <Rule ok={rules.number} text="Al menos un número" />
           <Rule ok={rules.special} text="Al menos un carácter especial" />
-          <Rule ok={rules.notSame} text="No puede ser igual a la actual" />
+          <Rule ok={rules.notSame} text="La nueva clave NO puede ser igual a la actual" />
           <Rule ok={rules.match} text="Las contraseñas coinciden" />
         </ul>
       </>
