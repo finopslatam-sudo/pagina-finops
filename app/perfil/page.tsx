@@ -8,12 +8,10 @@ export default function PerfilPage() {
   const { user, token, updateUser, planState } = useAuth();
 
   /* ================================
-     STATES
+     STATES (SIEMPRE ARRIBA)
   ================================= */
   const [editContact, setEditContact] = useState(false);
   const [editPhone, setEditPhone] = useState(false);
-
-  const [currentPassword, setCurrentPassword] = useState('');
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -27,7 +25,7 @@ export default function PerfilPage() {
   const [error, setError] = useState('');
 
   /* ================================
-     EFECTO: CARGAR DATOS
+     EFECTOS
   ================================= */
   useEffect(() => {
     if (!user) return;
@@ -38,11 +36,10 @@ export default function PerfilPage() {
       password: '',
       confirmPassword: '',
     });
-    setCurrentPassword('');
   }, [user]);
 
   /* ================================
-     PASSWORD RULES (REUTILIZABLE)
+     PASSWORD REUTILIZABLE
   ================================= */
   const { allValid, component: passwordUI } = PasswordFields({
     password: form.password,
@@ -53,15 +50,8 @@ export default function PerfilPage() {
       setForm((p) => ({ ...p, confirmPassword: v })),
   });
 
-  const passwordUsed = form.password.length > 0;
-
-  const notSameAsCurrent =
-    passwordUsed &&
-    currentPassword.length > 0 &&
-    form.password !== currentPassword;
-
   /* ================================
-     GUARD
+     GUARD (DESPUÉS DE LOS HOOKS)
   ================================= */
   if (!user || !token) {
     return (
@@ -79,16 +69,9 @@ export default function PerfilPage() {
     setError('');
     setSuccess('');
 
-    if (passwordUsed) {
-      if (!currentPassword) {
-        setError('Debes ingresar tu clave actual');
-        return;
-      }
-
-      if (!allValid || !notSameAsCurrent) {
-        setError('La contraseña no cumple los requisitos');
-        return;
-      }
+    if (form.password.length > 0 && !allValid) {
+      setError('La contraseña no cumple los requisitos');
+      return;
     }
 
     setLoading(true);
@@ -105,8 +88,7 @@ export default function PerfilPage() {
           body: JSON.stringify({
             contact_name: editContact ? form.contact_name : undefined,
             phone: editPhone ? form.phone : undefined,
-            password: passwordUsed ? form.password : undefined,
-            current_password: passwordUsed ? currentPassword : undefined,
+            password: form.password || undefined,
           }),
         }
       );
@@ -126,7 +108,6 @@ export default function PerfilPage() {
         password: '',
         confirmPassword: '',
       }));
-      setCurrentPassword('');
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
@@ -145,75 +126,149 @@ export default function PerfilPage() {
 
         {/* 🔒 DATOS DE CUENTA */}
         <div className="space-y-3 mb-6">
-          <input value={user.company_name || ''} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500" />
-          <input value={user.email} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500" />
           <input
-            value={planState.status === 'assigned' ? planState.plan.name : ''}
+            value={user.company_name || ''}
             disabled
+            placeholder="Empresa"
             className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
           />
-          <input value="Activa" disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-green-700 font-medium" />
+
+          <input
+            value={user.email}
+            disabled
+            placeholder="Email"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+          />
+
+          <input
+            value={
+              planState.status === 'assigned'
+                ? planState.plan.name
+                : ''
+            }
+            disabled
+            placeholder="Plan actual"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500"
+          />
+
+          <input
+            value="Activa"
+            disabled
+            placeholder="Estado"
+            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-green-700 font-medium"
+          />
         </div>
 
-        {error && <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">{error}</div>}
-        {success && <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">{success}</div>}
+        {error && (
+          <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">
+            {success}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
 
           {/* 👤 CONTACTO */}
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             {!editContact ? (
               <>
-                <input value={user.contact_name || ''} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
-                <button type="button" onClick={() => setEditContact(true)} className="text-blue-600 text-sm">Editar</button>
+                <input
+                  value={user.contact_name || ''}
+                  disabled
+                  placeholder="Nombre de contacto"
+                  className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => setEditContact(true)}
+                  className="text-blue-600 text-sm"
+                >
+                  Editar
+                </button>
               </>
             ) : (
               <>
-                <input value={form.contact_name} onChange={(e) => setForm(p => ({ ...p, contact_name: e.target.value }))} className="w-full px-4 py-2 border rounded-lg" />
-                <button type="button" onClick={() => setEditContact(false)} className="text-gray-600 text-sm">Cancelar</button>
+                <input
+                  value={form.contact_name}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, contact_name: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border rounded-lg"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditContact(false);
+                    setForm((p) => ({
+                      ...p,
+                      contact_name: user.contact_name || '',
+                    }));
+                  }}
+                  className="text-gray-600 text-sm"
+                >
+                  Cancelar
+                </button>
               </>
             )}
           </div>
 
           {/* 📞 TELÉFONO */}
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             {!editPhone ? (
               <>
-                <input value={user.phone || ''} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
-                <button type="button" onClick={() => setEditPhone(true)} className="text-blue-600 text-sm">Editar</button>
+                <input
+                  value={user.phone || ''}
+                  disabled
+                  placeholder="Teléfono de contacto"
+                  className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => setEditPhone(true)}
+                  className="text-blue-600 text-sm"
+                >
+                  Editar
+                </button>
               </>
             ) : (
               <>
-                <input value={form.phone} onChange={(e) => setForm(p => ({ ...p, phone: e.target.value }))} className="w-full px-4 py-2 border rounded-lg" />
-                <button type="button" onClick={() => setEditPhone(false)} className="text-gray-600 text-sm">Cancelar</button>
+                <input
+                  value={form.phone}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, phone: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border rounded-lg"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditPhone(false);
+                    setForm((p) => ({
+                      ...p,
+                      phone: user.phone || '',
+                    }));
+                  }}
+                  className="text-gray-600 text-sm"
+                >
+                  Cancelar
+                </button>
               </>
             )}
           </div>
 
-          {/* 🔐 CLAVE ACTUAL (solo si cambia password) */}
-          {passwordUsed && (
-            <input
-              type="password"
-              placeholder="Clave actual"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-          )}
-
           {/* 🔐 PASSWORD */}
           {passwordUI}
 
-          {/* ❌ REGLA: NO IGUAL A LA ACTUAL */}
-          {passwordUsed && (
-            <p className={`text-sm font-semibold ${notSameAsCurrent ? 'text-green-700' : 'text-red-600'}`}>
-              {notSameAsCurrent ? '✔️' : '❌'} No puede ser igual a la actual
-            </p>
-          )}
-
           <button
             type="submit"
-            disabled={loading || (passwordUsed && (!allValid || !notSameAsCurrent))}
+            disabled={loading || (form.password.length > 0 && !allValid)}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
           >
             {loading ? 'Guardando...' : 'Guardar cambios'}

@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function PasswordFields({
-  currentPassword,
+  currentPassword = '',
   setCurrentPassword,
   password,
   setPassword,
@@ -21,32 +21,73 @@ export function PasswordFields({
 }: Props) {
   const [show, setShow] = useState(false);
 
-  const rules = useMemo(() => ({
-    length: password.length >= 8 && password.length <= 12,
-    upper: /[A-Z]/.test(password),
-    lower: /[a-z]/.test(password),
-    number: /[0-9]/.test(password),
-    special: /[^A-Za-z0-9]/.test(password),
-    notSame: currentPassword ? password !== currentPassword : true,
-  }), [password, currentPassword]);
+  const rules = useMemo(() => {
+    const hasCurrent = currentPassword.length > 0;
+    const hasNew = password.length > 0;
 
-  const allValid = Object.values(rules).every(Boolean);
+    return {
+      length: password.length >= 8 && password.length <= 12,
+      upper: /[A-Z]/.test(password),
+      lower: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[^A-Za-z0-9]/.test(password),
 
-  const Rule = ({ ok, text }: { ok: boolean; text: string }) => (
-    <li className="flex items-center gap-2 text-sm">
-      <span className={ok ? 'text-green-600' : 'text-gray-400'}>
-        {ok ? '✔️' : '○'}
-      </span>
-      <span className={ok ? 'text-green-700' : 'text-gray-600'}>
-        {text}
-      </span>
-    </li>
+      // 👇 regla clave: solo se evalúa si ambas existen
+      notSame:
+        !hasCurrent || !hasNew
+          ? null
+          : password !== currentPassword,
+    };
+  }, [password, currentPassword]);
+
+  const allValid = Object.values(rules).every(
+    (v) => v === true || v === null
   );
+
+  const Rule = ({
+    ok,
+    text,
+    isError = false,
+  }: {
+    ok: boolean | null;
+    text: string;
+    isError?: boolean;
+  }) => {
+    if (ok === null) return null;
+
+    return (
+      <li className="flex items-center gap-2 text-sm">
+        <span
+          className={
+            ok
+              ? 'text-green-600'
+              : isError
+              ? 'text-red-600'
+              : 'text-gray-400'
+          }
+        >
+          {ok ? '✔️' : isError ? '❌' : '○'}
+        </span>
+        <span
+          className={
+            ok
+              ? 'text-green-700'
+              : isError
+              ? 'text-red-600'
+              : 'text-gray-600'
+          }
+        >
+          {text}
+        </span>
+      </li>
+    );
+  };
 
   return {
     allValid,
     component: (
       <>
+        {/* 🔐 CLAVE ACTUAL — SIEMPRE VISIBLE */}
         {setCurrentPassword && (
           <input
             type={show ? 'text' : 'password'}
@@ -57,6 +98,7 @@ export function PasswordFields({
           />
         )}
 
+        {/* 🔐 NUEVA CONTRASEÑA */}
         <div className="relative">
           <input
             type={show ? 'text' : 'password'}
@@ -74,6 +116,7 @@ export function PasswordFields({
           </button>
         </div>
 
+        {/* 🔐 CONFIRMAR */}
         <input
           type={show ? 'text' : 'password'}
           placeholder="Confirmar contraseña"
@@ -82,15 +125,20 @@ export function PasswordFields({
           onChange={(e) => setConfirm(e.target.value)}
         />
 
+        {/* 📏 REGLAS */}
         <ul className="mb-4 space-y-1">
           <Rule ok={rules.length} text="Entre 8 y 12 caracteres" />
           <Rule ok={rules.upper} text="Al menos una letra mayúscula" />
           <Rule ok={rules.lower} text="Al menos una letra minúscula" />
           <Rule ok={rules.number} text="Al menos un número" />
           <Rule ok={rules.special} text="Al menos un carácter especial" />
-          {currentPassword && (
-            <Rule ok={rules.notSame} text="No puede ser igual a la actual" />
-          )}
+
+          {/* ❗ regla crítica */}
+          <Rule
+            ok={rules.notSame}
+            text="No puede ser igual a la actual"
+            isError
+          />
         </ul>
       </>
     ),
