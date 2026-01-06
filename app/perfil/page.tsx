@@ -336,8 +336,13 @@ export default function PerfilPage() {
             </button>
           </form>
 
+          {/* COLUMNA DERECHA */}
+          <div>
+            {/* (si ya no quieres nada aquí, déjalo vacío o elimina esta columna) */}
           </div>
 
+        </div>
+          
           <hr className="my-12 border-gray-200" />
           
           {/* ================= SEGURIDAD ================= */}
@@ -356,7 +361,6 @@ export default function PerfilPage() {
               </button>
             </form>
           </div>
-
         </div>
       </div>
     </main>
