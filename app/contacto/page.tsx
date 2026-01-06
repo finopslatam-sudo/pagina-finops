@@ -1,6 +1,43 @@
 'use client';
 
+import { useState } from "react";
+
 export default function QuienesSomos() {
+  const [form, setForm] = useState({
+    nombre: "",
+    empresa: "",
+    email: "",
+    telefono: "",
+    servicio: "",
+    mensaje: "",
+  });
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+  
+    const data = await res.json();
+  
+    if (!res.ok) {
+      alert(data.error || "Error al enviar la solicitud");
+      return;
+    }
+  
+    alert("Solicitud enviada correctamente");
+    setForm({
+      nombre: "",
+      empresa: "",
+      email: "",
+      telefono: "",
+      servicio: "",
+      mensaje: "",
+    });
+  };  
   return (
     <main className="min-h-screen bg-white text-gray-900">
 
@@ -114,7 +151,10 @@ export default function QuienesSomos() {
             <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-gray-200">
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Solicita tu Consultoría Gratuita</h3>
               
-              <form className="space-y-4 sm:space-y-6">
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-4 sm:space-y-6"
+              >
                 <div className="grid grid-cols-1 gap-4 sm:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -123,7 +163,11 @@ export default function QuienesSomos() {
                     <input
                       type="text"
                       required
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                      value={form.nombre}
+                      onChange={(e) =>
+                        setForm({ ...form, nombre: e.target.value })
+                      }
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg"
                       placeholder="Tu nombre completo"
                     />
                   </div>
@@ -134,7 +178,11 @@ export default function QuienesSomos() {
                     <input
                       type="text"
                       required
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                      value={form.empresa}
+                      onChange={(e) =>
+                        setForm({ ...form, empresa: e.target.value })
+                      }
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Nombre de tu empresa"
                     />
                   </div>
@@ -148,7 +196,11 @@ export default function QuienesSomos() {
                     <input
                       type="email"
                       required
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                      value={form.email}
+                      onChange={(e) =>
+                        setForm({ ...form, email: e.target.value })
+                      }
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="tu@email.com"
                     />
                   </div>
@@ -158,9 +210,14 @@ export default function QuienesSomos() {
                     </label>
                     <input
                       type="tel"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                      value={form.telefono}
+                      onChange={(e) =>
+                        setForm({ ...form, telefono: e.target.value })
+                      }
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="+56 9 1234 5678"
                     />
+
                   </div>
                 </div>
 
@@ -170,14 +227,18 @@ export default function QuienesSomos() {
                   </label>
                   <select
                     required
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                    value={form.servicio}
+                    onChange={(e) =>
+                      setForm({ ...form, servicio: e.target.value })
+                    }
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Selecciona un servicio</option>
-                    <option value="auditoria">Auditoría de Costos</option>
-                    <option value="dashboards">Dashboards y Reportes</option>
-                    <option value="gobernanza">Gobernanza & Tagging</option>
-                    <option value="optimizacion">Optimización Continua</option>
-                    <option value="multiple">Múltiples Servicios</option>
+                    <option value="auditoria">Cloud Assessment</option>
+                    <option value="dashboards">Cloud Intelligence</option>
+                    <option value="gobernanza">Cloud Financial Operations</option>
+                    <option value="optimizacion">Cloud Optimization</option>
+                    <option value="Governance">Cloud Governance</option>
                   </select>
                 </div>
 
@@ -188,9 +249,13 @@ export default function QuienesSomos() {
                   <textarea
                     required
                     rows={4}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                    value={form.mensaje}
+                    onChange={(e) =>
+                      setForm({ ...form, mensaje: e.target.value })
+                    }
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Cuéntanos sobre tu proyecto y necesidades específicas..."
-                  ></textarea>
+                  />
                 </div>
 
                 <button
