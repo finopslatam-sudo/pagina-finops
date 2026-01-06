@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/app/context/AuthContext';
 import { useEffect, useState } from 'react';
+import { PasswordFields } from '@/app/components/Auth/PasswordFields';
 
 export default function PerfilPage() {
   const { user, token, updateUser, planState } = useAuth();
@@ -12,9 +13,13 @@ export default function PerfilPage() {
   const [editContact, setEditContact] = useState(false);
   const [editPhone, setEditPhone] = useState(false);
 
+  const [currentPassword, setCurrentPassword] = useState('');
+
   const [form, setForm] = useState({
     contact_name: '',
     phone: '',
+    password: '',
+    confirmPassword: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -30,8 +35,24 @@ export default function PerfilPage() {
     setForm({
       contact_name: user.contact_name || '',
       phone: user.phone || '',
+      password: '',
+      confirmPassword: '',
     });
   }, [user]);
+
+  /* ================================
+     PASSWORD REUTILIZABLE (CORRECTO)
+  ================================= */
+  const { allValid, component: passwordUI } = PasswordFields({
+    currentPassword,
+    setCurrentPassword,
+    password: form.password,
+    setPassword: (v: string) =>
+      setForm((p) => ({ ...p, password: v })),
+    confirm: form.confirmPassword,
+    setConfirm: (v: string) =>
+      setForm((p) => ({ ...p, confirmPassword: v })),
+  });
 
   /* ================================
      GUARD
@@ -45,17 +66,23 @@ export default function PerfilPage() {
   }
 
   /* ================================
-     SUBMIT (SOLO DATOS)
+     SUBMIT
   ================================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    if (form.password && !allValid) {
+      setError('La contraseña no cumple los requisitos');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${user.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile`,
         {
           method: 'PUT',
           headers: {
@@ -65,30 +92,28 @@ export default function PerfilPage() {
           body: JSON.stringify({
             contact_name: editContact ? form.contact_name : undefined,
             phone: editPhone ? form.phone : undefined,
+            current_password: form.password ? currentPassword : undefined,
+            password: form.password || undefined,
           }),
         }
       );
 
-      let data;
-      try {
-        data = await res.json();
-      } catch {
-        throw new Error('Error inesperado del servidor');
-      }
-
+      const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || 'Error al guardar cambios');
       }
 
-      updateUser({
-        ...user,
-        contact_name: form.contact_name,
-        phone: form.phone,
-      });
-
+      updateUser(data.user);
       setSuccess('Perfil actualizado correctamente');
       setEditContact(false);
       setEditPhone(false);
+      setCurrentPassword('');
+
+      setForm((p) => ({
+        ...p,
+        password: '',
+        confirmPassword: '',
+      }));
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
@@ -150,120 +175,18 @@ export default function PerfilPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* 👤 CONTACTO */}
-          <div className="flex items-center gap-2">
-            {!editContact ? (
-              <>
-                <input
-                  value={form.contact_name}
-                  disabled
-                  className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-                />
-                <button
-                  type="button"
-                  onClick={() => setEditContact(true)}
-                  className="text-blue-600 text-sm"
-                >
-                  Editar
-                </button>
-              </>
-            ) : (
-              <>
-                <input
-                  value={form.contact_name}
-                  onChange={(e) =>
-                    setForm((p) => ({
-                      ...p,
-                      contact_name: e.target.value,
-                    }))
-                  }
-                  className="w-full px-4 py-2 border rounded-lg"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditContact(false);
-                    setForm((p) => ({
-                      ...p,
-                      contact_name: user.contact_name || '',
-                    }));
-                  }}
-                  className="text-gray-600 text-sm"
-                >
-                  Cancelar
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* 📞 TELÉFONO */}
-          <div className="flex items-center gap-2">
-            {!editPhone ? (
-              <>
-                <input
-                  value={form.phone}
-                  disabled
-                  className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-                />
-                <button
-                  type="button"
-                  onClick={() => setEditPhone(true)}
-                  className="text-blue-600 text-sm"
-                >
-                  Editar
-                </button>
-              </>
-            ) : (
-              <>
-                <input
-                  value={form.phone}
-                  onChange={(e) =>
-                    setForm((p) => ({
-                      ...p,
-                      phone: e.target.value,
-                    }))
-                  }
-                  className="w-full px-4 py-2 border rounded-lg"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditPhone(false);
-                    setForm((p) => ({
-                      ...p,
-                      phone: user.phone || '',
-                    }));
-                  }}
-                  className="text-gray-600 text-sm"
-                >
-                  Cancelar
-                </button>
-              </>
-            )}
-          </div>
+          {/* 🔐 PASSWORD */}
+          {passwordUI}
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (form.password.length > 0 && !allValid)}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
           >
             {loading ? 'Guardando...' : 'Guardar cambios'}
           </button>
 
         </form>
-
-        {/* 🔐 CAMBIO DE CONTRASEÑA (SEPARADO Y SEGURO) */}
-        <div className="mt-6">
-          <a
-            href="/change-password"
-            className="block text-center text-blue-600 font-medium hover:underline"
-          >
-            Cambiar contraseña
-          </a>
-        </div>
-
       </div>
     </main>
   );
