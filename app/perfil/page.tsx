@@ -171,117 +171,128 @@ export default function PerfilPage() {
      JSX
   ================================= */
   return (
-    <main className="min-h-screen bg-gray-50 flex justify-center py-12 px-4">
-      <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6">
+    <main className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="bg-white w-full max-w-5xl mx-auto rounded-2xl shadow-lg p-8">
 
-        <h2 className="text-2xl font-semibold mb-6">Mi Perfil</h2>
+        <h2 className="text-2xl font-semibold mb-8">Mi Perfil</h2>
 
-        {/* 🔒 DATOS DE CUENTA */}
-        <div className="space-y-3 mb-6">
-          <input value={user.company_name || ''} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
-          <input value={user.email} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
-          <input
-            value={planState.status === 'assigned' ? planState.plan.name : ''}
-            disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-          />
-        </div>
-
+        {/* MENSAJES */}
         {error && <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">{error}</div>}
         {successProfile && <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">{successProfile}</div>}
         {successPassword && <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">{successPassword}</div>}
 
-        {/* 👤 PERFIL */}
-        <form onSubmit={handleProfileSubmit} className="space-y-4 mb-8">
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-          {/* Nombre contacto */}
-          <div className="flex items-center gap-3">
-            <input
-              value={form.contact_name}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, contact_name: e.target.value }))
-              }
-              disabled={!editContact}
-              placeholder="Nombre de contacto"
-              className={`w-full px-4 py-3 border rounded-xl transition ${
-                !editContact
-                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                  : 'bg-white'
-              }`}
-            />
+          {/* ================= DATOS PERFIL ================= */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Datos del perfil</h3>
 
-            <button
-              type="button"
-              onClick={() => {
-                if (editContact) {
-                  setForm((p) => ({
-                    ...p,
-                    contact_name: user.contact_name || '',
-                  }));
-                }
-                setEditContact(!editContact);
-              }}
-              className="text-blue-600 text-sm font-medium whitespace-nowrap"
-            >
-              {editContact ? 'Cancelar' : 'Editar'}
-            </button>
+            {/* Cuenta */}
+            <div className="space-y-3 mb-6">
+              <input value={user.company_name || ''} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
+              <input value={user.email} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
+              <input
+                value={planState.status === 'assigned' ? planState.plan.name : ''}
+                disabled
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+              />
+            </div>
+
+            <form onSubmit={handleProfileSubmit} className="space-y-4">
+
+              {/* Nombre */}
+              <div className="flex items-center gap-3">
+                <input
+                  value={form.contact_name}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, contact_name: e.target.value }))
+                  }
+                  disabled={!editContact}
+                  placeholder="Nombre de contacto"
+                  className={`w-full px-4 py-3 border rounded-xl ${
+                    !editContact
+                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                      : 'bg-white'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editContact) {
+                      setForm((p) => ({
+                        ...p,
+                        contact_name: user.contact_name || '',
+                      }));
+                    }
+                    setEditContact(!editContact);
+                  }}
+                  className="text-blue-600 text-sm font-medium"
+                >
+                  {editContact ? 'Cancelar' : 'Editar'}
+                </button>
+              </div>
+
+              {/* Teléfono */}
+              <div className="flex items-center gap-3">
+                <input
+                  value={form.phone}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, phone: e.target.value }))
+                  }
+                  disabled={!editPhone}
+                  placeholder="Teléfono de contacto"
+                  className={`w-full px-4 py-3 border rounded-xl ${
+                    !editPhone
+                      ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                      : 'bg-white'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editPhone) {
+                      setForm((p) => ({
+                        ...p,
+                        phone: user.phone || '',
+                      }));
+                    }
+                    setEditPhone(!editPhone);
+                  }}
+                  className="text-blue-600 text-sm font-medium"
+                >
+                  {editPhone ? 'Cancelar' : 'Editar'}
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loadingProfile}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+              >
+                {loadingProfile ? 'Guardando...' : 'Guardar perfil'}
+              </button>
+            </form>
           </div>
 
-          {/* Teléfono */}
-          <div className="flex items-center gap-3">
-            <input
-              value={form.phone}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, phone: e.target.value }))
-              }
-              disabled={!editPhone}
-              placeholder="Teléfono de contacto"
-              className={`w-full px-4 py-3 border rounded-xl transition ${
-                !editPhone
-                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                  : 'bg-white'
-              }`}
-            />
+          {/* ================= SEGURIDAD ================= */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Seguridad</h3>
 
-            <button
-              type="button"
-              onClick={() => {
-                if (editPhone) {
-                  setForm((p) => ({
-                    ...p,
-                    phone: user.phone || '',
-                  }));
-                }
-                setEditPhone(!editPhone);
-              }}
-              className="text-blue-600 text-sm font-medium whitespace-nowrap"
-            >
-              {editPhone ? 'Cancelar' : 'Editar'}
-            </button>
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              {passwordUI}
+
+              <button
+                type="submit"
+                disabled={loadingPassword || !allValid}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+              >
+                {loadingPassword ? 'Cambiando...' : 'Cambiar contraseña'}
+              </button>
+            </form>
           </div>
 
-          <button
-            type="submit"
-            disabled={loadingProfile}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
-          >
-            {loadingProfile ? 'Guardando...' : 'Guardar perfil'}
-          </button>
-        </form>
-
-        {/* 🔐 PASSWORD */}
-        <form onSubmit={handlePasswordSubmit} className="space-y-4">
-          {passwordUI}
-
-          <button
-            type="submit"
-            disabled={loadingPassword || !allValid}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
-          >
-            {loadingPassword ? 'Cambiando...' : 'Cambiar contraseña'}
-          </button>
-        </form>
-
+        </div>
       </div>
     </main>
   );

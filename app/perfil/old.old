@@ -69,7 +69,7 @@ export default function PerfilPage() {
   }
 
   /* ================================
-     SUBMIT PERFIL (NOMBRE / TELÉFONO)
+     SUBMIT PERFIL
   ================================= */
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,7 +116,7 @@ export default function PerfilPage() {
   };
 
   /* ================================
-     SUBMIT PASSWORD (VOLUNTARIO)
+     SUBMIT PASSWORD
   ================================= */
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,25 +193,72 @@ export default function PerfilPage() {
 
         {/* 👤 PERFIL */}
         <form onSubmit={handleProfileSubmit} className="space-y-4 mb-8">
-          <input
-            value={form.contact_name}
-            onChange={(e) => setForm((p) => ({ ...p, contact_name: e.target.value }))}
-            disabled={!editContact}
-            className="w-full px-4 py-2 border rounded-lg"
-          />
-          <button type="button" onClick={() => setEditContact(!editContact)} className="text-sm text-blue-600">
-            {editContact ? 'Cancelar' : 'Editar nombre'}
-          </button>
 
-          <input
-            value={form.phone}
-            onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-            disabled={!editPhone}
-            className="w-full px-4 py-2 border rounded-lg"
-          />
-          <button type="button" onClick={() => setEditPhone(!editPhone)} className="text-sm text-blue-600">
-            {editPhone ? 'Cancelar' : 'Editar teléfono'}
-          </button>
+          {/* Nombre contacto */}
+          <div className="flex items-center gap-3">
+            <input
+              value={form.contact_name}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, contact_name: e.target.value }))
+              }
+              disabled={!editContact}
+              placeholder="Nombre de contacto"
+              className={`w-full px-4 py-3 border rounded-xl transition ${
+                !editContact
+                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                  : 'bg-white'
+              }`}
+            />
+
+            <button
+              type="button"
+              onClick={() => {
+                if (editContact) {
+                  setForm((p) => ({
+                    ...p,
+                    contact_name: user.contact_name || '',
+                  }));
+                }
+                setEditContact(!editContact);
+              }}
+              className="text-blue-600 text-sm font-medium whitespace-nowrap"
+            >
+              {editContact ? 'Cancelar' : 'Editar'}
+            </button>
+          </div>
+
+          {/* Teléfono */}
+          <div className="flex items-center gap-3">
+            <input
+              value={form.phone}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, phone: e.target.value }))
+              }
+              disabled={!editPhone}
+              placeholder="Teléfono de contacto"
+              className={`w-full px-4 py-3 border rounded-xl transition ${
+                !editPhone
+                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                  : 'bg-white'
+              }`}
+            />
+
+            <button
+              type="button"
+              onClick={() => {
+                if (editPhone) {
+                  setForm((p) => ({
+                    ...p,
+                    phone: user.phone || '',
+                  }));
+                }
+                setEditPhone(!editPhone);
+              }}
+              className="text-blue-600 text-sm font-medium whitespace-nowrap"
+            >
+              {editPhone ? 'Cancelar' : 'Editar'}
+            </button>
+          </div>
 
           <button
             type="submit"
