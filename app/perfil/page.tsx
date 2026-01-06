@@ -248,92 +248,89 @@ export default function PerfilPage() {
             </div>
 
             {/* ===== EDITABLES ===== */}
-            <form onSubmit={handleProfileSubmit} className="space-y-6">
+            <form onSubmit={handleProfileSubmit} className="space-y-8">
 
-              {/* Nombre contacto */}
-              <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label className="text-sm text-gray-600">
-                    Nombre de contacto
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (editContact) {
-                        setForm((p) => ({
-                          ...p,
-                          contact_name: user.contact_name,
-                        }));
-                      }
-                      setEditContact(!editContact);
-                    }}
-                    className="text-blue-600 text-sm font-medium"
-                  >
-                    {editContact ? "Cancelar" : "Editar"}
-                  </button>
-                </div>
+            {/* ===== Nombre de contacto ===== */}
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600">
+                Nombre de contacto
+              </label>
 
-                <input
-                  value={form.contact_name}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, contact_name: e.target.value }))
-                  }
-                  disabled={!editContact}
-                  className={`w-full px-4 py-3 border rounded-xl ${
-                    !editContact
-                      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-                      : "bg-white"
-                  }`}
-                />
-              </div>
-
-              {/* Teléfono */}
-              <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label className="text-sm text-gray-600">
-                    Teléfono de contacto
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (editPhone) {
-                        setForm((p) => ({
-                          ...p,
-                          phone: user.phone,
-                        }));
-                      }
-                      setEditPhone(!editPhone);
-                    }}
-                    className="text-blue-600 text-sm font-medium"
-                  >
-                    {editPhone ? "Cancelar" : "Editar"}
-                  </button>
-                </div>
-
-                <input
-                  value={form.phone}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, phone: e.target.value }))
-                  }
-                  disabled={!editPhone}
-                  className={`w-full px-4 py-3 border rounded-xl ${
-                    !editPhone
-                      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-                      : "bg-white"
-                  }`}
-                />
-              </div>
+              <input
+                value={form.contact_name}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, contact_name: e.target.value }))
+                }
+                disabled={!editContact}
+                className={`w-full px-4 py-3 border rounded-xl ${
+                  !editContact
+                    ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                    : "bg-white"
+                }`}
+              />
 
               <button
-                type="submit"
-                disabled={loadingProfile}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
+                type="button"
+                onClick={() => {
+                  if (editContact) {
+                    setForm((p) => ({
+                      ...p,
+                      contact_name: user.contact_name,
+                    }));
+                  }
+                  setEditContact(!editContact);
+                }}
+                className="text-blue-600 text-sm font-medium"
               >
-                {loadingProfile ? "Guardando..." : "Guardar perfil"}
+                {editContact ? "Cancelar" : "Editar"}
               </button>
-            </form>
-          </div>
+            </div>
 
+            {/* ===== Teléfono de contacto ===== */}
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600">
+                Teléfono de contacto
+              </label>
+
+              <input
+                value={form.phone}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, phone: e.target.value }))
+                }
+                disabled={!editPhone}
+                className={`w-full px-4 py-3 border rounded-xl ${
+                  !editPhone
+                    ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                    : "bg-white"
+                }`}
+              />
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (editPhone) {
+                    setForm((p) => ({
+                      ...p,
+                      phone: user.phone,
+                    }));
+                  }
+                  setEditPhone(!editPhone);
+                }}
+                className="text-blue-600 text-sm font-medium"
+              >
+                {editPhone ? "Cancelar" : "Editar"}
+              </button>
+            </div>
+
+            {/* ===== Guardar ===== */}
+            <button
+              type="submit"
+              disabled={loadingProfile}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
+            >
+              {loadingProfile ? "Guardando..." : "Guardar perfil"}
+            </button>
+            </form>
 
 
           {/* ================= SEGURIDAD ================= */}
