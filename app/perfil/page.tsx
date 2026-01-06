@@ -184,73 +184,76 @@ export default function PerfilPage() {
         {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-          {/* ================= DATOS PERFIL ================= */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Datos del perfil</h3>
+          {/* ================= DATOS DEL PERFIL ================= */}
+          <div className="space-y-10">
 
-            {/* ===== NO EDITABLES ===== */}
-            <div className="space-y-5 mb-8">
+          <h3 className="text-lg font-semibold">
+            Datos del perfil
+          </h3>
 
-              {/* Empresa */}
-              <div className="space-y-1">
-                <label className="text-sm text-gray-600">
-                  Nombre de la empresa
-                </label>
-                <input
-                  value={user.company_name}
-                  disabled
-                  className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
-                />
-              </div>
+          {/* ===== NO EDITABLES ===== */}
+          <div className="space-y-5">
 
-              {/* Correo */}
-              <div className="space-y-1">
-                <label className="text-sm text-gray-600">
-                  Correo
-                </label>
-                <input
-                  value={user.email}
-                  disabled
-                  className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
-                />
-              </div>
-
-              {/* Plan */}
-              <div className="space-y-1">
-                <label className="text-sm text-gray-600">
-                  Plan / Suscripción
-                </label>
-                <input
-                  value={planState.status === "assigned" ? planState.plan.name : ""}
-                  disabled
-                  className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
-                />
-              </div>
-
-              {/* Estado */}
-              <div className="space-y-1">
-                <label className="text-sm text-gray-600">
-                  Estado de la cuenta
-                </label>
-                <div className="flex items-center justify-between px-4 py-2 border rounded-lg bg-gray-100">
-                  <span className="text-gray-700">
-                    {user.is_active ? "Activa" : "Inactiva"}
-                  </span>
-                  <span
-                    className={`text-sm font-semibold ${
-                      user.is_active ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    ●
-                  </span>
-                </div>
-              </div>
+            {/* Empresa */}
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600">
+                Nombre de la empresa
+              </label>
+              <input
+                value={user.company_name}
+                disabled
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+              />
             </div>
 
-            {/* ===== EDITABLES ===== */}
-            <form onSubmit={handleProfileSubmit} className="space-y-8">
+            {/* Correo */}
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600">
+                Correo
+              </label>
+              <input
+                value={user.email}
+                disabled
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+              />
+            </div>
 
-            {/* ===== Nombre de contacto ===== */}
+            {/* Plan */}
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600">
+                Plan / Suscripción
+              </label>
+              <input
+                value={planState.status === "assigned" ? planState.plan.name : ""}
+                disabled
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700"
+              />
+            </div>
+
+            {/* Estado */}
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600">
+                Estado de la cuenta
+              </label>
+              <div className="flex items-center justify-between px-4 py-2 border rounded-lg bg-gray-100">
+                <span className="text-gray-700">
+                  {user.is_active ? "Activa" : "Inactiva"}
+                </span>
+                <span
+                  className={`text-sm font-semibold ${
+                    user.is_active ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  ●
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== EDITABLES ===== */}
+          <form onSubmit={handleProfileSubmit} className="space-y-8">
+
+            {/* Nombre contacto */}
             <div className="space-y-2">
               <label className="text-sm text-gray-600">
                 Nombre de contacto
@@ -286,7 +289,7 @@ export default function PerfilPage() {
               </button>
             </div>
 
-            {/* ===== Teléfono de contacto ===== */}
+            {/* Teléfono */}
             <div className="space-y-2">
               <label className="text-sm text-gray-600">
                 Teléfono de contacto
@@ -322,7 +325,6 @@ export default function PerfilPage() {
               </button>
             </div>
 
-            {/* ===== Guardar ===== */}
             <button
               type="submit"
               disabled={loadingProfile}
@@ -330,8 +332,9 @@ export default function PerfilPage() {
             >
               {loadingProfile ? "Guardando..." : "Guardar perfil"}
             </button>
-            </form>
+          </form>
 
+          </div>
 
           {/* ================= SEGURIDAD ================= */}
           <div>
