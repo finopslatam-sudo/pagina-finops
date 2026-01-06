@@ -22,8 +22,11 @@ export default function PerfilPage() {
     confirmPassword: '',
   });
 
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
+
+  const [successProfile, setSuccessProfile] = useState('');
+  const [successPassword, setSuccessPassword] = useState('');
   const [error, setError] = useState('');
 
   /* ================================
@@ -41,7 +44,7 @@ export default function PerfilPage() {
   }, [user]);
 
   /* ================================
-     PASSWORD REUTILIZABLE (CORRECTO)
+     PASSWORD REUTILIZABLE
   ================================= */
   const { allValid, component: passwordUI } = PasswordFields({
     currentPassword,
@@ -66,23 +69,17 @@ export default function PerfilPage() {
   }
 
   /* ================================
-     SUBMIT
+     SUBMIT PERFIL (NOMBRE / TELÉFONO)
   ================================= */
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
-
-    if (form.password && !allValid) {
-      setError('La contraseña no cumple los requisitos');
-      return;
-    }
-
-    setLoading(true);
+    setSuccessProfile('');
+    setLoadingProfile(true);
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${user.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
         {
           method: 'PUT',
           headers: {
@@ -92,29 +89,72 @@ export default function PerfilPage() {
           body: JSON.stringify({
             contact_name: editContact ? form.contact_name : undefined,
             phone: editPhone ? form.phone : undefined,
-            current_password: form.password ? currentPassword : undefined,
-            password: form.password || undefined,
           }),
         }
       );
 
-      let data;
-      try {
-        data = await res.json();
-      } catch {
-        throw new Error('Respuesta inválida del servidor');
-      }
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Error al guardar cambios');
+        throw new Error(data.error || 'Error al actualizar perfil');
       }
 
-      updateUser(data.user);
-      setSuccess('Perfil actualizado correctamente');
+      updateUser({
+        ...user,
+        contact_name: form.contact_name,
+        phone: form.phone,
+      });
+
+      setSuccessProfile('Perfil actualizado correctamente');
       setEditContact(false);
       setEditPhone(false);
-      setCurrentPassword('');
+    } catch (err: any) {
+      setError(err.message || 'Error inesperado');
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
 
+  /* ================================
+     SUBMIT PASSWORD (VOLUNTARIO)
+  ================================= */
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccessPassword('');
+
+    if (!allValid) {
+      setError('La contraseña no cumple los requisitos');
+      return;
+    }
+
+    setLoadingPassword(true);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/change-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            current_password: currentPassword,
+            password: form.password,
+            confirm_password: form.confirmPassword,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al cambiar contraseña');
+      }
+
+      setSuccessPassword('Contraseña actualizada correctamente');
+      setCurrentPassword('');
       setForm((p) => ({
         ...p,
         password: '',
@@ -123,7 +163,7 @@ export default function PerfilPage() {
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
-      setLoading(false);
+      setLoadingPassword(false);
     }
   };
 
@@ -138,61 +178,63 @@ export default function PerfilPage() {
 
         {/* 🔒 DATOS DE CUENTA */}
         <div className="space-y-3 mb-6">
+          <input value={user.company_name || ''} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
+          <input value={user.email} disabled className="w-full px-4 py-2 border rounded-lg bg-gray-100" />
           <input
-            value={user.company_name || ''}
+            value={planState.status === 'assigned' ? planState.plan.name : ''}
             disabled
             className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-          />
-
-          <input
-            value={user.email}
-            disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-          />
-
-          <input
-            value={
-              planState.status === 'assigned'
-                ? planState.plan.name
-                : ''
-            }
-            disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-          />
-
-          <input
-            value="Activa"
-            disabled
-            className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-green-700 font-medium"
           />
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">{error}</div>}
+        {successProfile && <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">{successProfile}</div>}
+        {successPassword && <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">{successPassword}</div>}
 
-        {success && (
-          <div className="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded">
-            {success}
-          </div>
-        )}
+        {/* 👤 PERFIL */}
+        <form onSubmit={handleProfileSubmit} className="space-y-4 mb-8">
+          <input
+            value={form.contact_name}
+            onChange={(e) => setForm((p) => ({ ...p, contact_name: e.target.value }))}
+            disabled={!editContact}
+            className="w-full px-4 py-2 border rounded-lg"
+          />
+          <button type="button" onClick={() => setEditContact(!editContact)} className="text-sm text-blue-600">
+            {editContact ? 'Cancelar' : 'Editar nombre'}
+          </button>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+          <input
+            value={form.phone}
+            onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+            disabled={!editPhone}
+            className="w-full px-4 py-2 border rounded-lg"
+          />
+          <button type="button" onClick={() => setEditPhone(!editPhone)} className="text-sm text-blue-600">
+            {editPhone ? 'Cancelar' : 'Editar teléfono'}
+          </button>
 
-          {/* 🔐 PASSWORD */}
+          <button
+            type="submit"
+            disabled={loadingProfile}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+          >
+            {loadingProfile ? 'Guardando...' : 'Guardar perfil'}
+          </button>
+        </form>
+
+        {/* 🔐 PASSWORD */}
+        <form onSubmit={handlePasswordSubmit} className="space-y-4">
           {passwordUI}
 
           <button
             type="submit"
-            disabled={loading || (form.password.length > 0 && !allValid)}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
+            disabled={loadingPassword || !allValid}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
           >
-            {loading ? 'Guardando...' : 'Guardar cambios'}
+            {loadingPassword ? 'Cambiando...' : 'Cambiar contraseña'}
           </button>
-
         </form>
+
       </div>
     </main>
   );
