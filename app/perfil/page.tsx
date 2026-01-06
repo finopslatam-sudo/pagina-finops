@@ -82,7 +82,7 @@ export default function PerfilPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${user.id}`,
         {
           method: 'PUT',
           headers: {
@@ -98,7 +98,13 @@ export default function PerfilPage() {
         }
       );
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error('Respuesta inválida del servidor');
+      }
+
       if (!res.ok) {
         throw new Error(data.error || 'Error al guardar cambios');
       }
