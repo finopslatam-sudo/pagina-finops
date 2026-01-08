@@ -19,7 +19,10 @@ export function PasswordFields({
   confirm,
   setConfirm,
 }: Props) {
-  const [show, setShow] = useState(false);
+  // 👁️ Estados independientes
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const rules = useMemo(() => {
     const hasAll = currentPassword.length > 0 && password.length > 0;
@@ -66,40 +69,58 @@ export function PasswordFields({
     component: (
       <>
         {/* 🔐 CLAVE ACTUAL */}
-        <input
-          type={show ? 'text' : 'password'}
-          placeholder="Clave actual"
-          className="w-full border rounded-lg p-2 mb-3"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-        />
-
-        {/* 🔐 NUEVA */}
-        <div className="relative">
+        <div className="relative mb-3">
           <input
-            type={show ? 'text' : 'password'}
+            type={showCurrent ? 'text' : 'password'}
+            placeholder="Clave actual"
+            className="w-full border rounded-lg p-2 pr-10"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => setShowCurrent(!showCurrent)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+          >
+            {showCurrent ? '🙈' : '👁️'}
+          </button>
+        </div>
+
+        {/* 🔐 NUEVA CONTRASEÑA */}
+        <div className="relative mb-3">
+          <input
+            type={showPassword ? 'text' : 'password'}
             placeholder="Nueva contraseña"
-            className="w-full border rounded-lg p-2 pr-12 mb-3"
+            className="w-full border rounded-lg p-2 pr-10"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
             type="button"
-            onClick={() => setShow(!show)}
-            className="absolute right-3 top-2.5 text-gray-500"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
           >
-            👁
+            {showPassword ? '🙈' : '👁️'}
           </button>
         </div>
 
-        {/* 🔐 CONFIRMAR */}
-        <input
-          type={show ? 'text' : 'password'}
-          placeholder="Confirmar contraseña"
-          className="w-full border rounded-lg p-2 mb-3"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-        />
+        {/* 🔐 CONFIRMAR CONTRASEÑA */}
+        <div className="relative mb-3">
+          <input
+            type={showConfirm ? 'text' : 'password'}
+            placeholder="Confirmar contraseña"
+            className="w-full border rounded-lg p-2 pr-10"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirm(!showConfirm)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+          >
+            {showConfirm ? '🙈' : '👁️'}
+          </button>
+        </div>
 
         {/* 📏 REGLAS */}
         <ul className="mb-4 space-y-1">
