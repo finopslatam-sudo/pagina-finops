@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { PasswordFields } from '@/app/components/Auth/PasswordFields';
 
 export default function PerfilPage() {
-  const { user, token, updateUser, planState } = useAuth();
+  const { user, token, updateUser, planState, logout } = useAuth();
 
   /* ================================
      STATES
@@ -28,6 +28,7 @@ export default function PerfilPage() {
   const [successProfile, setSuccessProfile] = useState('');
   const [successPassword, setSuccessPassword] = useState('');
   const [error, setError] = useState('');
+  
 
   /* ================================
      EFECTOS
@@ -153,13 +154,12 @@ export default function PerfilPage() {
         throw new Error(data.error || 'Error al cambiar contraseña');
       }
 
-      setSuccessPassword('Contraseña actualizada correctamente');
-      setCurrentPassword('');
-      setForm((p) => ({
-        ...p,
-        password: '',
-        confirmPassword: '',
-      }));
+      // Mensaje claro al usuario
+      alert('Contraseña cambiada con éxito. Debes volver a iniciar sesión con tu nueva contraseña.');
+
+      // Cerrar sesión y limpiar estado
+      logout();
+      
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
