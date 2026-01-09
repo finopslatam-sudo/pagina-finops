@@ -48,7 +48,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setForgotMessage("");
 
     try {
-      await fetch("https://www.finopslatam.com/api/auth/forgot-password", {
+      await fetch("https://api.finopslatam.com/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: forgotEmail }),
