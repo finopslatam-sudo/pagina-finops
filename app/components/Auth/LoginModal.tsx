@@ -9,6 +9,10 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
+// ✅ Backend centralizado (PRO)
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://api.finopslatam.com";
+
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { login } = useAuth();
   const router = useRouter();
@@ -48,16 +52,25 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setForgotMessage("");
 
     try {
-      await fetch("https://api.finopslatam.com/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
-      });
+      const response = await fetch(
+        `${API_URL}/api/auth/forgot-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: forgotEmail }),
+        }
+      );
+
+      // 🔎 Seguridad + debug
+      if (!response.ok) {
+        console.error("Forgot password error:", response.status);
+      }
 
       setForgotMessage(
         "Si el correo existe, recibirás instrucciones en tu email."
       );
-    } catch {
+    } catch (err) {
+      console.error("Forgot password fetch failed:", err);
       setForgotMessage(
         "Si el correo existe, recibirás instrucciones en tu email."
       );
