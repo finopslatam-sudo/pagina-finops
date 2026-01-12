@@ -426,7 +426,7 @@ export default function AdminPage() {
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="px-4 py-3 text-left">Empresa</th>
-                    <th className="px-4 py-3 text-left">Contacto</th>
+                    <th className="px-4 py-3 text-left">Nombre Contacto</th>
                     <th className="px-4 py-3 text-left">Email</th>
                     <th className="px-4 py-3 text-left">Rol</th>
 
