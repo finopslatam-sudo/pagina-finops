@@ -67,6 +67,28 @@ export default function AdminDashboard() {
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
 
+// ============================
+// EXPORTACIONES
+// ============================
+const exportCSV = () => {
+    if (!token) return;
+  
+    window.open(
+      `${API_URL}/api/admin/stats/export/csv`,
+      '_blank'
+    );
+  };
+  
+  const exportPDF = () => {
+    if (!token) return;
+  
+    window.open(
+      `${API_URL}/api/admin/stats/export/pdf`,
+      '_blank'
+    );
+  };
+  
+
   useEffect(() => {
     if (!token) return;
 
@@ -119,6 +141,22 @@ export default function AdminDashboard() {
           color="indigo"
         />
       </div>
+      {/* EXPORTACIONES */}
+        <div className="flex gap-4 mt-6">
+        <button
+            onClick={exportPDF}
+            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+        >
+            📄 Exportar PDF
+        </button>
+
+        <button
+            onClick={exportCSV}
+            className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition"
+        >
+            📊 Exportar CSV
+        </button>
+        </div>
 
       {/* GRÁFICOS */}
       <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
