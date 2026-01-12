@@ -70,23 +70,69 @@ export default function AdminDashboard() {
 // ============================
 // EXPORTACIONES
 // ============================
-const exportCSV = () => {
-    if (!token) return;
-  
-    window.open(
-      `${API_URL}/api/admin/stats/export/csv`,
-      '_blank'
-    );
-  };
-  
-  const exportPDF = () => {
-    if (!token) return;
-  
-    window.open(
-      `${API_URL}/api/admin/stats/export/pdf`,
-      '_blank'
-    );
-  };
+    const exportCSV = async () => {
+        if (!token) return;
+    
+        const res = await fetch(
+        `${API_URL}/api/admin/stats/export/csv`,
+        {
+            headers: {
+            Authorization: `Bearer ${token}`,
+            },
+            credentials: 'omit',
+        }
+        );
+    
+        if (!res.ok) {
+        alert('Error al descargar CSV');
+        return;
+        }
+    
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+    
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'finopslatam_admin_stats.csv';
+        document.body.appendChild(a);
+        a.click();
+    
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    };
+    
+    
+    const exportPDF = async () => {
+        if (!token) return;
+    
+        const res = await fetch(
+        `${API_URL}/api/admin/stats/export/pdf`,
+        {
+            headers: {
+            Authorization: `Bearer ${token}`,
+            },
+            credentials: 'omit',
+        }
+        );
+    
+        if (!res.ok) {
+        alert('Error al descargar PDF');
+        return;
+        }
+    
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+    
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'finopslatam_admin_report.pdf';
+        document.body.appendChild(a);
+        a.click();
+    
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    };
+    
   
 
   useEffect(() => {
