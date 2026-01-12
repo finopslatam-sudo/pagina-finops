@@ -46,21 +46,27 @@ export default function Dashboard() {
                   ? safeUser.contact_name.replace(/\s*Name\s*$/i, '')
                   : safeUser.company_name || safeUser.email}
               </span>
+              
+              {user?.role === 'client' ? (
+                <span className="text-sm text-blue-600 font-medium">
+                  Plan contratado:{" "}
+                  {planState.status === "loading" && (
+                    <span className="text-gray-400">Cargando plan…</span>
+                  )}
 
-              <span className="text-sm text-blue-600 font-medium">
-              Plan contratado:{" "}
-              {planState.status === "loading" && (
-                <span className="text-gray-400">Cargando plan…</span>
-              )}
+                  {planState.status === "assigned" && (
+                    <span className="font-semibold">{planState.plan.name}</span>
+                  )}
 
-              {planState.status === "assigned" && (
-                <span className="font-semibold">{planState.plan.name}</span>
+                  {planState.status === "none" && (
+                    <span className="text-red-500">Plan no asignado</span>
+                  )}
+                </span>
+              ) : (
+                <span className="text-sm text-purple-700 font-medium">
+                  Rol: Administrador del sistema
+                </span>
               )}
-
-              {planState.status === "none" && (
-                <span className="text-red-500">Plan no asignado</span>
-              )}
-              </span>
             </div>
           </div>
         </header>
