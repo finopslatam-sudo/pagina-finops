@@ -34,7 +34,7 @@ export function PasswordFields({
     setShowCurrent(false);
     setShowPassword(false);
     setShowConfirm(false);
-  }, [currentPassword, password, confirm]);
+  }, []);
 
   /* =========================
      📏 VALIDACIONES
