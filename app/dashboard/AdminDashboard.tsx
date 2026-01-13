@@ -70,23 +70,22 @@ export default function AdminDashboard() {
 // ============================
 // EXPORTACIONES
 // ============================
+    // CSV
     const exportCSV = async () => {
         if (!token) return;
     
+        try {
         const res = await fetch(
-        `${API_URL}/api/admin/stats/export/csv`,
-        {
+            `${API_URL}/api/admin/stats/export/csv`,
+            {
             headers: {
-            Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
             credentials: 'omit',
-        }
+            }
         );
     
-        if (!res.ok) {
-        alert('Error al descargar CSV');
-        return;
-        }
+        if (!res.ok) throw new Error();
     
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
@@ -99,42 +98,45 @@ export default function AdminDashboard() {
     
         a.remove();
         window.URL.revokeObjectURL(url);
+        } catch {
+        alert('Error al descargar CSV');
+        }
     };
-    
-    
+  
+    // PDF    
     const exportPDF = async () => {
         if (!token) return;
-    
-        const res = await fetch(
-        `${API_URL}/api/admin/stats/export/pdf`,
-        {
-            headers: {
-            Authorization: `Bearer ${token}`,
-            },
-            credentials: 'omit',
+      
+        try {
+          const res = await fetch(
+            `${API_URL}/api/admin/stats/export/pdf`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              credentials: 'omit',
+            }
+          );
+      
+          if (!res.ok) throw new Error();
+      
+          const blob = await res.blob();
+          const url = window.URL.createObjectURL(blob);
+      
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'finopslatam_admin_report.pdf';
+          document.body.appendChild(a);
+          a.click();
+      
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        } catch {
+          alert('Error al descargar PDF');
         }
-        );
-    
-        if (!res.ok) {
-        alert('Error al descargar PDF');
-        return;
-        }
-    
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-    
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'finopslatam_admin_report.pdf';
-        document.body.appendChild(a);
-        a.click();
-    
-        a.remove();
-        window.URL.revokeObjectURL(url);
-    };
-    
+      };
+      
   
-
   useEffect(() => {
     if (!token) return;
 
@@ -187,7 +189,8 @@ export default function AdminDashboard() {
           color="indigo"
         />
       </div>
-      {/* EXPORTACIONES */}
+
+        {/* EXPORTACIONES */}
         <div className="flex gap-4 mt-6">
         <button
             onClick={exportPDF}
@@ -203,6 +206,7 @@ export default function AdminDashboard() {
             📊 Exportar CSV
         </button>
         </div>
+
 
       {/* GRÁFICOS */}
       <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
