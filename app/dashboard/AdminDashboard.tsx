@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import {
   PieChart,
@@ -13,12 +13,11 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend,
 } from 'recharts';
 
-// ============================
-// TIPOS
-// ============================
+/* ============================
+   TIPOS
+============================ */
 interface AdminStats {
   total_users: number;
   active_users: number;
@@ -29,192 +28,177 @@ interface AdminStats {
   }[];
 }
 
-// ============================
-// HELPERS UI
-// ============================
-const colorMap: Record<string, string> = {
-  gray: 'text-gray-600',
-  green: 'text-green-600',
-  red: 'text-red-600',
-  indigo: 'text-indigo-600',
-};
-
+/* ============================
+   UI HELPERS
+============================ */
 const KpiCard = ({
   title,
   value,
-  color = 'gray',
+  subtitle,
 }: {
   title: string;
   value: number | string;
-  color?: keyof typeof colorMap;
+  subtitle?: string;
 }) => (
-  <div className="bg-white border rounded-xl p-6 shadow">
+  <div className="bg-white border rounded-xl p-6 shadow-sm">
     <p className="text-sm text-gray-500">{title}</p>
-    <p className={`text-3xl font-bold ${colorMap[color]}`}>
-      {value}
-    </p>
+    <p className="text-3xl font-semibold text-gray-900">{value}</p>
+    {subtitle && (
+      <p className="text-xs text-gray-400 mt-1">{subtitle}</p>
+    )}
   </div>
 );
 
-// ============================
-// ADMIN DASHBOARD
-// ============================
+/* ============================
+   MAIN COMPONENT
+============================ */
 export default function AdminDashboard() {
   const { token } = useAuth();
   const [stats, setStats] = useState<AdminStats | null>(null);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
 
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
 
-// ============================
-// EXPORTACIONES
-// ============================
-    // CSV
-    const exportCSV = async () => {
-        if (!token) return;
-    
-        try {
-        const res = await fetch(
-            `${API_URL}/api/admin/stats/export/csv`,
-            {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            credentials: 'omit',
-            }
-        );
-    
-        if (!res.ok) throw new Error();
-    
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-    
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'finopslatam_admin_stats.csv';
-        document.body.appendChild(a);
-        a.click();
-    
-        a.remove();
-        window.URL.revokeObjectURL(url);
-        } catch {
-        alert('Error al descargar CSV');
-        }
-    };
-  
-    // PDF    
-    const exportPDF = async () => {
-        if (!token) return;
-      
-        try {
-          const res = await fetch(
-            `${API_URL}/api/admin/stats/export/pdf`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              credentials: 'omit',
-            }
-          );
-      
-          if (!res.ok) throw new Error();
-      
-          const blob = await res.blob();
-          const url = window.URL.createObjectURL(blob);
-      
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'finopslatam_admin_report.pdf';
-          document.body.appendChild(a);
-          a.click();
-      
-          a.remove();
-          window.URL.revokeObjectURL(url);
-        } catch {
-          alert('Error al descargar PDF');
-        }
-      };
-      
-  
+  /* ============================
+     FETCH DATA
+  ============================ */
   useEffect(() => {
     if (!token) return;
 
     fetch(`${API_URL}/api/admin/stats`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
-        if (!res.ok) throw new Error('Error al cargar estadísticas');
+        if (!res.ok) throw new Error();
         return res.json();
       })
       .then(setStats)
-      .catch(() => {
-        setError('No se pudieron cargar las métricas del sistema');
-      });
-  }, [token]);
+      .catch(() =>
+        setError('No se pudieron cargar las métricas del sistema')
+      );
+  }, [token, API_URL]);
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+  /* ============================
+     EXPORTS
+  ============================ */
+  const exportPDF = async () => {
+    if (!token) return;
 
-  if (!stats) {
-    return <p className="text-gray-500">Cargando métricas...</p>;
-  }
+    const res = await fetch(
+      `${API_URL}/api/v1/reports/admin/pdf`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!res.ok) {
+      alert('Error al generar PDF');
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'finopslatam_admin_report.pdf';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const exportCSV = async () => {
+    if (!token) return;
+
+    const res = await fetch(
+      `${API_URL}/api/v1/reports/admin/csv`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!res.ok) {
+      alert('Error al generar CSV');
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'finopslatam_admin_report.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  /* ============================
+     DERIVED DATA
+  ============================ */
+  const activeRatio = useMemo(() => {
+    if (!stats || stats.total_users === 0) return 0;
+    return Math.round(
+      (stats.active_users / stats.total_users) * 100
+    );
+  }, [stats]);
+
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!stats)
+    return <p className="text-gray-400">Cargando métricas…</p>;
 
   const userStatusData = [
     { name: 'Activos', value: stats.active_users },
     { name: 'Inactivos', value: stats.inactive_users },
   ];
 
-  const planColors = [
-    '#6366F1',
-    '#10B981',
-    '#F59E0B',
-    '#EF4444',
-    '#8B5CF6',
-  ];
-
+  /* ============================
+     RENDER
+  ============================ */
   return (
-    <>
+    <div className="space-y-10">
+
+      {/* HEADER ACTIONS */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={exportPDF}
+          className="px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800"
+        >
+          Exportar PDF
+        </button>
+        <button
+          onClick={exportCSV}
+          className="px-4 py-2 rounded-md bg-gray-100 text-gray-800 text-sm hover:bg-gray-200"
+        >
+          Exportar CSV
+        </button>
+      </div>
+
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <KpiCard title="Usuarios totales" value={stats.total_users} />
-        <KpiCard title="Usuarios activos" value={stats.active_users} color="green" />
-        <KpiCard title="Usuarios inactivos" value={stats.inactive_users} color="red" />
+        <KpiCard
+          title="Usuarios totales"
+          value={stats.total_users}
+        />
+        <KpiCard
+          title="Usuarios activos"
+          value={stats.active_users}
+          subtitle={`${activeRatio}% del total`}
+        />
+        <KpiCard
+          title="Usuarios inactivos"
+          value={stats.inactive_users}
+        />
         <KpiCard
           title="Planes activos"
           value={stats.users_by_plan.length}
-          color="indigo"
         />
       </div>
 
-        {/* EXPORTACIONES */}
-        <div className="flex gap-4 mt-6">
-        <button
-            onClick={exportPDF}
-            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
-        >
-            📄 Exportar PDF
-        </button>
-
-        <button
-            onClick={exportCSV}
-            className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition"
-        >
-            📊 Exportar CSV
-        </button>
-        </div>
-
-
       {/* GRÁFICOS */}
-      <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-        {/* Usuarios activos vs inactivos */}
-        <div className="bg-white border rounded-xl p-6 shadow">
-          <h3 className="font-semibold mb-4">
-            Usuarios activos vs inactivos
+        {/* STATUS PIE */}
+        <div className="bg-white border rounded-xl p-6 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-700 mb-4">
+            Estado de usuarios
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
@@ -223,8 +207,8 @@ export default function AdminDashboard() {
                 data={userStatusData}
                 dataKey="value"
                 nameKey="name"
+                innerRadius={60}
                 outerRadius={90}
-                label
               >
                 <Cell fill="#22c55e" />
                 <Cell fill="#ef4444" />
@@ -234,32 +218,27 @@ export default function AdminDashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* Usuarios por plan */}
-        <div className="bg-white border rounded-xl p-6 shadow">
-          <h3 className="font-semibold mb-4">
+        {/* USERS BY PLAN */}
+        <div className="bg-white border rounded-xl p-6 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-700 mb-4">
             Usuarios por plan
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={stats.users_by_plan}>
+            <BarChart data={stats.users_by_plan} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="plan" />
-              <YAxis allowDecimals={false} />
+              <XAxis type="number" allowDecimals={false} />
+              <YAxis
+                dataKey="plan"
+                type="category"
+                width={140}
+              />
               <Tooltip />
-              <Legend />
-              <Bar dataKey="count">
-                {stats.users_by_plan.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={planColors[index % planColors.length]}
-                  />
-                ))}
-              </Bar>
+              <Bar dataKey="count" fill="#6366F1" />
             </BarChart>
           </ResponsiveContainer>
         </div>
-
       </div>
-    </>
+    </div>
   );
 }
