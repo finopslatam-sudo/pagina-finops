@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useAuth } from '@/app/context/AuthContext';
 import PrivateRoute from '@/app/components/Auth/PrivateRoute';
 import AdminDashboard from './AdminDashboard';
