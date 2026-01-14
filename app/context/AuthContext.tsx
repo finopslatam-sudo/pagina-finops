@@ -36,6 +36,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   planState: PlanState;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUser: (partialUser: Partial<User>) => void;
@@ -69,6 +70,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL?.trim() ||
     "https://api.finopslatam.com";
+    
+  const isAdmin =
+    user?.role?.toLowerCase() === 'admin';
 
   /* =====================================================
      LOGOUT
@@ -240,6 +244,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         token,
         planState,
+        isAdmin,
         login,
         logout,
         updateUser,
