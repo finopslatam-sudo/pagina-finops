@@ -12,6 +12,7 @@ interface User {
   contact_name?: string;
   company_name?: string;
   email?: string;
+  role?: string;
 }
 
 // ============================
@@ -20,6 +21,21 @@ interface User {
 export default function Dashboard() {
   const { user, planState } = useAuth();
   const safeUser: User = user || {};
+
+  // ⛔️ Evita render prematuro
+  if (!user) {
+    return (
+      <PrivateRoute>
+        <main className="min-h-screen bg-white text-gray-900 flex items-center justify-center">
+          <p className="text-gray-400">Cargando dashboard…</p>
+        </main>
+      </PrivateRoute>
+    );
+  }
+
+  const isAdmin =
+    typeof user.role === 'string' &&
+    user.role.toLowerCase() === 'admin';
 
   return (
     <PrivateRoute>
@@ -35,7 +51,7 @@ export default function Dashboard() {
                 safeUser.email}
             </span>
 
-            {user?.role === 'admin' ? (
+            {isAdmin ? (
               <span className="text-sm text-purple-700 font-medium">
                 Rol: Administrador del sistema
               </span>
@@ -64,10 +80,7 @@ export default function Dashboard() {
 
         {/* CONTENT */}
         <section className="px-6 max-w-7xl mx-auto space-y-12">
-          {user?.role === 'admin'
-            ? <AdminDashboard />
-            : <ClientDashboard />
-          }
+          {isAdmin ? <AdminDashboard /> : <ClientDashboard />}
         </section>
 
         {/* FOOTER */}
