@@ -426,6 +426,7 @@ export default function AdminPage() {
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="px-4 py-3 text-left">Empresa</th>
+                    <th className="px-4 py-3 text-left">Nombre Contacto</th>
                     <th className="px-4 py-3 text-left">Email</th>
                     <th className="px-4 py-3 text-left">Rol</th>
 
@@ -442,6 +443,18 @@ export default function AdminPage() {
                     <tr key={u.id} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium">
                         {u.company_name}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        {u.contact_name ? (
+                          <span className="text-gray-900">
+                            {u.contact_name}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 italic">
+                            No definido
+                          </span>
+                        )}
                       </td>
 
                       <td className="px-4 py-3">
