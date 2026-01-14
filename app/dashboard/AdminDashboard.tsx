@@ -48,7 +48,7 @@ const KpiCard = ({
    MAIN COMPONENT
 ============================ */
 export default function AdminDashboard() {
-  const { token } = useAuth();
+  const { token } = useAuth(); // ⬅️ solo token
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [error, setError] = useState('');
 
@@ -121,6 +121,28 @@ export default function AdminDashboard() {
     window.URL.revokeObjectURL(url);
   };
 
+  const exportXLSX = async () => {
+    if (!token) return;
+
+    const res = await fetch(
+      `${API_URL}/api/v1/reports/admin/xlsx`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (!res.ok) {
+      alert('Error al generar Excel');
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'finopslatam_admin_report.xlsx';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   /* ============================
      DERIVED DATA (PERCENTAGES)
   ============================ */
@@ -166,11 +188,19 @@ export default function AdminDashboard() {
         >
           Exportar PDF
         </button>
+
         <button
           onClick={exportCSV}
           className="px-4 py-2 rounded-md bg-gray-100 text-gray-800 text-sm hover:bg-gray-200"
         >
           Exportar CSV
+        </button>
+
+        <button
+          onClick={exportXLSX}
+          className="px-4 py-2 rounded-md bg-green-600 text-white text-sm hover:bg-green-700"
+        >
+          Exportar Excel
         </button>
       </div>
 
