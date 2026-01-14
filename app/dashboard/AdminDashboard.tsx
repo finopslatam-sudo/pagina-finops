@@ -180,8 +180,19 @@ export default function AdminDashboard() {
   ============================ */
   return (
     <div className="space-y-10">
-      {/* HEADER ACTIONS */}
-      <div className="flex justify-end gap-3">
+
+      {/* KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <KpiCard title="Usuarios totales" value={stats.total_users} />
+        <KpiCard title="Usuarios activos" value={stats.active_users} />
+        <KpiCard title="Usuarios inactivos" value={stats.inactive_users} />
+        <KpiCard
+          title="Planes activos"
+          value={stats.users_by_plan.length}
+        />
+      </div>
+            {/* HEADER ACTIONS */}
+            <div className="flex justify-end gap-3">
         <button
           onClick={exportPDF}
           className="px-4 py-2 rounded-md bg-gray-900 text-white text-sm hover:bg-gray-800"
@@ -202,17 +213,6 @@ export default function AdminDashboard() {
         >
           Exportar Excel
         </button>
-      </div>
-
-      {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <KpiCard title="Usuarios totales" value={stats.total_users} />
-        <KpiCard title="Usuarios activos" value={stats.active_users} />
-        <KpiCard title="Usuarios inactivos" value={stats.inactive_users} />
-        <KpiCard
-          title="Planes activos"
-          value={stats.users_by_plan.length}
-        />
       </div>
 
       {/* GRÁFICOS */}

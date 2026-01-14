@@ -50,18 +50,6 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* HERO */}
-        <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 mb-12">
-          <div className="max-w-7xl mx-auto px-6 text-center">
-            <h1 className="text-4xl font-bold mb-4">
-              Dashboard FinOps
-            </h1>
-            <p className="text-blue-100">
-              Control y visibilidad centralizada
-            </p>
-          </div>
-        </section>
-
         {/* CONTENT */}
         <section className="px-6 max-w-7xl mx-auto space-y-12">
           {user?.role === 'admin'
