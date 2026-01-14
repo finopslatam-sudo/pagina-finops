@@ -79,8 +79,17 @@ export default function Dashboard() {
         </section>
 
         {/* CONTENT */}
+
         <section className="px-6 max-w-7xl mx-auto space-y-12">
-          {isAdmin ? <AdminDashboard /> : <ClientDashboard />}
+        {!user ? (
+          <p className="text-gray-400 text-center">
+            Cargando dashboard…
+          </p>
+        ) : user.role?.toLowerCase() === 'admin' ? (
+          <AdminDashboard />
+        ) : (
+          <ClientDashboard />
+        )}
         </section>
 
         {/* FOOTER */}
