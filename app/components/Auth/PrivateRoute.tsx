@@ -10,17 +10,26 @@ interface PrivateRouteProps {
 }
 
 export default function PrivateRoute({ children }: PrivateRouteProps) {
-  const { user } = useAuth();
+  const { user, isAuthReady } = useAuth(); // 👈 isAuthReady agregado
   const router = useRouter();
 
-  // 🔁 Redirección si no hay sesión
+  // 🔁 Redirección SOLO cuando el contexto ya está listo
   useEffect(() => {
-    if (!user) {
+    if (isAuthReady && !user) {
       router.replace('/');
     }
-  }, [user, router]);
+  }, [isAuthReady, user, router]);
 
-  // 🛑 No renderizar nada hasta que Auth esté definido
+  // ⏳ Esperar a que AuthContext termine de rehidratarse
+  if (!isAuthReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400">
+        Cargando sesión…
+      </div>
+    );
+  }
+
+  // 🛑 Contexto listo, pero sin sesión
   if (!user) {
     return null;
   }
@@ -30,7 +39,7 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
       {/* 🔐 Overlay obligatorio si corresponde */}
       {user.force_password_change && <ForceChangePasswordModal />}
 
-      {/* ✅ CONTENIDO SIEMPRE PRESENTE */}
+      {/* ✅ CONTENIDO PROTEGIDO */}
       {children}
     </>
   );
