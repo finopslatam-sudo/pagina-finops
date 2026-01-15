@@ -286,16 +286,36 @@ export default function AdminPage() {
 
   // ➕ Crear usuario
   const createUser = async () => {
-    if (
-      !newUser.company_name ||
-      !newUser.email ||
-      !newUser.password ||
-      !newUser.contact_name ||
-      !newUser.phone ||
-      !newUser.plan_id
-    ) {
-      alert('Completa todos los campos obligatorios');
-      return;
+
+    // 🔹 Validación según rol
+    if (newUser.role === 'client') {
+      if (
+        !newUser.company_name ||
+        !newUser.email ||
+        !newUser.password ||
+        !newUser.contact_name ||
+        !newUser.phone ||
+        !newUser.plan_id
+      ) {
+        alert('Completa todos los campos obligatorios');
+        return;
+      }
+    }
+
+    if (newUser.role === 'admin') {
+      if (
+        !newUser.email ||
+        !newUser.password ||
+        !newUser.contact_name ||
+        !newUser.phone
+      ) {
+        alert('Completa todos los campos obligatorios para administrador');
+        return;
+      }
+
+      // 🔒 Limpiar campos que admin NO usa
+      newUser.plan_id = null;
+      newUser.company_name = '';
     }
 
     if (newUser.password !== confirmPassword) {
@@ -812,11 +832,11 @@ export default function AdminPage() {
                   Crear nuevo usuario
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Todos los campos son obligatorios
+                  Completa los campos según el rol seleccionado
                 </p>
               </div>
 
-              {/* BODY (SCROLL) */}
+              {/* BODY */}
               <div className="p-6 space-y-4 overflow-y-auto">
 
                 {formError && (
@@ -825,50 +845,72 @@ export default function AdminPage() {
                   </div>
                 )}
 
-                {/* PLAN */}
+                {/* 🔹 ROL (PRIMERO) */}
                 <div>
-                  <label className="text-sm text-gray-600">
-                    Plan de suscripción
-                  </label>
+                  <label className="text-sm text-gray-600">Rol</label>
                   <select
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.plan_id ?? ""}
+                    className="mt-1 border rounded-lg p-2 w-full font-semibold"
+                    value={newUser.role}
                     onChange={(e) =>
                       setNewUser({
                         ...newUser,
-                        plan_id: e.target.value === "" ? null : Number(e.target.value),
+                        role: e.target.value as 'admin' | 'client',
+                        plan_id: null,
+                        company_name: '',
                       })
                     }
-                    required
                   >
-                    <option value="">Selecciona un plan</option>
-
-                    {plans.map((plan) => (
-                      <option key={plan.id} value={plan.id}>
-                        {plan.name}
-                      </option>
-                    ))}
+                    <option value="client">Cliente</option>
+                    <option value="admin">Administrador</option>
                   </select>
-
-                  {plans.length === 0 && (
-                    <p className="text-sm text-gray-400 mt-1">
-                      Cargando planes...
-                    </p>
-                  )}
                 </div>
 
-                {/* EMPRESA */}
-                <div>
-                  <label className="text-sm text-gray-600">Empresa</label>
-                  <input
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.company_name}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, company_name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
+                {/* 🔹 SOLO CLIENTE */}
+                {newUser.role === 'client' && (
+                  <>
+                    {/* PLAN */}
+                    <div>
+                      <label className="text-sm text-gray-600">
+                        Plan de suscripción
+                      </label>
+                      <select
+                        className="mt-1 border rounded-lg p-2 w-full"
+                        value={newUser.plan_id ?? ''}
+                        onChange={(e) =>
+                          setNewUser({
+                            ...newUser,
+                            plan_id:
+                              e.target.value === ''
+                                ? null
+                                : Number(e.target.value),
+                          })
+                        }
+                      >
+                        <option value="">Selecciona un plan</option>
+                        {plans.map((plan) => (
+                          <option key={plan.id} value={plan.id}>
+                            {plan.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* EMPRESA */}
+                    <div>
+                      <label className="text-sm text-gray-600">Empresa</label>
+                      <input
+                        className="mt-1 border rounded-lg p-2 w-full"
+                        value={newUser.company_name}
+                        onChange={(e) =>
+                          setNewUser({
+                            ...newUser,
+                            company_name: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </>
+                )}
 
                 {/* EMAIL */}
                 <div>
@@ -880,48 +922,65 @@ export default function AdminPage() {
                     onChange={(e) =>
                       setNewUser({ ...newUser, email: e.target.value })
                     }
-                    required
                   />
                 </div>
 
                 {/* PASSWORD */}
-                <div>
+                <div className="relative">
                   <label className="text-sm text-gray-600">Password</label>
                   <input
-                    type="password"
-                    className="mt-1 border rounded-lg p-2 w-full"
+                    type={showPassword ? 'text' : 'password'}
+                    className="mt-1 border rounded-lg p-2 w-full pr-10"
                     value={newUser.password}
                     onChange={(e) =>
                       setNewUser({ ...newUser, password: e.target.value })
                     }
-                    required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
                 </div>
 
                 {/* CONFIRM PASSWORD */}
-                <div>
+                <div className="relative">
                   <label className="text-sm text-gray-600">
                     Confirmar password
                   </label>
                   <input
-                    type="password"
-                    className="mt-1 border rounded-lg p-2 w-full"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    className="mt-1 border rounded-lg p-2 w-full pr-10"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
                   />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
+                    className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirmPassword ? '🙈' : '👁️'}
+                  </button>
                 </div>
 
                 {/* CONTACTO */}
                 <div>
-                  <label className="text-sm text-gray-600">Nombre Contacto</label>
+                  <label className="text-sm text-gray-600">
+                    Nombre Contacto
+                  </label>
                   <input
                     className="mt-1 border rounded-lg p-2 w-full"
                     value={newUser.contact_name}
                     onChange={(e) =>
-                      setNewUser({ ...newUser, contact_name: e.target.value })
+                      setNewUser({
+                        ...newUser,
+                        contact_name: e.target.value,
+                      })
                     }
-                    required
                   />
                 </div>
 
@@ -934,46 +993,32 @@ export default function AdminPage() {
                     onChange={(e) =>
                       setNewUser({ ...newUser, phone: e.target.value })
                     }
-                    required
                   />
                 </div>
 
-                {/* ROL */}
-                <div>
-                  <label className="text-sm text-gray-600">Rol</label>
-                  <select
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.role}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, role: e.target.value as 'admin' | 'client'})
-                    }
-                  >
-                    <option value="client">Cliente</option>
-                    <option value="admin">Administrador</option>
-                  </select>
-                </div>
-
-                {/* ESTADO */}
-                <div>
-                  <label className="text-sm text-gray-600">Estado</label>
-                  <select
-                    className="mt-1 border rounded-lg p-2 w-full"
-                    value={newUser.is_active ? 'active' : 'inactive'}
-                    onChange={(e) =>
-                      setNewUser({
-                        ...newUser,
-                        is_active: e.target.value === 'active',
-                      })
-                    }
-                  >
-                    <option value="active">Activo</option>
-                    <option value="inactive">Inactivo</option>
-                  </select>
-                </div>
+                {/* 🔹 SOLO ADMIN */}
+                {newUser.role === 'admin' && (
+                  <div>
+                    <label className="text-sm text-gray-600">Estado</label>
+                    <select
+                      className="mt-1 border rounded-lg p-2 w-full"
+                      value={newUser.is_active ? 'active' : 'inactive'}
+                      onChange={(e) =>
+                        setNewUser({
+                          ...newUser,
+                          is_active: e.target.value === 'active',
+                        })
+                      }
+                    >
+                      <option value="active">Activo</option>
+                      <option value="inactive">Inactivo</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
-              {/* FOOTER (STICKY) */}
-              <div className="p-6 border-t bg-white flex justify-end gap-3 sticky bottom-0">
+              {/* FOOTER */}
+              <div className="p-6 border-t bg-white flex justify-end gap-3">
                 <button
                   onClick={() => {
                     setMode('edit');
@@ -992,10 +1037,10 @@ export default function AdminPage() {
                   Crear usuario
                 </button>
               </div>
-
             </div>
           </div>
         )}
+
       </main>
     </PrivateRoute>
   );

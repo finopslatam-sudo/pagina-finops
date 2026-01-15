@@ -37,6 +37,7 @@ interface AuthContextType {
   token: string | null;
   planState: PlanState;
   isAdmin: boolean;
+  isAuthReady: boolean; 
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUser: (partialUser: Partial<User>) => void;
@@ -64,15 +65,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     status: "loading",
   });
 
+  const [isAuthReady, setIsAuthReady] = useState(false); 
+
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLoggingOutRef = useRef(false);
 
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL?.trim() ||
     "https://api.finopslatam.com";
-    
-  const isAdmin =
-    user?.role?.toLowerCase() === 'admin';
+
+  const isAdmin = user?.role === "admin";
 
   /* =====================================================
      LOGOUT
@@ -112,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /* =====================================================
-     REHIDRATAR SESIÓN
+     REHIDRATAR SESIÓN 
   ===================================================== */
 
   useEffect(() => {
@@ -139,6 +141,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {
       localStorage.clear();
       setPlanState({ status: "none" });
+    } finally {
+      setIsAuthReady(true); 
     }
   }, []);
 
@@ -195,7 +199,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(data.error || "Error al iniciar sesión");
     }
 
-    // 🔐 Guardar user COMPLETO
     setUser(data.user);
     setToken(data.access_token);
 
@@ -218,7 +221,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /* =====================================================
-     UPDATE USER (MERGE, NO REPLACE)
+     UPDATE USER
   ===================================================== */
 
   const updateUser = (partialUser: Partial<User>) => {
@@ -245,6 +248,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         token,
         planState,
         isAdmin,
+        isAuthReady, // ✅ EXPUESTO
         login,
         logout,
         updateUser,

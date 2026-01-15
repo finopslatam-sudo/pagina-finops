@@ -74,6 +74,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     process.env.NEXT_PUBLIC_API_URL?.trim() ||
     "https://api.finopslatam.com";
 
+  console.log("🔥 API_URL EN FRONTEND:", API_URL);  
+
   const isAdmin = user?.role === "admin";
 
   /* =====================================================
@@ -186,25 +188,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     isLoggingOutRef.current = false;
-
+  
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // ✅ ESTA LÍNEA ES CLAVE
       body: JSON.stringify({ email, password }),
     });
-
+  
     const data = await res.json();
-
+  
     if (!res.ok) {
       throw new Error(data.error || "Error al iniciar sesión");
     }
-
+  
     setUser(data.user);
     setToken(data.access_token);
-
+  
     localStorage.setItem("finops_token", data.access_token);
     localStorage.setItem("finops_user", JSON.stringify(data.user));
-
+  
     if (data.user?.plan) {
       setPlanState({
         status: "assigned",
@@ -219,6 +222,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("finops_plan");
     }
   };
+  
 
   /* =====================================================
      UPDATE USER
