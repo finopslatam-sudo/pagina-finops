@@ -13,11 +13,7 @@ interface AdminUser {
   phone?: string;
   role: 'admin' | 'client';
   is_active: boolean;
-  plan: {
-    id?: number;
-    code: string;
-    name: string;
-  } | null;
+  plan: string | null;
 }
 
 interface Plan {
@@ -116,10 +112,9 @@ export default function AdminPage() {
       return;
     }
   
-    const planId = Number(editingUser.plan.id);
 
-    setSelectedPlanId(planId);
-    setOriginalPlanId(planId);
+    setSelectedPlanId(null);
+    setOriginalPlanId(null);
   
   }, [editingUser?.id]);
   
@@ -497,7 +492,7 @@ export default function AdminPage() {
                       <td className="px-4 py-3">
                         {u.plan ? (
                           <span className="px-2 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
-                            {u.plan.name}
+                            {u.plan}
                           </span>
                         ) : (
                           <span className="text-gray-400 italic">
@@ -522,8 +517,8 @@ export default function AdminPage() {
                           onClick={() => {
                             setEditingUser(u);
                             setMode('edit');
-                            setSelectedPlanId(u.plan?.id ?? null);
-                            setOriginalPlanId(u.plan?.id ?? null);
+                            setSelectedPlanId(null);
+                            setOriginalPlanId(null);
                             setSuccessMessage('');
                           }}
                           className="text-blue-600 hover:text-blue-800 font-medium"
@@ -574,7 +569,7 @@ export default function AdminPage() {
                     {editingUser.plan && (
                       <div className="mt-2 mb-3 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2">
                         <span className="text-sm font-semibold text-indigo-700">
-                          Plan actual: {editingUser.plan.name}
+                          Plan actual: {editingUser.plan}
                         </span>
                       </div>
                     )}

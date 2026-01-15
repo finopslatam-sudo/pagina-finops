@@ -14,6 +14,7 @@ interface AdminUser {
   role: 'admin' | 'client';
   is_active: boolean;
   plan: string | null;
+  is_root?: boolean;
 }
 
 interface Plan {
@@ -513,27 +514,33 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right space-x-4">
-                        <button
-                          onClick={() => {
-                            setEditingUser(u);
-                            setMode('edit');
-                            setSelectedPlanId(null);
-                            setOriginalPlanId(null);
-                            setSuccessMessage('');
-                          }}
-                          className="text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                          Editar
-                        </button>
-                        {u.is_active && u.id !== user?.id && (
-                        <button
-                          onClick={() => deleteUser(u.id)}
-                          className="text-red-600 hover:text-red-800 font-medium"
-                        >
-                          Eliminar
-                        </button>
-                      )}
-                    </td>
+                        {/* ❌ ROOT: no editable por nadie */}
+                        {!u.is_root && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setEditingUser(u);
+                                setMode('edit');
+                                setSelectedPlanId(null);
+                                setOriginalPlanId(null);
+                                setSuccessMessage('');
+                              }}
+                              className="text-blue-600 hover:text-blue-800 font-medium"
+                            >
+                              Editar
+                            </button>
+
+                            {u.is_active && u.id !== user?.id && (
+                              <button
+                                onClick={() => deleteUser(u.id)}
+                                className="text-red-600 hover:text-red-800 font-medium"
+                              >
+                                Eliminar
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
