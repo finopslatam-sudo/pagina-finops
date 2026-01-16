@@ -513,13 +513,14 @@ export default function AdminPage() {
                           {u.is_active ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
+                      
                       <td className="px-4 py-3 text-right space-x-4">
                         {(
-                          // ✅ ROOT puede editarse a sí mismo y a cualquiera
+                          // ROOT puede editar/eliminar a cualquiera (incluido a sí mismo)
                           user?.is_root ||
 
-                          // ✅ ADMIN solo puede editar CLIENTES
-                          (user?.role === 'admin' && u.role === 'client')
+                          // ADMIN puede editar/eliminar SOLO clientes
+                          (user?.role === 'admin' && u.role === 'client' && !u.is_root)
                         ) && (
                           <>
                             <button
@@ -535,8 +536,8 @@ export default function AdminPage() {
                               Editar
                             </button>
 
-                            {/* 🗑️ Eliminar: nunca a uno mismo */}
-                            {u.is_active && u.id !== user?.id && (
+                            {/* Eliminar solo si NO es root */}
+                            {!u.is_root && (
                               <button
                                 onClick={() => deleteUser(u.id)}
                                 className="text-red-600 hover:text-red-800 font-medium"
@@ -547,6 +548,7 @@ export default function AdminPage() {
                           </>
                         )}
                       </td>
+
 
                     </tr>
                   ))}
@@ -674,7 +676,7 @@ export default function AdminPage() {
                     <select
                       className="mt-1 border rounded-lg p-2 w-full"
                       value={editingUser.role}
-                      disabled={editingUser.id === user?.id}
+                      disabled={!user?.is_root && editingUser.id === user?.id}
                       onChange={(e) =>
                         setEditingUser({
                           ...editingUser,
