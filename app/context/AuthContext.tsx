@@ -21,6 +21,7 @@ export interface User {
   contact_name: string;
   phone: string;
   is_active: boolean;
+  is_root: boolean;
   force_password_change?: boolean;
 }
 
@@ -197,6 +198,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   
     const data = await res.json();
+
+    console.log("LOGIN USER:", data.user);
   
     if (!res.ok) {
       throw new Error(data.error || "Error al iniciar sesión");

@@ -514,8 +514,13 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right space-x-4">
-                        {/* ❌ ROOT: no editable por nadie */}
-                        {!u.is_root && (
+                        {(
+                          // ✅ ROOT puede editarse a sí mismo y a cualquiera
+                          user?.is_root ||
+
+                          // ✅ ADMIN solo puede editar CLIENTES
+                          (user?.role === 'admin' && u.role === 'client')
+                        ) && (
                           <>
                             <button
                               onClick={() => {
@@ -530,6 +535,7 @@ export default function AdminPage() {
                               Editar
                             </button>
 
+                            {/* 🗑️ Eliminar: nunca a uno mismo */}
                             {u.is_active && u.id !== user?.id && (
                               <button
                                 onClick={() => deleteUser(u.id)}
@@ -541,6 +547,7 @@ export default function AdminPage() {
                           </>
                         )}
                       </td>
+
                     </tr>
                   ))}
                 </tbody>
