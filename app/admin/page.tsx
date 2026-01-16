@@ -517,7 +517,9 @@ export default function AdminPage() {
 
                       <td className="px-4 py-3 text-right space-x-4">
                         {(() => {
-                          // 🔐 ROOT puede editar/eliminar a cualquiera (incluido a sí mismo)
+                          // =========================
+                          // ROOT: puede editar/eliminar a cualquiera (incluido a sí mismo)
+                          // =========================
                           if (user?.is_root) {
                             return (
                               <>
@@ -544,7 +546,29 @@ export default function AdminPage() {
                             );
                           }
 
-                          // 🔐 ADMIN: solo puede modificar CLIENTES
+                          // =========================
+                          // ADMIN: puede editarse a sí mismo
+                          // =========================
+                          if (user?.role === 'admin' && u.id === user.id) {
+                            return (
+                              <button
+                                onClick={() => {
+                                  setEditingUser(u);
+                                  setMode('edit');
+                                  setSelectedPlanId(null);
+                                  setOriginalPlanId(null);
+                                  setSuccessMessage('');
+                                }}
+                                className="text-blue-600 hover:text-blue-800 font-medium"
+                              >
+                                Editar
+                              </button>
+                            );
+                          }
+
+                          // =========================
+                          // ADMIN: puede editar/eliminar CLIENTES
+                          // =========================
                           if (user?.role === 'admin' && u.role === 'client') {
                             return (
                               <>
@@ -573,10 +597,13 @@ export default function AdminPage() {
                             );
                           }
 
-                          // ❌ Sin permisos
+                          // =========================
+                          // SIN PERMISOS
+                          // =========================
                           return null;
                         })()}
                       </td>
+
 
                     </tr>
                   ))}
