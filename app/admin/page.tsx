@@ -77,7 +77,13 @@ export default function AdminPage() {
   const [resetSuccess, setResetSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const canDeleteUser = (currentUser: any, targetUser: any) => {
+    if (!currentUser) return false;
+    if (!targetUser.is_active) return false;        // no eliminar inactivos
+    if (targetUser.is_root) return false;           // no eliminar root
+    if (currentUser.id === targetUser.id) return false; // no auto-eliminar
+    return true;
+  };
 
 
 
