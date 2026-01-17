@@ -13,7 +13,9 @@ interface AdminUser {
   phone?: string;
   role: 'admin' | 'client';
   is_active: boolean;
+  is_root?: boolean;
   plan: string | null;
+  
 }
 
 interface Plan {
@@ -512,28 +514,97 @@ export default function AdminPage() {
                           {u.is_active ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
+
                       <td className="px-4 py-3 text-right space-x-4">
-                        <button
-                          onClick={() => {
-                            setEditingUser(u);
-                            setMode('edit');
-                            setSelectedPlanId(null);
-                            setOriginalPlanId(null);
-                            setSuccessMessage('');
-                          }}
-                          className="text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                          Editar
-                        </button>
-                        {u.is_active && u.id !== user?.id && (
-                        <button
-                          onClick={() => deleteUser(u.id)}
-                          className="text-red-600 hover:text-red-800 font-medium"
-                        >
-                          Eliminar
-                        </button>
-                      )}
-                    </td>
+                        {(() => {
+                          // =========================
+                          // ROOT: puede editar/eliminar a cualquiera (incluido a sí mismo)
+                          // =========================
+                          if (user?.is_root) {
+                            return (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setEditingUser(u);
+                                    setMode('edit');
+                                    setSelectedPlanId(null);
+                                    setOriginalPlanId(null);
+                                    setSuccessMessage('');
+                                  }}
+                                  className="text-blue-600 hover:text-blue-800 font-medium"
+                                >
+                                  Editar
+                                </button>
+
+                                <button
+                                  onClick={() => deleteUser(u.id)}
+                                  className="text-red-600 hover:text-red-800 font-medium"
+                                >
+                                  Eliminar
+                                </button>
+                              </>
+                            );
+                          }
+
+                          // =========================
+                          // ADMIN: puede editarse a sí mismo
+                          // =========================
+                          if (user?.role === 'admin' && u.id === user.id) {
+                            return (
+                              <button
+                                onClick={() => {
+                                  setEditingUser(u);
+                                  setMode('edit');
+                                  setSelectedPlanId(null);
+                                  setOriginalPlanId(null);
+                                  setSuccessMessage('');
+                                }}
+                                className="text-blue-600 hover:text-blue-800 font-medium"
+                              >
+                                Editar
+                              </button>
+                            );
+                          }
+
+                          // =========================
+                          // ADMIN: puede editar/eliminar CLIENTES
+                          // =========================
+                          if (user?.role === 'admin' && u.role === 'client') {
+                            return (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setEditingUser(u);
+                                    setMode('edit');
+                                    setSelectedPlanId(null);
+                                    setOriginalPlanId(null);
+                                    setSuccessMessage('');
+                                  }}
+                                  className="text-blue-600 hover:text-blue-800 font-medium"
+                                >
+                                  Editar
+                                </button>
+
+                                {u.is_active && (
+                                  <button
+                                    onClick={() => deleteUser(u.id)}
+                                    className="text-red-600 hover:text-red-800 font-medium"
+                                  >
+                                    Eliminar
+                                  </button>
+                                )}
+                              </>
+                            );
+                          }
+
+                          // =========================
+                          // SIN PERMISOS
+                          // =========================
+                          return null;
+                        })()}
+                      </td>
+
+
                     </tr>
                   ))}
                 </tbody>
@@ -660,7 +731,7 @@ export default function AdminPage() {
                     <select
                       className="mt-1 border rounded-lg p-2 w-full"
                       value={editingUser.role}
-                      disabled={editingUser.id === user?.id}
+                      disabled={!user?.is_root && editingUser.id === user?.id}
                       onChange={(e) =>
                         setEditingUser({
                           ...editingUser,

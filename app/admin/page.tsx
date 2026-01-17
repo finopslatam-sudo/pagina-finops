@@ -245,7 +245,6 @@ export default function AdminPage() {
       // 2️⃣ Actualizar plan SOLO si cambió
       const planChanged =
         selectedPlanId !== null &&
-        originalPlanId !== null &&
         selectedPlanId !== originalPlanId;
 
       if (planChanged) {
