@@ -9,37 +9,56 @@ function Plan({
   title,
   description,
   features,
-  color,
+  bg,
+  border,
+  button,
   highlight,
   onClick,
 }: {
   title: string;
   description: string;
   features: string[];
-  color: string;
+  bg: string;
+  border: string;
+  button: string;
   highlight?: boolean;
   onClick: () => void;
 }) {
   return (
-    <div className={`bg-white border rounded-2xl shadow-lg p-8 flex flex-col relative ${highlight ? "border-blue-600" : ""}`}>
+    <div
+      className={`
+        relative rounded-3xl p-8 flex flex-col shadow-xl
+        ${bg} ${border}
+        transition-transform hover:-translate-y-1
+      `}
+    >
+      {/* DESCUENTO */}
+      <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white text-sm font-semibold px-4 py-1 rounded-full shadow">
+        🎉 20% dcto lanzamiento
+      </span>
+
+      {/* MÁS ELEGIDO */}
       {highlight && (
-        <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm">
+        <span className="absolute top-6 right-6 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
           Más elegido
         </span>
       )}
 
-      <h2 className="text-2xl font-bold mb-2">{title}</h2>
-      <p className="text-gray-600 mb-6">{description}</p>
+      <h2 className="text-2xl font-bold mb-2 text-gray-900">{title}</h2>
+      <p className="text-gray-700 mb-6">{description}</p>
 
-      <ul className="space-y-2 text-gray-700 flex-1 mb-6">
+      <ul className="space-y-2 text-gray-800 flex-1 mb-6">
         {features.map((f) => (
-          <li key={f}>✔ {f}</li>
+          <li key={f} className="flex items-start gap-2">
+            <span className="text-green-600 mt-1">✔</span>
+            <span>{f}</span>
+          </li>
         ))}
       </ul>
 
       <button
         onClick={onClick}
-        className={`${color} hover:opacity-90 text-white font-semibold py-3 rounded-lg transition`}
+        className={`${button} text-white font-semibold py-3 rounded-xl transition hover:opacity-90`}
       >
         Contratar Plan
       </button>
@@ -116,7 +135,7 @@ function ContractModal({
           <div className="bg-green-50 border border-green-300 text-green-700 p-4 rounded-lg">
             ✅ Solicitud enviada correctamente.  
             Alguien de nuestro equipo se contactará a la brevedad.
-            
+
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -195,51 +214,58 @@ export default function Servicios() {
       <section className="px-6 py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
 
-          <Plan
-            title="FinOps Foundation"
-            description="Visibilidad y control financiero cloud."
-            features={[
-              "Cloud Assessment inicial",
-              "Inventario completo de recursos",
-              "Costos por servicio y proyecto",
-              "Dashboards básicos",
-              "Alertas simples",
-              "Línea base FinOps",
-            ]}
-            color="bg-slate-700"
-            onClick={() => setSelectedPlan("FinOps Foundation")}
-          />
+        <Plan
+          title="FinOps Foundation"
+          description="Visibilidad y control financiero cloud."
+          features={[
+            "Cloud Assessment inicial",
+            "Inventario completo de recursos",
+            "Costos por servicio y proyecto",
+            "Dashboards básicos",
+            "Alertas simples",
+            "Línea base FinOps",
+          ]}
+          bg="bg-gradient-to-br from-slate-50 to-slate-100"
+          border="border border-slate-200"
+          button="bg-slate-700"
+          onClick={() => setSelectedPlan("FinOps Foundation")}
+        />
 
-          <Plan
-            title="FinOps Professional"
-            description="Optimización activa y decisiones basadas en datos."
-            features={[
-              "Todo Foundation",
-              "Forecasting y budget tracking",
-              "Cost allocation por tags",
-              "Savings Plans & RI analysis",
-              "Optimización técnica recomendada",
-              "IA FinOps asistida",
-            ]}
-            color="bg-blue-600"
-            highlight
-            onClick={() => setSelectedPlan("FinOps Professional")}
-          />
+        <Plan
+          title="FinOps Professional"
+          description="Optimización activa y decisiones basadas en datos."
+          features={[
+            "Todo Foundation",
+            "Forecasting y budget tracking",
+            "Cost allocation por tags",
+            "Savings Plans & RI analysis",
+            "Optimización técnica recomendada",
+            "IA FinOps asistida",
+          ]}
+          bg="bg-gradient-to-br from-blue-50 to-blue-100"
+          border="border-2 border-blue-600"
+          button="bg-blue-600"
+          highlight
+          onClick={() => setSelectedPlan("FinOps Professional")}
+        />
 
-          <Plan
-            title="FinOps Enterprise"
-            description="Gobierno completo y automatización avanzada."
-            features={[
-              "Todo Professional",
-              "Optimización automatizada",
-              "Anomaly Detection avanzado",
-              "IA FinOps predictiva",
-              "Operating Model FinOps",
-              "Compliance y gobierno cloud",
-            ]}
-            color="bg-purple-700"
-            onClick={() => setSelectedPlan("FinOps Enterprise")}
-          />
+        <Plan
+          title="FinOps Enterprise"
+          description="Gobierno completo y automatización avanzada."
+          features={[
+            "Todo Professional",
+            "Optimización automatizada",
+            "Anomaly Detection avanzado",
+            "IA FinOps predictiva",
+            "Operating Model FinOps",
+            "Compliance y gobierno cloud",
+          ]}
+          bg="bg-gradient-to-br from-purple-50 to-purple-100"
+          border="border border-purple-300"
+          button="bg-purple-700"
+          onClick={() => setSelectedPlan("FinOps Enterprise")}
+        />
+
 
         </div>
       </section>
