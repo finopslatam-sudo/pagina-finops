@@ -1,140 +1,258 @@
 'use client';
 
+import { useState } from "react";
+
+/* =========================
+   COMPONENTE PLAN
+========================= */
+function Plan({
+  title,
+  description,
+  features,
+  color,
+  highlight,
+  onClick,
+}: {
+  title: string;
+  description: string;
+  features: string[];
+  color: string;
+  highlight?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <div className={`bg-white border rounded-2xl shadow-lg p-8 flex flex-col relative ${highlight ? "border-blue-600" : ""}`}>
+      {highlight && (
+        <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm">
+          Más elegido
+        </span>
+      )}
+
+      <h2 className="text-2xl font-bold mb-2">{title}</h2>
+      <p className="text-gray-600 mb-6">{description}</p>
+
+      <ul className="space-y-2 text-gray-700 flex-1 mb-6">
+        {features.map((f) => (
+          <li key={f}>✔ {f}</li>
+        ))}
+      </ul>
+
+      <button
+        onClick={onClick}
+        className={`${color} hover:opacity-90 text-white font-semibold py-3 rounded-lg transition`}
+      >
+        Contratar Plan
+      </button>
+    </div>
+  );
+}
+
+/* =========================
+   MODAL CONTRATACIÓN
+========================= */
+function ContractModal({
+  plan,
+  onClose,
+}: {
+  plan: string;
+  onClose: () => void;
+}) {
+  const [form, setForm] = useState({
+    nombre: "",
+    empresa: "",
+    email: "",
+    telefono: "",
+    mensaje: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        servicio: plan,
+      }),
+    });
+
+    setLoading(false);
+
+    if (!res.ok) {
+      alert("Error al enviar solicitud");
+      return;
+    }
+
+    setSuccess(true);
+    setForm({
+      nombre: "",
+      empresa: "",
+      email: "",
+      telefono: "",
+      mensaje: "",
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl w-full max-w-lg p-8 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
+          ✕
+        </button>
+
+        <h3 className="text-2xl font-bold mb-2">
+          Contratar {plan}
+        </h3>
+
+        <p className="text-gray-600 mb-6">
+          Completa el formulario y te contactaremos a la brevedad.
+        </p>
+
+        {success ? (
+          <div className="bg-green-50 border border-green-300 text-green-700 p-4 rounded-lg">
+            ✅ Solicitud enviada correctamente.  
+            Nuestro equipo se pondrá en contacto contigo.
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              required
+              placeholder="Nombre"
+              value={form.nombre}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              className="w-full border rounded-lg px-4 py-2"
+            />
+            <input
+              required
+              placeholder="Empresa"
+              value={form.empresa}
+              onChange={(e) => setForm({ ...form, empresa: e.target.value })}
+              className="w-full border rounded-lg px-4 py-2"
+            />
+            <input
+              required
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="w-full border rounded-lg px-4 py-2"
+            />
+            <input
+              placeholder="Teléfono"
+              value={form.telefono}
+              onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+              className="w-full border rounded-lg px-4 py-2"
+            />
+            <textarea
+              required
+              rows={4}
+              placeholder="Mensaje"
+              value={form.mensaje}
+              onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+              className="w-full border rounded-lg px-4 py-2"
+            />
+
+            <button
+              disabled={loading}
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg"
+            >
+              {loading ? "Enviando..." : "Enviar Solicitud"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* =========================
+   PÁGINA SERVICIOS
+========================= */
 export default function Servicios() {
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+
   return (
     <main className="min-h-screen bg-white text-gray-900">
 
       {/* HERO */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative max-w-4xl mx-auto text-center px-6">
-          <h1 className="text-5xl font-bold mb-6">
-            Planes FinOps para cada etapa de crecimiento
-          </h1>
-          <p className="text-xl text-blue-100 leading-relaxed">
-            Gobierno financiero cloud, optimización continua y toma de decisiones
-            estratégicas basadas en datos e inteligencia artificial.
-          </p>
-        </div>
+      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 text-center px-6">
+        <h1 className="text-5xl font-bold mb-6">
+          Planes FinOps para cada etapa de crecimiento
+        </h1>
+        <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+          Gobierno financiero cloud, optimización continua y decisiones
+          estratégicas basadas en datos e inteligencia artificial.
+        </p>
       </section>
 
       {/* PLANES */}
       <section className="px-6 py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
 
-          {/* FOUNDATION */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl shadow-lg p-8 flex flex-col">
-            <h2 className="text-2xl font-bold mb-2">FinOps Foundation</h2>
-            <p className="text-gray-600 mb-6">
-              Visibilidad, control y orden financiero para entornos cloud en etapa inicial.
-            </p>
+          <Plan
+            title="FinOps Foundation"
+            description="Visibilidad y control financiero cloud."
+            features={[
+              "Cloud Assessment inicial",
+              "Inventario completo de recursos",
+              "Costos por servicio y proyecto",
+              "Dashboards básicos",
+              "Alertas simples",
+              "Línea base FinOps",
+            ]}
+            color="bg-slate-700"
+            onClick={() => setSelectedPlan("FinOps Foundation")}
+          />
 
-            <ul className="space-y-3 text-gray-700 flex-1">
-              <li>✔ Cloud Assessment inicial</li>
-              <li>✔ Inventario completo de recursos</li>
-              <li>✔ Costos por servicio y proyecto</li>
-              <li>✔ Dashboards básicos de visibilidad</li>
-              <li>✔ Alertas simples de gasto</li>
-              <li>✔ Línea base FinOps</li>
-            </ul>
+          <Plan
+            title="FinOps Professional"
+            description="Optimización activa y decisiones basadas en datos."
+            features={[
+              "Todo Foundation",
+              "Forecasting y budget tracking",
+              "Cost allocation por tags",
+              "Savings Plans & RI analysis",
+              "Optimización técnica recomendada",
+              "IA FinOps asistida",
+            ]}
+            color="bg-blue-600"
+            highlight
+            onClick={() => setSelectedPlan("FinOps Professional")}
+          />
 
-            <p className="mt-6 text-sm text-gray-500">
-              Ideal para startups y pymes
-            </p>
-
-            <a
-              href="https://wa.me/56965090121?text=Hola,%20quiero%20contratar%20FinOps%20Foundation"
-              target="_blank"
-              className="mt-6 inline-block text-center bg-slate-700 hover:bg-slate-800 text-white font-semibold py-3 rounded-lg transition"
-            >
-              Contratar Plan
-            </a>
-          </div>
-
-          {/* PROFESSIONAL */}
-          <div className="bg-blue-50 border-2 border-blue-600 rounded-2xl shadow-xl p-8 flex flex-col relative">
-            <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded-full">
-              Más elegido
-            </span>
-
-            <h2 className="text-2xl font-bold mb-2">FinOps Professional</h2>
-            <p className="text-gray-700 mb-6">
-              Optimización activa y toma de decisiones financieras basada en datos.
-            </p>
-
-            <ul className="space-y-3 text-gray-700 flex-1">
-              <li>✔ Todo Foundation</li>
-              <li>✔ Forecasting y budget tracking</li>
-              <li>✔ Cost allocation por tags</li>
-              <li>✔ Savings Plans & RI analysis</li>
-              <li>✔ Optimización técnica recomendada</li>
-              <li>✔ IA FinOps asistida (insights)</li>
-            </ul>
-
-            <p className="mt-6 text-sm text-gray-600">
-              Para equipos técnicos y financieros en crecimiento
-            </p>
-
-            <a
-              href="https://wa.me/56965090121?text=Hola,%20quiero%20contratar%20FinOps%20Professional"
-              target="_blank"
-              className="mt-6 inline-block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
-            >
-              Contratar Plan
-            </a>
-          </div>
-
-          {/* ENTERPRISE */}
-          <div className="bg-purple-50 border border-purple-300 rounded-2xl shadow-lg p-8 flex flex-col">
-            <h2 className="text-2xl font-bold mb-2">FinOps Enterprise</h2>
-            <p className="text-gray-700 mb-6">
-              Gobierno completo, automatización y decisiones financieras asistidas por IA.
-            </p>
-
-            <ul className="space-y-3 text-gray-700 flex-1">
-              <li>✔ Todo Professional</li>
-              <li>✔ Optimización automatizada controlada</li>
-              <li>✔ Anomaly Detection avanzado</li>
-              <li>✔ IA FinOps predictiva y explicable</li>
-              <li>✔ Operating Model FinOps</li>
-              <li>✔ Gobierno y compliance cloud</li>
-            </ul>
-
-            <p className="mt-6 text-sm text-gray-600">
-              Diseñado para organizaciones enterprise
-            </p>
-
-            <a
-              href="https://wa.me/56965090121?text=Hola,%20quiero%20evaluar%20FinOps%20Enterprise"
-              target="_blank"
-              className="mt-6 inline-block text-center bg-purple-700 hover:bg-purple-800 text-white font-semibold py-3 rounded-lg transition"
-            >
-              Solicitar Evaluación
-            </a>
-          </div>
+          <Plan
+            title="FinOps Enterprise"
+            description="Gobierno completo y automatización avanzada."
+            features={[
+              "Todo Professional",
+              "Optimización automatizada",
+              "Anomaly Detection avanzado",
+              "IA FinOps predictiva",
+              "Operating Model FinOps",
+              "Compliance y gobierno cloud",
+            ]}
+            color="bg-purple-700"
+            onClick={() => setSelectedPlan("FinOps Enterprise")}
+          />
 
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <section className="px-6 py-16 bg-gray-900 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">
-            ¿No sabes qué plan elegir?
-          </h2>
-          <p className="text-gray-300 mb-8 text-lg">
-            Agenda una consultoría gratuita y te ayudamos a definir la mejor
-            estrategia FinOps para tu organización.
-          </p>
-          <a
-            href="https://wa.me/56965090121?text=Hola,%20quiero%20una%20consultoría%20FinOps"
-            target="_blank"
-            className="inline-block bg-[#2CA01C] hover:bg-[#238015] text-white font-semibold px-8 py-4 rounded-lg transition"
-          >
-            Agendar Consultoría Gratuita
-          </a>
-        </div>
-      </section>
+      {selectedPlan && (
+        <ContractModal
+          plan={selectedPlan}
+          onClose={() => setSelectedPlan(null)}
+        />
+      )}
 
       {/* FOOTER */}
       <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
