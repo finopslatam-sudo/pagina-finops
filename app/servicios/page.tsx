@@ -112,14 +112,11 @@ function ContractModal({
           Contratar {plan}
         </h3>
 
-        <p className="text-gray-600 mb-6">
-          Completa el formulario y te contactaremos a la brevedad.
-        </p>
-
         {success ? (
           <div className="bg-green-50 border border-green-300 text-green-700 p-4 rounded-lg">
             ✅ Solicitud enviada correctamente.  
-            Nuestro equipo se pondrá en contacto contigo.
+            Alguien de nuestro equipo se contactará a la brevedad.
+            
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
