@@ -234,11 +234,9 @@ export default function QuienesSomos() {
                     className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Selecciona un servicio</option>
-                    <option value="auditoria">Cloud Assessment</option>
-                    <option value="dashboards">Cloud Intelligence</option>
-                    <option value="gobernanza">Cloud Financial Operations</option>
-                    <option value="optimizacion">Cloud Optimization</option>
-                    <option value="Governance">Cloud Governance</option>
+                    <option value="auditoria">FinOps Foundation</option>
+                    <option value="dashboards">FinOps Professional</option>
+                    <option value="gobernanza">FinOps Enterprise</option>
                   </select>
                 </div>
 
