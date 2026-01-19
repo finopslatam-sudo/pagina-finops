@@ -33,8 +33,16 @@ function Plan({
       `}
     >
       {/* DESCUENTO */}
-      <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white text-sm font-semibold px-4 py-1 rounded-full shadow">
-        🎉 20% dcto lanzamiento
+      <span className="
+        absolute -top-6 left-1/2 -translate-x-1/2
+        bg-green-600 text-white
+        text-base font-bold
+        px-6 py-2
+        rounded-full
+        shadow-lg
+        tracking-wide
+      ">
+        🎉 20% DCTO
       </span>
 
       {/* MÁS ELEGIDO */}
@@ -226,7 +234,7 @@ export default function Servicios() {
             "Línea base FinOps",
           ]}
           bg="bg-gradient-to-br from-slate-50 to-slate-100"
-          border="border border-slate-200"
+          border="border border-slate-300"
           button="bg-slate-700"
           onClick={() => setSelectedPlan("FinOps Foundation")}
         />
