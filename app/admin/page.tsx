@@ -525,28 +525,40 @@ export default function AdminPage() {
                           // =========================
                           // ROOT: puede editar/eliminar a cualquiera (incluido a sí mismo)
                           // =========================
+                          // =========================
+                          // ROOT: puede editar a cualquiera
+                          // - NO puede eliminarse a sí mismo
+                          // - NO puede eliminar usuarios inactivos
+                          // =========================
                           if (user?.is_root) {
+                            const isSelf = u.id === user.id;
+                            const canDelete = u.is_active && !isSelf;
+
                             return (
                               <>
+                                {/* EDITAR: siempre permitido */}
                                 <button
                                   onClick={() => {
                                     setEditingUser(u);
-                                    setMode('edit');
+                                    setMode("edit");
                                     setSelectedPlanId(null);
                                     setOriginalPlanId(null);
-                                    setSuccessMessage('');
+                                    setSuccessMessage("");
                                   }}
                                   className="text-blue-600 hover:text-blue-800 font-medium"
                                 >
                                   Editar
                                 </button>
 
-                                <button
-                                  onClick={() => deleteUser(u.id)}
-                                  className="text-red-600 hover:text-red-800 font-medium"
-                                >
-                                  Eliminar
-                                </button>
+                                {/* ELIMINAR: solo si está activo y no es él mismo */}
+                                {canDelete && (
+                                  <button
+                                    onClick={() => deleteUser(u.id)}
+                                    className="text-red-600 hover:text-red-800 font-medium"
+                                  >
+                                    Eliminar
+                                  </button>
+                                )}
                               </>
                             );
                           }
