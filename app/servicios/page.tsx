@@ -233,7 +233,7 @@ export default function Servicios() {
             "Alertas simples",
             "Línea base FinOps",
           ]}
-          bg="bg-gradient-to-br from-slate-50 to-slate-100"
+          bg="bg-gradient-to-br from-slate-200 via-slate-100 to-white"
           border="border border-slate-300"
           button="bg-slate-700"
           onClick={() => setSelectedPlan("FinOps Foundation")}
