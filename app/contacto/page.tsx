@@ -15,11 +15,14 @@ export default function QuienesSomos() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const res = await fetch(
+       "https://api.finopslatam.com/api/contact",
+       {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify(form),
+       }
+     );
   
     const data = await res.json();
   
@@ -237,9 +240,7 @@ export default function QuienesSomos() {
                     <option value="auditoria">FinOps Foundation</option>
                     <option value="dashboards">FinOps Professional</option>
                     <option value="gobernanza">FinOps Enterprise</option>
-                    <option value="optimizacion">Cloud Optimization</option>
-                    <option value="Governance">Cloud Governance</option>
-                  </select>
+                    </select>
                 </div>
 
                 <div>
