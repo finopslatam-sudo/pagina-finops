@@ -266,7 +266,6 @@ export default function Servicios() {
           onClick={() => setSelectedPlan("FinOps Enterprise")}
         />
 
-
         </div>
       </section>
 
