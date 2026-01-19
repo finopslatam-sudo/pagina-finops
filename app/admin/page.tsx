@@ -522,9 +522,7 @@ export default function AdminPage() {
 
                       <td className="px-4 py-3 text-right space-x-4">
                         {(() => {
-                          // =========================
-                          // ROOT: puede editar/eliminar a cualquiera (incluido a sí mismo)
-                          // =========================
+
                           // =========================
                           // ROOT: puede editar a cualquiera
                           // - NO puede eliminarse a sí mismo
