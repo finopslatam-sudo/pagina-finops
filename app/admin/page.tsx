@@ -132,14 +132,13 @@ export default function AdminPage() {
 
   // 🔒 Solo admin
   useEffect(() => {
-    if (
-      user &&
-      user.global_role !== 'root' &&
-      user.global_role !== 'support'
-    ) {
+    if (!user) return;
+  
+    if (!['root', 'support'].includes(user.global_role ?? '')) {
       router.replace('/dashboard');
     }
   }, [user, router]);
+  
   
 
   // 📡 Cargar usuarios

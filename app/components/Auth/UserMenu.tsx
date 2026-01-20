@@ -21,6 +21,10 @@ export default function UserMenu() {
 
   if (!user) return null;
 
+  // ✅ NUEVO: admin real según arquitectura
+  const isAdmin =
+    ['root', 'support'].includes(user.global_role ?? '');
+
   const handleLogout = () => {
     setOpen(false);
     setShowToast(true);
@@ -51,9 +55,9 @@ export default function UserMenu() {
             onClick={(e) => e.stopPropagation()}
             className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden"
           >
-            {/* Dashboard (todos) */}
+            {/* DASHBOARD */}
             <Link
-              href="/dashboard"
+              href={isAdmin ? "/admin" : "/dashboard"}
               className="block px-4 py-3 hover:bg-blue-50"
               onClick={() => setOpen(false)}
             >
@@ -61,18 +65,18 @@ export default function UserMenu() {
             </Link>
 
             {/* ADMIN */}
-            {user.role === 'admin' && (
+            {isAdmin && (
               <Link
                 href="/admin"
                 className="block px-4 py-3 hover:bg-blue-50 border-t"
                 onClick={() => setOpen(false)}
               >
-                ✏️ Editar perfiles
+                🛠️ Panel de Administración
               </Link>
             )}
 
-            {/* CLIENTES */}
-            {user.role !== 'admin' && (
+            {/* PERFIL CLIENTE */}
+            {!isAdmin && (
               <Link
                 href="/perfil"
                 className="block px-4 py-3 hover:bg-blue-50 border-t"
@@ -82,7 +86,7 @@ export default function UserMenu() {
               </Link>
             )}
 
-            {/* Logout (todos) */}
+            {/* LOGOUT */}
             <button
               onClick={handleLogout}
               className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 border-t"
