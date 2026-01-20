@@ -1,69 +1,51 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
-import PrivateRoute from '@/app/components/Auth/PrivateRoute';
-import AdminDashboard from './AdminDashboard';
-import ClientDashboard from './ClientDashboard';
 
-// ============================
-// TIPOS
-// ============================
-interface User {
-  contact_name?: string;
-  company_name?: string;
-  email?: string;
-}
+export default function ClientDashboard() {
+  const { user } = useAuth();
+  const router = useRouter();
 
-// ============================
-// PAGE
-// ============================
-export default function Dashboard() {
-  const { user, planState } = useAuth();
-  const safeUser: User = user || {};
+  /* ============================
+     ROLE GUARD
+  ============================ */
+  useEffect(() => {
+    if (!user) return;
+
+    if (user.global_role === 'root' || user.global_role === 'support') {
+      router.replace('/admin');
+    }
+  }, [user, router]);
 
   return (
-    <PrivateRoute>
-      <main className="min-h-screen bg-white text-gray-900">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-        {/* HEADER */}
-        <header className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-6 py-4">
-            <span className="text-gray-700 font-medium text-lg block">
-              Estás en tu sesión:{' '}
-              {safeUser.contact_name ||
-                safeUser.company_name ||
-                safeUser.email}
-            </span>
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border shadow-lg">
+        <h3 className="text-lg font-semibold mb-4">
+          Gasto Mensual Cloud
+        </h3>
+        <img src="/ima1.png" className="rounded-lg mb-4 border" />
+        <img src="/ima2.png" className="rounded-lg border" />
+      </div>
 
-            {user?.role === 'admin' ? (
-              <span className="text-sm text-purple-700 font-medium">
-                Rol: Administrador del sistema
-              </span>
-            ) : (
-              <span className="text-sm text-blue-600 font-medium">
-                Plan contratado:{' '}
-                {planState.status === 'assigned'
-                  ? planState.plan.name
-                  : 'No asignado'}
-              </span>
-            )}
-          </div>
-        </header>
+      <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl border shadow-lg">
+        <h3 className="text-lg font-semibold mb-4">
+          Ahorro Potencial
+        </h3>
+        <img src="/ima3.png" className="rounded-lg mb-4 border" />
+        <img src="/ima4.png" className="rounded-lg border" />
+      </div>
 
-        {/* CONTENT */}
-        <section className="px-6 max-w-7xl mx-auto space-y-12">
-          {user?.role === 'admin'
-            ? <AdminDashboard />
-            : <ClientDashboard />
-          }
-        </section>
+      <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-2xl border shadow-lg">
+        <h3 className="text-lg font-semibold mb-4">
+          Proyecciones FinOps
+        </h3>
+        <img src="/ima5.png" className="rounded-lg mb-4 border" />
+        <img src="/ima6.png" className="rounded-lg border" />
+      </div>
 
-        {/* FOOTER */}
-        <footer className="bg-gray-900 text-gray-400 mt-16 py-8 text-center text-sm">
-          © {new Date().getFullYear()} FinOpsLatam — Todos los derechos reservados
-        </footer>
-
-      </main>
-    </PrivateRoute>
+    </div>
   );
 }
