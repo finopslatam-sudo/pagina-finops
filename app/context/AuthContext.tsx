@@ -23,6 +23,9 @@ export interface User {
   is_active: boolean;
   is_root: boolean;
   force_password_change?: boolean;
+  global_role?: 'root' | 'support' | null;
+  client_role?: 'owner' | 'finops_admin' | 'viewer' | null;
+  client_id?: number | null;
 }
 
 type PlanState =
@@ -255,7 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         token,
         planState,
         isAdmin,
-        isAuthReady, // ✅ EXPUESTO
+        isAuthReady,
         login,
         logout,
         updateUser,

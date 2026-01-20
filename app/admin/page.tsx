@@ -11,10 +11,13 @@ interface AdminUser {
   company_name: string;
   contact_name?: string;
   phone?: string;
-  role: 'admin' | 'client';
   is_active: boolean;
-  is_root?: boolean;
   plan: string | null;
+  role: 'admin' | 'client';
+  is_root?: boolean;
+  global_role?: 'root' | 'support' | null;
+  client_role?: 'owner' | 'finops_admin' | 'viewer';
+
   
 }
 
@@ -129,10 +132,15 @@ export default function AdminPage() {
 
   // 🔒 Solo admin
   useEffect(() => {
-    if (user && user.role !== 'admin') {
+    if (
+      user &&
+      user.global_role !== 'root' &&
+      user.global_role !== 'support'
+    ) {
       router.replace('/dashboard');
     }
   }, [user, router]);
+  
 
   // 📡 Cargar usuarios
   const fetchUsers = async () => {
@@ -528,7 +536,7 @@ export default function AdminPage() {
                           // - NO puede eliminarse a sí mismo
                           // - NO puede eliminar usuarios inactivos
                           // =========================
-                          if (user?.is_root) {
+                          if (user?.global_role === 'root') {
                             const isSelf = u.id === user.id;
                             const canDelete = u.is_active && !isSelf;
 
@@ -564,7 +572,10 @@ export default function AdminPage() {
                           // =========================
                           // ADMIN: puede editarse a sí mismo
                           // =========================
-                          if (user?.role === 'admin' && u.id === user.id) {
+                          if (
+                            user?.global_role === 'support' &&
+                            u.id === user.id
+                          ) {
                             return (
                               <button
                                 onClick={() => {
@@ -584,7 +595,11 @@ export default function AdminPage() {
                           // =========================
                           // ADMIN: puede editar/eliminar CLIENTES
                           // =========================
-                          if (user?.role === 'admin' && u.role === 'client') {
+                          if (
+                             ['root', 'support'].includes(user?.global_role ?? '') &&
+                             u.client_role !== 'owner'
+                          ) {
+                            
                             return (
                               <>
                                 <button
