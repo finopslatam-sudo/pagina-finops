@@ -35,17 +35,35 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     e.preventDefault();
     setError("");
     setLoading(true);
-
+  
     try {
       await login(email, password);
+  
+      // 🔐 leer usuario persistido (evita race condition)
+      const storedUserRaw = localStorage.getItem("finops_user");
+      const storedUser = storedUserRaw
+        ? JSON.parse(storedUserRaw)
+        : null;
+  
       onClose();
-      router.push("/dashboard");
-    } catch {
+  
+      // 🎯 REDIRECCIÓN POR ROL
+      if (
+        storedUser &&
+        ["root", "support"].includes(storedUser.global_role)
+      ) {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+  
+    } catch (err) {
       setError("Credenciales inválidas");
     } finally {
       setLoading(false);
     }
   };
+   
 
   const handleForgotPassword = async () => {
     setForgotLoading(true);
