@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/context/AuthContext";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
@@ -15,29 +15,30 @@ export default function UserMenu() {
   // 🔔 Cerrar menú al hacer click fuera
   useEffect(() => {
     const close = () => setOpen(false);
-    window.addEventListener("click", close);
-    return () => window.removeEventListener("click", close);
+    window.addEventListener('click', close);
+    return () => window.removeEventListener('click', close);
   }, []);
 
+  // ⛔ No renderizar si no hay sesión
   if (!user) return null;
 
-  // ✅ NUEVO: admin real según arquitectura
-  const isAdmin =
-    ['root', 'support'].includes(user.global_role ?? '');
+  // ✅ Rol administrativo real (según backend)
+  const isAdmin = ['root', 'support'].includes(user.global_role ?? '');
 
+  // 🚪 Logout controlado
   const handleLogout = () => {
     setOpen(false);
     setShowToast(true);
 
     setTimeout(() => {
       logout();
-      router.push("/");
+      router.push('/');
     }, 1800);
   };
 
   return (
     <>
-      {/* BOTÓN */}
+      {/* BOTÓN PRINCIPAL */}
       <div className="relative">
         <button
           onClick={(e) => {
@@ -49,13 +50,13 @@ export default function UserMenu() {
           Mi cuenta
         </button>
 
-        {/* MENÚ */}
+        {/* MENÚ DESPLEGABLE */}
         {open && (
           <div
             onClick={(e) => e.stopPropagation()}
             className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden"
           >
-            {/* DASHBOARD */}
+            {/* DASHBOARD ÚNICO (admin y client) */}
             <Link
               href="/dashboard"
               className="block px-4 py-3 hover:bg-blue-50"
@@ -64,18 +65,7 @@ export default function UserMenu() {
               📊 Mi Dashboard
             </Link>
 
-            {/* ADMIN */}
-            {isAdmin && (
-              <Link
-                href="/Admin"
-                className="block px-4 py-3 hover:bg-blue-50 border-t"
-                onClick={() => setOpen(false)}
-              >
-                🛠️ Panel de Administración
-              </Link>
-            )}
-
-            {/* PERFIL CLIENTE */}
+            {/* PERFIL SOLO CLIENTES */}
             {!isAdmin && (
               <Link
                 href="/perfil"
@@ -97,7 +87,7 @@ export default function UserMenu() {
         )}
       </div>
 
-      {/* TOAST */}
+      {/* TOAST LOGOUT */}
       {showToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-fade-in-out">
           <div className="bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg">

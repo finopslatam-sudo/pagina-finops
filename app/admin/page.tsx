@@ -50,22 +50,17 @@ export default function AdminPage() {
 
     const planColor = (planCode?: string) => {
       switch (planCode) {
-        case 'assessment':
+        case 'FINOPS_FOUNDATION':
           return 'bg-blue-50 text-blue-700 border-blue-300';
-        case 'intelligence':
-          return 'bg-green-50 text-green-700 border-green-300';
-        case 'finops':
-      
+        case 'FINOPS_PROFESSIONAL':
           return 'bg-indigo-50 text-indigo-700 border-indigo-300';
-        case 'optimization':
-          return 'bg-yellow-50 text-yellow-800 border-yellow-300';
-        case 'governance':
+        case 'FINOPS_ENTERPRISE':
           return 'bg-purple-50 text-purple-700 border-purple-300';
         default:
-          return '';
+          return 'bg-gray-50 text-gray-600 border-gray-200';
       }
     };
-
+    
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -259,17 +254,6 @@ export default function AdminPage() {
       const planChanged =
         selectedPlanId !== null &&
         selectedPlanId !== originalPlanId;
-
-      if (planChanged) {
-        await fetch(`${API_URL}/api/admin/users/${editingUser.id}/plan`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ plan_id: selectedPlanId }),
-        });
-      }
 
       // ✅ 3️⃣ Feedback GLOBAL (fuera del modal)
       setSuccessMessage('Usuario actualizado con éxito');
@@ -590,15 +574,12 @@ export default function AdminPage() {
                               </button>
                             );
                           }
-
+                          
+                          const isStaff = ['root', 'support'].includes(user?.global_role ?? '');
                           // =========================
-                          // ADMIN: puede editar/eliminar CLIENTES
+                          // ADMIN (ROOT / SUPPORT): puede editar y eliminar usuarios
                           // =========================
-                          if (
-                             ['root', 'support'].includes(user?.global_role ?? '') &&
-                             u.client_role !== 'owner'
-                          ) {
-                            
+                          if (isStaff) {
                             return (
                               <>
                                 <button
@@ -614,7 +595,7 @@ export default function AdminPage() {
                                   Editar
                                 </button>
 
-                                {u.is_active && (
+                                {u.is_active && u.id !== user?.id && !u.is_root && (
                                   <button
                                     onClick={() => deleteUser(u.id)}
                                     className="text-red-600 hover:text-red-800 font-medium"
@@ -625,6 +606,7 @@ export default function AdminPage() {
                               </>
                             );
                           }
+
 
                           // =========================
                           // SIN PERMISOS

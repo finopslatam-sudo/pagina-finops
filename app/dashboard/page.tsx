@@ -8,11 +8,7 @@ export default function DashboardPage() {
   const { user, isAuthReady } = useAuth();
 
   if (!isAuthReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-400">
-        Cargando dashboard…
-      </div>
-    );
+    return <div className="p-6">Cargando dashboard…</div>;
   }
 
   if (!user) {
@@ -20,7 +16,8 @@ export default function DashboardPage() {
   }
 
   const isAdmin =
-    user.global_role === 'root' || user.global_role === 'support';
+    user.global_role === 'root' ||
+    user.global_role === 'support';
 
   return isAdmin ? <AdminDashboard /> : <ClientDashboard />;
 }
