@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
 export default function UserMenu() {
-  const { user, logout } = useAuth();
+  const { user, logout, isStaff } = useAuth();
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
@@ -21,9 +21,6 @@ export default function UserMenu() {
 
   // ⛔ No renderizar si no hay sesión
   if (!user) return null;
-
-  // ✅ Rol administrativo real (según backend)
-  const isAdmin = ['root', 'support'].includes(user.global_role ?? '');
 
   // 🚪 Logout controlado
   const handleLogout = () => {
@@ -56,7 +53,7 @@ export default function UserMenu() {
             onClick={(e) => e.stopPropagation()}
             className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden"
           >
-            {/* DASHBOARD ÚNICO (admin y client) */}
+            {/* DASHBOARD (todos) */}
             <Link
               href="/dashboard"
               className="block px-4 py-3 hover:bg-blue-50"
@@ -65,8 +62,19 @@ export default function UserMenu() {
               📊 Mi Dashboard
             </Link>
 
-            {/* PERFIL SOLO CLIENTES */}
-            {!isAdmin && (
+            {/* PANEL ADMIN (solo staff) */}
+            {isStaff && (
+              <Link
+                href="/dashboard/admin"
+                className="block px-4 py-3 hover:bg-blue-50 border-t"
+                onClick={() => setOpen(false)}
+              >
+                🛠️ Panel de Administración
+              </Link>
+            )}
+
+            {/* PERFIL (solo clientes) */}
+            {!isStaff && (
               <Link
                 href="/perfil"
                 className="block px-4 py-3 hover:bg-blue-50 border-t"

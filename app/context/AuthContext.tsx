@@ -23,8 +23,8 @@ export interface User {
   is_active: boolean;
   is_root: boolean;
   force_password_change?: boolean;
-  global_role?: 'root' | 'support' | null;
-  client_role?: 'owner' | 'finops_admin' | 'viewer' | null;
+  global_role?: "root" | "support" | null;
+  client_role?: "owner" | "finops_admin" | "viewer" | null;
   client_id?: number | null;
 }
 
@@ -40,8 +40,14 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   planState: PlanState;
+
+  /** permisos */
+  isRoot: boolean;
   isAdmin: boolean;
-  isAuthReady: boolean; 
+  isStaff: boolean;
+
+  isAuthReady: boolean;
+
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUser: (partialUser: Partial<User>) => void;
@@ -69,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     status: "loading",
   });
 
-  const [isAuthReady, setIsAuthReady] = useState(false); 
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLoggingOutRef = useRef(false);
@@ -78,11 +84,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     process.env.NEXT_PUBLIC_API_URL?.trim() ||
     "https://api.finopslatam.com";
 
-  console.log("🔥 API_URL EN FRONTEND:", API_URL);  
+  /* =====================================================
+     PERMISOS UNIFICADOS (CLAVE)
+  ===================================================== */
 
-  const isAdmin =
-  user?.global_role === 'root' || user?.global_role === 'support';
-
+  const isRoot = user?.global_role === "root";
+  const isAdmin = user?.global_role === "support";
+  const isStaff = isRoot || isAdmin;
 
   /* =====================================================
      LOGOUT
@@ -122,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /* =====================================================
-     REHIDRATAR SESIÓN 
+     REHIDRATAR SESIÓN
   ===================================================== */
 
   useEffect(() => {
@@ -150,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.clear();
       setPlanState({ status: "none" });
     } finally {
-      setIsAuthReady(true); 
+      setIsAuthReady(true);
     }
   }, []);
 
@@ -191,30 +199,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   /* =====================================================
      LOGIN
   ===================================================== */
+
   const login = async (email: string, password: string) => {
     isLoggingOutRef.current = false;
-  
+
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ email, password }),
     });
-  
+
     const data = await res.json();
-  
+
     if (!res.ok) {
       throw new Error(data.error || "Error al iniciar sesión");
     }
-  
-    // ✅ Estado
+
     setUser(data.user);
     setToken(data.access_token);
-  
-    // ✅ Persistencia
+
     localStorage.setItem("finops_token", data.access_token);
     localStorage.setItem("finops_user", JSON.stringify(data.user));
-  
+
     if (data.user?.plan) {
       setPlanState({
         status: "assigned",
@@ -228,8 +235,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setPlanState({ status: "none" });
       localStorage.removeItem("finops_plan");
     }
-  
-    // 🚀 REDIRECCIÓN ÚNICA Y CORRECTA
+
     router.replace("/dashboard");
   };
 
@@ -260,7 +266,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         token,
         planState,
+        isRoot,
         isAdmin,
+        isStaff,
         isAuthReady,
         login,
         logout,
