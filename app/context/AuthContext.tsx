@@ -95,27 +95,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   /* =====================================================
     LOGOUT
   ===================================================== */
-
   const logout = () => {
     if (isLoggingOutRef.current) return;
     isLoggingOutRef.current = true;
-
+  
     if (inactivityTimer.current) {
       clearTimeout(inactivityTimer.current);
       inactivityTimer.current = null;
     }
-
-    // 🔥 limpiar todo
+  
     localStorage.clear();
     setUser(null);
     setToken(null);
     setPlanState({ status: 'none' });
-
-    // 🚪 SIEMPRE volver a raíz
-    router.replace('/');
+  
+    // ⛔ fuerza salida SIEMPRE a /
+    window.location.href = '/';
   };
-
-
+  
   /* =====================================================
      INACTIVIDAD
   ===================================================== */

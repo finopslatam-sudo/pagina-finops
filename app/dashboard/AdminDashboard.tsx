@@ -69,11 +69,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!isAuthReady || !user || !token) return;
 
-    const isAdmin =
+    const isStaff =
       user.global_role === 'root' ||
       user.global_role === 'support';
 
-    if (!isAdmin) return;
+    if (!isStaff) return;
 
     apiFetch('/api/admin/stats', { token })
       .then((data) => {
@@ -84,7 +84,6 @@ export default function AdminDashboard() {
         console.error('ADMIN STATS ERROR:', err);
         setError('No se pudieron cargar las métricas del sistema');
       });
-
   }, [isAuthReady, user, token]);
 
   /* ============================
