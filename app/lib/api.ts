@@ -1,41 +1,35 @@
-// app/lib/api.ts
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://api.finopslatam.com';
-
-type ApiFetchOptions = {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+interface ApiFetchOptions {
   token?: string;
+  method?: string;
   body?: any;
-};
+}
 
-/**
- * Fetch centralizado enterprise-safe
- */
 export async function apiFetch(
   path: string,
   options: ApiFetchOptions = {}
 ) {
-  const { method = 'GET', token, body } = options;
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
 
-  const res = await fetch(`${API_URL}${path}`, {
-    method,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'API error');
+  if (options.token) {
+    headers.Authorization = `Bearer ${options.token}`;
   }
 
-  // 204 No Content safe
-  if (res.status === 204) return null;
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}${path}`,
+    {
+      method: options.method || 'GET',
+      headers,
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      credentials: 'include',
+    }
+  );
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw error;
+  }
 
   return res.json();
 }

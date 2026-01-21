@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isStaff = isRoot || isAdmin;
 
   /* =====================================================
-     LOGOUT
+    LOGOUT
   ===================================================== */
 
   const logout = () => {
@@ -105,13 +105,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       inactivityTimer.current = null;
     }
 
+    // 🔥 limpiar todo
     localStorage.clear();
     setUser(null);
     setToken(null);
-    setPlanState({ status: "none" });
+    setPlanState({ status: 'none' });
 
-    router.replace("/");
+    // 🚪 SIEMPRE volver a raíz
+    router.replace('/');
   };
+
 
   /* =====================================================
      INACTIVIDAD

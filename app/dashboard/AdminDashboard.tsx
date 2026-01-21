@@ -64,7 +64,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState('');
 
   /* ============================
-     FETCH STATS (ADMIN)
+    FETCH STATS (ADMIN)
   ============================ */
   useEffect(() => {
     if (!isAuthReady || !user || !token) return;
@@ -76,14 +76,15 @@ export default function AdminDashboard() {
     if (!isAdmin) return;
 
     apiFetch('/api/admin/stats', { token })
-    .then((data) => {
-      setStats(data);
-    })
-    .catch((err) => {
-      console.error('ADMIN STATS ERROR:', err);
-      setError('No se pudieron cargar las métricas del sistema');
-    });
-    
+      .then((data) => {
+        setStats(data);
+        setError('');
+      })
+      .catch((err) => {
+        console.error('ADMIN STATS ERROR:', err);
+        setError('No se pudieron cargar las métricas del sistema');
+      });
+
   }, [isAuthReady, user, token]);
 
   /* ============================
