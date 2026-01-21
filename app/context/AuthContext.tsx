@@ -80,7 +80,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   console.log("🔥 API_URL EN FRONTEND:", API_URL);  
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin =
+  user?.global_role === 'root' || user?.global_role === 'support';
+
 
   /* =====================================================
      LOGOUT
@@ -189,28 +191,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   /* =====================================================
      LOGIN
   ===================================================== */
-
   const login = async (email: string, password: string) => {
     isLoggingOutRef.current = false;
   
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include", // ✅ ESTA LÍNEA ES CLAVE
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
   
     const data = await res.json();
-
-    console.log("LOGIN USER:", data.user);
   
     if (!res.ok) {
       throw new Error(data.error || "Error al iniciar sesión");
     }
   
+    // ✅ Estado
     setUser(data.user);
     setToken(data.access_token);
   
+    // ✅ Persistencia
     localStorage.setItem("finops_token", data.access_token);
     localStorage.setItem("finops_user", JSON.stringify(data.user));
   
@@ -227,8 +228,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setPlanState({ status: "none" });
       localStorage.removeItem("finops_plan");
     }
-  };
   
+    // 🚀 REDIRECCIÓN ÚNICA Y CORRECTA
+    router.replace("/dashboard");
+  };
 
   /* =====================================================
      UPDATE USER
