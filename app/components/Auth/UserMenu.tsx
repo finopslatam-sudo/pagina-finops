@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
 export default function UserMenu() {
   const { user, logout, isStaff } = useAuth();
-  const router = useRouter();
 
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -22,15 +20,14 @@ export default function UserMenu() {
   // ⛔ No renderizar si no hay sesión
   if (!user) return null;
 
-  // 🚪 Logout controlado
+  // 🚪 Logout controlado (una sola redirección)
   const handleLogout = () => {
     setOpen(false);
     setShowToast(true);
 
     setTimeout(() => {
-      logout();
-      router.push('/');
-    }, 1800);
+      logout(); // ⬅️ ya redirige a "/"
+    }, 1200);
   };
 
   return (
@@ -53,7 +50,7 @@ export default function UserMenu() {
             onClick={(e) => e.stopPropagation()}
             className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden"
           >
-            {/* DASHBOARD (todos) */}
+            {/* DASHBOARD (todos los usuarios) */}
             <Link
               href="/dashboard"
               className="block px-4 py-3 hover:bg-blue-50"
