@@ -76,7 +76,11 @@ export default function AdminDashboard() {
     if (!isAdmin) return;
 
     apiFetch('/api/admin/stats', { token })
-      .then(setStats)
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Fetch failed');
+        const data = await res.json();
+        setStats(data);
+      })
       .catch(() =>
         setError('No se pudieron cargar las métricas del sistema')
       );
@@ -126,26 +130,10 @@ export default function AdminDashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <KpiCard
-          title="Usuarios totales"
-          value={stats.total_users}
-          accent="blue"
-        />
-        <KpiCard
-          title="Usuarios activos"
-          value={stats.active_users}
-          accent="green"
-        />
-        <KpiCard
-          title="Usuarios inactivos"
-          value={stats.inactive_users}
-          accent="red"
-        />
-        <KpiCard
-          title="Planes activos"
-          value={stats.users_by_plan.length}
-          accent="indigo"
-        />
+        <KpiCard title="Usuarios totales" value={stats.total_users} accent="blue" />
+        <KpiCard title="Usuarios activos" value={stats.active_users} accent="green" />
+        <KpiCard title="Usuarios inactivos" value={stats.inactive_users} accent="red" />
+        <KpiCard title="Planes activos" value={stats.users_by_plan.length} accent="indigo" />
       </div>
 
       {/* GRÁFICOS */}
@@ -186,11 +174,7 @@ export default function AdminDashboard() {
               <XAxis type="number" allowDecimals={false} />
               <YAxis dataKey="plan" type="category" width={140} />
               <Tooltip />
-              <Bar
-                dataKey="count"
-                fill="#6366F1"
-                radius={[0, 6, 6, 0]}
-              />
+              <Bar dataKey="count" fill="#6366F1" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
