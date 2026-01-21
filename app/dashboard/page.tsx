@@ -8,17 +8,6 @@ export default function ClientDashboard() {
   const { user } = useAuth();
   const router = useRouter();
 
-  /* ============================
-     ROLE GUARD
-  ============================ */
-  useEffect(() => {
-    if (!user) return;
-
-    if (user.global_role === 'root' || user.global_role === 'support') {
-      router.replace('/admin');
-    }
-  }, [user, router]);
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
