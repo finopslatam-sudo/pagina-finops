@@ -76,14 +76,14 @@ export default function AdminDashboard() {
     if (!isAdmin) return;
 
     apiFetch('/api/admin/stats', { token })
-      .then(async (res) => {
-        if (!res.ok) throw new Error('Fetch failed');
-        const data = await res.json();
-        setStats(data);
-      })
-      .catch(() =>
-        setError('No se pudieron cargar las métricas del sistema')
-      );
+    .then((data) => {
+      setStats(data);
+    })
+    .catch((err) => {
+      console.error('ADMIN STATS ERROR:', err);
+      setError('No se pudieron cargar las métricas del sistema');
+    });
+    
   }, [isAuthReady, user, token]);
 
   /* ============================
