@@ -67,7 +67,7 @@ export default function UserMenu() {
             {/* ADMIN */}
             {isAdmin && (
               <Link
-                href="/dashboard"
+                href="/AdminDashboard"
                 className="block px-4 py-3 hover:bg-blue-50 border-t"
                 onClick={() => setOpen(false)}
               >
