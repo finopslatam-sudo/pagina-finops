@@ -38,24 +38,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   
     try {
       await login(email, password);
-  
-      // 🔐 leer usuario persistido (evita race condition)
-      const storedUserRaw = localStorage.getItem("finops_user");
-      const storedUser = storedUserRaw
-        ? JSON.parse(storedUserRaw)
-        : null;
-  
       onClose();
   
-      // 🎯 REDIRECCIÓN POR ROL
-      if (
-        storedUser &&
-        ["root", "support"].includes(storedUser.global_role)
-      ) {
-        router.push("/admin");
-      } else {
-        router.push("/dashboard");
-      }
+      // 🔁 Redirección única: el dashboard decide según rol
+      router.replace("/dashboard");
+
   
     } catch (err) {
       setError("Credenciales inválidas");
@@ -64,7 +51,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     }
   };
    
-
   const handleForgotPassword = async () => {
     setForgotLoading(true);
     setForgotMessage("");
