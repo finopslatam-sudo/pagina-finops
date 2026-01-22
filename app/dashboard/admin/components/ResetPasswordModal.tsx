@@ -9,6 +9,7 @@ interface Props {
   }
 
 export default function ResetPasswordModal({ user, onClose }: Props) {
+
   const { resetPassword } = useAdminUsers();
 
   const [password, setPassword] = useState('');
