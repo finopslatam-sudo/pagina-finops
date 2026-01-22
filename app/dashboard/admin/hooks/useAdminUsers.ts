@@ -2,31 +2,36 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { apiFetch } from '@/app/lib/api';
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
 
 /* ============================
-   TIPOS
+   TYPES
 ============================ */
 export interface AdminUser {
   id: number;
   email: string;
-  contact_name?: string;
-  phone?: string;
-  is_active: boolean;
   global_role: 'root' | 'support' | null;
-  client_role?: 'owner' | 'finops_admin' | 'viewer' | null;
-  client_id?: number | null;
-  company_name?: string | null;
+  client_role: 'owner' | 'finops_admin' | 'viewer' | null;
+  is_active: boolean;
+
+  company_name: string | null;
+  contact_name: string | null;
+  client_email: string | null;
+  client_active: boolean | null;
+
+  is_root: boolean;
 }
 
 /* ============================
    HOOK
 ============================ */
 export function useAdminUsers() {
-  const { user, token } = useAuth();
+  const { token } = useAuth();
 
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   /* ============================
@@ -39,54 +44,142 @@ export function useAdminUsers() {
     setError(null);
 
     try {
-      const data = await apiFetch('/api/admin/users', { token });
-      setUsers(data);
-    } catch (err) {
-      console.error('FETCH USERS ERROR:', err);
-      setError('No se pudieron cargar los usuarios');
+      const res = await fetch(`${API_URL}/api/admin/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al cargar usuarios');
+      }
+
+      setUsers(data.users);
+    } catch (err: any) {
+      console.error('[ADMIN_USERS_FETCH]', err);
+      setError(err.message || 'Error inesperado');
     } finally {
       setLoading(false);
     }
   }, [token]);
 
-  /* ============================
-     INACTIVATE USER
-  ============================ */
-  const inactivateUser = async (target: AdminUser) => {
-    if (!token || !user) return;
-
-    // 🔒 Reglas de seguridad (frontend)
-    if (target.id === user.id) {
-      throw new Error('No puedes inactivarte a ti mismo');
-    }
-
-    if (
-      target.global_role === 'root' &&
-      user.global_role !== 'root'
-    ) {
-      throw new Error('No tienes permisos para inactivar este usuario');
-    }
-
-    await apiFetch(`/api/admin/users/${target.id}/inactivate`, {
-      method: 'PATCH',
-      token,
-    });
-
-    await fetchUsers();
-  };
-
-  /* ============================
-     INIT
-  ============================ */
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
+  /* ============================
+     ACTIVATE / DEACTIVATE
+  ============================ */
+  const setUserActive = async (
+    userId: number,
+    isActive: boolean
+  ) => {
+    if (!token) return;
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/admin/users/${userId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ is_active: isActive }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'No se pudo actualizar');
+      }
+
+      await fetchUsers();
+    } catch (err) {
+      console.error('[ADMIN_USER_UPDATE]', err);
+      throw err;
+    }
+  };
+
+  /* ============================
+     DEACTIVATE (DELETE)
+  ============================ */
+  const deactivateUser = async (userId: number) => {
+    if (!token) return;
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/admin/users/${userId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'No se pudo desactivar');
+      }
+
+      await fetchUsers();
+    } catch (err) {
+      console.error('[ADMIN_USER_DELETE]', err);
+      throw err;
+    }
+  };
+
+  /* ============================
+     RESET PASSWORD
+  ============================ */
+  const resetPassword = async (
+    userId: number,
+    newPassword: string
+  ) => {
+    if (!token) return;
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/admin/users/${userId}/reset-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ password: newPassword }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'No se pudo resetear');
+      }
+
+      await fetchUsers();
+    } catch (err) {
+      console.error('[ADMIN_RESET_PASSWORD]', err);
+      throw err;
+    }
+  };
+
+  /* ============================
+     PUBLIC API
+  ============================ */
   return {
     users,
     loading,
     error,
+
     refresh: fetchUsers,
-    inactivateUser,
+    setUserActive,
+    deactivateUser,
+    resetPassword,
   };
 }

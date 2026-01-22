@@ -1,54 +1,42 @@
 'use client';
 
-interface ConfirmDialogProps {
-  open: boolean;
-  title?: string;
+interface Props {
+  title: string;
   message: string;
-  confirmText?: string;
-  cancelText?: string;
-  danger?: boolean;
-  onConfirm: () => void;
+  confirmText: string;
   onCancel: () => void;
+  onConfirm: () => void;
 }
 
 export default function ConfirmDialog({
-  open,
-  title = 'Confirmar acción',
+  title,
   message,
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
-  danger = false,
-  onConfirm,
+  confirmText,
   onCancel,
-}: ConfirmDialogProps) {
-  if (!open) return null;
-
+  onConfirm,
+}: Props) {
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-        <h2 className="text-lg font-semibold mb-3">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+        <h2 className="text-lg font-semibold mb-2">
           {title}
         </h2>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-sm text-gray-600 mb-4">
           {message}
         </p>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-2">
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg border hover:bg-gray-50"
+            className="px-4 py-2 text-gray-600 hover:underline"
           >
-            {cancelText}
+            Cancelar
           </button>
 
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-lg text-white ${
-              danger
-                ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg"
           >
             {confirmText}
           </button>

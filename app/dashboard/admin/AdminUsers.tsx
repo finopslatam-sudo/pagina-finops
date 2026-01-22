@@ -1,61 +1,55 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAdminUsers } from './hooks/useAdminUsers';
 import UsersTable from './components/UsersTable';
 import UserFormModal from './components/UserFormModal';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function AdminUsers() {
+  const { users, loading, error } = useAdminUsers();
   const { user } = useAuth();
 
-  const [showUserForm, setShowUserForm] = useState(false);
-  const [editingUser, setEditingUser] = useState<any | null>(null);
-
-  const handleCreateUser = () => {
-    setEditingUser(null);
-    setShowUserForm(true);
-  };
-
-  const handleEditUser = (u: any) => {
-    setEditingUser(u);
-    setShowUserForm(true);
-  };
+  const [showCreateModal, setShowCreateModal] =
+    useState(false);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
+
       {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">
-          Gestión de Usuarios
-        </h1>
-
-        <div className="flex gap-3">
-          <button
-            onClick={handleCreateUser}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            ➕ Nuevo Usuario
-          </button>
-
-          {user?.global_role === 'root' && (
-            <button
-              onClick={() => alert('Crear cliente')}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-            >
-              🏢 Nuevo Cliente
-            </button>
-          )}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">
+            Administración de Usuarios
+          </h1>
+          <p className="text-sm text-gray-600">
+            Gestión de usuarios internos y clientes
+          </p>
         </div>
+
+        {/* CREATE BUTTON (ROOT / SUPPORT) */}
+        {(user?.global_role === 'root' ||
+          user?.global_role === 'support') && (
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            ➕ Crear
+          </button>
+        )}
       </div>
 
-      {/* TABLA */}
-      <UsersTable onEdit={handleEditUser} />
+      {/* USERS TABLE */}
+      <UsersTable
+        users={users}
+        loading={loading}
+        error={error}
+      />
 
-      {/* MODAL */}
-      {showUserForm && (
+      {/* CREATE MODAL */}
+      {showCreateModal && (
         <UserFormModal
-          user={editingUser}
-          onClose={() => setShowUserForm(false)}
+          onClose={() => setShowCreateModal(false)}
         />
       )}
     </div>
