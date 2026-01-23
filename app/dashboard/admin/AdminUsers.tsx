@@ -7,15 +7,27 @@ import UserFormModal from './components/UserFormModal';
 import { useAuth } from '@/app/context/AuthContext';
 
 export default function AdminUsers() {
-  const { users, loading, error } = useAdminUsers();
-  const { user } = useAuth();
+  const {
+    users,
+    loading,
+    error,
+    refresh,
+    setUserActive,
+    deactivateUser,
+    resetPassword,
+  } = useAdminUsers();
 
-  const [showCreateModal, setShowCreateModal] =
-    useState(false);
+  const { user } = useAuth();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const DEFAULT_CLIENT_ID = 1;
+
+  const canManageUsers =
+    user?.global_role === 'root' ||
+    user?.global_role === 'support';
 
   return (
     <div className="space-y-6">
-
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
@@ -23,18 +35,16 @@ export default function AdminUsers() {
             Administración de Usuarios
           </h1>
           <p className="text-sm text-gray-600">
-            Gestión de usuarios internos y clientes
+            Gestión de usuarios internos y usuarios de clientes
           </p>
         </div>
 
-        {/* CREATE BUTTON (ROOT / SUPPORT) */}
-        {(user?.global_role === 'root' ||
-          user?.global_role === 'support') && (
+        {canManageUsers && (
           <button
             onClick={() => setShowCreateModal(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            ➕ Crear
+            ➕ Crear usuario
           </button>
         )}
       </div>
@@ -44,12 +54,20 @@ export default function AdminUsers() {
         users={users}
         loading={loading}
         error={error}
+        onToggleActive={setUserActive}
+        onDelete={deactivateUser}
+        onResetPassword={resetPassword}
       />
 
-      {/* CREATE MODAL */}
+      {/* CREATE USER MODAL */}
       {showCreateModal && (
         <UserFormModal
+          clientId={DEFAULT_CLIENT_ID}
           onClose={() => setShowCreateModal(false)}
+          onCreate={async () => {
+            await refresh();
+            setShowCreateModal(false);
+          }}
         />
       )}
     </div>

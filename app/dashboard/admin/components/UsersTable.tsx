@@ -11,10 +11,14 @@ import ResetPasswordModal from './ResetPasswordModal';
    PROPS
 ============================ */
 interface UsersTableProps {
-  users: AdminUser[];
-  loading: boolean;
-  error: string | null;
-}
+    users: AdminUser[];
+    loading: boolean;
+    error: string | null;
+  
+    onToggleActive: (userId: number, isActive: boolean) => Promise<void>;
+    onDelete: (userId: number) => Promise<void>;
+    onResetPassword: (userId: number, newPassword: string) => Promise<void>;
+  }
 
 /* ============================
    COMPONENT

@@ -1,85 +1,50 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
+
+export type CreateUserPayload = {
+  email: string;
+  client_id: number;
+  client_role: 'owner' | 'finops_admin' | 'viewer';
+};
 
 interface Props {
+  clientId: number;
   onClose: () => void;
+  onCreate: (payload: CreateUserPayload) => Promise<void>;
 }
 
-type Mode = 'client' | 'user';
+export default function UserFormModal({
+  clientId,
+  onClose,
+  onCreate,
+}: Props) {
+  const [email, setEmail] = useState('');
+  const [clientRole, setClientRole] =
+    useState<'owner' | 'finops_admin' | 'viewer'>('viewer');
 
-export default function UserFormModal({ onClose }: Props) {
-  const { user, token } = useAuth(); // ✅ CORRECTO (dentro del componente)
-
-  const [mode, setMode] = useState<Mode>('client');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  // CLIENT
-  const [companyName, setCompanyName] = useState('');
-  const [clientEmail, setClientEmail] = useState('');
-
-  // USER
-  const [userEmail, setUserEmail] = useState('');
-  const [globalRole, setGlobalRole] =
-    useState<'support' | ''>('');
+  const [error, setError] = useState<string | null>(null);
 
   const submit = async () => {
-    setError('');
-
-    if (mode === 'client' && (!companyName || !clientEmail)) {
-      setError('Completa todos los campos');
-      return;
-    }
-
-    if (mode === 'user' && (!userEmail || !globalRole)) {
-      setError('Completa todos los campos');
+    if (!email) {
+      setError('Email es obligatorio');
       return;
     }
 
     setLoading(true);
+    setError(null);
 
     try {
-      // ⛔ ENDPOINTS A CONFIRMAR (BACKEND)
-      const endpoint =
-        mode === 'client'
-          ? '/api/admin/clients'
-          : '/api/admin/users';
+      await onCreate({
+        email,
+        client_id: clientId,
+        client_role: clientRole,
+      });
 
-      const body =
-        mode === 'client'
-          ? {
-              company_name: companyName,
-              email: clientEmail,
-            }
-          : {
-              email: userEmail,
-              global_role: globalRole,
-            };
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(body),
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Error al crear');
-      }
-
-      alert('Creado correctamente');
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Error inesperado');
+      setError(err.message || 'Error al crear usuario');
     } finally {
       setLoading(false);
     }
@@ -87,91 +52,65 @@ export default function UserFormModal({ onClose }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
-      <div className="bg-white rounded-xl p-6 w-full max-w-lg shadow-xl">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+
         <h2 className="text-lg font-semibold mb-4">
-          Crear {mode === 'client' ? 'Cliente' : 'Usuario'}
+          Crear usuario
         </h2>
 
-        {user?.global_role === 'root' && (
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setMode('client')}
-              className={`px-3 py-1 rounded ${
-                mode === 'client'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200'
-              }`}
-            >
-              Cliente
-            </button>
-            <button
-              onClick={() => setMode('user')}
-              className={`px-3 py-1 rounded ${
-                mode === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200'
-              }`}
-            >
-              Usuario
-            </button>
-          </div>
-        )}
-
         {error && (
-          <p className="text-sm text-red-600 mb-3">{error}</p>
+          <p className="text-sm text-red-600 mb-3">
+            {error}
+          </p>
         )}
 
-        {mode === 'client' && (
-          <>
-            <input
-              placeholder="Nombre empresa"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full px-4 py-2 border rounded mb-3"
-            />
-            <input
-              placeholder="Email empresa"
-              value={clientEmail}
-              onChange={(e) => setClientEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded mb-3"
-            />
-          </>
-        )}
+        {/* EMAIL */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">
+            Email
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg"
+            placeholder="usuario@empresa.cl"
+          />
+        </div>
 
-        {mode === 'user' && (
-          <>
-            <input
-              placeholder="Email usuario"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded mb-3"
-            />
-            <select
-              value={globalRole}
-              onChange={(e) =>
-                setGlobalRole(e.target.value as any)
-              }
-              className="w-full px-4 py-2 border rounded mb-3"
-            >
-              <option value="">Selecciona rol</option>
-              <option value="support">Support</option>
-            </select>
-          </>
-        )}
+        {/* ROLE */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-1">
+            Rol
+          </label>
+          <select
+            value={clientRole}
+            onChange={(e) =>
+              setClientRole(e.target.value as any)
+            }
+            className="w-full px-4 py-2 border rounded-lg"
+          >
+            <option value="owner">Owner</option>
+            <option value="finops_admin">FinOps Admin</option>
+            <option value="viewer">Viewer</option>
+          </select>
+        </div>
 
-        <div className="flex justify-end gap-2 mt-4">
+        {/* ACTIONS */}
+        <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="text-gray-600 hover:underline"
+            className="px-4 py-2 text-gray-600 hover:underline"
           >
             Cancelar
           </button>
+
           <button
             onClick={submit}
             disabled={loading}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
           >
-            {loading ? 'Guardando…' : 'Crear'}
+            {loading ? 'Creando…' : 'Crear usuario'}
           </button>
         </div>
       </div>

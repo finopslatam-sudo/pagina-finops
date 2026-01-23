@@ -182,4 +182,35 @@ export function useAdminUsers() {
     deactivateUser,
     resetPassword,
   };
+
+  const createUser = async (payload: {
+    email: string;
+    client_id: number;
+    client_role: 'owner' | 'finops_admin' | 'viewer';
+  }) => {
+    if (!token) return;
+  
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        throw new Error(data.error || 'No se pudo crear el usuario');
+      }
+  
+      await fetchUsers();
+    } catch (err) {
+      console.error('[ADMIN_CREATE_USER]', err);
+      throw err;
+    }
+  };
+  
 }
