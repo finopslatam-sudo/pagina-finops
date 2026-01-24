@@ -10,6 +10,8 @@ import UsersTable from './components/UsersTable';
 import UserFormModal from './components/UserFormModal';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import CreateClientModal from './components/CreateClientModal';
+
 
 /* =====================================================
    COMPONENT
@@ -75,6 +77,7 @@ export default function AdminUsers() {
    * ✔ Escalable a selector real después
    */
   const DEFAULT_CLIENT_ID = 1;
+  const [showCreateClientModal, setShowCreateClientModal] = useState(false);
 
   /* =========================
      RENDER
@@ -103,7 +106,7 @@ export default function AdminUsers() {
 
             {/* CREAR CLIENTE */}
             <button
-              onClick={() => router.push('/dashboard/admin/clients')}
+              onClick={() => setShowCreateClientModal(true)}
               className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
             >
               🏢 Crear cliente
@@ -136,9 +139,18 @@ export default function AdminUsers() {
       {/* =========================
          CREATE USER MODAL
       ========================== */}
+      {showCreateClientModal && (
+        <CreateClientModal
+          onClose={() => setShowCreateClientModal(false)}
+          onCreate={async () => {
+            await refresh();
+            setShowCreateClientModal(false);
+          }}
+        />
+      )}
+
       {showCreateUserModal && (
         <UserFormModal
-          clientId={DEFAULT_CLIENT_ID}
           onClose={() => setShowCreateUserModal(false)}
           onCreate={async () => {
             await refresh();

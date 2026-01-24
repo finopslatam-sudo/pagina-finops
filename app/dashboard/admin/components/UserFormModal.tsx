@@ -2,42 +2,30 @@
 
 /* =====================================================
    USER FORM MODAL
-   - Modal UI para creación de usuarios
-   - NO conoce backend
-   - Recibe acción vía onCreate (inyección)
+   - Crear usuario ligado a un cliente
 ===================================================== */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { apiFetch } from '@/app/lib/api';
+import { useAuth } from '@/app/context/AuthContext';
 
 /* =====================================================
-   TYPES (ALINEADOS BACKEND)
+   TYPES
 ===================================================== */
 
-/**
- * Payload esperado por el backend
- * POST /api/admin/users
- */
 export type CreateUserPayload = {
   email: string;
   client_id: number;
   client_role: 'owner' | 'finops_admin' | 'viewer';
 };
 
-interface UserFormModalProps {
-  /**
-   * Client ID objetivo
-   * ⚠️ Debe venir del contexto admin, NO hardcodeado
-   */
-  clientId: number;
+interface Client {
+  id: number;
+  name: string;
+}
 
-  /**
-   * Cierra el modal
-   */
+interface Props {
   onClose: () => void;
-
-  /**
-   * Acción de creación (inyectada)
-   */
   onCreate: (payload: CreateUserPayload) => Promise<void>;
 }
 
@@ -46,47 +34,52 @@ interface UserFormModalProps {
 ===================================================== */
 
 export default function UserFormModal({
-  clientId,
   onClose,
   onCreate,
-}: UserFormModalProps) {
-  /* =========================
-     STATE
-  ========================== */
+}: Props) {
 
+  /* =========================
+     AUTH
+  ========================== */
+  const { token } = useAuth();
+
+  /* =========================
+     FORM STATE
+  ========================== */
   const [email, setEmail] = useState('');
   const [clientRole, setClientRole] =
     useState<'owner' | 'finops_admin' | 'viewer'>('viewer');
+
+  const [clients, setClients] = useState<Client[]>([]);
+  const [clientId, setClientId] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /* =========================
-     VALIDATION HELPERS
+     LOAD CLIENTS
   ========================== */
+  useEffect(() => {
+    if (!token) return;
 
-  const isValidEmail = (value: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    apiFetch<{ clients: Client[] }>('/api/admin/clients', { token })
+      .then((data) => setClients(data.clients))
+      .catch(() => setClients([]));
+  }, [token]);
 
   /* =========================
      SUBMIT
   ========================== */
-
   const submit = async () => {
-    const normalizedEmail = email.trim().toLowerCase();
 
-    if (!normalizedEmail) {
-      setError('El email es obligatorio');
-      return;
-    }
-
-    if (!isValidEmail(normalizedEmail)) {
-      setError('Formato de email inválido');
+    // 🔴 VALIDACIONES
+    if (!email) {
+      setError('Email es obligatorio');
       return;
     }
 
     if (!clientId) {
-      setError('Cliente no válido');
+      setError('Debes seleccionar un cliente');
       return;
     }
 
@@ -95,7 +88,7 @@ export default function UserFormModal({
 
     try {
       await onCreate({
-        email: normalizedEmail,
+        email,
         client_id: clientId,
         client_role: clientRole,
       });
@@ -108,34 +101,30 @@ export default function UserFormModal({
     }
   };
 
-  /* =====================================================
+  /* =========================
      RENDER
-  ===================================================== */
+  ========================== */
 
   return (
-    <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]"
-      role="dialog"
-      aria-modal="true"
-    >
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
       <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
 
-        {/* TITLE */}
         <h2 className="text-lg font-semibold mb-4">
           Crear usuario
         </h2>
 
-        {/* ERROR */}
         {error && (
           <p className="text-sm text-red-600 mb-3">
             {error}
           </p>
         )}
 
-        {/* EMAIL */}
+        {/* =========================
+           EMAIL
+        ========================== */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">
-            Email del usuario
+            Email
           </label>
           <input
             type="email"
@@ -143,14 +132,38 @@ export default function UserFormModal({
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg"
             placeholder="usuario@empresa.cl"
-            disabled={loading}
           />
         </div>
 
-        {/* ROLE */}
+        {/* =========================
+           CLIENTE (OBLIGATORIO)
+        ========================== */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">
+            Cliente
+          </label>
+          <select
+            value={clientId ?? ''}
+            onChange={(e) => setClientId(Number(e.target.value))}
+            className="w-full px-4 py-2 border rounded-lg"
+          >
+            <option value="" disabled>
+              Selecciona un cliente
+            </option>
+            {clients.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* =========================
+           ROL
+        ========================== */}
         <div className="mb-6">
           <label className="block text-sm font-medium mb-1">
-            Rol del usuario
+            Rol
           </label>
           <select
             value={clientRole}
@@ -158,7 +171,6 @@ export default function UserFormModal({
               setClientRole(e.target.value as any)
             }
             className="w-full px-4 py-2 border rounded-lg"
-            disabled={loading}
           >
             <option value="owner">Owner</option>
             <option value="finops_admin">FinOps Admin</option>
@@ -166,12 +178,13 @@ export default function UserFormModal({
           </select>
         </div>
 
-        {/* ACTIONS */}
+        {/* =========================
+           ACTIONS
+        ========================== */}
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
             className="px-4 py-2 text-gray-600 hover:underline"
-            disabled={loading}
           >
             Cancelar
           </button>
@@ -184,6 +197,7 @@ export default function UserFormModal({
             {loading ? 'Creando…' : 'Crear usuario'}
           </button>
         </div>
+
       </div>
     </div>
   );
