@@ -60,7 +60,7 @@ export function useAdminUsers() {
   ========================== */
 
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   /* =====================================================
@@ -70,7 +70,6 @@ export function useAdminUsers() {
 
   const fetchUsers = useCallback(async () => {
     if (!token) {
-      setUsers([]);
       setLoading(false);
       return;
     }
@@ -202,7 +201,9 @@ export function useAdminUsers() {
     loading,
     error,
 
+    /** 🔑 CLAVE: ahora refresh EXISTE */
     refresh: fetchUsers,
+
     createUser,
     setUserActive,
     deactivateUser,

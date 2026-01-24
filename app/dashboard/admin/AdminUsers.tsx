@@ -42,7 +42,7 @@ export default function AdminUsers() {
     users,
     loading,
     error,
-    refresh: refreshUsers,
+    refresh,
     createUser,
     setUserActive,
     deactivateUser,
@@ -137,13 +137,21 @@ export default function AdminUsers() {
       {showCreateClientModal && (
         <CreateClientModal
           onClose={() => setShowCreateClientModal(false)}
-          onCreate={async () => {
-            /**
-             * Refresca clientes + usuarios
-             * Mantiene consistencia UI
-             */
-            await refreshClients();
-            await refreshUsers();
+          onCreate={async (payload) => {
+            await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/admin/clients`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(payload),
+              }
+            );
+
+            // Refresca usuarios (por ahora)
+            await refresh();
             setShowCreateClientModal(false);
           }}
         />
