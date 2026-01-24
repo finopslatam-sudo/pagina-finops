@@ -1,7 +1,7 @@
 'use client';
 
 /* =====================================================
-   CREATE CLIENT MODAL
+   CREATE CLIENT MODAL — FINOPSLATAM
 ===================================================== */
 
 import { useState } from 'react';
@@ -62,10 +62,13 @@ export default function CreateClientModal({
         phone: phone || undefined,
         is_active: isActive,
       });
-
-      onClose();
+      // ⛔ NO cerrar aquí → el padre decide
     } catch (err: any) {
-      setError(err?.message || 'Error al crear cliente');
+      setError(
+        err?.error ||
+        err?.message ||
+        'Error al crear cliente'
+      );
     } finally {
       setLoading(false);
     }
@@ -149,7 +152,9 @@ export default function CreateClientModal({
             checked={isActive}
             onChange={(e) => setIsActive(e.target.checked)}
           />
-          <span className="text-sm">Cliente activo</span>
+          <span className="text-sm">
+            Cliente activo
+          </span>
         </div>
 
         {/* ACTIONS */}
