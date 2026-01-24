@@ -172,7 +172,7 @@ export default function AdminDashboard() {
         />
         <KpiCard
           title="Planes activos"
-          value={stats.users_by_plan.length}
+          value={stats.users_by_plan?.length ?? 0}
           accent="indigo"
         />
       </div>
@@ -212,7 +212,8 @@ export default function AdminDashboard() {
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={stats.users_by_plan} layout="vertical">
+            <BarChart data={stats.users_by_plan ?? []} layout="vertical">
+
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" allowDecimals={false} />
               <YAxis
