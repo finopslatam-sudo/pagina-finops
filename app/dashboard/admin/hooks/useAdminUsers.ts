@@ -69,7 +69,10 @@ export function useAdminUsers() {
   ===================================================== */
 
   const fetchUsers = useCallback(async () => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -80,9 +83,9 @@ export function useAdminUsers() {
       }>('/api/admin/users', { token });
 
       setUsers(data.users);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[ADMIN_USERS_FETCH]', err);
-      setError(err.message || 'Error inesperado');
+      setError('No se pudieron cargar los usuarios');
     } finally {
       setLoading(false);
     }

@@ -5,54 +5,67 @@
 ===================================================== */
 
 import { useState } from 'react';
-import { apiFetch } from '@/app/lib/api';
-import { useAuth } from '@/app/context/AuthContext';
+
+export type CreateClientPayload = {
+  company_name: string;
+  email: string;
+  contact_name?: string;
+  phone?: string;
+  is_active: boolean;
+};
 
 interface Props {
   onClose: () => void;
-  onCreate: () => Promise<void>;
+  onCreate: (payload: CreateClientPayload) => Promise<void>;
 }
 
-export default function CreateClientModal({ onClose, onCreate }: Props) {
-  const { token } = useAuth();
+export default function CreateClientModal({
+  onClose,
+  onCreate,
+}: Props) {
+  /* =========================
+     STATE
+  ========================== */
 
-  const [name, setName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [email, setEmail] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [phone, setPhone] = useState('');
   const [isActive, setIsActive] = useState(true);
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   /* =========================
      SUBMIT
   ========================== */
 
-  const handleSubmit = async () => {
-    if (!name.trim()) {
-      setError('El nombre del cliente es obligatorio');
+  const submit = async () => {
+    if (!companyName) {
+      setError('El nombre de la empresa es obligatorio');
       return;
     }
 
-    if (!token) {
-      setError('Sesión inválida');
+    if (!email) {
+      setError('El email es obligatorio');
       return;
     }
+
+    setLoading(true);
+    setError(null);
 
     try {
-      setLoading(true);
-      setError('');
-
-      await apiFetch('/api/admin/clients', {
-        method: 'POST',
-        token,
-        body: {
-          name,
-          is_active: isActive,
-        },
+      await onCreate({
+        company_name: companyName,
+        email,
+        contact_name: contactName || undefined,
+        phone: phone || undefined,
+        is_active: isActive,
       });
 
-      await onCreate();
-    } catch (err) {
-      console.error('CREATE CLIENT ERROR:', err);
-      setError('No se pudo crear el cliente');
+      onClose();
+    } catch (err: any) {
+      setError(err?.message || 'Error al crear cliente');
     } finally {
       setLoading(false);
     }
@@ -63,60 +76,95 @@ export default function CreateClientModal({ onClose, onCreate }: Props) {
   ========================== */
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
 
-      <div className="bg-white w-full max-w-md rounded-xl shadow-xl p-6 space-y-4">
-
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-lg font-semibold mb-4">
           Crear cliente
         </h2>
 
-        {/* ERROR */}
         {error && (
-          <p className="text-sm text-red-600">
+          <p className="text-sm text-red-600 mb-3">
             {error}
           </p>
         )}
 
-        {/* NOMBRE */}
-        <div>
+        {/* COMPANY NAME */}
+        <div className="mb-4">
           <label className="block text-sm font-medium mb-1">
-            Nombre del cliente
+            Empresa *
           </label>
           <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2"
-            placeholder="Empresa ABC"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg"
+            placeholder="FinOps Latam"
           />
         </div>
 
-        {/* ESTADO */}
-        <div className="flex items-center gap-2">
+        {/* EMAIL */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">
+            Email *
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg"
+            placeholder="contacto@empresa.cl"
+          />
+        </div>
+
+        {/* CONTACT NAME */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">
+            Nombre de contacto
+          </label>
+          <input
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg"
+            placeholder="Juan Pérez"
+          />
+        </div>
+
+        {/* PHONE */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">
+            Teléfono
+          </label>
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg"
+            placeholder="+56 9 1234 5678"
+          />
+        </div>
+
+        {/* ACTIVE */}
+        <div className="mb-6 flex items-center gap-2">
           <input
             type="checkbox"
             checked={isActive}
             onChange={(e) => setIsActive(e.target.checked)}
           />
-          <span className="text-sm">
-            Cliente activo
-          </span>
+          <span className="text-sm">Cliente activo</span>
         </div>
 
         {/* ACTIONS */}
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border"
+            className="px-4 py-2 text-gray-600 hover:underline"
           >
             Cancelar
           </button>
 
           <button
-            onClick={handleSubmit}
+            onClick={submit}
             disabled={loading}
-            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
           >
             {loading ? 'Creando…' : 'Crear cliente'}
           </button>

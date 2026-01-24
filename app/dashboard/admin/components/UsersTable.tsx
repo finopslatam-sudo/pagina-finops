@@ -1,6 +1,11 @@
 'use client';
 
 /* =====================================================
+   USERS TABLE — ADMIN PANEL
+   Lista unificada de usuarios internos y de clientes
+===================================================== */
+
+/* =====================================================
    IMPORTS
 ===================================================== */
 
@@ -22,7 +27,7 @@ interface UsersTableProps {
   error: string | null;
 
   onToggleActive: (userId: number, isActive: boolean) => Promise<void>;
-  onDelete: (userId: number) => Promise<void>;
+  onDelete: (userId: number) => Promise<void>; // reservado (soft delete)
   onResetPassword: (userId: number, newPassword: string) => Promise<void>;
 }
 
@@ -70,7 +75,7 @@ export default function UsersTable({
 
   /* =====================================================
      STATES
-===================================================== */
+  ===================================================== */
 
   if (loading) {
     return <p className="text-gray-400">Cargando usuarios…</p>;
@@ -86,7 +91,7 @@ export default function UsersTable({
 
   /* =====================================================
      RENDER
-===================================================== */
+  ===================================================== */
 
   return (
     <>
@@ -94,7 +99,7 @@ export default function UsersTable({
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="px-4 py-3 text-left">Email</th>
+              <th className="px-4 py-3 text-left">Usuario</th>
               <th className="px-4 py-3 text-left">Empresa</th>
               <th className="px-4 py-3 text-left">Rol</th>
               <th className="px-4 py-3 text-left">Estado</th>
@@ -108,13 +113,20 @@ export default function UsersTable({
                 key={u.id}
                 className="border-b hover:bg-gray-50"
               >
-                {/* EMAIL */}
+                {/* USER */}
                 <td className="px-4 py-3">
                   <div className="font-medium">{u.email}</div>
+
                   {u.is_root && (
                     <span className="text-xs text-red-600">
                       ROOT
                     </span>
+                  )}
+
+                  {!u.is_root && u.client_email && (
+                    <div className="text-xs text-gray-500">
+                      {u.client_email}
+                    </div>
                   )}
                 </td>
 
@@ -142,7 +154,7 @@ export default function UsersTable({
                 </td>
 
                 {/* ACTIONS */}
-                <td className="px-4 py-3 text-right space-x-2">
+                <td className="px-4 py-3 text-right space-x-3">
                   {canModify(u) && (
                     <>
                       {/* RESET PASSWORD */}

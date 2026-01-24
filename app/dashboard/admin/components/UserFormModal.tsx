@@ -1,17 +1,8 @@
 'use client';
 
-/* =====================================================
-   USER FORM MODAL
-   - Crear usuario ligado a un cliente
-===================================================== */
-
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import { useAuth } from '@/app/context/AuthContext';
-
-/* =====================================================
-   TYPES
-===================================================== */
 
 export type CreateUserPayload = {
   email: string;
@@ -21,7 +12,7 @@ export type CreateUserPayload = {
 
 interface Client {
   id: number;
-  name: string;
+  company_name: string;
 }
 
 interface Props {
@@ -29,30 +20,15 @@ interface Props {
   onCreate: (payload: CreateUserPayload) => Promise<void>;
 }
 
-/* =====================================================
-   COMPONENT
-===================================================== */
-
-export default function UserFormModal({
-  onClose,
-  onCreate,
-}: Props) {
-
-  /* =========================
-     AUTH
-  ========================== */
+export default function UserFormModal({ onClose, onCreate }: Props) {
   const { token } = useAuth();
 
-  /* =========================
-     FORM STATE
-  ========================== */
   const [email, setEmail] = useState('');
+  const [clientId, setClientId] = useState<number | null>(null);
   const [clientRole, setClientRole] =
     useState<'owner' | 'finops_admin' | 'viewer'>('viewer');
 
   const [clients, setClients] = useState<Client[]>([]);
-  const [clientId, setClientId] = useState<number | null>(null);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,16 +39,16 @@ export default function UserFormModal({
     if (!token) return;
 
     apiFetch<{ clients: Client[] }>('/api/admin/clients', { token })
-      .then((data) => setClients(data.clients))
-      .catch(() => setClients([]));
+      .then((res) => setClients(res.clients))
+      .catch(() =>
+        setError('No se pudieron cargar los clientes')
+      );
   }, [token]);
 
   /* =========================
      SUBMIT
   ========================== */
   const submit = async () => {
-
-    // 🔴 VALIDACIONES
     if (!email) {
       setError('Email es obligatorio');
       return;
@@ -95,7 +71,7 @@ export default function UserFormModal({
 
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Error al crear usuario');
+      setError(err?.message || 'Error al crear usuario');
     } finally {
       setLoading(false);
     }
@@ -104,7 +80,6 @@ export default function UserFormModal({
   /* =========================
      RENDER
   ========================== */
-
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
       <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
@@ -119,48 +94,41 @@ export default function UserFormModal({
           </p>
         )}
 
-        {/* =========================
-           EMAIL
-        ========================== */}
+        {/* EMAIL */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">
-            Email
+            Email *
           </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg"
-            placeholder="usuario@empresa.cl"
           />
         </div>
 
-        {/* =========================
-           CLIENTE (OBLIGATORIO)
-        ========================== */}
+        {/* CLIENT */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">
-            Cliente
+            Cliente *
           </label>
           <select
             value={clientId ?? ''}
             onChange={(e) => setClientId(Number(e.target.value))}
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full border rounded-lg px-3 py-2"
           >
             <option value="" disabled>
               Selecciona un cliente
             </option>
             {clients.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {c.company_name}
               </option>
             ))}
           </select>
         </div>
 
-        {/* =========================
-           ROL
-        ========================== */}
+        {/* ROLE */}
         <div className="mb-6">
           <label className="block text-sm font-medium mb-1">
             Rol
@@ -178,9 +146,7 @@ export default function UserFormModal({
           </select>
         </div>
 
-        {/* =========================
-           ACTIONS
-        ========================== */}
+        {/* ACTIONS */}
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
@@ -197,7 +163,6 @@ export default function UserFormModal({
             {loading ? 'Creando…' : 'Crear usuario'}
           </button>
         </div>
-
       </div>
     </div>
   );
