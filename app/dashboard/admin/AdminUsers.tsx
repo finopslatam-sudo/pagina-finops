@@ -9,6 +9,7 @@ import { useAdminUsers } from './hooks/useAdminUsers';
 import UsersTable from './components/UsersTable';
 import UserFormModal from './components/UserFormModal';
 import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 /* =====================================================
    COMPONENT
@@ -17,17 +18,17 @@ import { useAuth } from '@/app/context/AuthContext';
 /**
  * AdminUsers
  *
- * Módulo principal del Panel Administrativo.
+ * Panel Administrativo — Usuarios y Clientes
  *
  * Responsabilidades:
- * - Orquestar gestión de usuarios
- * - Renderizar tabla y modales
- * - Aplicar permisos de UI (staff)
+ * - Visualizar TODOS los usuarios del sistema
+ *   (root, admin, soporte, clientes)
+ * - Crear usuarios asociados a clientes
+ * - Punto de entrada para gestión de clientes
  *
- * NOTA:
- * - No contiene lógica de negocio
- * - No llama APIs directamente
- * - Backend valida JWT + roles
+ * Importante:
+ * - NO contiene lógica de negocio
+ * - Backend es la fuente de verdad
  */
 export default function AdminUsers() {
   /* =========================
@@ -49,11 +50,12 @@ export default function AdminUsers() {
   ========================== */
 
   const { user } = useAuth();
+  const router = useRouter();
 
   /**
-   * Solo ROOT o SUPPORT pueden gestionar usuarios
+   * Solo ROOT o SUPPORT
    */
-  const canManageUsers =
+  const canManage =
     user?.global_role === 'root' ||
     user?.global_role === 'support';
 
@@ -61,15 +63,16 @@ export default function AdminUsers() {
      UI STATE
   ========================== */
 
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] =
+    useState(false);
 
   /**
-   * ⚠️ DEFAULT CLIENT ID
+   * Cliente por defecto
+   * (backend lo controla realmente)
    *
-   * Uso temporal / controlado.
-   * En producción avanzada:
-   * - usar selector de cliente
-   * - o default backend
+   * ✔ No rompe nada
+   * ✔ Permite crear usuarios ahora
+   * ✔ Escalable a selector real después
    */
   const DEFAULT_CLIENT_ID = 1;
 
@@ -83,29 +86,43 @@ export default function AdminUsers() {
       {/* =========================
          HEADER
       ========================== */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
         <div>
           <h1 className="text-2xl font-semibold">
-            Administración de Usuarios
+            Panel de Administración
           </h1>
           <p className="text-sm text-gray-600">
-            Gestión de usuarios internos y usuarios de clientes
+            Gestión de clientes y usuarios del sistema
           </p>
         </div>
 
-        {/* ACCIÓN SOLO STAFF */}
-        {canManageUsers && (
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            ➕ Crear usuario
-          </button>
+        {/* ACCIONES ADMIN */}
+        {canManage && (
+          <div className="flex gap-3">
+
+            {/* CREAR CLIENTE */}
+            <button
+              onClick={() => router.push('/dashboard/admin/clients')}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+            >
+              🏢 Crear cliente
+            </button>
+
+            {/* CREAR USUARIO */}
+            <button
+              onClick={() => setShowCreateUserModal(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              ➕ Crear usuario
+            </button>
+          </div>
         )}
       </div>
 
       {/* =========================
          USERS TABLE
+         (incluye root / admin / clientes)
       ========================== */}
       <UsersTable
         users={users}
@@ -119,17 +136,13 @@ export default function AdminUsers() {
       {/* =========================
          CREATE USER MODAL
       ========================== */}
-      {showCreateModal && (
+      {showCreateUserModal && (
         <UserFormModal
           clientId={DEFAULT_CLIENT_ID}
-          onClose={() => setShowCreateModal(false)}
+          onClose={() => setShowCreateUserModal(false)}
           onCreate={async () => {
-            /**
-             * Refresca listado post-creación
-             * Mantiene UI consistente
-             */
             await refresh();
-            setShowCreateModal(false);
+            setShowCreateUserModal(false);
           }}
         />
       )}
