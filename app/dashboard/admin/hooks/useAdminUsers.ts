@@ -60,7 +60,7 @@ export function useAdminUsers() {
   ========================== */
 
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   /* =====================================================
@@ -70,6 +70,7 @@ export function useAdminUsers() {
 
   const fetchUsers = useCallback(async () => {
     if (!token) {
+      setUsers([]);
       setLoading(false);
       return;
     }
@@ -78,12 +79,13 @@ export function useAdminUsers() {
     setError(null);
 
     try {
-      const data = await apiFetch<{
-        users: AdminUser[];
-      }>('/api/admin/users', { token });
+      const data = await apiFetch<{ users: AdminUser[] }>(
+        '/api/admin/users',
+        { token }
+      );
 
       setUsers(data.users);
-    } catch (err: unknown) {
+    } catch (err) {
       console.error('[ADMIN_USERS_FETCH]', err);
       setError('No se pudieron cargar los usuarios');
     } finally {

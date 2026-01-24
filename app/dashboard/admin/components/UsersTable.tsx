@@ -2,11 +2,7 @@
 
 /* =====================================================
    USERS TABLE — ADMIN PANEL
-   Lista unificada de usuarios internos y de clientes
-===================================================== */
-
-/* =====================================================
-   IMPORTS
+   Visualiza usuarios de plataforma y clientes agrupados
 ===================================================== */
 
 import { useState } from 'react';
@@ -27,7 +23,7 @@ interface UsersTableProps {
   error: string | null;
 
   onToggleActive: (userId: number, isActive: boolean) => Promise<void>;
-  onDelete: (userId: number) => Promise<void>; // reservado (soft delete)
+  onDelete: (userId: number) => Promise<void>;
   onResetPassword: (userId: number, newPassword: string) => Promise<void>;
 }
 
@@ -53,23 +49,14 @@ export default function UsersTable({
 
   /* =====================================================
      PERMISSIONS
-     - root: puede todo
-     - support: NO puede modificar root
-     - nadie puede modificarse a sí mismo
   ===================================================== */
 
-  const isRoot = currentUser?.global_role === 'root';
   const isSupport = currentUser?.global_role === 'support';
 
   const canModify = (target: AdminUser) => {
     if (!currentUser) return false;
-
-    // ❌ no self-modification
     if (target.id === currentUser.id) return false;
-
-    // ❌ support no toca root
     if (isSupport && target.global_role === 'root') return false;
-
     return true;
   };
 
@@ -90,106 +77,100 @@ export default function UsersTable({
   }
 
   /* =====================================================
+     DATA NORMALIZATION
+  ===================================================== */
+
+  const staffUsers = users.filter(
+    (u) => u.global_role !== null
+  );
+
+  const clientUsers = users.filter(
+    (u) => u.client_role !== null && u.company_name
+  );
+
+  const usersByClient = clientUsers.reduce(
+    (acc, user) => {
+      const key = user.company_name as string;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(user);
+      return acc;
+    },
+    {} as Record<string, AdminUser[]>
+  );
+
+  /* =====================================================
      RENDER
   ===================================================== */
 
+  const renderTable = (list: AdminUser[]) => (
+    <div className="overflow-x-auto bg-white rounded-xl shadow border">
+      <table className="min-w-full text-sm">
+        <thead className="bg-gray-50 border-b">
+          <tr>
+            <th className="px-4 py-3 text-left">Usuario</th>
+            <th className="px-4 py-3 text-left">Empresa</th>
+            <th className="px-4 py-3 text-left">Rol</th>
+            <th className="px-4 py-3 text-left">Estado</th>
+            <th className="px-4 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((u) => (
+            <tr key={u.id} className="border-b hover:bg-gray-50">
+              <td className="px-4 py-3 font-medium">{u.email}</td>
+              <td className="px-4 py-3">{u.company_name || '—'}</td>
+              <td className="px-4 py-3">
+                {u.global_role || u.client_role}
+              </td>
+              <td className="px-4 py-3">
+                {u.is_active ? (
+                  <span className="text-green-600">Activo</span>
+                ) : (
+                  <span className="text-red-600">Inactivo</span>
+                )}
+              </td>
+              <td className="px-4 py-3 text-right">
+                {canModify(u) && (
+                  <button
+                    onClick={() => setConfirmUser(u)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Gestionar
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
     <>
-      <div className="overflow-x-auto bg-white rounded-xl shadow border">
-        <table className="min-w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-4 py-3 text-left">Usuario</th>
-              <th className="px-4 py-3 text-left">Empresa</th>
-              <th className="px-4 py-3 text-left">Rol</th>
-              <th className="px-4 py-3 text-left">Estado</th>
-              <th className="px-4 py-3 text-right">Acciones</th>
-            </tr>
-          </thead>
+      {/* STAFF */}
+      {staffUsers.length > 0 && (
+        <>
+          <h2 className="text-lg font-semibold mt-6 mb-2">
+            Usuarios de Plataforma
+          </h2>
+          {renderTable(staffUsers)}
+        </>
+      )}
 
-          <tbody>
-            {users.map((u) => (
-              <tr
-                key={u.id}
-                className="border-b hover:bg-gray-50"
-              >
-                {/* USER */}
-                <td className="px-4 py-3">
-                  <div className="font-medium">{u.email}</div>
+      {/* CLIENTES */}
+      {Object.entries(usersByClient).map(
+        ([company, list]) => (
+          <div key={company} className="mt-8">
+            <h2 className="text-lg font-semibold mb-2">
+              {company}
+            </h2>
+            {renderTable(list)}
+          </div>
+        )
+      )}
 
-                  {u.is_root && (
-                    <span className="text-xs text-red-600">
-                      ROOT
-                    </span>
-                  )}
-
-                  {!u.is_root && u.client_email && (
-                    <div className="text-xs text-gray-500">
-                      {u.client_email}
-                    </div>
-                  )}
-                </td>
-
-                {/* COMPANY */}
-                <td className="px-4 py-3">
-                  {u.company_name || '—'}
-                </td>
-
-                {/* ROLE */}
-                <td className="px-4 py-3">
-                  {u.global_role || u.client_role || 'cliente'}
-                </td>
-
-                {/* STATUS */}
-                <td className="px-4 py-3">
-                  {u.is_active ? (
-                    <span className="text-green-600">
-                      Activo
-                    </span>
-                  ) : (
-                    <span className="text-red-600">
-                      Inactivo
-                    </span>
-                  )}
-                </td>
-
-                {/* ACTIONS */}
-                <td className="px-4 py-3 text-right space-x-3">
-                  {canModify(u) && (
-                    <>
-                      {/* RESET PASSWORD */}
-                      <button
-                        onClick={() => setResetUser(u)}
-                        className="text-blue-600 hover:underline"
-                      >
-                        Reset
-                      </button>
-
-                      {/* ACTIVATE / DEACTIVATE */}
-                      <button
-                        onClick={() => setConfirmUser(u)}
-                        className={`${
-                          u.is_active
-                            ? 'text-red-600'
-                            : 'text-green-600'
-                        } hover:underline`}
-                      >
-                        {u.is_active
-                          ? 'Desactivar'
-                          : 'Activar'}
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ============================
-          CONFIRM DIALOG
-      ============================ */}
+      {/* MODALS */}
       {confirmUser && (
         <ConfirmDialog
           title={
@@ -197,11 +178,7 @@ export default function UsersTable({
               ? 'Desactivar usuario'
               : 'Activar usuario'
           }
-          message={`¿Confirmas ${
-            confirmUser.is_active
-              ? 'desactivar'
-              : 'activar'
-          } a ${confirmUser.email}?`}
+          message={`¿Confirmas acción sobre ${confirmUser.email}?`}
           confirmText="Confirmar"
           onCancel={() => setConfirmUser(null)}
           onConfirm={async () => {
@@ -214,9 +191,6 @@ export default function UsersTable({
         />
       )}
 
-      {/* ============================
-          RESET PASSWORD MODAL
-      ============================ */}
       {resetUser && (
         <ResetPasswordModal
           user={resetUser}

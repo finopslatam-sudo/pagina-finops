@@ -5,14 +5,15 @@
 ===================================================== */
 
 import { useState } from 'react';
+
 import { useAdminUsers } from './hooks/useAdminUsers';
+import { useAdminClients } from './hooks/useAdminClients';
+
 import UsersTable from './components/UsersTable';
 import UserFormModal from './components/UserFormModal';
 import CreateClientModal from './components/CreateClientModal';
 
 import { useAuth } from '@/app/context/AuthContext';
-import { apiFetch } from '@/app/lib/api';
-import { useRouter } from 'next/navigation';
 
 /* =====================================================
    COMPONENT
@@ -25,35 +26,39 @@ import { useRouter } from 'next/navigation';
  *
  * Responsabilidades:
  * - Visualizar TODOS los usuarios del sistema
- *   (root, admin, soporte, clientes)
  * - Crear clientes
- * - Crear usuarios asociados a clientes
+ * - Crear usuarios asociados a clientes existentes
  *
  * Importante:
  * - NO contiene lógica de negocio
- * - Backend es la fuente de verdad
+ * - Hooks son la capa de dominio
  */
 export default function AdminUsers() {
   /* =========================
-     DATA (HOOK)
+     DATA (HOOKS)
   ========================== */
 
   const {
     users,
     loading,
     error,
-    refresh,
+    refresh: refreshUsers,
+    createUser,
     setUserActive,
     deactivateUser,
     resetPassword,
   } = useAdminUsers();
 
+  const {
+    clients,
+    refresh: refreshClients,
+  } = useAdminClients();
+
   /* =========================
      AUTH / PERMISSIONS
   ========================== */
 
-  const { user, token } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth();
 
   /**
    * Solo ROOT o SUPPORT
@@ -97,7 +102,6 @@ export default function AdminUsers() {
         {canManage && (
           <div className="flex gap-3">
 
-            {/* CREAR CLIENTE */}
             <button
               onClick={() => setShowCreateClientModal(true)}
               className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
@@ -105,7 +109,6 @@ export default function AdminUsers() {
               🏢 Crear cliente
             </button>
 
-            {/* CREAR USUARIO */}
             <button
               onClick={() => setShowCreateUserModal(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
@@ -118,7 +121,6 @@ export default function AdminUsers() {
 
       {/* =========================
          USERS TABLE
-         (incluye root / admin / clientes)
       ========================== */}
       <UsersTable
         users={users}
@@ -135,20 +137,13 @@ export default function AdminUsers() {
       {showCreateClientModal && (
         <CreateClientModal
           onClose={() => setShowCreateClientModal(false)}
-          onCreate={async (payload) => {
-            if (!token) return;
-
-            await apiFetch('/api/admin/clients', {
-              method: 'POST',
-              token,
-              body: payload,
-            });
-
+          onCreate={async () => {
             /**
-             * Refresca vistas dependientes
-             * (usuarios / clientes visibles)
+             * Refresca clientes + usuarios
+             * Mantiene consistencia UI
              */
-            await refresh();
+            await refreshClients();
+            await refreshUsers();
             setShowCreateClientModal(false);
           }}
         />
@@ -159,17 +154,10 @@ export default function AdminUsers() {
       ========================== */}
       {showCreateUserModal && (
         <UserFormModal
+          clients={clients}
           onClose={() => setShowCreateUserModal(false)}
           onCreate={async (payload) => {
-            if (!token) return;
-
-            await apiFetch('/api/admin/users', {
-              method: 'POST',
-              token,
-              body: payload,
-            });
-
-            await refresh();
+            await createUser(payload);
             setShowCreateUserModal(false);
           }}
         />
