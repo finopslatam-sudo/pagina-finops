@@ -8,10 +8,11 @@ import { useState } from 'react';
 import { useAdminUsers } from './hooks/useAdminUsers';
 import UsersTable from './components/UsersTable';
 import UserFormModal from './components/UserFormModal';
-import { useAuth } from '@/app/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import CreateClientModal from './components/CreateClientModal';
 
+import { useAuth } from '@/app/context/AuthContext';
+import { apiFetch } from '@/app/lib/api';
+import { useRouter } from 'next/navigation';
 
 /* =====================================================
    COMPONENT
@@ -25,8 +26,8 @@ import CreateClientModal from './components/CreateClientModal';
  * Responsabilidades:
  * - Visualizar TODOS los usuarios del sistema
  *   (root, admin, soporte, clientes)
+ * - Crear clientes
  * - Crear usuarios asociados a clientes
- * - Punto de entrada para gestión de clientes
  *
  * Importante:
  * - NO contiene lógica de negocio
@@ -51,7 +52,7 @@ export default function AdminUsers() {
      AUTH / PERMISSIONS
   ========================== */
 
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const router = useRouter();
 
   /**
@@ -68,16 +69,8 @@ export default function AdminUsers() {
   const [showCreateUserModal, setShowCreateUserModal] =
     useState(false);
 
-  /**
-   * Cliente por defecto
-   * (backend lo controla realmente)
-   *
-   * ✔ No rompe nada
-   * ✔ Permite crear usuarios ahora
-   * ✔ Escalable a selector real después
-   */
-  const DEFAULT_CLIENT_ID = 1;
-  const [showCreateClientModal, setShowCreateClientModal] = useState(false);
+  const [showCreateClientModal, setShowCreateClientModal] =
+    useState(false);
 
   /* =========================
      RENDER
@@ -137,22 +130,45 @@ export default function AdminUsers() {
       />
 
       {/* =========================
-         CREATE USER MODAL
+         CREATE CLIENT MODAL
       ========================== */}
       {showCreateClientModal && (
         <CreateClientModal
           onClose={() => setShowCreateClientModal(false)}
-          onCreate={async () => {
+          onCreate={async (payload) => {
+            if (!token) return;
+
+            await apiFetch('/api/admin/clients', {
+              method: 'POST',
+              token,
+              body: payload,
+            });
+
+            /**
+             * Refresca vistas dependientes
+             * (usuarios / clientes visibles)
+             */
             await refresh();
             setShowCreateClientModal(false);
           }}
         />
       )}
 
+      {/* =========================
+         CREATE USER MODAL
+      ========================== */}
       {showCreateUserModal && (
         <UserFormModal
           onClose={() => setShowCreateUserModal(false)}
-          onCreate={async () => {
+          onCreate={async (payload) => {
+            if (!token) return;
+
+            await apiFetch('/api/admin/users', {
+              method: 'POST',
+              token,
+              body: payload,
+            });
+
             await refresh();
             setShowCreateUserModal(false);
           }}
