@@ -201,7 +201,7 @@ export default function Home() {
                   {/* Gráfico - Imagen real */}
                   <div className="rounded-xl overflow-hidden">
                     <img 
-                      src="/dash.png" 
+                      src="/ima1.png" 
                       alt="Dashboard FinOps - Visualización de costos en la nube" 
                       className="w-full h-auto rounded-lg shadow-lg"
                     />
@@ -227,74 +227,138 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICIOS ACTUALIZADOS */}
-      <section id="servicios" className="px-6 py-20 max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h3 className="text-4xl font-bold mb-4 text-gray-900">Servicios FinOps</h3>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Soluciones completas para la gestión y optimización de costos en la nube
-          </p>
-        </div>
+      {/* =====================================================
+         SERVICIOS FINOPS
+         - Sección de servicios actuales
+      ===================================================== */}
+      <section
+        id="servicios"
+        className="px-6 py-24 bg-gray-50"
+      >
+        <div className="max-w-6xl mx-auto">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Cloud Assessment */}
-          <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-white text-xl">🔍</span>
-            </div>
-            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Assessment</h4>
-            <p className="text-gray-600 leading-relaxed">
-              Diagnóstico estratégico completo de tu infraestructura cloud para identificar oportunidades 
-              de optimización inmediata y establecer tu línea base FinOps.
+          {/* TÍTULO */}
+          <div className="text-center mb-16">
+            <h3 className="text-4xl font-bold mb-4 text-gray-900">
+              Servicios FinOps
+            </h3>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Modelos de servicio diseñados para acompañar la madurez FinOps
+              de tu organización
             </p>
           </div>
 
-          {/* Cloud Intelligence */}
-          <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-white text-xl">📊</span>
-            </div>
-            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Intelligence</h4>
-            <p className="text-gray-600 leading-relaxed">
-              Monitoreo proactivo y analytics avanzado con dashboards en tiempo real, alertas inteligentes 
-              y forecasting para toma de decisiones informada.
-            </p>
-          </div>
+          {/* GRID DE PLANES */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-          {/* Cloud Financial Operations */}
-          <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-white text-xl">💰</span>
-            </div>
-            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Financial Operations</h4>
-            <p className="text-gray-600 leading-relaxed">
-              Gestión estratégica de compromisos financieros cloud con enfoque en maximizar ROI mediante 
-              Reserved Instances, Savings Plans y estrategias de compra optimizadas.
-            </p>
-          </div>
+            {/* ===================== FOUNDATION ===================== */}
+            <a
+              href="/servicios"
+              className="group block rounded-3xl border bg-gradient-to-b from-blue-50 to-white p-8 shadow-sm hover:shadow-xl transition"
+            >
+              {/* Badge */}
+              <div className="flex justify-center mb-6">
+                <span className="bg-green-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
+                  🎉 20% DCTO
+                </span>
+              </div>
 
-          {/* Cloud Optimization */}
-          <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-white text-xl">⚡</span>
-            </div>
-            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Optimization</h4>
-            <p className="text-gray-600 leading-relaxed">
-              Optimización técnica automatizada de recursos cloud mediante right-sizing, auto-scaling 
-              inteligente y eficiencia operativa continua.
-            </p>
-          </div>
+              <h4 className="text-2xl font-bold mb-3 text-gray-900">
+                FinOps Foundation
+              </h4>
+              <p className="text-gray-600 mb-6">
+                Visibilidad y control financiero cloud.
+              </p>
 
-          {/* Cloud Governance */}
-          <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-white text-xl">🏷️</span>
-            </div>
-            <h4 className="text-xl font-semibold mb-4 text-gray-900">Cloud Governance</h4>
-            <p className="text-gray-600 leading-relaxed">
-              Framework completo de gobierno cloud con políticas, controles y cultura FinOps para 
-              transformación organizacional sostenible.
-            </p>
+              <ul className="space-y-3 text-gray-700 mb-10">
+                <li>✔ Cloud Assessment inicial</li>
+                <li>✔ Inventario completo de recursos</li>
+                <li>✔ Costos por servicio y proyecto</li>
+                <li>✔ Dashboards básicos</li>
+                <li>✔ Alertas simples</li>
+                <li>✔ Línea base FinOps</li>
+              </ul>
+
+              <div className="mt-auto">
+                <div className="bg-gray-800 text-white text-center font-semibold py-3 rounded-xl group-hover:bg-gray-900 transition">
+                  Contratar Plan
+                </div>
+              </div>
+            </a>
+
+            {/* ===================== PROFESSIONAL (DESTACADO) ===================== */}
+            <a
+              href="/servicios"
+              className="group block rounded-3xl border-2 border-blue-600 bg-gradient-to-b from-blue-50 to-white p-8 shadow-lg hover:shadow-2xl transition relative"
+            >
+              {/* Badges */}
+              <div className="flex justify-center gap-2 mb-6">
+                <span className="bg-green-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
+                  🎉 20% DCTO
+                </span>
+                <span className="bg-blue-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                  Más elegido
+                </span>
+              </div>
+
+              <h4 className="text-2xl font-bold mb-3 text-gray-900">
+                FinOps Professional
+              </h4>
+              <p className="text-gray-600 mb-6">
+                Optimización activa y decisiones basadas en datos.
+              </p>
+
+              <ul className="space-y-3 text-gray-700 mb-10">
+                <li>✔ Todo Foundation</li>
+                <li>✔ Forecasting y budget tracking</li>
+                <li>✔ Cost allocation por tags</li>
+                <li>✔ Savings Plans & RI analysis</li>
+                <li>✔ Optimización técnica recomendada</li>
+                <li>✔ IA FinOps asistida</li>
+              </ul>
+
+              <div className="mt-auto">
+                <div className="bg-blue-600 text-white text-center font-semibold py-3 rounded-xl group-hover:bg-blue-700 transition">
+                  Contratar Plan
+                </div>
+              </div>
+            </a>
+
+            {/* ===================== ENTERPRISE ===================== */}
+            <a
+              href="/servicios"
+              className="group block rounded-3xl border bg-gradient-to-b from-purple-50 to-white p-8 shadow-sm hover:shadow-xl transition"
+            >
+              {/* Badge */}
+              <div className="flex justify-center mb-6">
+                <span className="bg-green-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
+                  🎉 20% DCTO
+                </span>
+              </div>
+
+              <h4 className="text-2xl font-bold mb-3 text-gray-900">
+                FinOps Enterprise
+              </h4>
+              <p className="text-gray-600 mb-6">
+                Gobierno completo y automatización avanzada.
+              </p>
+
+              <ul className="space-y-3 text-gray-700 mb-10">
+                <li>✔ Todo Professional</li>
+                <li>✔ Optimización automatizada</li>
+                <li>✔ Anomaly Detection avanzado</li>
+                <li>✔ IA FinOps predictiva</li>
+                <li>✔ Operating Model FinOps</li>
+                <li>✔ Compliance y gobierno cloud</li>
+              </ul>
+
+              <div className="mt-auto">
+                <div className="bg-purple-600 text-white text-center font-semibold py-3 rounded-xl group-hover:bg-purple-700 transition">
+                  Contratar Plan
+                </div>
+              </div>
+            </a>
+
           </div>
         </div>
       </section>

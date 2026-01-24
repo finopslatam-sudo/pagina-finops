@@ -1,38 +1,82 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+/* =====================================================
+   IMPORTS
+===================================================== */
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
 
+/* =====================================================
+   COMPONENT
+===================================================== */
+
+/**
+ * UserMenu
+ *
+ * Menú contextual del usuario autenticado.
+ *
+ * - Visible solo con sesión activa
+ * - Refleja permisos desde AuthContext
+ * - Logout seguro y centralizado
+ * - UX consistente para SaaS enterprise
+ */
 export default function UserMenu() {
   const { user, logout, isStaff } = useAuth();
+
+  /* =========================
+     STATE
+  ========================== */
 
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  // 🔔 Cerrar menú al hacer click fuera
+  /* =====================================================
+     CLOSE MENU ON OUTSIDE CLICK
+  ===================================================== */
+
   useEffect(() => {
     const close = () => setOpen(false);
     window.addEventListener('click', close);
     return () => window.removeEventListener('click', close);
   }, []);
 
-  // ⛔ No renderizar si no hay sesión
+  /* =====================================================
+     GUARD
+     (No sesión → no render)
+  ===================================================== */
+
   if (!user) return null;
 
-  // 🚪 Logout controlado (una sola redirección)
+  /* =====================================================
+     LOGOUT HANDLER
+     - UX suave
+     - Logout real delegado al context
+  ===================================================== */
+
   const handleLogout = () => {
     setOpen(false);
     setShowToast(true);
 
+    /**
+     * Delay solo visual.
+     * AuthContext maneja limpieza + redirect.
+     */
     setTimeout(() => {
-      logout(); // ⬅️ ya redirige a "/"
+      logout(); // 🔐 Redirige a "/"
     }, 1200);
   };
 
+  /* =====================================================
+     RENDER
+  ===================================================== */
+
   return (
     <>
-      {/* BOTÓN PRINCIPAL */}
+      {/* =========================
+         MAIN BUTTON
+      ========================== */}
       <div className="relative">
         <button
           onClick={(e) => {
@@ -44,13 +88,15 @@ export default function UserMenu() {
           Mi cuenta
         </button>
 
-        {/* MENÚ DESPLEGABLE */}
+        {/* =========================
+           DROPDOWN MENU
+        ========================== */}
         {open && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden"
+            className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden z-40"
           >
-            {/* DASHBOARD (todos los usuarios) */}
+            {/* DASHBOARD — TODOS */}
             <Link
               href="/dashboard"
               className="block px-4 py-3 hover:bg-blue-50"
@@ -59,7 +105,7 @@ export default function UserMenu() {
               📊 Mi Dashboard
             </Link>
 
-            {/* PANEL ADMIN (solo staff) */}
+            {/* ADMIN PANEL — STAFF */}
             {isStaff && (
               <Link
                 href="/dashboard/admin"
@@ -70,7 +116,7 @@ export default function UserMenu() {
               </Link>
             )}
 
-            {/* PERFIL (solo clientes) */}
+            {/* PERFIL — SOLO CLIENTES */}
             {!isStaff && (
               <Link
                 href="/perfil"
@@ -92,7 +138,9 @@ export default function UserMenu() {
         )}
       </div>
 
-      {/* TOAST LOGOUT */}
+      {/* =========================
+         LOGOUT TOAST
+      ========================== */}
       {showToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-fade-in-out">
           <div className="bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg">

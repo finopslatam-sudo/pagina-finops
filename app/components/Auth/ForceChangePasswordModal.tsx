@@ -1,18 +1,48 @@
 'use client';
 
+/* =====================================================
+   FORCE CHANGE PASSWORD MODAL — FINOPSLATAM
+   - UI pura
+   - No conoce API_URL
+   - No hace fetch directo
+===================================================== */
+
+/* =====================================================
+   IMPORTS
+===================================================== */
+
 import { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { apiFetch } from '@/app/lib/api';
 import { PasswordFields } from './PasswordFields';
+
+/* =====================================================
+   COMPONENT
+===================================================== */
 
 export default function ForceChangePasswordModal() {
   const { user, token, logout } = useAuth();
-  if (!user) return null;
+
+  /**
+   * Seguridad defensiva:
+   * - Si no hay usuario o token, no renderiza
+   */
+  if (!user || !token) return null;
+
+  /* =========================
+     STATE
+  ========================== */
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  /* =========================
+     PASSWORD VALIDATION UI
+  ========================== */
 
   const {
     allValid,
@@ -26,10 +56,13 @@ export default function ForceChangePasswordModal() {
     setConfirm,
   });
 
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
+  /* =========================
+     SUBMIT HANDLER
+  ========================== */
 
   const submit = async () => {
+    /* ---------- Validaciones frontend ---------- */
+
     if (!currentPassword || !password || !confirm) {
       setError('Completa todos los campos');
       return;
@@ -45,41 +78,55 @@ export default function ForceChangePasswordModal() {
       return;
     }
 
+    /* ---------- Request ---------- */
+
     setLoading(true);
     setError('');
 
     try {
-      const res = await fetch(`${API_URL}/api/auth/change-password`, {
+      await apiFetch('/api/auth/change-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+        token,
+        body: {
           current_password: currentPassword,
           password,
           confirm_password: confirm,
-        }),
+        },
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || 'Error al cambiar contraseña');
-        return;
-      }
+      /* ---------- Éxito ---------- */
 
-      alert('Contraseña cambiada con éxito. Inicia sesión nuevamente.');
+      alert(
+        'Contraseña cambiada con éxito. Debes iniciar sesión nuevamente.'
+      );
+
+      /**
+       * 🔒 Logout forzado:
+       * - Limpia token
+       * - Limpia contexto
+       * - Evita estado inconsistente
+       */
       logout();
-    } catch {
-      setError('Error inesperado');
+    } catch (err: any) {
+      console.error('[CHANGE_PASSWORD_ERROR]', err);
+      setError(
+        err?.message ||
+        'Error inesperado. Intenta nuevamente.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  /* =====================================================
+     RENDER
+  ===================================================== */
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[999]">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+
+        {/* HEADER */}
         <h2 className="text-xl font-bold mb-1">
           Cambio obligatorio de contraseña
         </h2>
@@ -88,20 +135,27 @@ export default function ForceChangePasswordModal() {
           Por tu seguridad debes modificar tu clave antes de continuar.
         </p>
 
+        {/* ERROR */}
         {error && (
           <div className="mb-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        {/* 🔐 CAMPOS REUTILIZADOS */}
+        {/* PASSWORD FIELDS */}
         {passwordUI}
 
+        {/* SUBMIT */}
         <button
           onClick={submit}
           disabled={loading || !allValid}
-          className={`w-full py-2 rounded-lg text-white font-medium transition
-            ${allValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}
+          className={`
+            w-full py-2 rounded-lg text-white font-medium transition
+            ${
+              allValid
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-400 cursor-not-allowed'
+            }
           `}
         >
           {loading ? 'Guardando…' : 'Cambiar contraseña'}

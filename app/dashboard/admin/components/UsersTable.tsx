@@ -1,38 +1,44 @@
 'use client';
 
+/* =====================================================
+   IMPORTS
+===================================================== */
+
 import { useState } from 'react';
-import { AdminUser } from '../hooks/useAdminUsers';
-import { useAdminUsers } from '../hooks/useAdminUsers';
 import { useAuth } from '@/app/context/AuthContext';
+
 import ConfirmDialog from './ConfirmDialog';
 import ResetPasswordModal from './ResetPasswordModal';
 
-/* ============================
-   PROPS
-============================ */
-interface UsersTableProps {
-    users: AdminUser[];
-    loading: boolean;
-    error: string | null;
-  
-    onToggleActive: (userId: number, isActive: boolean) => Promise<void>;
-    onDelete: (userId: number) => Promise<void>;
-    onResetPassword: (userId: number, newPassword: string) => Promise<void>;
-  }
+import { AdminUser } from '../hooks/useAdminUsers';
 
-/* ============================
+/* =====================================================
+   PROPS
+===================================================== */
+
+interface UsersTableProps {
+  users: AdminUser[];
+  loading: boolean;
+  error: string | null;
+
+  onToggleActive: (userId: number, isActive: boolean) => Promise<void>;
+  onDelete: (userId: number) => Promise<void>;
+  onResetPassword: (userId: number, newPassword: string) => Promise<void>;
+}
+
+/* =====================================================
    COMPONENT
-============================ */
+===================================================== */
+
 export default function UsersTable({
   users,
   loading,
   error,
+  onToggleActive,
+  onDelete,
+  onResetPassword,
 }: UsersTableProps) {
   const { user: currentUser } = useAuth();
-  const {
-    setUserActive,
-    deactivateUser,
-  } = useAdminUsers();
 
   const [confirmUser, setConfirmUser] =
     useState<AdminUser | null>(null);
@@ -40,27 +46,32 @@ export default function UsersTable({
   const [resetUser, setResetUser] =
     useState<AdminUser | null>(null);
 
-  /* ============================
+  /* =====================================================
      PERMISSIONS
-  ============================ */
+     - root: puede todo
+     - support: NO puede modificar root
+     - nadie puede modificarse a sí mismo
+  ===================================================== */
+
   const isRoot = currentUser?.global_role === 'root';
   const isSupport = currentUser?.global_role === 'support';
 
   const canModify = (target: AdminUser) => {
     if (!currentUser) return false;
 
-    // ❌ no self
+    // ❌ no self-modification
     if (target.id === currentUser.id) return false;
 
-    // support no puede tocar root
+    // ❌ support no toca root
     if (isSupport && target.global_role === 'root') return false;
 
     return true;
   };
 
-  /* ============================
+  /* =====================================================
      STATES
-  ============================ */
+===================================================== */
+
   if (loading) {
     return <p className="text-gray-400">Cargando usuarios…</p>;
   }
@@ -73,9 +84,10 @@ export default function UsersTable({
     return <p className="text-gray-500">No hay usuarios</p>;
   }
 
-  /* ============================
+  /* =====================================================
      RENDER
-  ============================ */
+===================================================== */
+
   return (
     <>
       <div className="overflow-x-auto bg-white rounded-xl shadow border">
@@ -131,30 +143,30 @@ export default function UsersTable({
 
                 {/* ACTIONS */}
                 <td className="px-4 py-3 text-right space-x-2">
-                  {/* RESET PASSWORD */}
                   {canModify(u) && (
-                    <button
-                      onClick={() => setResetUser(u)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Reset
-                    </button>
-                  )}
+                    <>
+                      {/* RESET PASSWORD */}
+                      <button
+                        onClick={() => setResetUser(u)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Reset
+                      </button>
 
-                  {/* ACTIVATE / DEACTIVATE */}
-                  {canModify(u) && (
-                    <button
-                      onClick={() => setConfirmUser(u)}
-                      className={`${
-                        u.is_active
-                          ? 'text-red-600'
-                          : 'text-green-600'
-                      } hover:underline`}
-                    >
-                      {u.is_active
-                        ? 'Desactivar'
-                        : 'Activar'}
-                    </button>
+                      {/* ACTIVATE / DEACTIVATE */}
+                      <button
+                        onClick={() => setConfirmUser(u)}
+                        className={`${
+                          u.is_active
+                            ? 'text-red-600'
+                            : 'text-green-600'
+                        } hover:underline`}
+                      >
+                        {u.is_active
+                          ? 'Desactivar'
+                          : 'Activar'}
+                      </button>
+                    </>
                   )}
                 </td>
               </tr>
@@ -181,14 +193,10 @@ export default function UsersTable({
           confirmText="Confirmar"
           onCancel={() => setConfirmUser(null)}
           onConfirm={async () => {
-            if (confirmUser.is_active) {
-              await deactivateUser(confirmUser.id);
-            } else {
-              await setUserActive(
-                confirmUser.id,
-                true
-              );
-            }
+            await onToggleActive(
+              confirmUser.id,
+              !confirmUser.is_active
+            );
             setConfirmUser(null);
           }}
         />
@@ -201,6 +209,13 @@ export default function UsersTable({
         <ResetPasswordModal
           user={resetUser}
           onClose={() => setResetUser(null)}
+          onSubmit={async (newPassword) => {
+            await onResetPassword(
+              resetUser.id,
+              newPassword
+            );
+            setResetUser(null);
+          }}
         />
       )}
     </>

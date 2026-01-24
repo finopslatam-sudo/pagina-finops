@@ -1,20 +1,49 @@
-import { useEffect, useState } from "react";
-import { API_URL } from "../utils/api";
+import { useEffect, useState } from 'react';
+import { apiFetch } from '../api';
 
-export function useApi(path: string) {
-  const [data, setData] = useState<any>(null);
+interface UseApiResult<T> {
+  data: T | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export function useApi<T = any>(
+  endpoint: string,
+  token?: string | null
+): UseApiResult<T> {
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}${path}`)
-      .then(res => res.json())
-      .then(setData)
-      .catch(err => {
-        console.error("API Error:", err);
-        setData(null);
-      })
-      .finally(() => setLoading(false));
-  }, [path]);
+    let cancelled = false;
 
-  return { data, loading };
+    setLoading(true);
+    setError(null);
+
+    apiFetch<T>(endpoint, { token })
+      .then(response => {
+        if (!cancelled) {
+          setData(response);
+        }
+      })
+      .catch(err => {
+        if (!cancelled) {
+          console.error('API Error:', err);
+          setError(err.message || 'Error inesperado');
+          setData(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [endpoint, token]);
+
+  return { data, loading, error };
 }

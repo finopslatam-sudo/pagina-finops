@@ -1,14 +1,54 @@
 'use client';
 
-import { useAuth } from "@/app/context/AuthContext";
+/* =====================================================
+   PUBLIC NAVBAR — FINOPSLATAM
+   Navbar global público y de sesión
+===================================================== */
+
+/* =====================================================
+   IMPORTS
+===================================================== */
+
 import { useState } from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/app/context/AuthContext';
+
 import LoginModal from '@/app/components/Auth/LoginModal';
 import UserMenu from '@/app/components/Auth/UserMenu';
 
+/* =====================================================
+   COMPONENT
+===================================================== */
+
+/**
+ * PublicNavbar
+ *
+ * Responsabilidad:
+ * - Mostrar navegación pública (NO autenticados)
+ * - Mostrar menú de usuario autenticado
+ * - Exponer acceso al Portal de Socios
+ *
+ * Importante:
+ * - NO valida permisos
+ * - NO contiene lógica de negocio
+ * - Depende únicamente de AuthContext
+ */
 export default function PublicNavbar() {
   const { user } = useAuth();
-  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  /* =========================
+     UI STATE
+  ========================== */
+
+  const [isLoginDropdownOpen, setIsLoginDropdownOpen] =
+    useState(false);
+
+  const [isLoginModalOpen, setIsLoginModalOpen] =
+    useState(false);
+
+  /* =====================================================
+     RENDER
+  ===================================================== */
 
   return (
     <>
@@ -16,33 +56,61 @@ export default function PublicNavbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
 
-            {/* LOGO */}
-            <a href="/">
-              <img src="/logo2.png" className="h-24 w-auto" />
-            </a>
+            {/* =========================
+               LOGO
+            ========================== */}
+            <Link href="/" className="flex items-center">
+              <img
+                src="/logo2.png"
+                alt="FinOpsLatam"
+                className="h-24 w-auto"
+              />
+            </Link>
 
-            {/* MENÚ SOLO NO LOGEADOS */}
+            {/* =========================
+               MENÚ PÚBLICO
+               (solo NO autenticados)
+            ========================== */}
             {!user && (
               <nav className="hidden md:flex items-center space-x-8 mx-auto">
-                <a href="/" className="nav-link">Inicio</a>
-                <a href="/servicios" className="nav-link">Servicios</a>
-                <a href="/quienes-somos" className="nav-link">Quiénes Somos</a>
-                <a href="/blog" className="nav-link">Blog</a>
-                <a href="/contacto" className="nav-link">Contacto</a>
+                <Link href="/" className="nav-link">
+                  Inicio
+                </Link>
+                <Link href="/servicios" className="nav-link">
+                  Servicios
+                </Link>
+                <Link href="/quienes-somos" className="nav-link">
+                  Quiénes Somos
+                </Link>
+                <Link href="/blog" className="nav-link">
+                  Blog
+                </Link>
+                <Link href="/contacto" className="nav-link">
+                  Contacto
+                </Link>
               </nav>
             )}
 
-            {/* ACCIONES */}
+            {/* =========================
+               ACCIONES
+            ========================== */}
             <div className="relative">
+
+              {/* ---------- LOGIN ---------- */}
               {!user && (
                 <>
                   <button
-                    onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
-                    className="border-2 border-blue-500 text-blue-500 px-6 py-2.5 rounded-lg font-semibold"
+                    onClick={() =>
+                      setIsLoginDropdownOpen(
+                        !isLoginDropdownOpen
+                      )
+                    }
+                    className="border-2 border-blue-500 text-blue-500 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition"
                   >
                     Login
                   </button>
 
+                  {/* DROPDOWN */}
                   {isLoginDropdownOpen && (
                     <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg min-w-[200px]">
                       <button
@@ -59,12 +127,17 @@ export default function PublicNavbar() {
                 </>
               )}
 
+              {/* ---------- USER MENU ---------- */}
               {user && <UserMenu />}
             </div>
+
           </div>
         </div>
       </header>
 
+      {/* =========================
+         LOGIN MODAL
+      ========================== */}
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

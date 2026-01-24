@@ -1,19 +1,33 @@
 'use client';
 
+/* =====================================================
+   ADMIN USERS HOOK — FINOPSLATAM
+   Capa de dominio ADMIN (usuarios)
+===================================================== */
+
+/* =====================================================
+   IMPORTS
+===================================================== */
+
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { apiFetch } from '@/app/lib/api';
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
-
-/* ============================
+/* =====================================================
    TYPES
-============================ */
+===================================================== */
+
+/**
+ * Usuario administrativo
+ * Resultado de JOIN backend: users + clients
+ */
 export interface AdminUser {
   id: number;
   email: string;
+
   global_role: 'root' | 'support' | null;
   client_role: 'owner' | 'finops_admin' | 'viewer' | null;
+
   is_active: boolean;
 
   company_name: string | null;
@@ -24,19 +38,36 @@ export interface AdminUser {
   is_root: boolean;
 }
 
-/* ============================
+/**
+ * Payload de creación
+ * (alineado con backend)
+ */
+export type CreateAdminUserPayload = {
+  email: string;
+  client_id: number;
+  client_role: 'owner' | 'finops_admin' | 'viewer';
+};
+
+/* =====================================================
    HOOK
-============================ */
+===================================================== */
+
 export function useAdminUsers() {
   const { token } = useAuth();
+
+  /* =========================
+     STATE
+  ========================== */
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /* ============================
+  /* =====================================================
      FETCH USERS
-  ============================ */
+     GET /api/admin/users
+  ===================================================== */
+
   const fetchUsers = useCallback(async () => {
     if (!token) return;
 
@@ -44,17 +75,9 @@ export function useAdminUsers() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/admin/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Error al cargar usuarios');
-      }
+      const data = await apiFetch<{
+        users: AdminUser[];
+      }>('/api/admin/users', { token });
 
       setUsers(data.users);
     } catch (err: any) {
@@ -69,9 +92,33 @@ export function useAdminUsers() {
     fetchUsers();
   }, [fetchUsers]);
 
-  /* ============================
+  /* =====================================================
+     CREATE USER
+     POST /api/admin/users
+  ===================================================== */
+
+  const createUser = async (payload: CreateAdminUserPayload) => {
+    if (!token) return;
+
+    try {
+      await apiFetch('/api/admin/users', {
+        method: 'POST',
+        token,
+        body: payload,
+      });
+
+      await fetchUsers();
+    } catch (err) {
+      console.error('[ADMIN_CREATE_USER]', err);
+      throw err;
+    }
+  };
+
+  /* =====================================================
      ACTIVATE / DEACTIVATE
-  ============================ */
+     PUT /api/admin/users/:id
+  ===================================================== */
+
   const setUserActive = async (
     userId: number,
     isActive: boolean
@@ -79,23 +126,11 @@ export function useAdminUsers() {
     if (!token) return;
 
     try {
-      const res = await fetch(
-        `${API_URL}/api/admin/users/${userId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ is_active: isActive }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'No se pudo actualizar');
-      }
+      await apiFetch(`/api/admin/users/${userId}`, {
+        method: 'PUT',
+        token,
+        body: { is_active: isActive },
+      });
 
       await fetchUsers();
     } catch (err) {
@@ -104,28 +139,19 @@ export function useAdminUsers() {
     }
   };
 
-  /* ============================
-     DEACTIVATE (DELETE)
-  ============================ */
+  /* =====================================================
+     DEACTIVATE (SOFT DELETE)
+     DELETE /api/admin/users/:id
+  ===================================================== */
+
   const deactivateUser = async (userId: number) => {
     if (!token) return;
 
     try {
-      const res = await fetch(
-        `${API_URL}/api/admin/users/${userId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'No se pudo desactivar');
-      }
+      await apiFetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        token,
+      });
 
       await fetchUsers();
     } catch (err) {
@@ -134,9 +160,11 @@ export function useAdminUsers() {
     }
   };
 
-  /* ============================
+  /* =====================================================
      RESET PASSWORD
-  ============================ */
+     POST /api/admin/users/:id/reset-password
+  ===================================================== */
+
   const resetPassword = async (
     userId: number,
     newPassword: string
@@ -144,23 +172,14 @@ export function useAdminUsers() {
     if (!token) return;
 
     try {
-      const res = await fetch(
-        `${API_URL}/api/admin/users/${userId}/reset-password`,
+      await apiFetch(
+        `/api/admin/users/${userId}/reset-password`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ password: newPassword }),
+          token,
+          body: { password: newPassword },
         }
       );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'No se pudo resetear');
-      }
 
       await fetchUsers();
     } catch (err) {
@@ -169,48 +188,19 @@ export function useAdminUsers() {
     }
   };
 
-  /* ============================
+  /* =====================================================
      PUBLIC API
-  ============================ */
+  ===================================================== */
+
   return {
     users,
     loading,
     error,
 
     refresh: fetchUsers,
+    createUser,
     setUserActive,
     deactivateUser,
     resetPassword,
   };
-
-  const createUser = async (payload: {
-    email: string;
-    client_id: number;
-    client_role: 'owner' | 'finops_admin' | 'viewer';
-  }) => {
-    if (!token) return;
-  
-    try {
-      const res = await fetch(`${API_URL}/api/admin/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-  
-      const data = await res.json();
-  
-      if (!res.ok) {
-        throw new Error(data.error || 'No se pudo crear el usuario');
-      }
-  
-      await fetchUsers();
-    } catch (err) {
-      console.error('[ADMIN_CREATE_USER]', err);
-      throw err;
-    }
-  };
-  
 }

@@ -1,26 +1,41 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+/* =====================================================
+   PRIVATE ROUTE — FINOPSLATAM
+   Protección de rutas autenticadas
+===================================================== */
+
+/* =====================================================
+   IMPORTS
+===================================================== */
+
+import { ReactNode } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import ForceChangePasswordModal from '@/app/components/Auth/ForceChangePasswordModal';
+
+/* =====================================================
+   TYPES
+===================================================== */
 
 interface PrivateRouteProps {
   children: ReactNode;
 }
 
-export default function PrivateRoute({ children }: PrivateRouteProps) {
-  const { user, isAuthReady } = useAuth(); // 👈 isAuthReady agregado
-  const router = useRouter();
+/* =====================================================
+   COMPONENT
+===================================================== */
 
-  // 🔁 Redirección SOLO cuando el contexto ya está listo
-  useEffect(() => {
-    if (isAuthReady && !user) {
-      router.replace('/');
-    }
-  }, [isAuthReady, user, router]);
+export default function PrivateRoute({
+  children,
+}: PrivateRouteProps) {
+  const { user, isAuthReady } = useAuth();
 
-  // ⏳ Esperar a que AuthContext termine de rehidratarse
+  /* =====================================================
+     LOADING STATE
+     - Espera rehidratación del AuthContext
+     - Evita renders inconsistentes
+  ===================================================== */
+
   if (!isAuthReady) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-400">
@@ -29,18 +44,38 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
     );
   }
 
-  // 🛑 Contexto listo, pero sin sesión
+  /* =====================================================
+     USUARIO NO AUTENTICADO
+     - AuthContext se encarga del logout
+     - PrivateRoute NO redirige
+  ===================================================== */
+
   if (!user) {
     return null;
   }
 
-  return (
-    <>
-      {/* 🔐 Overlay obligatorio si corresponde */}
-      {user.force_password_change && <ForceChangePasswordModal />}
+  /* =====================================================
+     🔐 BLOQUEO DE SEGURIDAD CRÍTICO
+     - Forzado por backend
+     - UI completamente bloqueada
+  ===================================================== */
 
-      {/* ✅ CONTENIDO PROTEGIDO */}
-      {children}
-    </>
-  );
+  if (user.force_password_change) {
+    /**
+     * Reglas:
+     * - No renderizar children
+     * - No permitir navegación
+     * - Modal bloquea toda la UI
+     *
+     * Este estado solo se libera
+     * cuando el backend confirma el cambio
+     */
+    return <ForceChangePasswordModal />;
+  }
+
+  /* =====================================================
+     ACCESO AUTORIZADO
+  ===================================================== */
+
+  return <>{children}</>;
 }
