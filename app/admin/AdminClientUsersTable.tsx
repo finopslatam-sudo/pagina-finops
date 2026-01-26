@@ -18,7 +18,7 @@ interface ClientUser {
   email: string;
   global_role: string | null;
   client_role: string | null;
-  is_active: boolean | null;
+  is_active: boolean;
   client: {
     id: number;
     company_name: string;
@@ -34,7 +34,7 @@ interface ClientUser {
  *
  * Usuarios que pertenecen a empresas (clientes).
  *
- * - Excluye usuarios de plataforma
+ * - Excluye usuarios de plataforma (sin client)
  * - Backend protegido por JWT
  * - Edición vía modal
  */
@@ -57,10 +57,11 @@ export default function AdminClientUsersTable() {
 
     setLoading(true);
 
-    apiFetch<ClientUser[]>('/api/admin/users', { token })
+    apiFetch<{ users: ClientUser[] }>('/api/admin/users', { token })
       .then((data) => {
-        const clientUsers = data.filter(
-          (u) => u.client && u.client.id
+        // Solo usuarios asociados a clientes
+        const clientUsers = data.users.filter(
+          (u) => u.client !== null
         );
 
         setUsers(clientUsers);
