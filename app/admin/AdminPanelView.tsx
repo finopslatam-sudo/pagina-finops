@@ -27,9 +27,13 @@ import AdminClientUsersTable from './AdminClientUsersTable';
  *
  * (Eso ya lo hace app/admin/page.tsx)
  */
+
 export default function AdminPanelView() {
   return (
     <div className="space-y-14 p-6">
+      <p className="text-red-600 font-bold">
+        DEBUG: AdminPanelView renderizado
+      </p>
 
       {/* =================================================
          USUARIOS DE PLATAFORMA

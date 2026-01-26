@@ -1,66 +1,59 @@
 'use client';
 
 /* =====================================================
-   IMPORTS
+   ADMIN USERS TABLE
+   Usuarios de plataforma (root / admin / support)
 ===================================================== */
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
-import EditClientModal from './modals/EditClientModal';
 
 /* =====================================================
    TYPES
 ===================================================== */
 
-interface Client {
+interface AdminUser {
   id: number;
-  company_name: string;
   email: string;
-  contact_name: string | null;
-  phone: string | null;
-  is_active: boolean | null;
+  global_role: 'root' | 'admin' | 'support' | null;
+  is_active: boolean;
 }
 
 /* =====================================================
    COMPONENT
 ===================================================== */
 
-/**
- * AdminClientsTable
- *
- * Tabla de empresas (clientes).
- *
- * - Backend protegido por JWT
- * - Edición vía modal
- */
-export default function AdminClientsTable() {
+export default function AdminUsersTable() {
   const { token } = useAuth();
 
-  const [clients, setClients] = useState<Client[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const [selectedClient, setSelectedClient] =
-    useState<Client | null>(null);
+  const [selectedUser, setSelectedUser] =
+    useState<AdminUser | null>(null);
 
   /* =====================================================
-     FETCH CLIENTS
+     FETCH USERS
   ===================================================== */
 
-  const loadClients = () => {
+  const loadUsers = () => {
     if (!token) return;
 
     setLoading(true);
 
-    apiFetch<Client[]>('/api/admin/clients', { token })
-      .then((data) => {
-        setClients(data);
+    apiFetch<{ users: any[] }>('/api/admin/users', { token })
+      .then((res) => {
+        const platformUsers = res.users.filter(
+          (u) => u.global_role !== null
+        );
+
+        setUsers(platformUsers);
         setError('');
       })
       .catch((err) => {
-        console.error('ADMIN CLIENTS ERROR:', err);
-        setError('No se pudieron cargar las empresas');
+        console.error('ADMIN USERS ERROR:', err);
+        setError('No se pudieron cargar los usuarios');
       })
       .finally(() => {
         setLoading(false);
@@ -68,7 +61,7 @@ export default function AdminClientsTable() {
   };
 
   useEffect(() => {
-    loadClients();
+    loadUsers();
   }, [token]);
 
   /* =====================================================
@@ -76,17 +69,17 @@ export default function AdminClientsTable() {
   ===================================================== */
 
   if (loading) {
-    return <p className="text-gray-400">Cargando empresas…</p>;
+    return <p className="text-gray-400">Cargando usuarios…</p>;
   }
 
   if (error) {
     return <p className="text-red-500">{error}</p>;
   }
 
-  if (clients.length === 0) {
+  if (users.length === 0) {
     return (
       <p className="text-gray-400">
-        No hay empresas registradas
+        No hay usuarios de plataforma
       </p>
     );
   }
@@ -101,37 +94,32 @@ export default function AdminClientsTable() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left">
             <tr>
-              <th className="p-4">Empresa</th>
               <th className="p-4">Email</th>
-              <th className="p-4">Contacto</th>
+              <th className="p-4">Rol global</th>
               <th className="p-4">Estado</th>
               <th className="p-4 text-right">Acciones</th>
             </tr>
           </thead>
 
           <tbody className="divide-y">
-            {clients.map((client) => (
-              <tr key={client.id}>
+            {users.map((user) => (
+              <tr key={user.id}>
                 <td className="p-4 font-medium">
-                  {client.company_name}
+                  {user.email}
                 </td>
 
                 <td className="p-4">
-                  {client.email}
+                  {user.global_role}
                 </td>
 
                 <td className="p-4">
-                  {client.contact_name || '—'}
-                </td>
-
-                <td className="p-4">
-                  {client.is_active ? (
+                  {user.is_active ? (
                     <span className="text-green-600 font-medium">
-                      Activa
+                      Activo
                     </span>
                   ) : (
                     <span className="text-red-600 font-medium">
-                      Inactiva
+                      Inactivo
                     </span>
                   )}
                 </td>
@@ -139,7 +127,7 @@ export default function AdminClientsTable() {
                 <td className="p-4 text-right">
                   <button
                     className="text-blue-600 hover:underline"
-                    onClick={() => setSelectedClient(client)}
+                    onClick={() => setSelectedUser(user)}
                   >
                     Editar
                   </button>
@@ -149,20 +137,6 @@ export default function AdminClientsTable() {
           </tbody>
         </table>
       </div>
-
-      {/* =========================
-         MODAL
-      ========================== */}
-      {selectedClient && (
-        <EditClientModal
-          client={selectedClient}
-          onClose={() => setSelectedClient(null)}
-          onSaved={() => {
-            setSelectedClient(null);
-            loadClients();
-          }}
-        />
-      )}
     </>
   );
 }
