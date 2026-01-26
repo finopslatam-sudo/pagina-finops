@@ -1,63 +1,70 @@
 'use client';
 
 /* =====================================================
-   ADMIN USERS TABLE
-   Usuarios de plataforma (NO clientes)
+   IMPORTS
 ===================================================== */
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
+import EditClientModal from './modals/EditClientModal';
 
-/* ============================
+/* =====================================================
    TYPES
-============================ */
+===================================================== */
 
-interface AdminUser {
+interface Client {
   id: number;
+  company_name: string;
   email: string;
-  global_role: string | null;
+  contact_name: string | null;
+  phone: string | null;
   is_active: boolean | null;
-  client: null;
+}
+
+interface ClientsResponse {
+  clients: Client[];
 }
 
 /* =====================================================
    COMPONENT
 ===================================================== */
 
-export default function AdminUsersTable() {
+export default function AdminClientsTable() {
   const { token } = useAuth();
 
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [selectedClient, setSelectedClient] =
+    useState<Client | null>(null);
+
   /* =====================================================
-     FETCH USERS
+     FETCH CLIENTS
   ===================================================== */
 
-  useEffect(() => {
+  const loadClients = () => {
     if (!token) return;
 
     setLoading(true);
 
-    apiFetch<{ users: AdminUser[] }>('/api/admin/users', { token })
+    apiFetch<ClientsResponse>('/api/admin/clients', { token })
       .then((data) => {
-        // 👇 solo usuarios de plataforma (sin cliente)
-        const platformUsers = data.users.filter(
-          (u) => !u.client
-        );
-
-        setUsers(platformUsers);
+        setClients(data.clients || []);
         setError('');
       })
       .catch((err) => {
-        console.error('ADMIN USERS ERROR:', err);
-        setError('No se pudieron cargar los usuarios de plataforma');
+        console.error('ADMIN CLIENTS ERROR:', err);
+        setError('No se pudieron cargar las empresas');
       })
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    loadClients();
   }, [token]);
 
   /* =====================================================
@@ -65,17 +72,17 @@ export default function AdminUsersTable() {
   ===================================================== */
 
   if (loading) {
-    return <p className="text-gray-400">Cargando usuarios…</p>;
+    return <p className="text-gray-400">Cargando empresas…</p>;
   }
 
   if (error) {
     return <p className="text-red-500">{error}</p>;
   }
 
-  if (users.length === 0) {
+  if (clients.length === 0) {
     return (
       <p className="text-gray-400">
-        No hay usuarios de plataforma
+        No hay empresas registradas
       </p>
     );
   }
@@ -85,42 +92,73 @@ export default function AdminUsersTable() {
   ===================================================== */
 
   return (
-    <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-left">
-          <tr>
-            <th className="p-4">Email</th>
-            <th className="p-4">Rol global</th>
-            <th className="p-4">Estado</th>
-          </tr>
-        </thead>
-
-        <tbody className="divide-y">
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td className="p-4 font-medium">
-                {user.email}
-              </td>
-
-              <td className="p-4">
-                {user.global_role || '—'}
-              </td>
-
-              <td className="p-4">
-                {user.is_active ? (
-                  <span className="text-green-600 font-medium">
-                    Activo
-                  </span>
-                ) : (
-                  <span className="text-red-600 font-medium">
-                    Inactivo
-                  </span>
-                )}
-              </td>
+    <>
+      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 text-left">
+            <tr>
+              <th className="p-4">Empresa</th>
+              <th className="p-4">Email</th>
+              <th className="p-4">Contacto</th>
+              <th className="p-4">Estado</th>
+              <th className="p-4 text-right">Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+
+          <tbody className="divide-y">
+            {clients.map((client) => (
+              <tr key={client.id}>
+                <td className="p-4 font-medium">
+                  {client.company_name}
+                </td>
+
+                <td className="p-4">
+                  {client.email}
+                </td>
+
+                <td className="p-4">
+                  {client.contact_name || '—'}
+                </td>
+
+                <td className="p-4">
+                  {client.is_active ? (
+                    <span className="text-green-600 font-medium">
+                      Activa
+                    </span>
+                  ) : (
+                    <span className="text-red-600 font-medium">
+                      Inactiva
+                    </span>
+                  )}
+                </td>
+
+                <td className="p-4 text-right">
+                  <button
+                    className="text-blue-600 hover:underline"
+                    onClick={() => setSelectedClient(client)}
+                  >
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* =========================
+         MODAL
+      ========================== */}
+      {selectedClient && (
+        <EditClientModal
+          client={selectedClient}
+          onClose={() => setSelectedClient(null)}
+          onSaved={() => {
+            setSelectedClient(null);
+            loadClients();
+          }}
+        />
+      )}
+    </>
   );
 }
