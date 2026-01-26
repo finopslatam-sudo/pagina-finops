@@ -27,26 +27,32 @@ import {
 
 /**
  * Contrato EXACTO con /api/admin/stats
- * No agregar campos que el backend no entregue
+ * NO agregar campos que el backend no entregue
  */
 interface AdminStats {
-  total_users: number;
-  active_users: number;
-  inactive_users: number;
-  users_by_plan: {
-    plan: string;
-    count: number;
-  }[];
+  companies: {
+    total: number;
+    inactive: number;
+  };
+  users: {
+    clients: number;
+    admins: number;
+    root: number;
+    inactive: number;
+  };
+  plans: {
+    in_use: number;
+    usage: {
+      plan: string;
+      count: number;
+    }[];
+  };
 }
 
 /* =====================================================
    UI HELPERS
 ===================================================== */
 
-/**
- * Estilos semánticos para KPIs
- * (visual-only, sin lógica)
- */
 const accentMap: Record<string, string> = {
   blue: 'bg-blue-50 text-blue-700',
   green: 'bg-green-50 text-green-700',
@@ -54,9 +60,6 @@ const accentMap: Record<string, string> = {
   indigo: 'bg-indigo-50 text-indigo-700',
 };
 
-/**
- * Card KPI reutilizable
- */
 const KpiCard = ({
   title,
   value,
@@ -84,8 +87,6 @@ export default function AdminDashboard() {
 
   /* =====================================================
      FETCH ADMIN STATS
-     - Solo ROOT / SUPPORT
-     - Backend protegido por JWT
   ===================================================== */
 
   useEffect(() => {
@@ -108,29 +109,18 @@ export default function AdminDashboard() {
   }, [isAuthReady, user, token, isStaff]);
 
   /* =====================================================
-     DERIVED DATA
-     (solo presentación, no negocio)
+     DERIVED DATA (VISUAL)
   ===================================================== */
 
-  const totalUsers = stats?.total_users ?? 0;
-
-  const userStatusData = useMemo(() => {
-    if (!stats || totalUsers === 0) {
-      return [
-        { name: 'Activos', value: 0 },
-        { name: 'Inactivos', value: 0 },
-      ];
-    }
-
-    const activePct = Math.round(
-      (stats.active_users / totalUsers) * 100
-    );
+  const usersPieData = useMemo(() => {
+    if (!stats) return [];
 
     return [
-      { name: 'Activos', value: activePct },
-      { name: 'Inactivos', value: 100 - activePct },
+      { name: 'Usuarios clientes', value: stats.users.clients },
+      { name: 'Admins', value: stats.users.admins },
+      { name: 'Root', value: stats.users.root },
     ];
-  }, [stats, totalUsers]);
+  }, [stats]);
 
   /* =====================================================
      STATES
@@ -156,23 +146,23 @@ export default function AdminDashboard() {
       ========================== */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <KpiCard
-          title="Usuarios totales"
-          value={stats.total_users}
+          title="Empresas totales"
+          value={stats.companies.total}
           accent="blue"
         />
         <KpiCard
-          title="Usuarios activos"
-          value={stats.active_users}
-          accent="green"
-        />
-        <KpiCard
-          title="Usuarios inactivos"
-          value={stats.inactive_users}
+          title="Empresas inactivas"
+          value={stats.companies.inactive}
           accent="red"
         />
         <KpiCard
+          title="Usuarios de clientes"
+          value={stats.users.clients}
+          accent="green"
+        />
+        <KpiCard
           title="Planes activos"
-          value={stats.users_by_plan?.length ?? 0}
+          value={stats.plans.in_use}
           accent="indigo"
         />
       </div>
@@ -185,20 +175,21 @@ export default function AdminDashboard() {
         {/* -------- PIE CHART -------- */}
         <div className="bg-white/80 border rounded-xl p-6 shadow-md">
           <h3 className="text-sm font-medium text-gray-700 mb-4">
-            Estado de usuarios
+            Distribución de usuarios
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie
-                data={userStatusData}
+                data={usersPieData}
                 dataKey="value"
                 nameKey="name"
                 innerRadius={60}
                 outerRadius={90}
               >
                 <Cell fill="#22c55e" />
-                <Cell fill="#ef4444" />
+                <Cell fill="#3b82f6" />
+                <Cell fill="#6366f1" />
               </Pie>
               <Tooltip />
             </PieChart>
@@ -208,18 +199,17 @@ export default function AdminDashboard() {
         {/* -------- BAR CHART -------- */}
         <div className="bg-white/80 border rounded-xl p-6 shadow-md">
           <h3 className="text-sm font-medium text-gray-700 mb-4">
-            Usuarios por plan
+            Uso de planes
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={stats.users_by_plan ?? []} layout="vertical">
-
+            <BarChart data={stats.plans.usage} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" allowDecimals={false} />
               <YAxis
                 dataKey="plan"
                 type="category"
-                width={140}
+                width={160}
               />
               <Tooltip />
               <Bar
