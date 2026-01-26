@@ -19,7 +19,7 @@ interface Client {
   email: string;
   contact_name: string | null;
   phone: string | null;
-  is_active: boolean | null;
+  is_active: boolean;
 }
 
 interface ClientsResponse {
@@ -36,7 +36,6 @@ export default function AdminClientsTable() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   const [selectedClient, setSelectedClient] =
     useState<Client | null>(null);
 
@@ -44,23 +43,23 @@ export default function AdminClientsTable() {
      FETCH CLIENTS
   ===================================================== */
 
-  const loadClients = () => {
+  const loadClients = async () => {
     if (!token) return;
 
-    setLoading(true);
-
-    apiFetch<ClientsResponse>('/api/admin/clients', { token })
-      .then((data) => {
-        setClients(data.clients || []);
-        setError('');
-      })
-      .catch((err) => {
-        console.error('ADMIN CLIENTS ERROR:', err);
-        setError('No se pudieron cargar las empresas');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    try {
+      setLoading(true);
+      const res = await apiFetch<ClientsResponse>(
+        '/api/admin/clients',
+        { token }
+      );
+      setClients(res.clients);
+      setError('');
+    } catch (err) {
+      console.error('ADMIN CLIENTS ERROR:', err);
+      setError('No se pudieron cargar las empresas');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -80,11 +79,7 @@ export default function AdminClientsTable() {
   }
 
   if (clients.length === 0) {
-    return (
-      <p className="text-gray-400">
-        No hay empresas registradas
-      </p>
-    );
+    return <p className="text-gray-400">No hay empresas registradas</p>;
   }
 
   /* =====================================================
@@ -111,15 +106,8 @@ export default function AdminClientsTable() {
                 <td className="p-4 font-medium">
                   {client.company_name}
                 </td>
-
-                <td className="p-4">
-                  {client.email}
-                </td>
-
-                <td className="p-4">
-                  {client.contact_name || '—'}
-                </td>
-
+                <td className="p-4">{client.email}</td>
+                <td className="p-4">{client.contact_name ?? '—'}</td>
                 <td className="p-4">
                   {client.is_active ? (
                     <span className="text-green-600 font-medium">
@@ -131,7 +119,6 @@ export default function AdminClientsTable() {
                     </span>
                   )}
                 </td>
-
                 <td className="p-4 text-right">
                   <button
                     className="text-blue-600 hover:underline"
@@ -146,9 +133,6 @@ export default function AdminClientsTable() {
         </table>
       </div>
 
-      {/* =========================
-         MODAL
-      ========================== */}
       {selectedClient && (
         <EditClientModal
           client={selectedClient}

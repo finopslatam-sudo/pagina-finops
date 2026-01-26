@@ -2,7 +2,6 @@
 
 /* =====================================================
    ADMIN USERS TABLE
-   Usuarios de plataforma (root / admin / support)
 ===================================================== */
 
 import { useEffect, useState } from 'react';
@@ -16,8 +15,12 @@ import { apiFetch } from '@/app/lib/api';
 interface AdminUser {
   id: number;
   email: string;
-  global_role: 'root' | 'admin' | 'support' | null;
+  global_role: 'root' | 'admin' | 'support';
   is_active: boolean;
+}
+
+interface UsersResponse {
+  users: AdminUser[];
 }
 
 /* =====================================================
@@ -35,27 +38,28 @@ export default function AdminUsersTable() {
      FETCH USERS
   ===================================================== */
 
-  const loadUsers = () => {
+  const loadUsers = async () => {
     if (!token) return;
 
-    setLoading(true);
+    try {
+      setLoading(true);
+      const res = await apiFetch<UsersResponse>(
+        '/api/admin/users',
+        { token }
+      );
 
-    apiFetch<{ users: any[] }>('/api/admin/users', { token })
-      .then((res) => {
-        const platformUsers = res.users.filter(
-          (u) => u.global_role !== null
-        );
+      const platformUsers = res.users.filter(
+        (u) => u.global_role !== null
+      );
 
-        setUsers(platformUsers);
-        setError('');
-      })
-      .catch((err) => {
-        console.error('ADMIN USERS ERROR:', err);
-        setError('No se pudieron cargar los usuarios');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      setUsers(platformUsers);
+      setError('');
+    } catch (err) {
+      console.error('ADMIN USERS ERROR:', err);
+      setError('No se pudieron cargar los usuarios');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -75,11 +79,7 @@ export default function AdminUsersTable() {
   }
 
   if (users.length === 0) {
-    return (
-      <p className="text-gray-400">
-        No hay usuarios de plataforma
-      </p>
-    );
+    return <p className="text-gray-400">No hay usuarios</p>;
   }
 
   /* =====================================================
@@ -92,7 +92,7 @@ export default function AdminUsersTable() {
         <thead className="bg-gray-50 text-left">
           <tr>
             <th className="p-4">Email</th>
-            <th className="p-4">Rol global</th>
+            <th className="p-4">Rol</th>
             <th className="p-4">Estado</th>
             <th className="p-4 text-right">Acciones</th>
           </tr>
@@ -101,14 +101,8 @@ export default function AdminUsersTable() {
         <tbody className="divide-y">
           {users.map((user) => (
             <tr key={user.id}>
-              <td className="p-4 font-medium">
-                {user.email}
-              </td>
-
-              <td className="p-4">
-                {user.global_role}
-              </td>
-
+              <td className="p-4 font-medium">{user.email}</td>
+              <td className="p-4">{user.global_role}</td>
               <td className="p-4">
                 {user.is_active ? (
                   <span className="text-green-600 font-medium">
@@ -120,7 +114,6 @@ export default function AdminUsersTable() {
                   </span>
                 )}
               </td>
-
               <td className="p-4 text-right text-gray-400">
                 No editable
               </td>

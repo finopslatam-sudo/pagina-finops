@@ -18,7 +18,7 @@ interface ClientUser {
   email: string;
   global_role: string | null;
   client_role: string | null;
-  is_active: boolean | null;
+  is_active: boolean;
   force_password_change?: boolean;
   client: {
     id: number;
@@ -47,27 +47,28 @@ export default function AdminClientUsersTable() {
      FETCH USERS
   ===================================================== */
 
-  const loadUsers = () => {
+  const loadUsers = async () => {
     if (!token) return;
 
-    setLoading(true);
+    try {
+      setLoading(true);
+      const res = await apiFetch<UsersResponse>(
+        '/api/admin/users',
+        { token }
+      );
 
-    apiFetch<UsersResponse>('/api/admin/users', { token })
-      .then((res) => {
-        const clientUsers = res.users.filter(
-          (u) => u.client && u.client.id
-        );
+      const clientUsers = res.users.filter(
+        (u) => u.client !== null
+      );
 
-        setUsers(clientUsers);
-        setError('');
-      })
-      .catch((err) => {
-        console.error('ADMIN CLIENT USERS ERROR:', err);
-        setError('No se pudieron cargar los usuarios de clientes');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      setUsers(clientUsers);
+      setError('');
+    } catch (err) {
+      console.error('ADMIN CLIENT USERS ERROR:', err);
+      setError('No se pudieron cargar los usuarios');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -87,11 +88,7 @@ export default function AdminClientUsersTable() {
   }
 
   if (users.length === 0) {
-    return (
-      <p className="text-gray-400">
-        No hay usuarios asociados a empresas
-      </p>
-    );
+    return <p className="text-gray-400">No hay usuarios de clientes</p>;
   }
 
   /* =====================================================
@@ -115,18 +112,13 @@ export default function AdminClientUsersTable() {
           <tbody className="divide-y">
             {users.map((user) => (
               <tr key={user.id}>
-                <td className="p-4 font-medium">
-                  {user.email}
-                </td>
-
+                <td className="p-4 font-medium">{user.email}</td>
                 <td className="p-4">
                   {user.client?.company_name}
                 </td>
-
                 <td className="p-4">
                   {user.client_role ?? '—'}
                 </td>
-
                 <td className="p-4">
                   {user.is_active ? (
                     <span className="text-green-600 font-medium">
@@ -138,7 +130,6 @@ export default function AdminClientUsersTable() {
                     </span>
                   )}
                 </td>
-
                 <td className="p-4 text-right">
                   <button
                     className="text-blue-600 hover:underline"
