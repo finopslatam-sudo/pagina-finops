@@ -30,8 +30,6 @@ export default function AdminUsersTable() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedUser, setSelectedUser] =
-    useState<AdminUser | null>(null);
 
   /* =====================================================
      FETCH USERS
@@ -89,54 +87,47 @@ export default function AdminUsersTable() {
   ===================================================== */
 
   return (
-    <>
-      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left">
-            <tr>
-              <th className="p-4">Email</th>
-              <th className="p-4">Rol global</th>
-              <th className="p-4">Estado</th>
-              <th className="p-4 text-right">Acciones</th>
+    <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 text-left">
+          <tr>
+            <th className="p-4">Email</th>
+            <th className="p-4">Rol global</th>
+            <th className="p-4">Estado</th>
+            <th className="p-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody className="divide-y">
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td className="p-4 font-medium">
+                {user.email}
+              </td>
+
+              <td className="p-4">
+                {user.global_role}
+              </td>
+
+              <td className="p-4">
+                {user.is_active ? (
+                  <span className="text-green-600 font-medium">
+                    Activo
+                  </span>
+                ) : (
+                  <span className="text-red-600 font-medium">
+                    Inactivo
+                  </span>
+                )}
+              </td>
+
+              <td className="p-4 text-right text-gray-400">
+                No editable
+              </td>
             </tr>
-          </thead>
-
-          <tbody className="divide-y">
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td className="p-4 font-medium">
-                  {user.email}
-                </td>
-
-                <td className="p-4">
-                  {user.global_role}
-                </td>
-
-                <td className="p-4">
-                  {user.is_active ? (
-                    <span className="text-green-600 font-medium">
-                      Activo
-                    </span>
-                  ) : (
-                    <span className="text-red-600 font-medium">
-                      Inactivo
-                    </span>
-                  )}
-                </td>
-
-                <td className="p-4 text-right">
-                  <button
-                    className="text-blue-600 hover:underline"
-                    onClick={() => setSelectedUser(user)}
-                  >
-                    Editar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
