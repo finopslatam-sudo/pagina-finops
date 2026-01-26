@@ -13,21 +13,27 @@ import AdminClientUsersTable from './AdminClientUsersTable';
 ===================================================== */
 
 /**
- * AdminPanel
+ * AdminPanelView
  *
  * Contenido REAL del Panel de Administración.
  *
- * - Se asume que el acceso ya fue validado en page.tsx
- * - No contiene lógica de permisos
- * - Solo UI + composición
+ * RESPONSABILIDADES:
+ * - Renderizar secciones administrativas
+ * - Componer tablas y modales
+ *
+ * NO HACE:
+ * - Validaciones de permisos
+ * - Guards de ruta
+ *
+ * (Eso ya lo hace app/admin/page.tsx)
  */
-export default function AdminPanel() {
+export default function AdminPanelView() {
   return (
-    <div className="space-y-12">
+    <div className="space-y-14 p-6">
 
-      {/* ===============================
+      {/* =================================================
          USUARIOS DE PLATAFORMA
-      =============================== */}
+      ================================================= */}
       <section>
         <h2 className="text-xl font-semibold mb-4">
           Usuarios de Plataforma
@@ -36,9 +42,9 @@ export default function AdminPanel() {
         <AdminUsersTable />
       </section>
 
-      {/* ===============================
+      {/* =================================================
          EMPRESAS / CLIENTES
-      =============================== */}
+      ================================================= */}
       <section>
         <h2 className="text-xl font-semibold mb-4">
           Empresas
@@ -47,9 +53,9 @@ export default function AdminPanel() {
         <AdminClientsTable />
       </section>
 
-      {/* ===============================
-         USUARIOS POR EMPRESA
-      =============================== */}
+      {/* =================================================
+         USUARIOS DE EMPRESAS
+      ================================================= */}
       <section>
         <h2 className="text-xl font-semibold mb-4">
           Usuarios por Empresa
@@ -57,16 +63,6 @@ export default function AdminPanel() {
 
         <AdminClientUsersTable />
       </section>
-
-      {/* =========================
-    USUARIOS DE CLIENTES
-    ========================== */}
-    <section className="space-y-4">
-        <h2 className="text-lg font-semibold">
-            Usuarios de Empresas
-        </h2>
-        <AdminClientUsersTable />
-    </section>
 
     </div>
   );

@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
+import AdminPanelView from '@/app/admin/AdminPanelView';
 
 import {
   PieChart,
