@@ -60,8 +60,8 @@ export default function EditUserModal({
 
     try {
       await apiFetch(`/api/admin/users/${user.id}`, {
+        method: 'PATCH',
         token,
-        method: 'PUT',
         body: {
           email,
           global_role: globalRole || null,
@@ -126,8 +126,7 @@ export default function EditUserModal({
               value={globalRole}
               onChange={(e) => setGlobalRole(e.target.value)}
             >
-              <option value="">Sin rol</option>
-              <option value="root">Root</option>
+              <option value="">Usuario</option>
               <option value="admin">Admin</option>
               <option value="support">Support</option>
             </select>
@@ -145,7 +144,8 @@ export default function EditUserModal({
             >
               <option value="">Sin rol</option>
               <option value="owner">Owner</option>
-              <option value="user">User</option>
+              <option value="finops_admin">FinOps Admin</option>
+              <option value="viewer">Viewer</option>
             </select>
           </div>
 

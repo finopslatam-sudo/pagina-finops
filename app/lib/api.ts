@@ -17,7 +17,7 @@ export const API_URL =
 
 export interface ApiFetchOptions {
   token?: string | null;
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
 }
 
