@@ -52,6 +52,11 @@ interface AdminStats {
 /* =====================================================
    UI HELPERS
 ===================================================== */
+const planLabelMap: Record<string, string> = {
+  FINOPS_FOUNDATION: 'FinOps Foundation',
+  FINOPS_PROFESSIONAL: 'FinOps Professional',
+  FINOPS_ENTERPRISE: 'FinOps Enterprise',
+};
 
 const accentMap: Record<string, string> = {
   blue: 'bg-blue-50 text-blue-700',
@@ -91,7 +96,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!isAuthReady || !user || !token) return;
-    
+
     const role = user.global_role;
 
     if (!role || !['root', 'admin', 'support'].includes(role)) {
@@ -113,6 +118,15 @@ export default function AdminDashboard() {
   /* =====================================================
      DERIVED DATA (VISUAL)
   ===================================================== */
+  const plansChartData = useMemo(() => {
+    if (!stats) return [];
+  
+    return stats.plans.usage.map((item) => ({
+      ...item,
+      planLabel: planLabelMap[item.plan] ?? item.plan,
+    }));
+  }, [stats]);
+  
 
   const usersPieData = useMemo(() => {
     if (!stats) return [];
@@ -215,13 +229,11 @@ export default function AdminDashboard() {
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={stats.plans.usage} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" allowDecimals={false} />
+            <BarChart data={plansChartData} layout="vertical">
               <YAxis
-                dataKey="plan"
+                dataKey="planLabel"
                 type="category"
-                width={160}
+                width={200}
               />
               <Tooltip />
               <Bar
