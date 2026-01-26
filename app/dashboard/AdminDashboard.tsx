@@ -52,6 +52,12 @@ interface AdminStats {
 /* =====================================================
    UI HELPERS
 ===================================================== */
+const planShortLabelMap: Record<string, string> = {
+  FINOPS_FOUNDATION: 'F. Foundation',
+  FINOPS_PROFESSIONAL: 'F.Professional',
+  FINOPS_ENTERPRISE: 'F. Enterprise',
+};
+
 const planLabelMap: Record<string, string> = {
   FINOPS_FOUNDATION: 'FinOps Foundation',
   FINOPS_PROFESSIONAL: 'FinOps Professional',
@@ -122,12 +128,12 @@ export default function AdminDashboard() {
     if (!stats) return [];
   
     return stats.plans.usage.map((item) => ({
-      ...item,
-      planLabel: planLabelMap[item.plan] ?? item.plan,
+      plan: planShortLabelMap[item.plan] ?? item.plan,
+      fullPlan: item.plan,
+      count: item.count,
     }));
   }, [stats]);
   
-
   const usersPieData = useMemo(() => {
     if (!stats) return [];
 
@@ -229,17 +235,20 @@ export default function AdminDashboard() {
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={plansChartData} layout="vertical">
-              <YAxis
-                dataKey="planLabel"
-                type="category"
-                width={200}
+            <BarChart data={plansChartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="plan" />
+              <YAxis allowDecimals={false} />
+              <Tooltip
+                formatter={(value, _name, props) => [
+                  value,
+                  props.payload.fullPlan,
+                ]}
               />
-              <Tooltip />
               <Bar
                 dataKey="count"
                 fill="#6366F1"
-                radius={[0, 6, 6, 0]}
+                radius={[6, 6, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
