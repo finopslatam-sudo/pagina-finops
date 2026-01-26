@@ -80,7 +80,7 @@ const KpiCard = ({
 ===================================================== */
 
 export default function AdminDashboard() {
-  const { user, token, isAuthReady, isStaff } = useAuth();
+  const { user, token, isAuthReady } = useAuth();
 
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [error, setError] = useState<string>('');
@@ -91,8 +91,10 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!isAuthReady || !user || !token) return;
+    
+    const role = user.global_role;
 
-    if (!isStaff) {
+    if (!role || !['root', 'admin', 'support'].includes(role)) {
       setError('No tienes permisos para ver esta sección');
       return;
     }
@@ -106,7 +108,7 @@ export default function AdminDashboard() {
         console.error('ADMIN STATS ERROR:', err);
         setError('No se pudieron cargar las métricas del sistema');
       });
-  }, [isAuthReady, user, token, isStaff]);
+  }, [isAuthReady, user, token]);
 
   /* =====================================================
      DERIVED DATA (VISUAL)
@@ -120,6 +122,16 @@ export default function AdminDashboard() {
       { name: 'Admins', value: stats.users.admins },
       { name: 'Root', value: stats.users.root },
     ];
+  }, [stats]);
+
+  const totalUsers = useMemo(() => {
+    if (!stats) return 0;
+
+    return (
+      stats.users.clients +
+      stats.users.admins +
+      stats.users.root
+    );
   }, [stats]);
 
   /* =====================================================
@@ -156,8 +168,8 @@ export default function AdminDashboard() {
           accent="red"
         />
         <KpiCard
-          title="Usuarios de clientes"
-          value={stats.users.clients}
+          title="Usuarios totales"
+          value={totalUsers}
           accent="green"
         />
         <KpiCard
@@ -175,7 +187,7 @@ export default function AdminDashboard() {
         {/* -------- PIE CHART -------- */}
         <div className="bg-white/80 border rounded-xl p-6 shadow-md">
           <h3 className="text-sm font-medium text-gray-700 mb-4">
-            Distribución de usuarios
+            Distribución de usuarios por rol
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
@@ -199,7 +211,7 @@ export default function AdminDashboard() {
         {/* -------- BAR CHART -------- */}
         <div className="bg-white/80 border rounded-xl p-6 shadow-md">
           <h3 className="text-sm font-medium text-gray-700 mb-4">
-            Uso de planes
+            Uso de planes por empresa
           </h3>
 
           <ResponsiveContainer width="100%" height={260}>
