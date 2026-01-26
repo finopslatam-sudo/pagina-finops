@@ -18,33 +18,28 @@ interface ClientUser {
   email: string;
   global_role: string | null;
   client_role: string | null;
-  is_active: boolean;
+  is_active: boolean | null;
+  force_password_change?: boolean;
   client: {
     id: number;
     company_name: string;
   } | null;
 }
 
+interface UsersResponse {
+  users: ClientUser[];
+}
+
 /* =====================================================
    COMPONENT
 ===================================================== */
 
-/**
- * AdminClientUsersTable
- *
- * Usuarios que pertenecen a empresas (clientes).
- *
- * - Excluye usuarios de plataforma (sin client)
- * - Backend protegido por JWT
- * - Edición vía modal
- */
 export default function AdminClientUsersTable() {
   const { token } = useAuth();
 
   const [users, setUsers] = useState<ClientUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   const [selectedUser, setSelectedUser] =
     useState<ClientUser | null>(null);
 
@@ -57,11 +52,10 @@ export default function AdminClientUsersTable() {
 
     setLoading(true);
 
-    apiFetch<{ users: ClientUser[] }>('/api/admin/users', { token })
-      .then((data) => {
-        // Solo usuarios asociados a clientes
-        const clientUsers = data.users.filter(
-          (u) => u.client !== null
+    apiFetch<UsersResponse>('/api/admin/users', { token })
+      .then((res) => {
+        const clientUsers = res.users.filter(
+          (u) => u.client && u.client.id
         );
 
         setUsers(clientUsers);
@@ -85,11 +79,7 @@ export default function AdminClientUsersTable() {
   ===================================================== */
 
   if (loading) {
-    return (
-      <p className="text-gray-400">
-        Cargando usuarios de clientes…
-      </p>
-    );
+    return <p className="text-gray-400">Cargando usuarios…</p>;
   }
 
   if (error) {
@@ -130,11 +120,11 @@ export default function AdminClientUsersTable() {
                 </td>
 
                 <td className="p-4">
-                  {user.client?.company_name || '—'}
+                  {user.client?.company_name}
                 </td>
 
                 <td className="p-4">
-                  {user.client_role || '—'}
+                  {user.client_role ?? '—'}
                 </td>
 
                 <td className="p-4">
@@ -163,9 +153,6 @@ export default function AdminClientUsersTable() {
         </table>
       </div>
 
-      {/* =========================
-         MODAL
-      ========================== */}
       {selectedUser && (
         <EditUserModal
           user={selectedUser}
