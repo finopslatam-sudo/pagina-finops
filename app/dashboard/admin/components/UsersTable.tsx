@@ -2,7 +2,7 @@
 
 /* =====================================================
    USERS TABLE — ADMIN PANEL
-   Visualiza usuarios de plataforma y clientes agrupados
+   Visualiza usuarios de plataforma
 ===================================================== */
 
 import { useState } from 'react';
@@ -80,26 +80,13 @@ export default function UsersTable({
      DATA NORMALIZATION
   ===================================================== */
 
+  // Usuarios de plataforma (root, admin, support)
   const staffUsers = users.filter(
     (u) => u.global_role !== null
   );
 
-  const clientUsers = users.filter(
-    (u) => u.client_role !== null && u.company_name
-  );
-
-  const usersByClient = clientUsers.reduce(
-    (acc, user) => {
-      const key = user.company_name as string;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(user);
-      return acc;
-    },
-    {} as Record<string, AdminUser[]>
-  );
-
   /* =====================================================
-     RENDER
+     RENDER HELPERS
   ===================================================== */
 
   const renderTable = (list: AdminUser[]) => (
@@ -146,9 +133,13 @@ export default function UsersTable({
     </div>
   );
 
+  /* =====================================================
+     RENDER
+  ===================================================== */
+
   return (
     <>
-      {/* STAFF */}
+      {/* USUARIOS DE PLATAFORMA */}
       {staffUsers.length > 0 && (
         <>
           <h2 className="text-lg font-semibold mt-6 mb-2">
@@ -156,18 +147,6 @@ export default function UsersTable({
           </h2>
           {renderTable(staffUsers)}
         </>
-      )}
-
-      {/* CLIENTES */}
-      {Object.entries(usersByClient).map(
-        ([company, list]) => (
-          <div key={company} className="mt-8">
-            <h2 className="text-lg font-semibold mb-2">
-              {company}
-            </h2>
-            {renderTable(list)}
-          </div>
-        )
       )}
 
       {/* MODALS */}
