@@ -15,28 +15,38 @@ export default function AdminUsers() {
   ============================ */
 
   const systemUsers = useMemo(
-    () => users.filter((u) => u.type === 'global'),
+    () =>
+      users.filter(
+        (u) =>
+          u.role === 'root' ||
+          u.role === 'admin' ||
+          u.role === 'support'
+      ),
     [users]
   );
-
+  
   const usersByClient = useMemo(() => {
     const map = new Map<string, AdminUser[]>();
-
+  
     users
       .filter(
-        (u) => u.type === 'client' && u.company_name
+        (u) =>
+          !['root', 'admin', 'support'].includes(
+            u.role ?? ''
+          )
       )
       .forEach((user) => {
-        const company = user.company_name!;
-        if (!map.has(company)) {
-          map.set(company, []);
+        if (!user.company_name) return;
+  
+        if (!map.has(user.company_name)) {
+          map.set(user.company_name, []);
         }
-        map.get(company)!.push(user);
+        map.get(user.company_name)!.push(user);
       });
-
+  
     return map;
   }, [users]);
-
+  
   /* ============================
      STATES
   ============================ */
