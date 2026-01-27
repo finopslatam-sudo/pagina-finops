@@ -10,51 +10,52 @@ export default function AdminUsers() {
   const [selectedUser, setSelectedUser] =
     useState<AdminUser | null>(null);
 
+  /* ============================
+     DERIVED DATA
+  ============================ */
+
+  // Usuarios del sistema (staff)
   const systemUsers = useMemo(
     () =>
-      users.filter((u) =>
-        ['root', 'admin', 'support'].includes(
-          u.role ?? ''
-        )
+      users.filter(
+        (u) =>
+          u.global_role === 'root' ||
+          u.global_role === 'admin' ||
+          u.global_role === 'support'
       ),
     [users]
   );
 
+  // Usuarios por cliente
   const usersByClient = useMemo(() => {
     const map = new Map<string, AdminUser[]>();
 
     users
-      .filter(
-        (u) =>
-          !['root', 'admin', 'support'].includes(
-            u.role ?? ''
-          )
-      )
-      .forEach((u) => {
-        if (!u.company_name) return;
-        if (!map.has(u.company_name)) {
-          map.set(u.company_name, []);
+      .filter((u) => u.client_id && u.company_name)
+      .forEach((user) => {
+        const company = user.company_name!;
+        if (!map.has(company)) {
+          map.set(company, []);
         }
-        map.get(u.company_name)!.push(u);
+        map.get(company)!.push(user);
       });
 
     return map;
   }, [users]);
 
-  if (loading) {
-    return <p>Cargando usuarios…</p>;
-  }
+  /* ============================
+     STATES
+  ============================ */
 
-  if (error) {
-    return (
-      <p className="text-red-600">
-        {error}
-      </p>
-    );
-  }
+  if (loading) return <p>Cargando usuarios…</p>;
+  if (error)
+    return <p className="text-red-600">{error}</p>;
 
   return (
     <section className="space-y-10">
+      {/* ============================
+          USUARIOS DEL SISTEMA
+      ============================ */}
       <div>
         <h2 className="text-xl font-semibold mb-4">
           Usuarios del sistema
@@ -66,13 +67,16 @@ export default function AdminUsers() {
         />
       </div>
 
+      {/* ============================
+          CLIENTES
+      ============================ */}
       <div>
         <h2 className="text-xl font-semibold mb-4">
           Clientes
         </h2>
 
         {[...usersByClient.entries()].map(
-          ([company, list]) => (
+          ([company, clientUsers]) => (
             <div
               key={company}
               className="mb-8 border rounded-lg p-4"
@@ -82,7 +86,7 @@ export default function AdminUsers() {
               </h3>
 
               <UsersTable
-                users={list}
+                users={clientUsers}
                 onEdit={setSelectedUser}
               />
             </div>
@@ -90,15 +94,14 @@ export default function AdminUsers() {
         )}
       </div>
 
+      {/* ============================
+          MODAL
+      ============================ */}
       {selectedUser && (
         <UserFormModal
           user={selectedUser}
-          onClose={() =>
-            setSelectedUser(null)
-          }
-          onSaved={() =>
-            setSelectedUser(null)
-          }
+          onClose={() => setSelectedUser(null)}
+          onSaved={() => setSelectedUser(null)}
         />
       )}
     </section>

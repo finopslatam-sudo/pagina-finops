@@ -2,19 +2,32 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { apiFetch } from '@/app/lib/api';
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
+/* ============================
+   TYPES
+============================ */
 
 export interface AdminUser {
   id: number;
   email: string;
-  role: string | null;
+
+  /* ROLES */
+  global_role: 'root' | 'admin' | 'support' | null;
+  client_role: 'owner' | 'finops_admin' | 'viewer' | null;
+
+  /* CLIENT */
+  client_id: number | null;
   company_name: string | null;
+
+  /* FLAGS */
   is_active: boolean;
-  global_role?: string | null;
-  client_role?: string | null;
+  force_password_change: boolean;
 }
+
+/* ============================
+   HOOK
+============================ */
 
 export function useAdminUsers() {
   const { token } = useAuth();
@@ -26,58 +39,49 @@ export function useAdminUsers() {
   const fetchUsers = useCallback(async () => {
     if (!token) return;
 
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      const res = await fetch(
-        `${API_URL}/api/admin/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const data = await apiFetch<{
+        users: any[];
+      }>('/api/admin/users', { token });
 
-      if (!res.ok) {
-        throw new Error(
-          `Error ${res.status}`
-        );
-      }
+      /**
+       * 🔥 ADAPTADOR DE CONTRATO
+       * Backend → Frontend
+       */
+      const adapted: AdminUser[] = data.users.map((u) => ({
+        id: u.id,
+        email: u.email,
 
-      const json = await res.json();
+        global_role: u.global_role ?? null,
+        client_role: u.client_role ?? null,
 
-      const mapped: AdminUser[] =
-        (json.users ?? []).map((u: any) => ({
-          id: u.id,
-          email: u.email,
-          role: u.global_role ?? u.client_role ?? null,
-          company_name:
-            u.client?.company_name ?? null,
-          is_active: u.is_active,
-          global_role: u.global_role,
-          client_role: u.client_role,
-        }));
+        client_id: u.client?.id ?? null,
+        company_name: u.client?.company_name ?? null,
 
-      setUsers(mapped);
+        is_active: u.is_active,
+        force_password_change: u.force_password_change,
+      }));
+
+      setUsers(adapted);
     } catch (err) {
-      console.error(err);
-      setError(
-        'No se pudieron cargar los usuarios'
-      );
+      console.error('[useAdminUsers]', err);
+      setError('No se pudieron cargar los usuarios');
     } finally {
       setLoading(false);
     }
   }, [token]);
 
-  // 🔥 CLAVE: refetch cuando token aparece
   useEffect(() => {
-    if (token) {
-      fetchUsers();
-    }
-  }, [token, fetchUsers]);
+    fetchUsers();
+  }, [fetchUsers]);
 
   return {
     users,
     loading,
     error,
+    refetch: fetchUsers,
   };
 }
