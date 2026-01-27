@@ -7,20 +7,18 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
 
 /* ============================
-   TYPES (ALINEADO A BD)
+   TYPES
 ============================ */
 
 export interface AdminUser {
   id: number;
   email: string;
-  global_role: 'root' | 'admin' | 'support' | null;
-  client_role: 'owner' | 'finops_admin' | 'viewer' | null;
-  client: {
-    id: number;
-    company_name: string;
-  } | null;
+  type: 'global' | 'client';
+  role: string | null;
+  company_name: string | null;
   is_active: boolean;
-  force_password_change: boolean;
+  force_password_change?: boolean;
+  can_edit: boolean;
 }
 
 /* ============================
@@ -28,7 +26,7 @@ export interface AdminUser {
 ============================ */
 
 export function useAdminUsers() {
-  const { token } = useAuth();
+  const { token, user: authUser } = useAuth();
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,55 +51,38 @@ export function useAdminUsers() {
 
       const json = await res.json();
 
-      setUsers(json.users ?? []);
+      const normalized: AdminUser[] = (json.users ?? []).map(
+        (u: any) => ({
+          id: u.id,
+          email: u.email,
+          type: u.global_role ? 'global' : 'client',
+          role: u.global_role ?? u.client_role,
+          company_name: u.client?.company_name ?? null,
+          is_active: u.is_active,
+          force_password_change: u.force_password_change,
+          can_edit:
+            authUser?.global_role === 'root' &&
+            u.global_role !== 'root',
+        })
+      );
+
+      setUsers(normalized);
     } catch (err) {
       console.error('[useAdminUsers]', err);
       setError('No se pudieron cargar los usuarios');
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, authUser]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
-
-  const updateUser = async (
-    userId: number,
-    payload: Partial<{
-      email: string;
-      global_role: 'admin' | 'support' | null;
-      client_role: 'owner' | 'finops_admin' | 'viewer' | null;
-      is_active: boolean;
-      force_password_change: boolean;
-    }>
-  ) => {
-    if (!token) return;
-
-    const res = await fetch(
-      `${API_URL}/api/admin/users/${userId}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error('Error actualizando usuario');
-    }
-
-    await fetchUsers();
-  };
 
   return {
     users,
     loading,
     error,
     refetch: fetchUsers,
-    updateUser,
   };
 }

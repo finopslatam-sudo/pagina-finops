@@ -1,3 +1,5 @@
+'use client';
+
 import { AdminUser } from '../hooks/useAdminUsers';
 
 interface Props {
@@ -6,47 +8,65 @@ interface Props {
 }
 
 export function UsersTable({ users, onEdit }: Props) {
+  if (!users.length) {
+    return (
+      <p className="text-sm text-gray-500">
+        No hay usuarios
+      </p>
+    );
+  }
+
   return (
-    <table className="w-full border">
+    <table className="w-full border-collapse">
       <thead>
-        <tr>
-          <th>Email</th>
-          <th>Empresa</th>
-          <th>Rol</th>
-          <th>Estado</th>
-          <th>Acciones</th>
+        <tr className="border-b">
+          <th className="text-left py-2">Email</th>
+          <th className="text-left py-2">Empresa</th>
+          <th className="text-left py-2">Rol</th>
+          <th className="text-left py-2">Estado</th>
+          <th className="text-left py-2">
+            Acciones
+          </th>
         </tr>
       </thead>
       <tbody>
-        {users.map((user) => {
-          const role =
-            user.global_role ??
-            user.client_role ??
-            '—';
-
-          return (
-            <tr key={user.id}>
-              <td>{user.email}</td>
-              <td>{user.client?.company_name ?? '—'}</td>
-              <td>{role}</td>
-              <td>
-                {user.is_active ? 'Activo' : 'Inactivo'}
-              </td>
-              <td>
-                {user.global_role === 'root' ? (
-                  '—'
-                ) : (
-                  <button
-                    className="text-blue-600"
-                    onClick={() => onEdit(user)}
-                  >
-                    Editar
-                  </button>
-                )}
-              </td>
-            </tr>
-          );
-        })}
+        {users.map((user) => (
+          <tr
+            key={user.id}
+            className="border-b last:border-0"
+          >
+            <td className="py-2">{user.email}</td>
+            <td className="py-2">
+              {user.company_name ?? '—'}
+            </td>
+            <td className="py-2">
+              {user.role ?? '—'}
+            </td>
+            <td className="py-2">
+              {user.is_active ? (
+                <span className="text-green-600">
+                  Activo
+                </span>
+              ) : (
+                <span className="text-red-600">
+                  Inactivo
+                </span>
+              )}
+            </td>
+            <td className="py-2">
+              {user.can_edit ? (
+                <button
+                  className="text-blue-600 hover:underline"
+                  onClick={() => onEdit(user)}
+                >
+                  Editar
+                </button>
+              ) : (
+                '—'
+              )}
+            </td>
+          </tr>
+        ))}
       </tbody>
     </table>
   );
