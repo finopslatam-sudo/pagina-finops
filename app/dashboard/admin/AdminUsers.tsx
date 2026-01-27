@@ -11,29 +11,37 @@ export default function AdminUsers() {
     useState<AdminUser | null>(null);
 
   /* ============================
-     DERIVED DATA
+     USUARIOS DEL SISTEMA
+     (root | support)
   ============================ */
 
-  // Usuarios del sistema (staff)
   const systemUsers = useMemo(
     () =>
       users.filter(
         (u) =>
           u.global_role === 'root' ||
-          u.global_role === 'admin' ||
           u.global_role === 'support'
       ),
     [users]
   );
 
-  // Usuarios por cliente
+  /* ============================
+     USUARIOS DE CLIENTE
+  ============================ */
+
   const usersByClient = useMemo(() => {
     const map = new Map<string, AdminUser[]>();
 
     users
-      .filter((u) => u.client_id && u.company_name)
+      .filter(
+        (u) =>
+          u.client_id !== null &&
+          u.client_role !== null
+      )
       .forEach((user) => {
-        const company = user.company_name!;
+        const company =
+          user.company_name ?? 'Cliente sin nombre';
+
         if (!map.has(company)) {
           map.set(company, []);
         }
@@ -49,7 +57,11 @@ export default function AdminUsers() {
 
   if (loading) return <p>Cargando usuarios…</p>;
   if (error)
-    return <p className="text-red-600">{error}</p>;
+    return (
+      <p className="text-red-600">
+        {error}
+      </p>
+    );
 
   return (
     <section className="space-y-10">
