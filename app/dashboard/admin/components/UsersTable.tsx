@@ -62,7 +62,7 @@ export function UsersTable({ users, onEdit }: Props) {
               </td>
 
               <td className="px-4 py-2 text-right">
-                {onEdit && user.can_edit ? (
+                {onEdit ? (
                   <button
                     onClick={() => onEdit(user)}
                     className="text-blue-600 hover:underline"

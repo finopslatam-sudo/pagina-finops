@@ -13,12 +13,10 @@ const API_URL =
 export interface AdminUser {
   id: number;
   email: string;
-  type: 'global' | 'client';
   role: string | null;
   company_name: string | null;
   is_active: boolean;
   force_password_change?: boolean;
-  can_edit: boolean;
 }
 
 /* ============================
@@ -26,7 +24,7 @@ export interface AdminUser {
 ============================ */
 
 export function useAdminUsers() {
-  const { token, user: authUser } = useAuth();
+  const { token } = useAuth();
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,14 +53,10 @@ export function useAdminUsers() {
         (u: any) => ({
           id: u.id,
           email: u.email,
-          type: u.global_role ? 'global' : 'client',
-          role: u.global_role ?? u.client_role,
+          role: u.global_role ?? u.client_role ?? null,
           company_name: u.client?.company_name ?? null,
           is_active: u.is_active,
           force_password_change: u.force_password_change,
-          can_edit:
-            authUser?.global_role === 'root' &&
-            u.global_role !== 'root',
         })
       );
 
@@ -73,7 +67,7 @@ export function useAdminUsers() {
     } finally {
       setLoading(false);
     }
-  }, [token, authUser]);
+  }, [token]);
 
   useEffect(() => {
     fetchUsers();
