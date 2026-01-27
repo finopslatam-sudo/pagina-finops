@@ -7,7 +7,7 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
 
 /* ============================
-   TYPES
+   TYPES (UI MODEL)
 ============================ */
 
 export interface AdminUser {
@@ -16,7 +16,8 @@ export interface AdminUser {
   role: string | null;
   company_name: string | null;
   is_active: boolean;
-  force_password_change?: boolean;
+  global_role?: string | null;
+  client_role?: string | null;
 }
 
 /* ============================
@@ -37,33 +38,55 @@ export function useAdminUsers() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/admin/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${API_URL}/api/admin/users`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
-        throw new Error(`Error ${res.status}`);
+        throw new Error(
+          `Error ${res.status}`
+        );
       }
 
       const json = await res.json();
 
-      const normalized: AdminUser[] = (json.users ?? []).map(
-        (u: any) => ({
-          id: u.id,
-          email: u.email,
-          role: u.global_role ?? u.client_role ?? null,
-          company_name: u.client?.company_name ?? null,
-          is_active: u.is_active,
-          force_password_change: u.force_password_change,
-        })
-      );
+      /**
+       * 🔥 MAPPER ENTERPRISE
+       * Backend → UI Model
+       */
+      const mapped: AdminUser[] =
+        (json.users ?? []).map((u: any) => {
+          const role =
+            u.global_role ??
+            u.client_role ??
+            null;
 
-      setUsers(normalized);
+          return {
+            id: u.id,
+            email: u.email,
+            role,
+            company_name:
+              u.client?.company_name ?? null,
+            is_active: u.is_active,
+            global_role: u.global_role,
+            client_role: u.client_role,
+          };
+        });
+
+      setUsers(mapped);
     } catch (err) {
-      console.error('[useAdminUsers]', err);
-      setError('No se pudieron cargar los usuarios');
+      console.error(
+        '[useAdminUsers]',
+        err
+      );
+      setError(
+        'No se pudieron cargar los usuarios'
+      );
     } finally {
       setLoading(false);
     }
