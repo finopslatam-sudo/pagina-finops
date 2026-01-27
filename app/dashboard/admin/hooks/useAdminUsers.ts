@@ -7,16 +7,18 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
 
 /* ============================
-   TYPES (ALINEADOS A BD)
+   TYPES (ALINEADO A BD)
 ============================ */
 
 export interface AdminUser {
   id: number;
   email: string;
-  type: 'global' | 'client';
   global_role: 'root' | 'admin' | 'support' | null;
-  client_role: 'owner' | 'viewer' | null;
-  company_name: string | null;
+  client_role: 'owner' | 'finops_admin' | 'viewer' | null;
+  client: {
+    id: number;
+    company_name: string;
+  } | null;
   is_active: boolean;
   force_password_change: boolean;
 }
@@ -36,6 +38,8 @@ export function useAdminUsers() {
     if (!token) return;
 
     setLoading(true);
+    setError(null);
+
     try {
       const res = await fetch(`${API_URL}/api/admin/users`, {
         headers: {
@@ -43,11 +47,15 @@ export function useAdminUsers() {
         },
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
 
       const json = await res.json();
-      setUsers(json.users); // ← backend real
-    } catch {
+
+      setUsers(json.users ?? []);
+    } catch (err) {
+      console.error('[useAdminUsers]', err);
       setError('No se pudieron cargar los usuarios');
     } finally {
       setLoading(false);
@@ -59,19 +67,19 @@ export function useAdminUsers() {
   }, [fetchUsers]);
 
   const updateUser = async (
-    user: AdminUser,
-    payload: {
-      email?: string;
-      is_active?: boolean;
-      global_role?: AdminUser['global_role'];
-      client_role?: AdminUser['client_role'];
-      force_password_change?: boolean;
-    }
+    userId: number,
+    payload: Partial<{
+      email: string;
+      global_role: 'admin' | 'support' | null;
+      client_role: 'owner' | 'finops_admin' | 'viewer' | null;
+      is_active: boolean;
+      force_password_change: boolean;
+    }>
   ) => {
     if (!token) return;
 
     const res = await fetch(
-      `${API_URL}/api/admin/users/${user.id}`,
+      `${API_URL}/api/admin/users/${userId}`,
       {
         method: 'PATCH',
         headers: {
@@ -93,6 +101,7 @@ export function useAdminUsers() {
     users,
     loading,
     error,
+    refetch: fetchUsers,
     updateUser,
   };
 }
