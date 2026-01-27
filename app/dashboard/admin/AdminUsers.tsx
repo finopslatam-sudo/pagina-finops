@@ -71,7 +71,7 @@ export default function AdminUsers() {
       </div>
 
       {/* ============================
-          CLIENTES (COLAPSABLES)
+          CLIENTES (CON METADATA)
       ============================ */}
       <div>
         <h2 className="text-xl font-semibold mb-4">
@@ -81,6 +81,20 @@ export default function AdminUsers() {
         {[...usersByClient.entries()].map(
           ([company, clientUsers]) => {
             const isOpen = openClients[company];
+
+            const total = clientUsers.length;
+            const owners = clientUsers.filter(
+              (u) => u.client_role === 'owner'
+            ).length;
+            const finops = clientUsers.filter(
+              (u) => u.client_role === 'finops_admin'
+            ).length;
+            const viewers = clientUsers.filter(
+              (u) => u.client_role === 'viewer'
+            ).length;
+            const inactive = clientUsers.filter(
+              (u) => !u.is_active
+            ).length;
 
             return (
               <div
@@ -92,11 +106,24 @@ export default function AdminUsers() {
                   onClick={() => toggleClient(company)}
                   className="w-full flex justify-between items-center px-4 py-3 bg-gray-50 hover:bg-gray-100"
                 >
-                  <span className="font-medium">
-                    {company}
-                  </span>
+                  <div>
+                    <div className="font-medium">
+                      {company}
+                    </div>
+                    <div className="text-xs text-gray-600 flex gap-3 mt-1">
+                      <span>👥 {total} usuarios</span>
+                      <span>🧑‍💼 {owners} owner</span>
+                      <span>🧠 {finops} finops</span>
+                      <span>👀 {viewers} viewer</span>
+                      {inactive > 0 && (
+                        <span className="text-red-600">
+                          🔴 {inactive} inactivos
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
                   <span className="text-sm text-gray-600">
-                    {clientUsers.length} usuarios{' '}
                     {isOpen ? '▾' : '▸'}
                   </span>
                 </button>
