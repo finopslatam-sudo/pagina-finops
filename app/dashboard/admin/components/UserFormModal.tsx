@@ -16,28 +16,32 @@ export default function UserFormModal({
 }: Props) {
   const { updateUser } = useAdminUsers();
 
-  const [role, setRole] = useState(user.role);
+  const [email, setEmail] = useState(user.email);
   const [isActive, setIsActive] = useState(user.is_active);
+  const [forceChange, setForceChange] =
+    useState(user.force_password_change);
+
+  const [globalRole, setGlobalRole] =
+    useState(user.global_role);
+
+  const [clientRole, setClientRole] =
+    useState(user.client_role);
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async () => {
     setLoading(true);
-    setError(null);
 
-    try {
-      // 🔥 CAMBIO CLAVE: pasamos el user completo
-      await updateUser(user, {
-        role,
-        is_active: isActive,
-      });
+    await updateUser(user, {
+      email,
+      is_active: isActive,
+      force_password_change: forceChange,
+      ...(user.type === 'global'
+        ? { global_role: globalRole }
+        : { client_role: clientRole }),
+    });
 
-      onSaved();
-    } catch (e) {
-      setError('No se pudo guardar el usuario');
-    } finally {
-      setLoading(false);
-    }
+    onSaved();
   };
 
   return (
@@ -47,68 +51,85 @@ export default function UserFormModal({
           Editar usuario
         </h3>
 
+        {/* EMAIL */}
         <div>
-          <label className="block text-sm font-medium">
-            Email
-          </label>
+          <label className="text-sm">Email</label>
           <input
-            disabled
-            value={user.email}
-            className="mt-1 w-full border rounded px-3 py-2 bg-gray-100"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border rounded px-3 py-2"
           />
         </div>
 
+        {/* ROLE */}
         <div>
-          <label className="block text-sm font-medium">
-            Rol
+          <label className="text-sm">Rol</label>
+
+          {user.type === 'global' ? (
+            <select
+              value={globalRole ?? ''}
+              onChange={(e) =>
+                setGlobalRole(
+                  e.target.value as AdminUser['global_role']
+                )
+              }
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="root">root</option>
+              <option value="admin">admin</option>
+              <option value="support">support</option>
+            </select>
+          ) : (
+            <select
+              value={clientRole ?? ''}
+              onChange={(e) =>
+                setClientRole(
+                  e.target.value as AdminUser['client_role']
+                )
+              }
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="owner">owner</option>
+              <option value="viewer">viewer</option>
+            </select>
+          )}
+        </div>
+
+        {/* FLAGS */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+            />
+            Usuario activo
           </label>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="mt-1 w-full border rounded px-3 py-2"
-          >
-            {user.type === 'global' ? (
-              <>
-                <option value="root">root</option>
-                <option value="support">support</option>
-                <option value="admin">admin</option>
-              </>
-            ) : (
-              <>
-                <option value="owner">owner</option>
-                <option value="finops_admin">
-                  finops_admin
-                </option>
-                <option value="viewer">viewer</option>
-              </>
-            )}
-          </select>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={forceChange}
+              onChange={(e) =>
+                setForceChange(e.target.checked)
+              }
+            />
+            Forzar cambio de contraseña
+          </label>
         </div>
 
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
-          />
-          <span className="text-sm">Activo</span>
-        </div>
-
-        {error && (
-          <p className="text-sm text-red-600">{error}</p>
-        )}
-
+        {/* ACTIONS */}
         <div className="flex justify-end gap-2 pt-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm border rounded"
+            className="border px-4 py-2 rounded"
           >
             Cancelar
           </button>
           <button
-            onClick={handleSave}
             disabled={loading}
-            className="px-4 py-2 text-sm bg-blue-600 text-white rounded"
+            onClick={handleSave}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             Guardar
           </button>

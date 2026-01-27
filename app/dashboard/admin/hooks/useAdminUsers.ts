@@ -7,18 +7,18 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'https://api.finopslatam.com';
 
 /* ============================
-   TYPES
+   TYPES (ALINEADOS A BD)
 ============================ */
 
 export interface AdminUser {
   id: number;
   email: string;
   type: 'global' | 'client';
-  role: string;
+  global_role: 'root' | 'admin' | 'support' | null;
+  client_role: 'owner' | 'viewer' | null;
   company_name: string | null;
   is_active: boolean;
-  force_password_change?: boolean;
-  can_edit: boolean;
+  force_password_change: boolean;
 }
 
 /* ============================
@@ -29,19 +29,13 @@ export function useAdminUsers() {
   const { token } = useAuth();
 
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  /* ============================
-     FETCH USERS
-  ============================ */
 
   const fetchUsers = useCallback(async () => {
     if (!token) return;
 
     setLoading(true);
-    setError(null);
-
     try {
       const res = await fetch(`${API_URL}/api/admin/users`, {
         headers: {
@@ -49,14 +43,11 @@ export function useAdminUsers() {
         },
       });
 
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}`);
-      }
+      if (!res.ok) throw new Error();
 
       const json = await res.json();
-      setUsers(json.data ?? []);
-    } catch (err) {
-      console.error('[useAdminUsers]', err);
+      setUsers(json.users); // ← backend real
+    } catch {
       setError('No se pudieron cargar los usuarios');
     } finally {
       setLoading(false);
@@ -67,29 +58,17 @@ export function useAdminUsers() {
     fetchUsers();
   }, [fetchUsers]);
 
-  /* ============================
-     UPDATE USER
-  ============================ */
-
   const updateUser = async (
     user: AdminUser,
     payload: {
-      role: string;
-      is_active: boolean;
+      email?: string;
+      is_active?: boolean;
+      global_role?: AdminUser['global_role'];
+      client_role?: AdminUser['client_role'];
+      force_password_change?: boolean;
     }
   ) => {
     if (!token) return;
-
-    const body: Record<string, any> = {
-      is_active: payload.is_active,
-    };
-
-    // 🔥 Normalización enterprise
-    if (user.type === 'global') {
-      body.global_role = payload.role;
-    } else {
-      body.client_role = payload.role;
-    }
 
     const res = await fetch(
       `${API_URL}/api/admin/users/${user.id}`,
@@ -99,7 +78,7 @@ export function useAdminUsers() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       }
     );
 
@@ -114,7 +93,6 @@ export function useAdminUsers() {
     users,
     loading,
     error,
-    refetch: fetchUsers,
     updateUser,
   };
 }
