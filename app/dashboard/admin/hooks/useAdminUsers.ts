@@ -32,6 +32,10 @@ export function useAdminUsers() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  /* ============================
+     FETCH USERS
+  ============================ */
+
   const fetchUsers = useCallback(async () => {
     if (!token) return;
 
@@ -50,7 +54,6 @@ export function useAdminUsers() {
       }
 
       const json = await res.json();
-
       setUsers(json.data ?? []);
     } catch (err) {
       console.error('[useAdminUsers]', err);
@@ -64,10 +67,54 @@ export function useAdminUsers() {
     fetchUsers();
   }, [fetchUsers]);
 
+  /* ============================
+     UPDATE USER
+  ============================ */
+
+  const updateUser = async (
+    user: AdminUser,
+    payload: {
+      role: string;
+      is_active: boolean;
+    }
+  ) => {
+    if (!token) return;
+
+    const body: Record<string, any> = {
+      is_active: payload.is_active,
+    };
+
+    // 🔥 Normalización enterprise
+    if (user.type === 'global') {
+      body.global_role = payload.role;
+    } else {
+      body.client_role = payload.role;
+    }
+
+    const res = await fetch(
+      `${API_URL}/api/admin/users/${user.id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error('Error actualizando usuario');
+    }
+
+    await fetchUsers();
+  };
+
   return {
     users,
     loading,
     error,
     refetch: fetchUsers,
+    updateUser,
   };
 }

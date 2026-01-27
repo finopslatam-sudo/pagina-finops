@@ -1,178 +1,118 @@
 'use client';
 
-/* =====================================================
-   USER FORM MODAL
-===================================================== */
-
 import { useState } from 'react';
-
-/* =====================================================
-   TYPES
-===================================================== */
-
-export type CreateUserPayload = {
-  email: string;
-  client_id: number;
-  client_role: 'owner' | 'finops_admin' | 'viewer';
-};
-
-export interface ClientOption {
-  id: number;
-  company_name: string;
-}
+import { AdminUser, useAdminUsers } from '../hooks/useAdminUsers';
 
 interface Props {
-  clients: ClientOption[];
+  user: AdminUser;
   onClose: () => void;
-  onCreate: (payload: CreateUserPayload) => Promise<void>;
+  onSaved: () => void;
 }
 
-/* =====================================================
-   COMPONENT
-===================================================== */
-
 export default function UserFormModal({
-  clients,
+  user,
   onClose,
-  onCreate,
+  onSaved,
 }: Props) {
-  /* =========================
-     STATE
-  ========================== */
+  const { updateUser } = useAdminUsers();
 
-  const [email, setEmail] = useState('');
-  const [clientId, setClientId] = useState<number | null>(null);
-  const [clientRole, setClientRole] =
-    useState<'owner' | 'finops_admin' | 'viewer'>('viewer');
-
+  const [role, setRole] = useState(user.role);
+  const [isActive, setIsActive] = useState(user.is_active);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /* =========================
-     SUBMIT
-  ========================== */
-
-  const submit = async () => {
-    if (!email) {
-      setError('Email es obligatorio');
-      return;
-    }
-
-    if (!clientId) {
-      setError('Debes seleccionar un cliente');
-      return;
-    }
-
+  const handleSave = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      await onCreate({
-        email,
-        client_id: clientId,
-        client_role: clientRole,
+      // 🔥 CAMBIO CLAVE: pasamos el user completo
+      await updateUser(user, {
+        role,
+        is_active: isActive,
       });
 
-      onClose();
-    } catch (err: any) {
-      setError(err?.message || 'Error al crear usuario');
+      onSaved();
+    } catch (e) {
+      setError('No se pudo guardar el usuario');
     } finally {
       setLoading(false);
     }
   };
 
-  /* =========================
-     RENDER
-  ========================== */
-
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg w-full max-w-md p-6 space-y-4">
+        <h3 className="text-lg font-semibold">
+          Editar usuario
+        </h3>
 
-        <h2 className="text-lg font-semibold mb-4">
-          Crear usuario
-        </h2>
-
-        {error && (
-          <p className="text-sm text-red-600 mb-3">
-            {error}
-          </p>
-        )}
-
-        {/* EMAIL */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Email *
+        <div>
+          <label className="block text-sm font-medium">
+            Email
           </label>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg"
-            placeholder="usuario@empresa.cl"
+            disabled
+            value={user.email}
+            className="mt-1 w-full border rounded px-3 py-2 bg-gray-100"
           />
         </div>
 
-        {/* CLIENT */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Cliente *
+        <div>
+          <label className="block text-sm font-medium">
+            Rol
           </label>
           <select
-            value={clientId ?? ''}
-            onChange={(e) =>
-              setClientId(Number(e.target.value))
-            }
-            className="w-full px-4 py-2 border rounded-lg"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="mt-1 w-full border rounded px-3 py-2"
           >
-            <option value="" disabled>
-              Selecciona un cliente
-            </option>
-
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.company_name}
-              </option>
-            ))}
+            {user.type === 'global' ? (
+              <>
+                <option value="root">root</option>
+                <option value="support">support</option>
+                <option value="admin">admin</option>
+              </>
+            ) : (
+              <>
+                <option value="owner">owner</option>
+                <option value="finops_admin">
+                  finops_admin
+                </option>
+                <option value="viewer">viewer</option>
+              </>
+            )}
           </select>
         </div>
 
-        {/* ROLE */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium mb-1">
-            Rol dentro del cliente
-          </label>
-          <select
-            value={clientRole}
-            onChange={(e) =>
-              setClientRole(e.target.value as any)
-            }
-            className="w-full px-4 py-2 border rounded-lg"
-          >
-            <option value="owner">Owner</option>
-            <option value="finops_admin">FinOps Admin</option>
-            <option value="viewer">Viewer</option>
-          </select>
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.target.checked)}
+          />
+          <span className="text-sm">Activo</span>
         </div>
 
-        {/* ACTIONS */}
-        <div className="flex justify-end gap-2">
+        {error && (
+          <p className="text-sm text-red-600">{error}</p>
+        )}
+
+        <div className="flex justify-end gap-2 pt-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:underline"
+            className="px-4 py-2 text-sm border rounded"
           >
             Cancelar
           </button>
-
           <button
-            onClick={submit}
+            onClick={handleSave}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded"
           >
-            {loading ? 'Creando…' : 'Crear usuario'}
+            Guardar
           </button>
         </div>
-
       </div>
     </div>
   );

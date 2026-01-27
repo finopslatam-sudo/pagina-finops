@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useAdminUsers, AdminUser } from './hooks/useAdminUsers';
 import { UsersTable } from './components/UsersTable';
+import UserFormModal from './components/UserFormModal';
 
 export default function AdminUsers() {
   const { users, loading, error } = useAdminUsers();
@@ -10,7 +11,7 @@ export default function AdminUsers() {
     useState<AdminUser | null>(null);
 
   /* ============================
-     DERIVED DATA (ENTERPRISE)
+     DERIVED DATA
   ============================ */
 
   const systemUsers = useMemo(
@@ -85,12 +86,14 @@ export default function AdminUsers() {
       </div>
 
       {/* ============================
-          MODAL (YA EXISTENTE)
+          MODAL EDICIÓN
       ============================ */}
       {selectedUser && (
-        <div>
-          {/* Aquí conectas UserFormModal / ResetPasswordModal */}
-        </div>
+        <UserFormModal
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+          onSaved={() => setSelectedUser(null)}
+        />
       )}
     </section>
   );
