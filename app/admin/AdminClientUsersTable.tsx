@@ -8,26 +8,14 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
 import EditUserModal from './modals/EditUserModal';
+import { AdminUser } from '@/app/dashboard/admin/hooks/useAdminUsers';
 
 /* =====================================================
    TYPES
 ===================================================== */
 
-interface ClientUser {
-  id: number;
-  email: string;
-  global_role: string | null;
-  client_role: string | null;
-  is_active: boolean;
-  force_password_change?: boolean;
-  client: {
-    id: number;
-    company_name: string;
-  } | null;
-}
-
 interface UsersResponse {
-  users: ClientUser[];
+  data: AdminUser[];
 }
 
 /* =====================================================
@@ -37,11 +25,11 @@ interface UsersResponse {
 export default function AdminClientUsersTable() {
   const { token } = useAuth();
 
-  const [users, setUsers] = useState<ClientUser[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedUser, setSelectedUser] =
-    useState<ClientUser | null>(null);
+    useState<AdminUser | null>(null);
 
   /* =====================================================
      FETCH USERS
@@ -52,13 +40,18 @@ export default function AdminClientUsersTable() {
 
     try {
       setLoading(true);
+
       const res = await apiFetch<UsersResponse>(
-        '/admin/users',
+        '/api/admin/users',
         { token }
       );
 
-      const clientUsers = res.users.filter(
-        (u) => u.client !== null
+      /**
+       * Solo usuarios que pertenecen a un cliente
+       * (client_id !== null)
+       */
+      const clientUsers = res.data.filter(
+        (u) => u.client_id !== null
       );
 
       setUsers(clientUsers);
@@ -88,7 +81,11 @@ export default function AdminClientUsersTable() {
   }
 
   if (users.length === 0) {
-    return <p className="text-gray-400">No hay usuarios de clientes</p>;
+    return (
+      <p className="text-gray-400">
+        No hay usuarios asociados a clientes
+      </p>
+    );
   }
 
   /* =====================================================
@@ -112,13 +109,18 @@ export default function AdminClientUsersTable() {
           <tbody className="divide-y">
             {users.map((user) => (
               <tr key={user.id}>
-                <td className="p-4 font-medium">{user.email}</td>
-                <td className="p-4">
-                  {user.client?.company_name}
+                <td className="p-4 font-medium">
+                  {user.email}
                 </td>
+
+                <td className="p-4">
+                  {user.company_name ?? '—'}
+                </td>
+
                 <td className="p-4">
                   {user.client_role ?? '—'}
                 </td>
+
                 <td className="p-4">
                   {user.is_active ? (
                     <span className="text-green-600 font-medium">
@@ -130,6 +132,7 @@ export default function AdminClientUsersTable() {
                     </span>
                   )}
                 </td>
+
                 <td className="p-4 text-right">
                   <button
                     className="text-blue-600 hover:underline"
