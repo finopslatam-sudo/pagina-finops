@@ -63,7 +63,7 @@ export function useAdminUsers() {
     try {
       const res = await apiFetch<{
         data: RawAdminUser[];
-      }>('/api/admin/users', { token });
+      }>('/admin/users', { token });
 
       const adapted: AdminUser[] = res.data.map(
         (u): AdminUser => ({
