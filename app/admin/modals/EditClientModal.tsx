@@ -1,16 +1,8 @@
 'use client';
 
-/* =====================================================
-   IMPORTS
-===================================================== */
-
 import { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
-
-/* =====================================================
-   TYPES
-===================================================== */
 
 interface Client {
   id: number;
@@ -19,6 +11,8 @@ interface Client {
   contact_name: string | null;
   phone: string | null;
   is_active: boolean | null;
+  created_at?: string | null;
+  plan?: string | null;
 }
 
 interface Props {
@@ -27,19 +21,6 @@ interface Props {
   onSaved: () => void;
 }
 
-/* =====================================================
-   COMPONENT
-===================================================== */
-
-/**
- * EditClientModal
- *
- * Modal para editar una empresa (cliente).
- *
- * - No permite cambiar relaciones
- * - Backend protegido por JWT
- * - UX consistente con AdminPanel
- */
 export default function EditClientModal({
   client,
   onClose,
@@ -57,10 +38,6 @@ export default function EditClientModal({
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-
-  /* =====================================================
-     HANDLERS
-  ===================================================== */
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -81,7 +58,7 @@ export default function EditClientModal({
 
     try {
       await apiFetch(`/api/admin/clients/${client.id}`, {
-        method: 'PUT',
+        method: 'PATCH', // ✅ CORRECTO
         token,
         body: {
           company_name: form.company_name,
@@ -101,17 +78,11 @@ export default function EditClientModal({
     }
   };
 
-  /* =====================================================
-     RENDER
-  ===================================================== */
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white w-full max-w-lg rounded-xl shadow-lg p-6 space-y-6">
 
-        {/* =========================
-           HEADER
-        ========================== */}
+        {/* HEADER */}
         <div>
           <h2 className="text-lg font-semibold">
             Editar empresa
@@ -121,17 +92,28 @@ export default function EditClientModal({
           </p>
         </div>
 
-        {/* =========================
-           FORM
-        ========================== */}
+        {/* INFO NO EDITABLE */}
+        <div className="text-sm text-gray-600 space-y-1">
+          {client.plan && (
+            <p><strong>Plan:</strong> {client.plan}</p>
+          )}
+          {client.created_at && (
+            <p>
+              <strong>Creado:</strong>{' '}
+              {new Date(client.created_at).toLocaleString()}
+            </p>
+          )}
+        </div>
+
+        {/* FORM */}
         <div className="space-y-4">
 
           <input
             name="company_name"
             value={form.company_name}
             onChange={handleChange}
-            placeholder="Nombre de la empresa"
             className="w-full border rounded-lg p-2"
+            placeholder="Nombre de la empresa"
           />
 
           <input
@@ -139,24 +121,24 @@ export default function EditClientModal({
             type="email"
             value={form.email}
             onChange={handleChange}
-            placeholder="Email"
             className="w-full border rounded-lg p-2"
+            placeholder="Email"
           />
 
           <input
             name="contact_name"
             value={form.contact_name}
             onChange={handleChange}
-            placeholder="Nombre de contacto"
             className="w-full border rounded-lg p-2"
+            placeholder="Nombre de contacto"
           />
 
           <input
             name="phone"
             value={form.phone}
             onChange={handleChange}
-            placeholder="Teléfono"
             className="w-full border rounded-lg p-2"
+            placeholder="Teléfono"
           />
 
           <label className="flex items-center gap-2 text-sm">
@@ -171,24 +153,18 @@ export default function EditClientModal({
 
         </div>
 
-        {/* =========================
-           ERROR
-        ========================== */}
         {error && (
           <p className="text-sm text-red-600">
             {error}
           </p>
         )}
 
-        {/* =========================
-           ACTIONS
-        ========================== */}
+        {/* ACTIONS */}
         <div className="flex justify-end gap-3 pt-4 border-t">
-
           <button
             onClick={onClose}
             disabled={saving}
-            className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50"
+            className="px-4 py-2 text-sm border rounded-lg"
           >
             Cancelar
           </button>
@@ -196,11 +172,10 @@ export default function EditClientModal({
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+            className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white"
           >
             {saving ? 'Guardando…' : 'Guardar cambios'}
           </button>
-
         </div>
       </div>
     </div>
