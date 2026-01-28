@@ -65,32 +65,30 @@ export function useAdminUsers() {
         data: RawAdminUser[];
       }>('/admin/users', { token });
 
-      const adapted: AdminUser[] = res.data.map(
-        (u): AdminUser => ({
-          id: u.id,
-          email: u.email,
+      const adapted: AdminUser[] = res.data.map((u) => ({
+        id: u.id,
+        email: u.email,
 
-          global_role:
-            u.type === 'global'
-              ? (u.role as AdminUser['global_role'])
-              : null,
+        global_role:
+          u.type === 'global'
+            ? (u.role as AdminUser['global_role'])
+            : null,
 
-          client_role:
-            u.type === 'client'
-              ? (u.role as AdminUser['client_role'])
-              : null,
+        client_role:
+          u.type === 'client'
+            ? (u.role as AdminUser['client_role'])
+            : null,
 
-          client_id: u.client?.id ?? null,
+        client_id: u.client?.id ?? null,
 
-          company_name:
-            u.company_name ??
-            u.client?.company_name ??
-            null,
+        company_name:
+          u.company_name ??
+          u.client?.company_name ??
+          null,
 
-          is_active: u.is_active,
-          force_password_change: u.force_password_change,
-        })
-      );
+        is_active: u.is_active,
+        force_password_change: u.force_password_change,
+      }));
 
       setUsers(adapted);
     } catch (err) {
@@ -107,3 +105,9 @@ export function useAdminUsers() {
   }, [fetchUsers]);
 
   return {
+    users,
+    loading,
+    error,
+    refetch: fetchUsers,
+  };
+}
