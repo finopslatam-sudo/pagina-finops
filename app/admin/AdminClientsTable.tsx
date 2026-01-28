@@ -49,7 +49,7 @@ export default function AdminClientsTable() {
     try {
       setLoading(true);
       const res = await apiFetch<ClientsResponse>(
-        '/api/admin/clients',
+        '/admin/clients',
         { token }
       );
       setClients(res.clients);

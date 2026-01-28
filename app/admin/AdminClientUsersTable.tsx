@@ -53,7 +53,7 @@ export default function AdminClientUsersTable() {
     try {
       setLoading(true);
       const res = await apiFetch<UsersResponse>(
-        '/api/admin/users',
+        '/admin/users',
         { token }
       );
 

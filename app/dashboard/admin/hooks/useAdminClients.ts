@@ -99,7 +99,7 @@ export function useAdminClients() {
     if (!token) return;
 
     try {
-      await apiFetch('/api/admin/clients', {
+      await apiFetch('/admin/clients', {
         method: 'POST',
         token,
         body: payload,

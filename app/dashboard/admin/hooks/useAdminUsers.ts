@@ -6,17 +6,13 @@ import { apiFetch } from '@/app/lib/api';
 
 /* ============================
    RAW BACKEND TYPE
-   (lo que realmente llega)
 ============================ */
 
 interface RawAdminUser {
   id: number;
   email: string;
-
-  global_role?: 'root' | 'admin' | 'support' | null;
-  client_role?: 'owner' | 'finops_admin' | 'viewer' | null;
-
-  client_id?: number | null;
+  role: 'root' | 'admin' | 'support' | 'owner' | 'finops_admin' | 'viewer';
+  type: 'global' | 'client';
 
   client?: {
     id: number;
@@ -25,8 +21,8 @@ interface RawAdminUser {
 
   company_name?: string | null;
 
-  is_active?: boolean;
-  force_password_change?: boolean;
+  is_active: boolean;
+  force_password_change: boolean;
 }
 
 /* ============================
@@ -65,40 +61,34 @@ export function useAdminUsers() {
     setError(null);
 
     try {
-      const data = await apiFetch<any>(
-        '/api/admin/users',
-        { token }
-      );
+      const res = await apiFetch<{
+        data: RawAdminUser[];
+      }>('/api/admin/users', { token });
 
-      /**
-       * 🔥 NORMALIZACIÓN DE CONTRATO
-       */
-      const rawUsers: RawAdminUser[] = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.users)
-        ? data.users
-        : [];
-
-      const adapted: AdminUser[] = rawUsers.map(
-        (u: RawAdminUser) => ({
+      const adapted: AdminUser[] = res.data.map(
+        (u): AdminUser => ({
           id: u.id,
           email: u.email,
 
-          global_role: u.global_role ?? null,
-          client_role: u.client_role ?? null,
+          global_role:
+            u.type === 'global'
+              ? (u.role as AdminUser['global_role'])
+              : null,
 
-          client_id:
-            u.client_id ?? u.client?.id ?? null,
+          client_role:
+            u.type === 'client'
+              ? (u.role as AdminUser['client_role'])
+              : null,
+
+          client_id: u.client?.id ?? null,
 
           company_name:
             u.company_name ??
             u.client?.company_name ??
             null,
 
-          is_active: Boolean(u.is_active),
-          force_password_change: Boolean(
-            u.force_password_change
-          ),
+          is_active: u.is_active,
+          force_password_change: u.force_password_change,
         })
       );
 
@@ -117,9 +107,3 @@ export function useAdminUsers() {
   }, [fetchUsers]);
 
   return {
-    users,
-    loading,
-    error,
-    refetch: fetchUsers,
-  };
-}

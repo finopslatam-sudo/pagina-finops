@@ -1,74 +1,14 @@
 'use client';
 
 /* =====================================================
-   ADMIN USERS TABLE
+   ADMIN USERS TABLE — FINOPSLATAM
+   Usa hook de dominio (useAdminUsers)
 ===================================================== */
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
-import { apiFetch } from '@/app/lib/api';
-
-/* =====================================================
-   TYPES
-===================================================== */
-
-interface AdminUser {
-  id: number;
-  email: string;
-  global_role: 'root' | 'admin' | 'support';
-  is_active: boolean;
-}
-
-interface UsersResponse {
-  users: AdminUser[];
-}
-
-/* =====================================================
-   COMPONENT
-===================================================== */
+import { useAdminUsers } from '@/app/dashboard/admin/hooks/useAdminUsers';
 
 export default function AdminUsersTable() {
-  const { token } = useAuth();
-
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  /* =====================================================
-     FETCH USERS
-  ===================================================== */
-
-  const loadUsers = async () => {
-    if (!token) return;
-
-    try {
-      setLoading(true);
-      const res = await apiFetch<UsersResponse>(
-        '/api/admin/users',
-        { token }
-      );
-
-      const platformUsers = res.users.filter(
-        (u) => u.global_role !== null
-      );
-
-      setUsers(platformUsers);
-      setError('');
-    } catch (err) {
-      console.error('ADMIN USERS ERROR:', err);
-      setError('No se pudieron cargar los usuarios');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadUsers();
-  }, [token]);
-
-  /* =====================================================
-     STATES
-  ===================================================== */
+  const { users, loading, error } = useAdminUsers();
 
   if (loading) {
     return <p className="text-gray-400">Cargando usuarios…</p>;
@@ -78,13 +18,13 @@ export default function AdminUsersTable() {
     return <p className="text-red-500">{error}</p>;
   }
 
-  if (users.length === 0) {
+  const platformUsers = users.filter(
+    (u) => u.global_role !== null
+  );
+
+  if (platformUsers.length === 0) {
     return <p className="text-gray-400">No hay usuarios</p>;
   }
-
-  /* =====================================================
-     RENDER
-  ===================================================== */
 
   return (
     <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
@@ -99,10 +39,14 @@ export default function AdminUsersTable() {
         </thead>
 
         <tbody className="divide-y">
-          {users.map((user) => (
+          {platformUsers.map((user) => (
             <tr key={user.id}>
-              <td className="p-4 font-medium">{user.email}</td>
-              <td className="p-4">{user.global_role}</td>
+              <td className="p-4 font-medium">
+                {user.email}
+              </td>
+              <td className="p-4">
+                {user.global_role}
+              </td>
               <td className="p-4">
                 {user.is_active ? (
                   <span className="text-green-600 font-medium">
