@@ -16,6 +16,8 @@ export default function EditUserModal({
   onClose,
   onSaved,
 }: Props) {
+  console.log('[EditUserModal] user recibido:', user);
+
   const { token } = useAuth();
 
   // ✅ ROBUSTO: distingue usuarios plataforma vs cliente
