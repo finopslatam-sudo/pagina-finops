@@ -41,6 +41,9 @@ export interface AdminUser {
 
   is_active: boolean;
   force_password_change: boolean;
+
+  created_at?: string | null;
+  password_expires_at?: string | null;
 }
 
 /* ============================

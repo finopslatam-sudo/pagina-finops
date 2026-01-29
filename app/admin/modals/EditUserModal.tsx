@@ -26,6 +26,7 @@ export default function EditUserModal({
     global_role: user.global_role,
     client_role: user.client_role,
     is_active: user.is_active,
+    force_password_change: user.force_password_change,
   });
 
   const [saving, setSaving] = useState(false);
@@ -78,6 +79,10 @@ export default function EditUserModal({
 
         <h2 className="text-lg font-semibold">Editar usuario</h2>
 
+        <p className="text-sm text-gray-500">
+          ID #{user.id} · {user.company_name ?? 'Usuario del sistema'}
+        </p>
+
         <input
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -122,6 +127,13 @@ export default function EditUserModal({
           />
           Usuario activo
         </label>
+
+        {user.force_password_change && (
+          <p className="text-sm text-orange-600">
+            ⚠ Este usuario deberá cambiar su contraseña al iniciar sesión
+          </p>
+        )}
+
 
         <button
           onClick={resetPassword}
