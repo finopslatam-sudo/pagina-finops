@@ -16,14 +16,18 @@ export default function EditUserModal({
   onClose,
   onSaved,
 }: Props) {
-  console.log('[EditUserModal] user recibido:', user);
-
   const { token } = useAuth();
 
+  
   // ✅ ROBUSTO: distingue usuarios plataforma vs cliente
   const isGlobalUser =
-    user.global_role === 'root' ||
-    user.global_role === 'support';
+  user.client_id === null &&
+  (user.global_role === 'root' || user.global_role === 'support');
+
+  // 🔍 DEBUG TEMPORAL
+  console.log('[EditUserModal] user =>', user);
+  console.log('[EditUserModal] isGlobalUser =>', isGlobalUser);
+
 
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState('');
