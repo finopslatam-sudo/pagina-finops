@@ -6,11 +6,18 @@ import { apiFetch } from '@/app/lib/api';
 
 /* ============================
    RAW BACKEND TYPE
+   (contrato REAL del backend)
 ============================ */
 
 interface RawAdminUser {
   id: number;
   email: string;
+
+  /**
+   * Backend expone:
+   * - type: global | client
+   * - role: root | support | owner | viewer | finops_admin
+   */
   role: 'root' | 'admin' | 'support' | 'owner' | 'finops_admin' | 'viewer';
   type: 'global' | 'client';
 
@@ -23,13 +30,19 @@ interface RawAdminUser {
 
   is_active: boolean;
   force_password_change: boolean;
+
+  // Estos pueden venir ahora o a futuro
+  created_at?: string | null;
+  password_expires_at?: string | null;
 }
 
 /* ============================
    FRONTEND TYPE
+   (modelo CANÓNICO para UI)
 ============================ */
 
 export interface AdminUser {
+  // === users table ===
   id: number;
   email: string;
 
@@ -37,13 +50,14 @@ export interface AdminUser {
   client_role: 'owner' | 'finops_admin' | 'viewer' | null;
 
   client_id: number | null;
-  company_name: string | null;
 
   is_active: boolean;
+  created_at: string | null;
   force_password_change: boolean;
+  password_expires_at: string | null;
 
-  created_at?: string | null;
-  password_expires_at?: string | null;
+  // === client join (derivado) ===
+  company_name: string | null;
 }
 
 /* ============================
@@ -64,10 +78,15 @@ export function useAdminUsers() {
     setError(null);
 
     try {
-      const res = await apiFetch<{
-        data: RawAdminUser[];
-      }>('/api/admin/users', { token });
+      const res = await apiFetch<{ data: RawAdminUser[] }>(
+        '/api/admin/users',
+        { token }
+      );
 
+      /**
+       * 🔥 NORMALIZACIÓN ÚNICA
+       * Este es el punto crítico del sistema
+       */
       const adapted: AdminUser[] = res.data.map((u) => ({
         id: u.id,
         email: u.email,
@@ -84,13 +103,16 @@ export function useAdminUsers() {
 
         client_id: u.client?.id ?? null,
 
+        is_active: Boolean(u.is_active),
+        force_password_change: Boolean(u.force_password_change),
+
+        created_at: u.created_at ?? null,
+        password_expires_at: u.password_expires_at ?? null,
+
         company_name:
           u.company_name ??
           u.client?.company_name ??
           null,
-
-        is_active: u.is_active,
-        force_password_change: u.force_password_change,
       }));
 
       setUsers(adapted);

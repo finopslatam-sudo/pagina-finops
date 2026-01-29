@@ -20,8 +20,7 @@ export default function EditUserModal({
   const { token } = useAuth();
 
   const isGlobalUser = user.global_role !== null;
-  const isSelf = false;
-
+  
   const [form, setForm] = useState({
     email: user.email,
     global_role: user.global_role,
