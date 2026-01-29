@@ -157,13 +157,13 @@ export default function PerfilPage() {
     setLoadingPassword(true);
 
     try {
-      await apiFetch('/api/auth/change-password', {
+      await apiFetch('/api/me/change-password', {
         method: 'POST',
         token,
         body: {
           current_password: currentPassword,
-          password: form.password,
-          confirm_password: form.confirmPassword,
+          new_password: form.password,
+          
         },
       });
 

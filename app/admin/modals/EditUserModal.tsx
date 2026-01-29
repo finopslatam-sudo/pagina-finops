@@ -20,6 +20,10 @@ export default function EditUserModal({
   const { token } = useAuth();
 
   const isGlobalUser = user.global_role !== null;
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   
   const [form, setForm] = useState({
     email: user.email,
@@ -65,9 +69,12 @@ export default function EditUserModal({
       return;
     }
 
-    await apiFetch(`/api/admin/users/${user.id}/reset-password`, {
+    await apiFetch(`/api/admin/users/${user.id}/set-password`, {
       method: 'POST',
       token,
+      body: {
+        password: newPassword,
+      },
     });
 
     alert('Contraseña reseteada correctamente');
@@ -104,17 +111,26 @@ export default function EditUserModal({
         )}
 
         {!isGlobalUser && (
-          <select
-            value={form.client_role ?? ''}
-            onChange={(e) =>
-              setForm({ ...form, client_role: e.target.value as any })
-            }
-            className="w-full border p-2 rounded"
-          >
-            <option value="owner">Owner</option>
-            <option value="finops_admin">FinOps Admin</option>
-            <option value="viewer">Viewer</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Rol del cliente
+            </label>
+
+            <select
+              value={form.client_role ?? ''}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  client_role: e.target.value as AdminUser['client_role'],
+                })
+              }
+              className="w-full border p-2 rounded"
+            >
+              <option value="owner">Owner</option>
+              <option value="finops_admin">FinOps Admin</option>
+              <option value="viewer">Viewer</option>
+            </select>
+          </div>
         )}
 
         <label className="flex items-center gap-2">
@@ -136,11 +152,73 @@ export default function EditUserModal({
 
 
         <button
-          onClick={resetPassword}
-          className="text-sm text-red-600 underline"
+        onClick={() => setShowPasswordForm(!showPasswordForm)}
+        className="text-sm text-red-600 underline"
         >
-          Resetear contraseña
+        Resetear contraseña
         </button>
+
+        {showPasswordForm && (
+          <div className="space-y-3 border rounded-lg p-4 bg-gray-50">
+            <p className="text-sm font-medium text-gray-700">
+              Nueva contraseña
+            </p>
+
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full border p-2 rounded pr-10"
+                placeholder="Nueva contraseña"
+              />
+            </div>
+
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full border p-2 rounded pr-10"
+                placeholder="Confirmar contraseña"
+              />
+            </div>
+
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+              />
+              Mostrar contraseña
+            </label>
+
+            <button
+              onClick={async () => {
+                if (!newPassword || newPassword !== confirmPassword) {
+                  setError('Las contraseñas no coinciden');
+                  return;
+                }
+
+                await apiFetch(`/api/admin/users/${user.id}/set-password`, {
+                  method: 'POST',
+                  token,
+                  body: {
+                    password: newPassword,
+                  },
+                });
+
+                alert('Contraseña actualizada correctamente');
+                setShowPasswordForm(false);
+                setNewPassword('');
+                setConfirmPassword('');
+              }}
+              className="bg-red-600 text-white px-4 py-2 rounded"
+            >
+              Confirmar reset
+            </button>
+          </div>
+        )}
 
         {error && <p className="text-red-600 text-sm">{error}</p>}
 
