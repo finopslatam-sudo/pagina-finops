@@ -20,6 +20,7 @@ export default function EditUserModal({
   const { token } = useAuth();
 
   const isGlobalUser = user.global_role !== null;
+  const isSelf = false;
 
   const [form, setForm] = useState({
     email: user.email,
@@ -77,7 +78,7 @@ export default function EditUserModal({
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-xl w-full max-w-lg space-y-4">
 
-        <h2 className="text-lg font-semibold">Editar usuario</h2>
+        <h2 className="text-lg font-semibold">Editar usuario (PLATAFORMA)</h2>
 
         <p className="text-sm text-gray-500">
           ID #{user.id} · {user.company_name ?? 'Usuario del sistema'}
