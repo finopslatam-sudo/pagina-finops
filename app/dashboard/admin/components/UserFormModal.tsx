@@ -34,7 +34,7 @@ export default function UserFormModal({
   return (
     <Modal isOpen onClose={onClose}>
       <h2 className="text-xl font-semibold mb-4">
-        Editar usuario
+        Editar usuario de sistema
       </h2>
 
       <div className="space-y-4">

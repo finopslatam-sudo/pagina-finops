@@ -5,7 +5,6 @@ import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
 import { AdminUser } from '@/app/dashboard/admin/hooks/useAdminUsers';
 
-
 interface Props {
   user: AdminUser;
   onClose: () => void;
@@ -19,12 +18,16 @@ export default function EditUserModal({
 }: Props) {
   const { token } = useAuth();
 
-  const isGlobalUser = user.global_role !== null;
+  // ✅ ROBUSTO: distingue usuarios plataforma vs cliente
+  const isGlobalUser =
+    user.global_role === 'root' ||
+    user.global_role === 'support';
+
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [form, setForm] = useState({
     email: user.email,
     global_role: user.global_role,
@@ -62,29 +65,11 @@ export default function EditUserModal({
     }
   };
 
-  const resetPassword = async () => {
-    if (!token) return;
-
-    if (!confirm('¿Resetear contraseña? El usuario deberá cambiarla al iniciar sesión.')) {
-      return;
-    }
-
-    await apiFetch(`/api/admin/users/${user.id}/set-password`, {
-      method: 'POST',
-      token,
-      body: {
-        password: newPassword,
-      },
-    });
-
-    alert('Contraseña reseteada correctamente');
-  };
-
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-xl w-full max-w-lg space-y-4">
 
-        <h2 className="text-lg font-semibold">Editar usuario (PLATAFORMA)</h2>
+        <h2 className="text-lg font-semibold">Editar usuario</h2>
 
         <p className="text-sm text-gray-500">
           ID #{user.id} · {user.company_name ?? 'Usuario del sistema'}
@@ -115,7 +100,6 @@ export default function EditUserModal({
             <label className="block text-sm font-medium mb-1">
               Rol del cliente
             </label>
-
             <select
               value={form.client_role ?? ''}
               onChange={(e) =>
@@ -150,39 +134,30 @@ export default function EditUserModal({
           </p>
         )}
 
-
         <button
-        onClick={() => setShowPasswordForm(!showPasswordForm)}
-        className="text-sm text-red-600 underline"
+          onClick={() => setShowPasswordForm(!showPasswordForm)}
+          className="text-sm text-red-600 underline"
         >
-        Resetear contraseña
+          Resetear contraseña
         </button>
 
         {showPasswordForm && (
           <div className="space-y-3 border rounded-lg p-4 bg-gray-50">
-            <p className="text-sm font-medium text-gray-700">
-              Nueva contraseña
-            </p>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full border p-2 rounded"
+              placeholder="Nueva contraseña"
+            />
 
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full border p-2 rounded pr-10"
-                placeholder="Nueva contraseña"
-              />
-            </div>
-
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full border p-2 rounded pr-10"
-                placeholder="Confirmar contraseña"
-              />
-            </div>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full border p-2 rounded"
+              placeholder="Confirmar contraseña"
+            />
 
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -203,12 +178,10 @@ export default function EditUserModal({
                 await apiFetch(`/api/admin/users/${user.id}/set-password`, {
                   method: 'POST',
                   token,
-                  body: {
-                    password: newPassword,
-                  },
+                  body: { password: newPassword },
                 });
 
-                alert('Contraseña actualizada correctamente');
+                alert('Contraseña reseteada correctamente');
                 setShowPasswordForm(false);
                 setNewPassword('');
                 setConfirmPassword('');
