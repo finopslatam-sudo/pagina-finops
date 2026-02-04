@@ -29,6 +29,8 @@ interface RawAdminUser {
     | 'finops_admin'
     | 'viewer';
 
+  can_edit: boolean;  
+
   client?: {
     id: number;
     company_name: string;
@@ -65,6 +67,8 @@ export interface AdminUser {
 
   is_active: boolean;
   force_password_change: boolean;
+
+  can_edit: boolean;
 
   created_at: string | null;
   password_expires_at: string | null;
@@ -119,6 +123,8 @@ export function useAdminUsers() {
 
         is_active: Boolean(u.is_active),
         force_password_change: Boolean(u.force_password_change),
+
+        can_edit: Boolean(u.can_edit),
 
         created_at: u.created_at ?? null,
         password_expires_at: u.password_expires_at ?? null,
