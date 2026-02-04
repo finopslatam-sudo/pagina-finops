@@ -25,6 +25,7 @@ export default function UserFormModal({
    */
   const isGlobalUser = user.type === 'global';
   const canEdit = user.can_edit === true;
+  const [success, setSuccess] = useState(false);
 
   /* ============================
      FORM STATE
@@ -72,7 +73,12 @@ export default function UserFormModal({
         body,
       });
 
-      onSaved();
+      setSuccess(true);
+
+      setTimeout(() => {
+        onSaved();
+      }, 800);
+
     } catch (err) {
       setError('No se pudo guardar el usuario');
     } finally {
@@ -171,6 +177,11 @@ export default function UserFormModal({
         {error && (
           <p className="text-sm text-red-600">
             {error}
+          </p>
+        )}
+        {success && (
+          <p className="text-sm text-green-600">
+            ✅ Usuario actualizado correctamente
           </p>
         )}
 

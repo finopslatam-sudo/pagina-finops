@@ -6,7 +6,7 @@ import { UsersTable } from './components/UsersTable';
 import UserFormModal from './components/UserFormModal';
 
 export default function AdminUsers() {
-  const { users, loading, error } = useAdminUsers();
+  const { users, loading, error, refetch } = useAdminUsers();
   const [selectedUser, setSelectedUser] =
     useState<AdminUser | null>(null);
 
@@ -111,10 +111,13 @@ export default function AdminUsers() {
       ============================ */}
       {selectedUser && (
         <UserFormModal
-          user={selectedUser}
-          onClose={() => setSelectedUser(null)}
-          onSaved={() => setSelectedUser(null)}
-        />
+        user={selectedUser}
+        onClose={() => setSelectedUser(null)}
+        onSaved={() => {
+          setSelectedUser(null);
+          refetch(); // ✅ vuelve a cargar datos desde backend
+        }}
+      />
       )}
     </section>
   );
