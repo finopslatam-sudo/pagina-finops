@@ -1,85 +1,49 @@
 'use client';
 
 /* =====================================================
-   IMPORTS
+   ADMIN CLIENTS TABLE — FINOPSLATAM
 ===================================================== */
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
-import { apiFetch } from '@/app/lib/api';
-import EditClientModal from './modals/EditClientModal';
-
-/* =====================================================
-   TYPES
-===================================================== */
-
-interface Client {
-  id: number;
-  company_name: string;
-  email: string;
-  contact_name: string | null;
-  phone: string | null;
-  is_active: boolean;
-}
-
-interface ClientsResponse {
-  clients: Client[];
-}
-
-/* =====================================================
-   COMPONENT
-===================================================== */
+import { useState } from 'react';
+import {
+  useAdminClients,
+  AdminClient,
+} from '@/app/dashboard/admin/hooks/useAdminClients';
+import EditClientDrawer from './drawers/EditClientDrawer';
 
 export default function AdminClientsTable() {
-  const { token } = useAuth();
+  const { clients, loading, error, refresh } =
+    useAdminClients();
 
-  const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [selectedClient, setSelectedClient] =
-    useState<Client | null>(null);
-
-  /* =====================================================
-     FETCH CLIENTS
-  ===================================================== */
-
-  const loadClients = async () => {
-    if (!token) return;
-
-    try {
-      setLoading(true);
-      const res = await apiFetch<ClientsResponse>(
-        '/admin/clients',
-        { token }
-      );
-      setClients(res.clients);
-      setError('');
-    } catch (err) {
-      console.error('ADMIN CLIENTS ERROR:', err);
-      setError('No se pudieron cargar las empresas');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadClients();
-  }, [token]);
+    useState<AdminClient | null>(null);
 
   /* =====================================================
      STATES
   ===================================================== */
 
   if (loading) {
-    return <p className="text-gray-400">Cargando empresas…</p>;
+    return (
+      <p className="text-gray-400">
+        Cargando empresas…
+      </p>
+    );
   }
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return (
+      <p className="text-red-500">
+        {error}
+      </p>
+    );
   }
 
-  if (clients.length === 0) {
-    return <p className="text-gray-400">No hay empresas registradas</p>;
+  if (!clients.length) {
+    return (
+      <p className="text-gray-400">
+        No hay empresas registradas
+      </p>
+    );
   }
 
   /* =====================================================
@@ -96,7 +60,9 @@ export default function AdminClientsTable() {
               <th className="p-4">Email</th>
               <th className="p-4">Contacto</th>
               <th className="p-4">Estado</th>
-              <th className="p-4 text-right">Acciones</th>
+              <th className="p-4 text-right">
+                Acciones
+              </th>
             </tr>
           </thead>
 
@@ -106,8 +72,15 @@ export default function AdminClientsTable() {
                 <td className="p-4 font-medium">
                   {client.company_name}
                 </td>
-                <td className="p-4">{client.email}</td>
-                <td className="p-4">{client.contact_name ?? '—'}</td>
+
+                <td className="p-4">
+                  {client.email}
+                </td>
+
+                <td className="p-4">
+                  {client.contact_name ?? '—'}
+                </td>
+
                 <td className="p-4">
                   {client.is_active ? (
                     <span className="text-green-600 font-medium">
@@ -119,10 +92,13 @@ export default function AdminClientsTable() {
                     </span>
                   )}
                 </td>
+
                 <td className="p-4 text-right">
                   <button
                     className="text-blue-600 hover:underline"
-                    onClick={() => setSelectedClient(client)}
+                    onClick={() =>
+                      setSelectedClient(client)
+                    }
                   >
                     Editar
                   </button>
@@ -133,13 +109,17 @@ export default function AdminClientsTable() {
         </table>
       </div>
 
+      {/* =====================================================
+         DRAWER
+      ===================================================== */}
+
       {selectedClient && (
-        <EditClientModal
+        <EditClientDrawer
           client={selectedClient}
           onClose={() => setSelectedClient(null)}
           onSaved={() => {
             setSelectedClient(null);
-            loadClients();
+            refresh();
           }}
         />
       )}
