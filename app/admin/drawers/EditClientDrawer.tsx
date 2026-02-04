@@ -1,21 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
-import { apiFetch } from '@/app/lib/api';
+/* =====================================================
+   EDIT CLIENT DRAWER — FINOPSLATAM
+   UX enterprise para edición de clientes
+===================================================== */
 
-interface Client {
-  id: number;
-  company_name: string;
-  email: string;
-  contact_name: string | null;
-  phone: string | null;
-  is_active: boolean;
-  created_at: string;
-}
+import { useEffect, useState } from 'react';
+import { AdminClient, useAdminClients } from '@/app/dashboard/admin/hooks/useAdminClients';
 
 interface Props {
-  client: Client;
+  client: AdminClient;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -25,55 +19,59 @@ export default function EditClientDrawer({
   onClose,
   onSaved,
 }: Props) {
-  const { token } = useAuth();
+  const { updateClient } = useAdminClients();
 
-  /* ============================
+  /* =====================================================
      FORM STATE
-  ============================ */
+  ===================================================== */
 
-  const [companyName, setCompanyName] = useState(
-    client.company_name
-  );
+  const [companyName, setCompanyName] = useState(client.company_name);
   const [email, setEmail] = useState(client.email);
-  const [contactName, setContactName] = useState(
-    client.contact_name ?? ''
-  );
+  const [contactName, setContactName] = useState(client.contact_name ?? '');
   const [phone, setPhone] = useState(client.phone ?? '');
-  const [isActive, setIsActive] = useState(
-    client.is_active
-  );
+  const [isActive, setIsActive] = useState(client.is_active);
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(
-    null
-  );
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [confirmDeactivate, setConfirmDeactivate] = useState(false);
 
-  /* ============================
-     SAVE
-  ============================ */
+  /* =====================================================
+     HELPERS
+  ===================================================== */
+
+  const hasChanges =
+    companyName !== client.company_name ||
+    email !== client.email ||
+    contactName !== (client.contact_name ?? '') ||
+    phone !== (client.phone ?? '') ||
+    isActive !== client.is_active;
+
+  const isValidEmail = email.includes('@');
+
+  /* =====================================================
+     SAVE HANDLER
+  ===================================================== */
 
   const handleSave = async () => {
-    if (!token) return;
+    if (!hasChanges || !isValidEmail) return;
+
+    if (client.is_active && !isActive && !confirmDeactivate) {
+      setConfirmDeactivate(true);
+      return;
+    }
 
     setSaving(true);
     setError(null);
 
     try {
-      await apiFetch(
-        `/api/admin/clients/${client.id}`,
-        {
-          method: 'PATCH',
-          token,
-          body: {
-            company_name: companyName,
-            email,
-            contact_name: contactName || null,
-            phone: phone || null,
-            is_active: isActive,
-          },
-        }
-      );
+      await updateClient(client.id, {
+        company_name: companyName.trim(),
+        email: email.trim(),
+        contact_name: contactName || null,
+        phone: phone || null,
+        is_active: isActive,
+      });
 
       setSuccess(true);
 
@@ -81,57 +79,57 @@ export default function EditClientDrawer({
         onSaved();
       }, 800);
     } catch (err) {
-      setError(
-        'No se pudieron guardar los cambios'
-      );
+      console.error(err);
+      setError('No se pudieron guardar los cambios');
     } finally {
       setSaving(false);
     }
   };
 
-  /* ============================
+  /* =====================================================
+     RESET CONFIRMATION IF RE-ACTIVATED
+  ===================================================== */
+
+  useEffect(() => {
+    if (isActive) {
+      setConfirmDeactivate(false);
+    }
+  }, [isActive]);
+
+  /* =====================================================
      UI
-  ============================ */
+  ===================================================== */
 
   return (
-    <div className="fixed inset-0 z-50 flex">
-      {/* OVERLAY */}
-      <div
-        className="flex-1 bg-black/40"
-        onClick={onClose}
-      />
-
-      {/* DRAWER */}
-      <div className="w-full max-w-md bg-white shadow-xl p-6 overflow-y-auto">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h2 className="text-xl font-semibold">
-              Editar cliente
-            </h2>
-            <p className="text-sm text-gray-500">
-              {client.company_name}
-            </p>
-          </div>
-
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
+      <div className="w-full max-w-xl h-full bg-white shadow-xl p-6 overflow-y-auto">
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold">
+            Editar cliente
+          </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-500 hover:text-gray-700"
           >
             ✕
           </button>
         </div>
 
-        <div className="space-y-5">
-          {/* EMPRESA */}
+        {/* INFO */}
+        <p className="text-sm text-gray-500 mb-6">
+          ID #{client.id} · Creado automáticamente (no editable)
+        </p>
+
+        <div className="space-y-4">
+          {/* COMPANY NAME */}
           <div>
             <label className="block text-sm font-medium">
-              Nombre de la empresa
+              Empresa
             </label>
             <input
               value={companyName}
-              onChange={(e) =>
-                setCompanyName(e.target.value)
-              }
+              onChange={(e) => setCompanyName(e.target.value)}
               className="w-full border rounded px-3 py-2"
             />
           </div>
@@ -139,27 +137,28 @@ export default function EditClientDrawer({
           {/* EMAIL */}
           <div>
             <label className="block text-sm font-medium">
-              Email de contacto
+              Email
             </label>
             <input
               value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full border rounded px-3 py-2"
             />
+            {!isValidEmail && (
+              <p className="text-xs text-red-600">
+                Email inválido
+              </p>
+            )}
           </div>
 
           {/* CONTACT NAME */}
           <div>
             <label className="block text-sm font-medium">
-              Nombre de contacto
+              Contacto
             </label>
             <input
               value={contactName}
-              onChange={(e) =>
-                setContactName(e.target.value)
-              }
+              onChange={(e) => setContactName(e.target.value)}
               className="w-full border rounded px-3 py-2"
             />
           </div>
@@ -171,9 +170,7 @@ export default function EditClientDrawer({
             </label>
             <input
               value={phone}
-              onChange={(e) =>
-                setPhone(e.target.value)
-              }
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full border rounded px-3 py-2"
             />
           </div>
@@ -183,20 +180,32 @@ export default function EditClientDrawer({
             <input
               type="checkbox"
               checked={isActive}
-              onChange={(e) =>
-                setIsActive(e.target.checked)
-              }
+              onChange={(e) => setIsActive(e.target.checked)}
             />
             <span>Cliente activo</span>
           </div>
 
-          {/* METADATA */}
-          <div className="pt-3 border-t text-sm text-gray-500">
-            Creado el:{' '}
-            {new Date(
-              client.created_at
-            ).toLocaleString()}
-          </div>
+          {/* CONFIRM DEACTIVATE */}
+          {confirmDeactivate && (
+            <div className="border border-yellow-300 bg-yellow-50 p-3 rounded text-sm">
+              ⚠️ Estás por desactivar este cliente.  
+              Esto afectará a **todos sus usuarios**.
+              <div className="mt-2">
+                <button
+                  onClick={handleSave}
+                  className="text-red-600 underline mr-4"
+                >
+                  Confirmar desactivación
+                </button>
+                <button
+                  onClick={() => setIsActive(true)}
+                  className="text-gray-600 underline"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* FEEDBACK */}
           {error && (
@@ -204,7 +213,6 @@ export default function EditClientDrawer({
               {error}
             </p>
           )}
-
           {success && (
             <p className="text-sm text-green-600">
               ✅ Cliente actualizado correctamente
@@ -212,17 +220,16 @@ export default function EditClientDrawer({
           )}
 
           {/* ACTIONS */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
+          <div className="flex justify-end gap-3 pt-6 border-t">
             <button
               onClick={onClose}
               className="px-4 py-2 border rounded"
             >
               Cancelar
             </button>
-
             <button
               onClick={handleSave}
-              disabled={saving}
+              disabled={!hasChanges || !isValidEmail || saving}
               className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
             >
               Guardar cambios
