@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
 
-/* ============================
+/* =====================================================
    RAW BACKEND TYPE
-   (contrato REAL del backend)
-============================ */
+   (CONTRATO REAL DEL BACKEND)
+===================================================== */
 
 interface RawAdminUser {
   id: number;
@@ -16,10 +16,18 @@ interface RawAdminUser {
   /**
    * Backend expone:
    * - type: global | client
-   * - role: root | support | owner | viewer | finops_admin
+   * - role:
+   *   - global  → root | admin | support
+   *   - client  → owner | finops_admin | viewer
    */
-  role: 'root' | 'admin' | 'support' | 'owner' | 'finops_admin' | 'viewer';
   type: 'global' | 'client';
+  role:
+    | 'root'
+    | 'admin'
+    | 'support'
+    | 'owner'
+    | 'finops_admin'
+    | 'viewer';
 
   client?: {
     id: number;
@@ -31,20 +39,24 @@ interface RawAdminUser {
   is_active: boolean;
   force_password_change: boolean;
 
-  // Estos pueden venir ahora o a futuro
   created_at?: string | null;
   password_expires_at?: string | null;
 }
 
-/* ============================
+/* =====================================================
    FRONTEND TYPE
-   (modelo CANÓNICO para UI)
-============================ */
+   (MODELO CANÓNICO PARA LA UI)
+===================================================== */
 
 export interface AdminUser {
-  // === users table ===
   id: number;
   email: string;
+
+  /**
+   * 🔑 SOURCE OF TRUTH
+   * Este campo define el comportamiento del UI
+   */
+  type: 'global' | 'client';
 
   global_role: 'root' | 'admin' | 'support' | null;
   client_role: 'owner' | 'finops_admin' | 'viewer' | null;
@@ -52,17 +64,17 @@ export interface AdminUser {
   client_id: number | null;
 
   is_active: boolean;
-  created_at: string | null;
   force_password_change: boolean;
+
+  created_at: string | null;
   password_expires_at: string | null;
 
-  // === client join (derivado) ===
   company_name: string | null;
 }
 
-/* ============================
+/* =====================================================
    HOOK
-============================ */
+===================================================== */
 
 export function useAdminUsers() {
   const { token } = useAuth();
@@ -85,11 +97,13 @@ export function useAdminUsers() {
 
       /**
        * 🔥 NORMALIZACIÓN ÚNICA
-       * Este es el punto crítico del sistema
+       * Backend → Modelo canónico UI
        */
       const adapted: AdminUser[] = res.data.map((u) => ({
         id: u.id,
         email: u.email,
+
+        type: u.type, // ✅ CLAVE PARA TODO EL SISTEMA
 
         global_role:
           u.type === 'global'
