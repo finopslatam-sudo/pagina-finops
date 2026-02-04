@@ -19,11 +19,11 @@ export default function EditUserModal({
   const { token } = useAuth();
 
   /**
-   * 🔑 REGLA DE ORO
-   * El backend define el tipo de usuario con `type`
-   * NO se infiere desde roles
+   * 🔑 SOURCE OF TRUTH
+   * El backend define tipo y permisos
    */
   const isGlobalUser = user.type === 'global';
+  const canEdit = user.can_edit === true;
 
   const [form, setForm] = useState({
     email: user.email,
@@ -35,26 +35,16 @@ export default function EditUserModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-
   const save = async () => {
-    if (!token) return;
+    if (!token || !canEdit) return;
 
     setSaving(true);
     setError('');
 
     try {
-      /**
-       * ✅ PAYLOAD LIMPIO
-       * Nunca enviamos null
-       * Enviamos SOLO lo que el backend espera
-       */
       const body: any = {
         email: form.email,
-        is_active: form.is_active,
+        is_active: form.is_active, // boolean real
       };
 
       if (isGlobalUser) {
@@ -87,13 +77,20 @@ export default function EditUserModal({
           ID #{user.id} · {user.company_name ?? 'Usuario del sistema'}
         </p>
 
+        {!canEdit && (
+          <p className="text-sm text-gray-500">
+            Este usuario no puede ser modificado por tu rol.
+          </p>
+        )}
+
         {/* EMAIL */}
         <input
+          disabled={!canEdit}
           value={form.email}
           onChange={(e) =>
             setForm({ ...form, email: e.target.value })
           }
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded disabled:bg-gray-100"
           placeholder="Email"
         />
 
@@ -104,6 +101,7 @@ export default function EditUserModal({
               Rol del sistema
             </label>
             <select
+              disabled={!canEdit}
               value={form.global_role ?? ''}
               onChange={(e) =>
                 setForm({
@@ -111,7 +109,7 @@ export default function EditUserModal({
                   global_role: e.target.value as AdminUser['global_role'],
                 })
               }
-              className="w-full border p-2 rounded"
+              className="w-full border p-2 rounded disabled:bg-gray-100"
             >
               <option value="root">Root</option>
               <option value="support">Support</option>
@@ -126,6 +124,7 @@ export default function EditUserModal({
               Rol del cliente
             </label>
             <select
+              disabled={!canEdit}
               value={form.client_role ?? ''}
               onChange={(e) =>
                 setForm({
@@ -133,7 +132,7 @@ export default function EditUserModal({
                   client_role: e.target.value as AdminUser['client_role'],
                 })
               }
-              className="w-full border p-2 rounded"
+              className="w-full border p-2 rounded disabled:bg-gray-100"
             >
               <option value="owner">Owner</option>
               <option value="finops_admin">FinOps Admin</option>
@@ -146,6 +145,7 @@ export default function EditUserModal({
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
+            disabled={!canEdit}
             checked={form.is_active}
             onChange={(e) =>
               setForm({ ...form, is_active: e.target.checked })
@@ -153,76 +153,6 @@ export default function EditUserModal({
           />
           Usuario activo
         </label>
-
-        {/* RESET PASSWORD */}
-        <button
-          onClick={() => setShowPasswordForm(!showPasswordForm)}
-          className="text-sm text-red-600 underline"
-        >
-          Resetear contraseña
-        </button>
-
-        {showPasswordForm && (
-          <div className="space-y-3 border rounded-lg p-4 bg-gray-50">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full border p-2 rounded"
-              placeholder="Nueva contraseña"
-            />
-
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={confirmPassword}
-              onChange={(e) =>
-                setConfirmPassword(e.target.value)
-              }
-              className="w-full border p-2 rounded"
-              placeholder="Confirmar contraseña"
-            />
-
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={showPassword}
-                onChange={() =>
-                  setShowPassword(!showPassword)
-                }
-              />
-              Mostrar contraseña
-            </label>
-
-            <button
-              onClick={async () => {
-                if (
-                  !newPassword ||
-                  newPassword !== confirmPassword
-                ) {
-                  setError('Las contraseñas no coinciden');
-                  return;
-                }
-
-                await apiFetch(
-                  `/api/admin/users/${user.id}/set-password`,
-                  {
-                    method: 'POST',
-                    token,
-                    body: { password: newPassword },
-                  }
-                );
-
-                alert('Contraseña reseteada correctamente');
-                setShowPasswordForm(false);
-                setNewPassword('');
-                setConfirmPassword('');
-              }}
-              className="bg-red-600 text-white px-4 py-2 rounded"
-            >
-              Confirmar reset
-            </button>
-          </div>
-        )}
 
         {error && (
           <p className="text-red-600 text-sm">
@@ -234,8 +164,8 @@ export default function EditUserModal({
           <button onClick={onClose}>Cancelar</button>
           <button
             onClick={save}
-            disabled={saving}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            disabled={saving || !canEdit}
+            className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
           >
             Guardar
           </button>

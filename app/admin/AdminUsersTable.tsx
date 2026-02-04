@@ -1,32 +1,12 @@
 'use client';
 
-import { useAdminUsers } from '@/app/dashboard/admin/hooks/useAdminUsers';
 import { useState } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAdminUsers, AdminUser } from '@/app/dashboard/admin/hooks/useAdminUsers';
 import EditUserModal from './modals/EditUserModal';
-import { AdminUser } from '@/app/dashboard/admin/hooks/useAdminUsers';
 
 export default function AdminUsersTable() {
   const { users, loading, error, refetch } = useAdminUsers();
-  const { user: actor } = useAuth();
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
-
-  const canEditUser = (target: AdminUser) => {
-    if (!actor) return false;
-
-    // Root puede editar todo
-    if (actor.global_role === 'root') return true;
-
-    // Support solo puede editarse a sí mismo
-    if (
-      actor.global_role === 'support' &&
-      target.id === actor.id
-    ) {
-      return true;
-    }
-
-    return false;
-  };
 
   if (loading) {
     return <p className="text-gray-400">Cargando usuarios…</p>;
@@ -79,7 +59,7 @@ export default function AdminUsersTable() {
                 </td>
 
                 <td className="p-4 text-right">
-                  {canEditUser(user) ? (
+                  {user.can_edit ? (
                     <button
                       className="text-blue-600 hover:underline"
                       onClick={() => setSelectedUser(user)}
@@ -102,7 +82,7 @@ export default function AdminUsersTable() {
           onClose={() => setSelectedUser(null)}
           onSaved={() => {
             setSelectedUser(null);
-            refetch(); // 🔄 refresca la tabla
+            refetch(); // 🔄 refresca datos desde backend
           }}
         />
       )}
