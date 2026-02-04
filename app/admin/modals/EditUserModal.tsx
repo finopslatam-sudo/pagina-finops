@@ -18,32 +18,27 @@ export default function EditUserModal({
 }: Props) {
   const { token } = useAuth();
 
-  
-  // ✅ ROBUSTO: distingue usuarios plataforma vs cliente
-  const isGlobalUser =
-  user.client_id === null &&
-  (user.global_role === 'root' || user.global_role === 'support');
-
-  // 🔍 DEBUG TEMPORAL
-  console.log('[EditUserModal] user =>', user);
-  console.log('[EditUserModal] isGlobalUser =>', isGlobalUser);
-
-
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  /**
+   * 🔑 REGLA DE ORO
+   * El backend define el tipo de usuario con `type`
+   * NO se infiere desde roles
+   */
+  const isGlobalUser = user.type === 'global';
 
   const [form, setForm] = useState({
     email: user.email,
     global_role: user.global_role,
     client_role: user.client_role,
     is_active: user.is_active,
-    force_password_change: user.force_password_change,
   });
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const save = async () => {
     if (!token) return;
@@ -52,15 +47,26 @@ export default function EditUserModal({
     setError('');
 
     try {
+      /**
+       * ✅ PAYLOAD LIMPIO
+       * Nunca enviamos null
+       * Enviamos SOLO lo que el backend espera
+       */
+      const body: any = {
+        email: form.email,
+        is_active: form.is_active,
+      };
+
+      if (isGlobalUser) {
+        body.global_role = form.global_role;
+      } else {
+        body.client_role = form.client_role;
+      }
+
       await apiFetch(`/api/admin/users/${user.id}`, {
         method: 'PATCH',
         token,
-        body: {
-          email: form.email,
-          is_active: form.is_active,
-          global_role: isGlobalUser ? form.global_role : null,
-          client_role: !isGlobalUser ? form.client_role : null,
-        },
+        body,
       });
 
       onSaved();
@@ -81,26 +87,39 @@ export default function EditUserModal({
           ID #{user.id} · {user.company_name ?? 'Usuario del sistema'}
         </p>
 
+        {/* EMAIL */}
         <input
           value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          onChange={(e) =>
+            setForm({ ...form, email: e.target.value })
+          }
           className="w-full border p-2 rounded"
           placeholder="Email"
         />
 
+        {/* USUARIO GLOBAL */}
         {isGlobalUser && (
-          <select
-            value={form.global_role ?? ''}
-            onChange={(e) =>
-              setForm({ ...form, global_role: e.target.value as any })
-            }
-            className="w-full border p-2 rounded"
-          >
-            <option value="root">Root</option>
-            <option value="support">Support</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Rol del sistema
+            </label>
+            <select
+              value={form.global_role ?? ''}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  global_role: e.target.value as AdminUser['global_role'],
+                })
+              }
+              className="w-full border p-2 rounded"
+            >
+              <option value="root">Root</option>
+              <option value="support">Support</option>
+            </select>
+          </div>
         )}
 
+        {/* USUARIO CLIENTE */}
         {!isGlobalUser && (
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -123,6 +142,7 @@ export default function EditUserModal({
           </div>
         )}
 
+        {/* ACTIVO */}
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -134,12 +154,7 @@ export default function EditUserModal({
           Usuario activo
         </label>
 
-        {user.force_password_change && (
-          <p className="text-sm text-orange-600">
-            ⚠ Este usuario deberá cambiar su contraseña al iniciar sesión
-          </p>
-        )}
-
+        {/* RESET PASSWORD */}
         <button
           onClick={() => setShowPasswordForm(!showPasswordForm)}
           className="text-sm text-red-600 underline"
@@ -160,7 +175,9 @@ export default function EditUserModal({
             <input
               type={showPassword ? 'text' : 'password'}
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) =>
+                setConfirmPassword(e.target.value)
+              }
               className="w-full border p-2 rounded"
               placeholder="Confirmar contraseña"
             />
@@ -169,23 +186,31 @@ export default function EditUserModal({
               <input
                 type="checkbox"
                 checked={showPassword}
-                onChange={() => setShowPassword(!showPassword)}
+                onChange={() =>
+                  setShowPassword(!showPassword)
+                }
               />
               Mostrar contraseña
             </label>
 
             <button
               onClick={async () => {
-                if (!newPassword || newPassword !== confirmPassword) {
+                if (
+                  !newPassword ||
+                  newPassword !== confirmPassword
+                ) {
                   setError('Las contraseñas no coinciden');
                   return;
                 }
 
-                await apiFetch(`/api/admin/users/${user.id}/set-password`, {
-                  method: 'POST',
-                  token,
-                  body: { password: newPassword },
-                });
+                await apiFetch(
+                  `/api/admin/users/${user.id}/set-password`,
+                  {
+                    method: 'POST',
+                    token,
+                    body: { password: newPassword },
+                  }
+                );
 
                 alert('Contraseña reseteada correctamente');
                 setShowPasswordForm(false);
@@ -199,11 +224,19 @@ export default function EditUserModal({
           </div>
         )}
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {error && (
+          <p className="text-red-600 text-sm">
+            {error}
+          </p>
+        )}
 
         <div className="flex justify-end gap-3 pt-4 border-t">
           <button onClick={onClose}>Cancelar</button>
-          <button onClick={save} disabled={saving}>
+          <button
+            onClick={save}
+            disabled={saving}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
             Guardar
           </button>
         </div>
