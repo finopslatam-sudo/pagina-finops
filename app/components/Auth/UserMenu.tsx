@@ -105,14 +105,25 @@ export default function UserMenu() {
               📊 Mi Dashboard
             </Link>
 
-            {/* ADMIN PANEL — STAFF */}
+            {/* PANEL USUARIOS — STAFF */}
             {isStaff && (
               <Link
-                href="/dashboard/admin"
+                href="/dashboard/users"
                 className="block px-4 py-3 hover:bg-blue-50 border-t"
                 onClick={() => setOpen(false)}
               >
-                🛠️ Panel de Administración
+                👥 Panel de Usuarios
+              </Link>
+            )}
+
+            {/* PANEL CLIENTES — STAFF */}
+            {isStaff && (
+              <Link
+                href="/dashboard/clients"
+                className="block px-4 py-3 hover:bg-blue-50"
+                onClick={() => setOpen(false)}
+              >
+                🏢 Panel de Clientes
               </Link>
             )}
 
