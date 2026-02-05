@@ -4,7 +4,7 @@
    PANEL DE CLIENTES — FINOPSLATAM
 ===================================================== */
 
-import AdminClientsTable from '@/app/admin/AdminClientsTable';
+import ClientsTable from './components/ClientsTable';
 
 export default function ClientsPage() {
   return (
@@ -19,7 +19,7 @@ export default function ClientsPage() {
         </p>
       </header>
 
-      <AdminClientsTable />
+      <ClientsTable />
     </section>
   );
 }

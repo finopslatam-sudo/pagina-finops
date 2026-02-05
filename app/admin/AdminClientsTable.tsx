@@ -8,7 +8,7 @@ import { useState } from 'react';
 import {
   useAdminClients,
   AdminClient,
-} from '@/app/dashboard/admin/hooks/useAdminClients';
+} from '@/app/dashboard/clients/hooks/useAdminClients';
 import EditClientDrawer from './drawers/EditClientDrawer';
 
 export default function AdminClientsTable() {

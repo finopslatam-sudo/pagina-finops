@@ -6,7 +6,7 @@
 ===================================================== */
 
 import { useEffect, useState } from 'react';
-import { AdminClient, useAdminClients } from '@/app/dashboard/admin/hooks/useAdminClients';
+import { AdminClient, useAdminClients } from '@/app/dashboard/clients/hooks/useAdminClients';
 
 interface Props {
   client: AdminClient;
