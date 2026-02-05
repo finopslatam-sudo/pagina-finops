@@ -19,6 +19,7 @@ export default function ClientsPage() {
         </p>
       </header>
 
+      {/* TABLA DE CLIENTES */}
       <ClientsTable />
     </section>
   );
