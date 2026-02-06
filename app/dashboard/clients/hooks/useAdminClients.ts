@@ -57,11 +57,12 @@ export function useAdminClients() {
     setError(null);
 
     try {
-      const data = await apiFetch<{
-        clients: AdminClient[];
+      const res = await apiFetch<{
+        data: AdminClient[];
+        meta: { total: number };
       }>('/api/admin/clients', { token });
-
-      setClients(data.clients);
+      
+      setClients(res.data);
     } catch (err) {
       console.error('[ADMIN_CLIENTS_FETCH]', err);
       setError('No se pudieron cargar los clientes');
