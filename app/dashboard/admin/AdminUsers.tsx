@@ -84,7 +84,7 @@ export default function AdminUsers() {
       ============================ */}
       <div>
         <h2 className="text-xl font-semibold mb-4">
-          Clientes
+          Ususarios de Clientes
         </h2>
 
         {[...usersByClient.entries()].map(
