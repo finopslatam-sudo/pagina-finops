@@ -67,7 +67,7 @@ export default function EditClientModal({
         
         setTimeout(() => {
             onClose();
-        }, 1500); 
+        }, 1000); 
 
     } catch (err: any) {
       setError(
@@ -163,9 +163,9 @@ export default function EditClientModal({
         <div className="flex justify-end gap-2 pt-4">
           <button
             onClick={onClose}
-            className="text-gray-600"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            {success ? 'Cerrar' : 'Cancelar'}
+            {success ? 'Guardando…' : 'Guardar'}
           </button>
 
           {!success && (
