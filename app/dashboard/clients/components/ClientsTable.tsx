@@ -1,7 +1,7 @@
 'use client';
 
 /* =====================================================
-   CLIENTS TABLE — ADMIN (READ ONLY)
+   CLIENTS TABLE — ADMIN
 ===================================================== */
 
 import type { AdminClient } from '../hooks/useAdminClients';
@@ -40,15 +40,15 @@ export default function ClientsTable({
   }
 
   /* =========================
-     SPLIT CLIENTS
+     SPLIT CLIENTS (BACKEND-DRIVEN)
   ========================== */
 
   const systemClients = clients.filter(
-    client => client.plan === null
+    (client) => client.is_system
   );
 
   const businessClients = clients.filter(
-    client => client.plan !== null
+    (client) => !client.is_system
   );
 
   /* =========================
@@ -58,13 +58,13 @@ export default function ClientsTable({
   return (
     <div className="space-y-10">
 
-      {/* ==========================
-          CLIENTES DEL SISTEMA
-      ========================== */}
+      {/* =====================
+         CLIENTES DEL SISTEMA
+      ===================== */}
       <section>
-        <h2 className="text-lg font-semibold mb-3">
+        <h3 className="text-lg font-semibold mb-3">
           Clientes del sistema
-        </h2>
+        </h3>
 
         {systemClients.length === 0 ? (
           <p className="text-sm text-gray-500">
@@ -78,13 +78,13 @@ export default function ClientsTable({
         )}
       </section>
 
-      {/* ==========================
-          CLIENTES COMERCIALES
-      ========================== */}
+      {/* =====================
+         CLIENTES COMERCIALES
+      ===================== */}
       <section>
-        <h2 className="text-lg font-semibold mb-3">
+        <h3 className="text-lg font-semibold mb-3">
           Clientes comerciales
-        </h2>
+        </h3>
 
         {businessClients.length === 0 ? (
           <p className="text-sm text-gray-500">
@@ -130,7 +130,7 @@ function ClientsTableSection({
         </thead>
 
         <tbody className="divide-y">
-          {clients.map(client => (
+          {clients.map((client) => (
             <tr key={client.id}>
               <td className="p-4 font-medium">
                 {client.company_name}

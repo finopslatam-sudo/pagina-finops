@@ -22,6 +22,7 @@ export interface AdminClient {
   is_active: boolean;
   plan: string | null;
   created_at: string;
+  is_system: boolean;
 }
 
 export type CreateClientPayload = {
