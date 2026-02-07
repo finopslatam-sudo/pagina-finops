@@ -64,8 +64,6 @@ export default function EditClientModal({
       });
 
       setSuccess(true);
-      console.log('SUCCESS SET TO TRUE');
-
     } catch (err: any) {
       setError(
         err?.message ||
@@ -89,7 +87,6 @@ export default function EditClientModal({
           Editar cliente
         </h2>
 
-        {/* CREATED AT */}
         <div className="text-sm text-gray-500">
           Creado el{' '}
           {client.created_at
@@ -97,21 +94,18 @@ export default function EditClientModal({
             : '—'}
         </div>
 
-        {/* SUCCESS MESSAGE */}
         {success && (
           <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-2">
             ✅ Cambios aplicados con éxito
           </div>
         )}
 
-        {/* ERROR MESSAGE */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-2">
             {error}
           </div>
         )}
 
-        {/* FORM */}
         <input
           value={companyName}
           onChange={e => setCompanyName(e.target.value)}
@@ -161,23 +155,23 @@ export default function EditClientModal({
           Cliente activo
         </label>
 
-        {/* ACTIONS */}
         <div className="flex justify-end gap-2 pt-4">
-            <button
-                onClick={onClose}
-                className="text-gray-600"
-            >
-                {success ? 'Cerrar' : 'Cancelar'}
-            </button>
+          <button
+            onClick={onClose}
+            className="text-gray-600"
+          >
+            {success ? 'Cerrar' : 'Cancelar'}
+          </button>
 
-            {!success && (
-                <button
-                onClick={submit}
-                disabled={loading}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
-                >
-                {loading ? 'Guardando…' : 'Guardar'}
-                </button>
+          {!success && (
+            <button
+              onClick={submit}
+              disabled={loading}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+            >
+              {loading ? 'Guardando…' : 'Guardar'}
+            </button>
+          )}
         </div>
 
       </div>
