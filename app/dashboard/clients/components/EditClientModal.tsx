@@ -163,21 +163,21 @@ export default function EditClientModal({
 
         {/* ACTIONS */}
         <div className="flex justify-end gap-2 pt-4">
-          <button
-            onClick={onClose}
-            className="text-gray-600"
-            disabled={loading}
-          >
-            Cancelar
-          </button>
+            <button
+                onClick={onClose}
+                className="text-gray-600"
+            >
+                {success ? 'Cerrar' : 'Cancelar'}
+            </button>
 
-          <button
-            onClick={submit}
-            disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
-        >
-            {loading ? 'Guardando…' : 'Guardar'}
-        </button>
+            {!success && (
+                <button
+                onClick={submit}
+                disabled={loading}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+                >
+                {loading ? 'Guardando…' : 'Guardar'}
+                </button>
         </div>
 
       </div>
