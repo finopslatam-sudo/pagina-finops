@@ -9,7 +9,7 @@ import AdminUsers from '@/app/dashboard/admin/AdminUsers';
 
 export default function UsersPage() {
   return (
-    <section className="space-y-6">
+    <section className="max-w-7xl mx-auto px-6 py-6 space-y-6">
       <header>
         <h1 className="text-2xl font-semibold">
           Panel de Usuarios
