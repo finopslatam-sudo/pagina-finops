@@ -1,15 +1,25 @@
 'use client';
 
 /* =====================================================
-   CLIENTS TABLE — DOMAIN CLIENTS
+   CLIENTS TABLE — ADMIN DOMAIN (PRESENTATIONAL)
 ===================================================== */
 
-import { useAdminClients } from '@/app//dashboard/clients/hooks/useAdminClients';
-import type { AdminClient } from '@/app//dashboard/clients/hooks/useAdminClients';
+import type { AdminClient } from '../hooks/useAdminClients';
+import { PLANS } from '@/app/lib/plans';
 
-export default function ClientsTable() {
-  const { clients, loading, error } = useAdminClients();
+interface Props {
+  clients: AdminClient[];
+  loading: boolean;
+  error: string | null;
+  onChangePlan: (clientId: number, planId: number) => void;
+}
 
+export default function ClientsTable({
+  clients,
+  loading,
+  error,
+  onChangePlan,
+}: Props) {
   if (loading) {
     return <p className="text-gray-400">Cargando empresas…</p>;
   }
@@ -34,20 +44,51 @@ export default function ClientsTable() {
             <th className="p-4">Empresa</th>
             <th className="p-4">Email</th>
             <th className="p-4">Contacto</th>
+            <th className="p-4">Plan</th>
             <th className="p-4">Estado</th>
           </tr>
         </thead>
 
         <tbody className="divide-y">
-          {clients.map((client: AdminClient) => (
+          {clients.map((client) => (
             <tr key={client.id}>
               <td className="p-4 font-medium">
                 {client.company_name}
               </td>
+
               <td className="p-4">{client.email}</td>
+
               <td className="p-4">
                 {client.contact_name ?? '—'}
               </td>
+
+              {/* ===== PLAN (SELECT ADMIN) ===== */}
+              <td className="p-4">
+                <select
+                  className="border rounded px-2 py-1 text-sm"
+                  value={
+                    PLANS.find(
+                      (p) => p.name === client.plan
+                    )?.id
+                  }
+                  onChange={(e) =>
+                    onChangePlan(
+                      client.id,
+                      Number(e.target.value)
+                    )
+                  }
+                >
+                  {PLANS.map((plan) => (
+                    <option
+                      key={plan.id}
+                      value={plan.id}
+                    >
+                      {plan.name}
+                    </option>
+                  ))}
+                </select>
+              </td>
+
               <td className="p-4">
                 {client.is_active ? (
                   <span className="text-green-600 font-medium">

@@ -123,7 +123,27 @@ export function useAdminClients() {
       throw err;
     }
   };
-
+  /* =====================================================
+     CHANGE CLIENT PLAN
+  ===================================================== */
+  const changeClientPlan = async (
+    clientId: number,
+    planId: number
+  ) => {
+    if (!token) return;
+  
+    await apiFetch(
+      `/api/admin/clients/${clientId}/subscription`,
+      {
+        method: 'PATCH',
+        token,
+        body: { plan_id: planId },
+      }
+    );
+  
+    await fetchClients();
+  };
+  
   /* =====================================================
      PUBLIC API
   ===================================================== */
@@ -136,5 +156,6 @@ export function useAdminClients() {
     refresh: fetchClients,
     createClient,
     updateClient,
+    changeClientPlan,
   };
 }

@@ -5,6 +5,7 @@
 ===================================================== */
 
 import { useState } from 'react';
+import { PLANS } from '@/app/lib/plans';
 
 export type CreateClientPayload = {
   company_name: string;
@@ -12,6 +13,7 @@ export type CreateClientPayload = {
   contact_name?: string;
   phone?: string;
   is_active: boolean;
+  plan_id: number; // 👈 OBLIGATORIO
 };
 
 interface Props {
@@ -33,6 +35,10 @@ export default function CreateClientModal({
   const [phone, setPhone] = useState('');
   const [isActive, setIsActive] = useState(true);
 
+  const [planId, setPlanId] = useState<number>(
+    PLANS[0].id
+  );
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,6 +57,11 @@ export default function CreateClientModal({
       return;
     }
 
+    if (!planId) {
+      setError('Debes seleccionar un plan');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -61,6 +72,7 @@ export default function CreateClientModal({
         contact_name: contactName || undefined,
         phone: phone || undefined,
         is_active: isActive,
+        plan_id: planId,
       });
       // ⛔ NO cerrar aquí → el padre decide
     } catch (err: any) {
@@ -119,6 +131,26 @@ export default function CreateClientModal({
           />
         </div>
 
+        {/* PLAN */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">
+            Plan *
+          </label>
+          <select
+            value={planId}
+            onChange={(e) =>
+              setPlanId(Number(e.target.value))
+            }
+            className="w-full px-4 py-2 border rounded-lg"
+          >
+            {PLANS.map((plan) => (
+              <option key={plan.id} value={plan.id}>
+                {plan.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* CONTACT NAME */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">
@@ -150,7 +182,9 @@ export default function CreateClientModal({
           <input
             type="checkbox"
             checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
+            onChange={(e) =>
+              setIsActive(e.target.checked)
+            }
           />
           <span className="text-sm">
             Cliente activo

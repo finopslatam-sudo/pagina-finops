@@ -1,12 +1,20 @@
 'use client';
 
 /* =====================================================
-   PANEL DE CLIENTES — FINOPSLATAM
+   PANEL DE CLIENTES — FINOPSLATAM (ADMIN)
 ===================================================== */
 
 import ClientsTable from './components/ClientsTable';
+import { useAdminClients } from './hooks/useAdminClients';
 
 export default function ClientsPage() {
+  const {
+    clients,
+    loading,
+    error,
+    changeClientPlan,
+  } = useAdminClients();
+
   return (
     <section className="space-y-6">
       <header>
@@ -20,7 +28,12 @@ export default function ClientsPage() {
       </header>
 
       {/* TABLA DE CLIENTES */}
-      <ClientsTable />
+      <ClientsTable
+        clients={clients}
+        loading={loading}
+        error={error}
+        onChangePlan={changeClientPlan}
+      />
     </section>
   );
 }
