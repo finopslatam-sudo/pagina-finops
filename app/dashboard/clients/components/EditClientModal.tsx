@@ -65,10 +65,6 @@ export default function EditClientModal({
 
       setSuccess(true);
 
-      // cerrar modal luego de un breve delay
-      setTimeout(() => {
-        onClose();
-      }, 1200);
     } catch (err: any) {
       setError(
         err?.message ||
@@ -178,9 +174,9 @@ export default function EditClientModal({
             onClick={submit}
             disabled={loading}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
-          >
+        >
             {loading ? 'Guardando…' : 'Guardar'}
-          </button>
+        </button>
         </div>
 
       </div>
