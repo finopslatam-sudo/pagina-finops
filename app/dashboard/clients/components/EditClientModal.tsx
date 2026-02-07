@@ -64,6 +64,11 @@ export default function EditClientModal({
       });
 
       setSuccess(true);
+        
+        setTimeout(() => {
+            onClose();
+        }, 1500); 
+
     } catch (err: any) {
       setError(
         err?.message ||
