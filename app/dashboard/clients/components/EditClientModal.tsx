@@ -64,6 +64,7 @@ export default function EditClientModal({
       });
 
       setSuccess(true);
+      console.log('SUCCESS SET TO TRUE');
 
     } catch (err: any) {
       setError(
