@@ -32,42 +32,32 @@ export default function ClientsTable({
   }
 
   if (clients.length === 0) {
-    return (
-      <p className="text-gray-400">
-        No hay empresas registradas
-      </p>
-    );
+    return <p className="text-gray-400">No hay empresas registradas</p>;
   }
 
   /* =========================
      SPLIT CLIENTS
   ========================== */
 
-  const systemClients = clients.filter(
-    client => client.is_system === true
-  );
+  const systemClients = clients.filter(c => c.is_system);
 
-  const businessClientsRaw = clients.filter(
-    client => client.is_system === false
-  );
+  const businessClientsRaw = clients.filter(c => !c.is_system);
 
   /* =========================
-     GROUP BUSINESS CLIENTS
-     (1 fila por empresa)
+     GROUP BY COMPANY (FIX)
   ========================== */
 
   const businessClientsMap = new Map<string, AdminClient>();
 
   for (const client of businessClientsRaw) {
-    // si ya existe la empresa, no la sobreescribimos
-    if (!businessClientsMap.has(client.company_name)) {
-      businessClientsMap.set(client.company_name, client);
+    const key = client.company_name.trim().toLowerCase();
+
+    if (!businessClientsMap.has(key)) {
+      businessClientsMap.set(key, client);
     }
   }
 
-  const businessClients = Array.from(
-    businessClientsMap.values()
-  );
+  const businessClients = Array.from(businessClientsMap.values());
 
   /* =========================
      RENDER
@@ -116,7 +106,7 @@ export default function ClientsTable({
 }
 
 /* =====================================================
-   TABLE SECTION (REUTILIZABLE)
+   TABLE SECTION
 ===================================================== */
 
 interface SectionProps {
