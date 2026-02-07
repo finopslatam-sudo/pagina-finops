@@ -40,15 +40,33 @@ export default function ClientsTable({
   }
 
   /* =========================
-     SPLIT CLIENTS (BACKEND-DRIVEN)
+     SPLIT CLIENTS
   ========================== */
 
   const systemClients = clients.filter(
-    (client) => client.is_system
+    client => client.is_system === true
   );
 
-  const businessClients = clients.filter(
-    (client) => !client.is_system
+  const businessClientsRaw = clients.filter(
+    client => client.is_system === false
+  );
+
+  /* =========================
+     GROUP BUSINESS CLIENTS
+     (1 fila por empresa)
+  ========================== */
+
+  const businessClientsMap = new Map<string, AdminClient>();
+
+  for (const client of businessClientsRaw) {
+    // si ya existe la empresa, no la sobreescribimos
+    if (!businessClientsMap.has(client.company_name)) {
+      businessClientsMap.set(client.company_name, client);
+    }
+  }
+
+  const businessClients = Array.from(
+    businessClientsMap.values()
   );
 
   /* =========================
@@ -61,43 +79,38 @@ export default function ClientsTable({
       {/* =====================
          CLIENTES DEL SISTEMA
       ===================== */}
-      <section>
-        <h3 className="text-lg font-semibold mb-3">
-          Clientes del sistema
-        </h3>
+      <h3 className="text-lg font-semibold mt-6 mb-2">
+        Clientes del sistema
+      </h3>
 
-        {systemClients.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            No hay clientes del sistema
-          </p>
-        ) : (
-          <ClientsTableSection
-            clients={systemClients}
-            onEdit={onEdit}
-          />
-        )}
-      </section>
+      {systemClients.length === 0 ? (
+        <p className="text-sm text-gray-500">
+          No hay clientes del sistema
+        </p>
+      ) : (
+        <ClientsTableSection
+          clients={systemClients}
+          onEdit={onEdit}
+        />
+      )}
 
       {/* =====================
          CLIENTES COMERCIALES
       ===================== */}
-      <section>
-        <h3 className="text-lg font-semibold mb-3">
-          Clientes comerciales
-        </h3>
+      <h3 className="text-lg font-semibold mt-10 mb-2">
+        Clientes comerciales
+      </h3>
 
-        {businessClients.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            No hay clientes comerciales
-          </p>
-        ) : (
-          <ClientsTableSection
-            clients={businessClients}
-            onEdit={onEdit}
-          />
-        )}
-      </section>
-
+      {businessClients.length === 0 ? (
+        <p className="text-sm text-gray-500">
+          No hay clientes comerciales
+        </p>
+      ) : (
+        <ClientsTableSection
+          clients={businessClients}
+          onEdit={onEdit}
+        />
+      )}
     </div>
   );
 }
@@ -130,7 +143,7 @@ function ClientsTableSection({
         </thead>
 
         <tbody className="divide-y">
-          {clients.map((client) => (
+          {clients.map(client => (
             <tr key={client.id}>
               <td className="p-4 font-medium">
                 {client.company_name}
