@@ -67,7 +67,7 @@ export default function EditClientModal({
         
         setTimeout(() => {
             onClose();
-        }, 100); 
+        }, 1000); 
 
     } catch (err: any) {
       setError(
