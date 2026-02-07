@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import type { AdminClient } from '../hooks/useAdminClients';
 import { PLANS } from '@/app/lib/plans';
+import { useAuth } from '@/app/context/AuthContext';
 
 interface Props {
   client: AdminClient;
@@ -27,6 +28,12 @@ export default function EditClientModal({
   onSave,
 }: Props) {
   /* =========================
+     CONTEXT
+  ========================== */
+
+  const { user } = useAuth();
+
+  /* =========================
      STATE
   ========================== */
 
@@ -43,6 +50,17 @@ export default function EditClientModal({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  /* =========================
+     SECURITY RULE (CLIENT)
+  ========================== */
+
+  const isEditingOwnClient =
+    user?.client_id === client.id;
+
+  const disableActiveToggle =
+    isEditingOwnClient &&
+    ['root', 'admin', 'support'].includes(user?.global_role ?? '');
 
   /* =========================
      SUBMIT
@@ -64,10 +82,11 @@ export default function EditClientModal({
       });
 
       setSuccess(true);
-        
-        setTimeout(() => {
-            onClose();
-        }, 1000); 
+
+      // ⏱️ Mostrar feedback y cerrar automáticamente
+      setTimeout(() => {
+        onClose();
+      }, 1000);
 
     } catch (err: any) {
       setError(
@@ -92,6 +111,7 @@ export default function EditClientModal({
           Editar cliente
         </h2>
 
+        {/* CREATED AT */}
         <div className="text-sm text-gray-500">
           Creado el{' '}
           {client.created_at
@@ -99,18 +119,21 @@ export default function EditClientModal({
             : '—'}
         </div>
 
+        {/* SUCCESS */}
         {success && (
           <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-2">
             ✅ Cambios aplicados con éxito
           </div>
         )}
 
+        {/* ERROR */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-2">
             {error}
           </div>
         )}
 
+        {/* FORM */}
         <input
           value={companyName}
           onChange={e => setCompanyName(e.target.value)}
@@ -151,32 +174,41 @@ export default function EditClientModal({
           ))}
         </select>
 
+        {/* ACTIVE */}
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={isActive}
+            disabled={disableActiveToggle}
             onChange={e => setIsActive(e.target.checked)}
           />
           Cliente activo
         </label>
 
+        {/* UX MESSAGE */}
+        {disableActiveToggle && (
+          <p className="text-xs text-gray-500">
+            Este cliente no puede desactivarse a sí mismo.
+          </p>
+        )}
+
+        {/* ACTIONS */}
         <div className="flex justify-end gap-2 pt-4">
           <button
             onClick={onClose}
             className="text-gray-600"
+            disabled={loading}
           >
-            {success ? 'Cerrar' : 'Cancelar'}
+            Cancelar
           </button>
 
-          {!success && (
-            <button
-              onClick={submit}
-              disabled={loading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
-            >
-              {loading ? 'Guardando…' : 'Guardar'}
-            </button>
-          )}
+          <button
+            onClick={submit}
+            disabled={loading}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+          >
+            {loading ? 'Guardando…' : 'Guardar'}
+          </button>
         </div>
 
       </div>
