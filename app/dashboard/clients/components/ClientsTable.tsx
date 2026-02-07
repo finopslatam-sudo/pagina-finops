@@ -19,6 +19,10 @@ export default function ClientsTable({
   error,
   onEdit,
 }: Props) {
+  /* =========================
+     STATES
+  ========================== */
+
   if (loading) {
     return <p className="text-gray-400">Cargando empresas…</p>;
   }
@@ -35,6 +39,82 @@ export default function ClientsTable({
     );
   }
 
+  /* =========================
+     SPLIT CLIENTS
+  ========================== */
+
+  const systemClients = clients.filter(
+    client => client.plan === null
+  );
+
+  const businessClients = clients.filter(
+    client => client.plan !== null
+  );
+
+  /* =========================
+     RENDER
+  ========================== */
+
+  return (
+    <div className="space-y-10">
+
+      {/* ==========================
+          CLIENTES DEL SISTEMA
+      ========================== */}
+      <section>
+        <h2 className="text-lg font-semibold mb-3">
+          Clientes del sistema
+        </h2>
+
+        {systemClients.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            No hay clientes del sistema
+          </p>
+        ) : (
+          <ClientsTableSection
+            clients={systemClients}
+            onEdit={onEdit}
+          />
+        )}
+      </section>
+
+      {/* ==========================
+          CLIENTES COMERCIALES
+      ========================== */}
+      <section>
+        <h2 className="text-lg font-semibold mb-3">
+          Clientes comerciales
+        </h2>
+
+        {businessClients.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            No hay clientes comerciales
+          </p>
+        ) : (
+          <ClientsTableSection
+            clients={businessClients}
+            onEdit={onEdit}
+          />
+        )}
+      </section>
+
+    </div>
+  );
+}
+
+/* =====================================================
+   TABLE SECTION (REUTILIZABLE)
+===================================================== */
+
+interface SectionProps {
+  clients: AdminClient[];
+  onEdit: (client: AdminClient) => void;
+}
+
+function ClientsTableSection({
+  clients,
+  onEdit,
+}: SectionProps) {
   return (
     <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
       <table className="w-full text-sm">
@@ -50,13 +130,15 @@ export default function ClientsTable({
         </thead>
 
         <tbody className="divide-y">
-          {clients.map((client) => (
+          {clients.map(client => (
             <tr key={client.id}>
               <td className="p-4 font-medium">
                 {client.company_name}
               </td>
 
-              <td className="p-4">{client.email}</td>
+              <td className="p-4">
+                {client.email}
+              </td>
 
               <td className="p-4">
                 {client.contact_name ?? '—'}
