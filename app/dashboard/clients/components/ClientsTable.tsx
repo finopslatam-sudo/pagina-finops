@@ -1,24 +1,23 @@
 'use client';
 
 /* =====================================================
-   CLIENTS TABLE — ADMIN DOMAIN (PRESENTATIONAL)
+   CLIENTS TABLE — ADMIN (READ ONLY)
 ===================================================== */
 
 import type { AdminClient } from '../hooks/useAdminClients';
-import { PLANS } from '@/app/lib/plans';
 
 interface Props {
   clients: AdminClient[];
   loading: boolean;
   error: string | null;
-  onChangePlan: (clientId: number, planId: number) => void;
+  onEdit: (client: AdminClient) => void;
 }
 
 export default function ClientsTable({
   clients,
   loading,
   error,
-  onChangePlan,
+  onEdit,
 }: Props) {
   if (loading) {
     return <p className="text-gray-400">Cargando empresas…</p>;
@@ -46,6 +45,7 @@ export default function ClientsTable({
             <th className="p-4">Contacto</th>
             <th className="p-4">Plan</th>
             <th className="p-4">Estado</th>
+            <th className="p-4 text-right">Acciones</th>
           </tr>
         </thead>
 
@@ -62,31 +62,8 @@ export default function ClientsTable({
                 {client.contact_name ?? '—'}
               </td>
 
-              {/* ===== PLAN (SELECT ADMIN) ===== */}
               <td className="p-4">
-                <select
-                  className="border rounded px-2 py-1 text-sm"
-                  value={
-                    PLANS.find(
-                      (p) => p.name === client.plan
-                    )?.id
-                  }
-                  onChange={(e) =>
-                    onChangePlan(
-                      client.id,
-                      Number(e.target.value)
-                    )
-                  }
-                >
-                  {PLANS.map((plan) => (
-                    <option
-                      key={plan.id}
-                      value={plan.id}
-                    >
-                      {plan.name}
-                    </option>
-                  ))}
-                </select>
+                {client.plan ?? '—'}
               </td>
 
               <td className="p-4">
@@ -99,6 +76,15 @@ export default function ClientsTable({
                     Inactiva
                   </span>
                 )}
+              </td>
+
+              <td className="p-4 text-right">
+                <button
+                  onClick={() => onEdit(client)}
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  Editar
+                </button>
               </td>
             </tr>
           ))}

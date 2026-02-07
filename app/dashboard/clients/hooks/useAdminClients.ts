@@ -21,6 +21,7 @@ export interface AdminClient {
   phone: string | null;
   is_active: boolean;
   plan: string | null;
+  created_at: string;
 }
 
 export type CreateClientPayload = {
