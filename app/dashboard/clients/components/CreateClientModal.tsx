@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAdminClients } from '../hooks/useAdminClients';
-import { useAdminUsers } from '@/app/dashboard/admin/hooks/useAdminUsers';
+import { apiFetch } from '@/app/lib/api';
 import { PLANS } from '@/app/lib/plans';
 
 interface Props {
@@ -11,7 +11,6 @@ interface Props {
 
 export default function CreateClientModal({ onClose }: Props) {
   const { createClient } = useAdminClients();
-  const { createUser } = useAdminUsers();
 
   /* ======================
      CLIENT STATE
@@ -28,9 +27,17 @@ export default function CreateClientModal({ onClose }: Props) {
   ====================== */
   const [addUser, setAddUser] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-  const [userRole, setUserRole] =
+  const [userRole] =
     useState<'owner' | 'finops_admin' | 'viewer'>('owner');
 
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+
+  /* ======================
+     UI STATE
+  ====================== */
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +49,27 @@ export default function CreateClientModal({ onClose }: Props) {
     setError(null);
 
     try {
+      /* -------- VALIDACIÓN CLIENTE -------- */
+      if (!companyName || !email || !planId) {
+        throw new Error('Empresa, email y plan son obligatorios');
+      }
+
+      /* -------- VALIDACIÓN USUARIO -------- */
+      if (addUser) {
+        if (!userEmail) {
+          throw new Error('Email de usuario es obligatorio');
+        }
+
+        if (!password || password.length < 8) {
+          throw new Error('La contraseña debe tener al menos 8 caracteres');
+        }
+
+        if (password !== passwordConfirm) {
+          throw new Error('Las contraseñas no coinciden');
+        }
+      }
+
+      /* -------- CREAR CLIENTE -------- */
       const client = await createClient({
         company_name: companyName,
         email,
@@ -51,20 +79,24 @@ export default function CreateClientModal({ onClose }: Props) {
         plan_id: planId,
       });
 
+      /* -------- CREAR USUARIO CON PASSWORD -------- */
       if (addUser) {
-        await createUser({
-          email: userEmail,
-          client_id: client.id,
-          client_role: userRole,
+        await apiFetch('/api/admin/users/with-password', {
+          method: 'POST',
+          body: {
+            email: userEmail,
+            client_id: client.id,
+            client_role: userRole,
+            password,
+            password_confirm: passwordConfirm,
+            force_password_change: true,
+          },
         });
       }
 
       onClose();
     } catch (err: any) {
-      setError(
-        err?.message ||
-          'Error al crear cliente'
-      );
+      setError(err?.message || 'Error al crear cliente');
     } finally {
       setLoading(false);
     }
@@ -77,14 +109,10 @@ export default function CreateClientModal({ onClose }: Props) {
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
       <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-4">
 
-        <h2 className="text-lg font-semibold">
-          Crear cliente
-        </h2>
+        <h2 className="text-lg font-semibold">Crear cliente</h2>
 
         {error && (
-          <div className="text-sm text-red-600">
-            {error}
-          </div>
+          <div className="text-sm text-red-600">{error}</div>
         )}
 
         {/* CLIENT FORM */}
@@ -137,7 +165,6 @@ export default function CreateClientModal({ onClose }: Props) {
           Cliente activo
         </label>
 
-        {/* USER SECTION */}
         <hr />
 
         <label className="flex items-center gap-2">
@@ -158,30 +185,48 @@ export default function CreateClientModal({ onClose }: Props) {
               onChange={e => setUserEmail(e.target.value)}
             />
 
-            <select
-              className="w-full border rounded px-3 py-2"
-              value={userRole}
-              onChange={e =>
-                setUserRole(
-                  e.target.value as any
-                )
-              }
-            >
-              <option value="owner">Owner</option>
-              <option value="finops_admin">
-                FinOps Admin
-              </option>
-              <option value="viewer">Viewer</option>
-            </select>
+            {/* PASSWORD */}
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="w-full border rounded px-3 py-2 pr-10"
+                placeholder="Contraseña"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-2 text-sm"
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
+
+            <div className="relative">
+              <input
+                type={showPasswordConfirm ? 'text' : 'password'}
+                className="w-full border rounded px-3 py-2 pr-10"
+                placeholder="Confirmar contraseña"
+                value={passwordConfirm}
+                onChange={e => setPasswordConfirm(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPasswordConfirm(!showPasswordConfirm)
+                }
+                className="absolute right-2 top-2 text-sm"
+              >
+                {showPasswordConfirm ? '🙈' : '👁️'}
+              </button>
+            </div>
           </>
         )}
 
         {/* ACTIONS */}
         <div className="flex justify-end gap-2 pt-4">
-          <button
-            onClick={onClose}
-            className="text-gray-600"
-          >
+          <button onClick={onClose} className="text-gray-600">
             Cancelar
           </button>
 
@@ -193,7 +238,6 @@ export default function CreateClientModal({ onClose }: Props) {
             {loading ? 'Creando…' : 'Crear'}
           </button>
         </div>
-
       </div>
     </div>
   );
