@@ -2,7 +2,6 @@
 
 /* =====================================================
    ADMIN CLIENTS HOOK — FINOPSLATAM
-   Capa de dominio ADMIN (clientes)
 ===================================================== */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -31,6 +30,7 @@ export type CreateClientPayload = {
   contact_name?: string;
   phone?: string;
   is_active: boolean;
+  plan_id: number;
 };
 
 /* =====================================================
@@ -44,10 +44,9 @@ export function useAdminClients() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /* =====================================================
+  /* ======================
      FETCH CLIENTS
-     GET /api/admin/clients
-  ===================================================== */
+  ====================== */
 
   const fetchClients = useCallback(async () => {
     if (!token) {
@@ -63,7 +62,7 @@ export function useAdminClients() {
         data: AdminClient[];
         meta: { total: number };
       }>('/api/admin/clients', { token });
-      
+
       setClients(res.data);
     } catch (err) {
       console.error('[ADMIN_CLIENTS_FETCH]', err);
@@ -77,34 +76,39 @@ export function useAdminClients() {
     fetchClients();
   }, [fetchClients]);
 
-  /* =====================================================
+  /* ======================
      CREATE CLIENT
-     POST /api/admin/clients
-  ===================================================== */
+  ====================== */
 
   const createClient = async (
     payload: CreateClientPayload
   ) => {
-    if (!token) return;
+    if (!token) throw new Error('No token');
 
     try {
-      await apiFetch('/api/admin/clients', {
+      const res = await apiFetch<{
+        data: {
+          id: number;
+          company_name: string;
+          email: string;
+        };
+      }>('/api/admin/clients', {
         method: 'POST',
         token,
         body: payload,
       });
 
       await fetchClients();
+      return res.data;
     } catch (err) {
       console.error('[ADMIN_CREATE_CLIENT]', err);
       throw err;
     }
   };
 
-  /* =====================================================
+  /* ======================
      UPDATE CLIENT
-     PATCH /api/admin/clients/:id
-  ===================================================== */
+  ====================== */
 
   const updateClient = async (
     clientId: number,
@@ -125,15 +129,17 @@ export function useAdminClients() {
       throw err;
     }
   };
-  /* =====================================================
-     CHANGE CLIENT PLAN
-  ===================================================== */
+
+  /* ======================
+     CHANGE PLAN
+  ====================== */
+
   const changeClientPlan = async (
     clientId: number,
     planId: number
   ) => {
     if (!token) return;
-  
+
     await apiFetch(
       `/api/admin/clients/${clientId}/subscription`,
       {
@@ -142,19 +148,18 @@ export function useAdminClients() {
         body: { plan_id: planId },
       }
     );
-  
+
     await fetchClients();
   };
-  
-  /* =====================================================
+
+  /* ======================
      PUBLIC API
-  ===================================================== */
+  ====================== */
 
   return {
     clients,
     loading,
     error,
-
     refresh: fetchClients,
     createClient,
     updateClient,
