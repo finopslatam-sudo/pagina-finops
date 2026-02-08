@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useAdminClients } from '../hooks/useAdminClients';
 import { apiFetch } from '@/app/lib/api';
 import { PLANS } from '@/app/lib/plans';
+import { useAuth } from '@/app/context/AuthContext';
+
 
 interface Props {
   onClose: () => void;
@@ -11,6 +13,7 @@ interface Props {
 
 export default function CreateClientModal({ onClose }: Props) {
   const { createClient } = useAdminClients();
+  const { token } = useAuth();
 
   /* ======================
      CLIENT STATE
@@ -27,8 +30,8 @@ export default function CreateClientModal({ onClose }: Props) {
   ====================== */
   const [addUser, setAddUser] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-  const [userRole] =
-    useState<'owner' | 'finops_admin' | 'viewer'>('owner');
+  const [userRole, setUserRole] =
+  useState<'owner' | 'finops_admin' | 'viewer'>('owner');
 
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -83,6 +86,7 @@ export default function CreateClientModal({ onClose }: Props) {
       if (addUser) {
         await apiFetch('/api/admin/users/with-password', {
           method: 'POST',
+          token,
           body: {
             email: userEmail,
             client_id: client.id,
@@ -107,7 +111,9 @@ export default function CreateClientModal({ onClose }: Props) {
   ====================== */
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
-      <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-4">
+      <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-4
+                max-h-[85vh] overflow-y-auto">
+
 
         <h2 className="text-lg font-semibold">Crear cliente</h2>
 
@@ -184,6 +190,30 @@ export default function CreateClientModal({ onClose }: Props) {
               value={userEmail}
               onChange={e => setUserEmail(e.target.value)}
             />
+            <select
+              className="w-full border rounded px-3 py-2"
+              value={userRole}
+              onChange={e =>
+                setUserRole(e.target.value as
+                  | 'owner'
+                  | 'finops_admin'
+                  | 'viewer'
+                )
+              }
+            >
+              <option value="owner">
+                Owner (Administrador del cliente)
+              </option>
+
+              <option value="finops_admin">
+                FinOps Admin
+              </option>
+
+              <option value="viewer">
+                Viewer (Solo lectura)
+              </option>
+            </select>
+
 
             {/* PASSWORD */}
             <div className="relative">
