@@ -18,6 +18,7 @@ export default function ClientsPage() {
     error,
     updateClient,
     changeClientPlan,
+    refresh,
   } = useAdminClients();
 
   const [selectedClient, setSelectedClient] =
@@ -78,6 +79,10 @@ export default function ClientsPage() {
       {isCreateOpen && (
         <CreateClientModal
           onClose={() => setIsCreateOpen(false)}
+          onCreated={async () => {
+            await refresh();
+            setIsCreateOpen(false);
+          }}
         />
       )}
 

@@ -9,9 +9,10 @@ import { useAuth } from '@/app/context/AuthContext';
 
 interface Props {
   onClose: () => void;
+  onCreated: () => void;
 }
 
-export default function CreateClientModal({ onClose }: Props) {
+export default function CreateClientModal({ onClose, onCreated }: Props) {
   const { createClient } = useAdminClients();
   const { token } = useAuth();
 
@@ -29,10 +30,13 @@ export default function CreateClientModal({ onClose }: Props) {
      USER STATE
   ====================== */
   const [addUser, setAddUser] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [userRole, setUserRole] =
-  useState<'owner' | 'finops_admin' | 'viewer'>('owner');
 
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  
+  const [userRole, setUserRole] =
+    useState<'owner' | 'finops_admin' | 'viewer'>('owner');
+  
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -43,6 +47,7 @@ export default function CreateClientModal({ onClose }: Props) {
   ====================== */
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   /* ======================
      SUBMIT
@@ -59,6 +64,10 @@ export default function CreateClientModal({ onClose }: Props) {
 
       /* -------- VALIDACIÓN USUARIO -------- */
       if (addUser) {
+        if (!userName) {
+          throw new Error('Nombre del usuario es obligatorio');
+        }
+
         if (!userEmail) {
           throw new Error('Email de usuario es obligatorio');
         }
@@ -89,6 +98,7 @@ export default function CreateClientModal({ onClose }: Props) {
           token,
           body: {
             email: userEmail,
+            contact_name: userName,
             client_id: client.id,
             client_role: userRole,
             password,
@@ -96,9 +106,11 @@ export default function CreateClientModal({ onClose }: Props) {
             force_password_change: true,
           },
         });
-      }
 
-      onClose();
+      }
+      
+      setSuccess('Cliente creado exitosamente 🎉');
+      await onCreated();
     } catch (err: any) {
       setError(err?.message || 'Error al crear cliente');
     } finally {
@@ -120,6 +132,10 @@ export default function CreateClientModal({ onClose }: Props) {
         {error && (
           <div className="text-sm text-red-600">{error}</div>
         )}
+        {success && (
+          <div className="text-sm text-green-600">{success}</div>
+        )}
+
 
         {/* CLIENT FORM */}
         <input
@@ -184,6 +200,13 @@ export default function CreateClientModal({ onClose }: Props) {
 
         {addUser && (
           <>
+              <input
+                className="w-full border rounded px-3 py-2"
+                placeholder="Nombre del usuario"
+                value={userName}
+                onChange={e => setUserName(e.target.value)}
+              />
+              
             <input
               className="w-full border rounded px-3 py-2"
               placeholder="Email usuario"
