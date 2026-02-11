@@ -2,6 +2,10 @@
 
 /* =====================================================
    ADMIN CLIENTS HOOK — FINOPSLATAM
+   Alineado con backend transaccional:
+   - Cliente obligatorio
+   - Owner obligatorio
+   - Extra users opcional
 ===================================================== */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -24,6 +28,10 @@ export interface AdminClient {
   is_system: boolean;
 }
 
+/* =====================================================
+   CREATE CLIENT PAYLOAD (BACKEND CONTRACT)
+===================================================== */
+
 export type CreateClientPayload = {
   company_name: string;
   email: string;
@@ -31,6 +39,23 @@ export type CreateClientPayload = {
   phone?: string;
   is_active: boolean;
   plan_id: number;
+
+  /* OWNER OBLIGATORIO */
+  owner: {
+    email: string;
+    contact_name: string;
+    password: string;
+    password_confirm: string;
+  };
+
+  /* USUARIOS ADICIONALES (OPCIONAL) */
+  extra_users?: {
+    email: string;
+    contact_name: string;
+    client_role: 'finops_admin' | 'viewer';
+    password: string;
+    password_confirm: string;
+  }[];
 };
 
 /* =====================================================
@@ -44,9 +69,9 @@ export function useAdminClients() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /* ======================
+  /* =====================================================
      FETCH CLIENTS
-  ====================== */
+  ====================================================== */
 
   const fetchClients = useCallback(async () => {
     if (!token) {
@@ -76,9 +101,9 @@ export function useAdminClients() {
     fetchClients();
   }, [fetchClients]);
 
-  /* ======================
-     CREATE CLIENT
-  ====================== */
+  /* =====================================================
+     CREATE CLIENT (TRANSACCIONAL)
+  ====================================================== */
 
   const createClient = async (
     payload: CreateClientPayload
@@ -88,9 +113,11 @@ export function useAdminClients() {
     try {
       const res = await apiFetch<{
         data: {
-          id: number;
+          client_id: number;
           company_name: string;
-          email: string;
+          owner_id: number;
+          owner_email: string;
+          plan: string;
         };
       }>('/api/admin/clients', {
         method: 'POST',
@@ -106,15 +133,15 @@ export function useAdminClients() {
     }
   };
 
-  /* ======================
+  /* =====================================================
      UPDATE CLIENT
-  ====================== */
+  ====================================================== */
 
   const updateClient = async (
     clientId: number,
     payload: Partial<AdminClient>
   ) => {
-    if (!token) return;
+    if (!token) throw new Error('No token');
 
     try {
       await apiFetch(`/api/admin/clients/${clientId}`, {
@@ -130,31 +157,36 @@ export function useAdminClients() {
     }
   };
 
-  /* ======================
+  /* =====================================================
      CHANGE PLAN
-  ====================== */
+  ====================================================== */
 
   const changeClientPlan = async (
     clientId: number,
     planId: number
   ) => {
-    if (!token) return;
+    if (!token) throw new Error('No token');
 
-    await apiFetch(
-      `/api/admin/clients/${clientId}/subscription`,
-      {
-        method: 'PATCH',
-        token,
-        body: { plan_id: planId },
-      }
-    );
+    try {
+      await apiFetch(
+        `/api/admin/clients/${clientId}/subscription`,
+        {
+          method: 'PATCH',
+          token,
+          body: { plan_id: planId },
+        }
+      );
 
-    await fetchClients();
+      await fetchClients();
+    } catch (err) {
+      console.error('[ADMIN_CHANGE_PLAN]', err);
+      throw err;
+    }
   };
 
-  /* ======================
+  /* =====================================================
      PUBLIC API
-  ====================== */
+  ====================================================== */
 
   return {
     clients,

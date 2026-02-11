@@ -18,6 +18,7 @@ export default function ClientsPage() {
     error,
     updateClient,
     changeClientPlan,
+    createClient,
     refresh,
   } = useAdminClients();
 
@@ -30,7 +31,9 @@ export default function ClientsPage() {
   return (
     <section className="max-w-7xl mx-auto px-6 py-6 space-y-6">
 
-      {/* HEADER */}
+      {/* =========================
+          HEADER
+      ========================== */}
       <header className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-semibold">
@@ -49,6 +52,9 @@ export default function ClientsPage() {
         </button>
       </header>
 
+      {/* =========================
+          TABLE
+      ========================== */}
       <ClientsTable
         clients={clients}
         loading={loading}
@@ -56,6 +62,9 @@ export default function ClientsPage() {
         onEdit={setSelectedClient}
       />
 
+      {/* =========================
+          EDIT MODAL
+      ========================== */}
       {selectedClient && (
         <EditClientModal
           client={selectedClient}
@@ -72,16 +81,28 @@ export default function ClientsPage() {
                 data.plan_id
               );
             }
+
+            setSelectedClient(null);
+            await refresh();
           }}
         />
       )}
 
+      {/* =========================
+          CREATE MODAL
+      ========================== */}
       {isCreateOpen && (
         <CreateClientModal
           onClose={() => setIsCreateOpen(false)}
-          onCreated={async () => {
-            await refresh();
-            setIsCreateOpen(false);
+          onCreate={async (payload) => {
+            try {
+              await createClient(payload);
+              setIsCreateOpen(false);
+              await refresh();
+            } catch (err) {
+              console.error(err);
+              throw err;
+            }
           }}
         />
       )}
