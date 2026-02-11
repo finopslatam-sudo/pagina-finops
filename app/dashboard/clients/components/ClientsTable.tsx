@@ -67,24 +67,6 @@ export default function ClientsTable({
     <div className="space-y-10">
 
       {/* =====================
-         CLIENTES DEL SISTEMA
-      ===================== */}
-      <h3 className="text-lg font-semibold mt-6 mb-2">
-        Clientes del sistema
-      </h3>
-
-      {systemClients.length === 0 ? (
-        <p className="text-sm text-gray-500">
-          No hay clientes del sistema
-        </p>
-      ) : (
-        <ClientsTableSection
-          clients={systemClients}
-          onEdit={onEdit}
-        />
-      )}
-
-      {/* =====================
          CLIENTES COMERCIALES
       ===================== */}
       <h3 className="text-lg font-semibold mt-10 mb-2">
