@@ -1,296 +1,484 @@
 'use client';
 
-import { useState } from 'react';
-import { useAdminClients } from '../hooks/useAdminClients';
-import { apiFetch } from '@/app/lib/api';
-import { PLANS } from '@/app/lib/plans';
-import { useAuth } from '@/app/context/AuthContext';
+/* =====================================================
+   CREATE CLIENT MODAL — FINOPSLATAM
+   Cliente + Owner obligatorio + Usuarios adicionales
+===================================================== */
 
+import { useState } from 'react';
+import { PLANS } from '@/app/lib/plans';
+
+export type CreateClientPayload = {
+  company_name: string;
+  email: string;
+  contact_name?: string;
+  phone?: string;
+  is_active: boolean;
+  plan_id: number;
+
+  owner: {
+    email: string;
+    contact_name: string;
+    password: string;
+    password_confirm: string;
+  };
+
+  extra_users?: {
+    email: string;
+    contact_name: string;
+    client_role: 'finops_admin' | 'viewer';
+    password: string;
+    password_confirm: string;
+  }[];
+};
 
 interface Props {
   onClose: () => void;
-  onCreated: () => void;
+  onCreate: (payload: CreateClientPayload) => Promise<void>;
 }
 
-export default function CreateClientModal({ onClose, onCreated }: Props) {
-  const { createClient } = useAdminClients();
-  const { token } = useAuth();
-
-  /* ======================
+export default function CreateClientModal({
+  onClose,
+  onCreate,
+}: Props) {
+  /* =========================
      CLIENT STATE
-  ====================== */
+  ========================== */
+
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
   const [contactName, setContactName] = useState('');
   const [phone, setPhone] = useState('');
-  const [planId, setPlanId] = useState<number>(PLANS[0].id);
   const [isActive, setIsActive] = useState(true);
+  const [planId, setPlanId] = useState<number>(PLANS[0].id);
 
-  /* ======================
-     USER STATE
-  ====================== */
-  const [addUser, setAddUser] = useState(false);
+  /* =========================
+     OWNER STATE (OBLIGATORIO)
+  ========================== */
 
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  
-  const [userRole, setUserRole] =
-    useState<'owner' | 'finops_admin' | 'viewer'>('owner');
-  
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState('');
+  const [ownerName, setOwnerName] = useState('');
+  const [ownerPassword, setOwnerPassword] = useState('');
+  const [ownerPasswordConfirm, setOwnerPasswordConfirm] = useState('');
 
-  /* ======================
+  const [showOwnerPass, setShowOwnerPass] = useState(false);
+  const [showOwnerPass2, setShowOwnerPass2] = useState(false);
+
+  /* =========================
+     EXTRA USER STATE (OPCIONAL)
+  ========================== */
+
+  const [addExtraUser, setAddExtraUser] = useState(false);
+
+  const [extraEmail, setExtraEmail] = useState('');
+  const [extraName, setExtraName] = useState('');
+  const [extraRole, setExtraRole] =
+    useState<'finops_admin' | 'viewer'>('finops_admin');
+  const [extraPassword, setExtraPassword] = useState('');
+  const [extraPasswordConfirm, setExtraPasswordConfirm] =
+    useState('');
+
+  const [showExtraPass, setShowExtraPass] = useState(false);
+  const [showExtraPass2, setShowExtraPass2] =
+    useState(false);
+
+  /* =========================
      UI STATE
-  ====================== */
+  ========================== */
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
-  /* ======================
+  /* =========================
      SUBMIT
-  ====================== */
+  ========================== */
+
   const submit = async () => {
-    setLoading(true);
     setError(null);
 
+    /* =========================
+       VALIDACIONES CLIENTE
+    ========================== */
+
+    if (!companyName) {
+      setError('El nombre de la empresa es obligatorio');
+      return;
+    }
+
+    if (!email) {
+      setError('El email de la empresa es obligatorio');
+      return;
+    }
+
+    if (!planId) {
+      setError('Debes seleccionar un plan');
+      return;
+    }
+
+    /* =========================
+       VALIDACIONES OWNER
+    ========================== */
+
+    if (!ownerEmail) {
+      setError('El email del Owner es obligatorio');
+      return;
+    }
+
+    if (!ownerName) {
+      setError('El nombre del Owner es obligatorio');
+      return;
+    }
+
+    if (!ownerPassword || ownerPassword.length < 8) {
+      setError('La contraseña del Owner debe tener al menos 8 caracteres');
+      return;
+    }
+
+    if (ownerPassword !== ownerPasswordConfirm) {
+      setError('Las contraseñas del Owner no coinciden');
+      return;
+    }
+
+    /* =========================
+       VALIDACIONES EXTRA
+    ========================== */
+
+    if (addExtraUser) {
+      if (!extraEmail || !extraName) {
+        setError('Email y nombre del usuario adicional son obligatorios');
+        return;
+      }
+
+      if (!extraPassword || extraPassword.length < 8) {
+        setError('La contraseña del usuario adicional debe tener mínimo 8 caracteres');
+        return;
+      }
+
+      if (extraPassword !== extraPasswordConfirm) {
+        setError('Las contraseñas del usuario adicional no coinciden');
+        return;
+      }
+    }
+
+    setLoading(true);
+
     try {
-      /* -------- VALIDACIÓN CLIENTE -------- */
-      if (!companyName || !email || !planId) {
-        throw new Error('Empresa, email y plan son obligatorios');
-      }
-
-      /* -------- VALIDACIÓN USUARIO -------- */
-      if (addUser) {
-        if (!userName) {
-          throw new Error('Nombre del usuario es obligatorio');
-        }
-
-        if (!userEmail) {
-          throw new Error('Email de usuario es obligatorio');
-        }
-
-        if (!password || password.length < 8) {
-          throw new Error('La contraseña debe tener al menos 8 caracteres');
-        }
-
-        if (password !== passwordConfirm) {
-          throw new Error('Las contraseñas no coinciden');
-        }
-      }
-
-      /* -------- CREAR CLIENTE -------- */
-      const client = await createClient({
+      const payload: CreateClientPayload = {
         company_name: companyName,
         email,
         contact_name: contactName || undefined,
         phone: phone || undefined,
         is_active: isActive,
         plan_id: planId,
-      });
 
-      /* -------- CREAR USUARIO CON PASSWORD -------- */
-      if (addUser) {
-        await apiFetch('/api/admin/users/with-password', {
-          method: 'POST',
-          token,
-          body: {
-            email: userEmail,
-            contact_name: userName,
-            client_id: client.id,
-            client_role: userRole,
-            password,
-            password_confirm: passwordConfirm,
-            force_password_change: true,
+        owner: {
+          email: ownerEmail,
+          contact_name: ownerName,
+          password: ownerPassword,
+          password_confirm: ownerPasswordConfirm,
+        },
+      };
+
+      if (addExtraUser) {
+        payload.extra_users = [
+          {
+            email: extraEmail,
+            contact_name: extraName,
+            client_role: extraRole,
+            password: extraPassword,
+            password_confirm: extraPasswordConfirm,
           },
-        });
-
+        ];
       }
-      
-      setSuccess('Cliente creado exitosamente 🎉');
-      await onCreated();
+
+      await onCreate(payload);
+
     } catch (err: any) {
-      setError(err?.message || 'Error al crear cliente');
+      setError(
+        err?.error ||
+        err?.message ||
+        'Error al crear cliente'
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  /* ======================
+  /* =========================
      RENDER
-  ====================== */
+  ========================== */
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999]">
-      <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-4
-                max-h-[85vh] overflow-y-auto">
+      <div className="bg-white rounded-xl p-6 w-full max-w-xl shadow-xl max-h-[90vh] overflow-y-auto">
 
-
-        <h2 className="text-lg font-semibold">Crear cliente</h2>
+        <h2 className="text-lg font-semibold mb-6">
+          Crear Cliente
+        </h2>
 
         {error && (
-          <div className="text-sm text-red-600">{error}</div>
-        )}
-        {success && (
-          <div className="text-sm text-green-600">{success}</div>
+          <p className="text-sm text-red-600 mb-4">
+            {error}
+          </p>
         )}
 
+        {/* =========================
+            CLIENT DATA
+        ========================== */}
 
-        {/* CLIENT FORM */}
+        <h3 className="font-medium mb-3">
+          Datos de la empresa
+        </h3>
+
         <input
-          className="w-full border rounded px-3 py-2"
-          placeholder="Empresa"
+          className="w-full px-4 py-2 border rounded-lg mb-3"
+          placeholder="Nombre empresa"
           value={companyName}
-          onChange={e => setCompanyName(e.target.value)}
+          onChange={(e) =>
+            setCompanyName(e.target.value)
+          }
         />
 
         <input
-          className="w-full border rounded px-3 py-2"
+          className="w-full px-4 py-2 border rounded-lg mb-3"
           placeholder="Email empresa"
           value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-
-        <input
-          className="w-full border rounded px-3 py-2"
-          placeholder="Contacto"
-          value={contactName}
-          onChange={e => setContactName(e.target.value)}
-        />
-
-        <input
-          className="w-full border rounded px-3 py-2"
-          placeholder="Teléfono"
-          value={phone}
-          onChange={e => setPhone(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
         />
 
         <select
-          className="w-full border rounded px-3 py-2"
+          className="w-full px-4 py-2 border rounded-lg mb-3"
           value={planId}
-          onChange={e => setPlanId(Number(e.target.value))}
+          onChange={(e) =>
+            setPlanId(Number(e.target.value))
+          }
         >
-          {PLANS.map(p => (
-            <option key={p.id} value={p.id}>
-              {p.name}
+          {PLANS.map((plan) => (
+            <option key={plan.id} value={plan.id}>
+              {plan.name}
             </option>
           ))}
         </select>
 
-        <label className="flex items-center gap-2">
+        <input
+          className="w-full px-4 py-2 border rounded-lg mb-3"
+          placeholder="Nombre contacto empresa"
+          value={contactName}
+          onChange={(e) =>
+            setContactName(e.target.value)
+          }
+        />
+
+        <input
+          className="w-full px-4 py-2 border rounded-lg mb-4"
+          placeholder="Teléfono"
+          value={phone}
+          onChange={(e) =>
+            setPhone(e.target.value)
+          }
+        />
+
+        {/* =========================
+            OWNER SECTION
+        ========================== */}
+
+        <hr className="my-4" />
+
+        <h3 className="font-medium mb-3">
+          Usuario Owner (Obligatorio)
+        </h3>
+
+        <input
+          className="w-full px-4 py-2 border rounded-lg mb-3"
+          placeholder="Email Owner"
+          value={ownerEmail}
+          onChange={(e) =>
+            setOwnerEmail(e.target.value)
+          }
+        />
+
+        <input
+          className="w-full px-4 py-2 border rounded-lg mb-3"
+          placeholder="Nombre Owner"
+          value={ownerName}
+          onChange={(e) =>
+            setOwnerName(e.target.value)
+          }
+        />
+
+        <div className="relative mb-3">
+          <input
+            type={showOwnerPass ? 'text' : 'password'}
+            className="w-full px-4 py-2 border rounded-lg pr-10"
+            placeholder="Contraseña Owner"
+            value={ownerPassword}
+            onChange={(e) =>
+              setOwnerPassword(e.target.value)
+            }
+          />
+          <button
+            type="button"
+            onClick={() =>
+              setShowOwnerPass(!showOwnerPass)
+            }
+            className="absolute right-2 top-2"
+          >
+            👁️
+          </button>
+        </div>
+
+        <div className="relative mb-4">
+          <input
+            type={showOwnerPass2 ? 'text' : 'password'}
+            className="w-full px-4 py-2 border rounded-lg pr-10"
+            placeholder="Confirmar contraseña Owner"
+            value={ownerPasswordConfirm}
+            onChange={(e) =>
+              setOwnerPasswordConfirm(
+                e.target.value
+              )
+            }
+          />
+          <button
+            type="button"
+            onClick={() =>
+              setShowOwnerPass2(
+                !showOwnerPass2
+              )
+            }
+            className="absolute right-2 top-2"
+          >
+            👁️
+          </button>
+        </div>
+
+        {/* =========================
+            EXTRA USER
+        ========================== */}
+
+        <label className="flex items-center gap-2 mb-3">
           <input
             type="checkbox"
-            checked={isActive}
-            onChange={e => setIsActive(e.target.checked)}
+            checked={addExtraUser}
+            onChange={(e) =>
+              setAddExtraUser(e.target.checked)
+            }
           />
-          Cliente activo
+          Agregar usuario adicional
         </label>
 
-        <hr />
-
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={addUser}
-            onChange={e => setAddUser(e.target.checked)}
-          />
-          Agregar usuario a este cliente
-        </label>
-
-        {addUser && (
+        {addExtraUser && (
           <>
-              <input
-                className="w-full border rounded px-3 py-2"
-                placeholder="Nombre del usuario"
-                value={userName}
-                onChange={e => setUserName(e.target.value)}
-              />
-              
             <input
-              className="w-full border rounded px-3 py-2"
-              placeholder="Email usuario"
-              value={userEmail}
-              onChange={e => setUserEmail(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg mb-3"
+              placeholder="Email usuario adicional"
+              value={extraEmail}
+              onChange={(e) =>
+                setExtraEmail(e.target.value)
+              }
             />
+
+            <input
+              className="w-full px-4 py-2 border rounded-lg mb-3"
+              placeholder="Nombre usuario adicional"
+              value={extraName}
+              onChange={(e) =>
+                setExtraName(e.target.value)
+              }
+            />
+
             <select
-              className="w-full border rounded px-3 py-2"
-              value={userRole}
-              onChange={e =>
-                setUserRole(e.target.value as
-                  | 'owner'
-                  | 'finops_admin'
-                  | 'viewer'
+              className="w-full px-4 py-2 border rounded-lg mb-3"
+              value={extraRole}
+              onChange={(e) =>
+                setExtraRole(
+                  e.target.value as any
                 )
               }
             >
-              <option value="owner">
-                Owner (Administrador del cliente)
-              </option>
-
               <option value="finops_admin">
                 FinOps Admin
               </option>
-
               <option value="viewer">
-                Viewer (Solo lectura)
+                Viewer
               </option>
             </select>
 
-
-            {/* PASSWORD */}
-            <div className="relative">
+            <div className="relative mb-3">
               <input
-                type={showPassword ? 'text' : 'password'}
-                className="w-full border rounded px-3 py-2 pr-10"
+                type={showExtraPass ? 'text' : 'password'}
+                className="w-full px-4 py-2 border rounded-lg pr-10"
                 placeholder="Contraseña"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-2 text-sm"
-              >
-                {showPassword ? '🙈' : '👁️'}
-              </button>
-            </div>
-
-            <div className="relative">
-              <input
-                type={showPasswordConfirm ? 'text' : 'password'}
-                className="w-full border rounded px-3 py-2 pr-10"
-                placeholder="Confirmar contraseña"
-                value={passwordConfirm}
-                onChange={e => setPasswordConfirm(e.target.value)}
+                value={extraPassword}
+                onChange={(e) =>
+                  setExtraPassword(
+                    e.target.value
+                  )
+                }
               />
               <button
                 type="button"
                 onClick={() =>
-                  setShowPasswordConfirm(!showPasswordConfirm)
+                  setShowExtraPass(
+                    !showExtraPass
+                  )
                 }
-                className="absolute right-2 top-2 text-sm"
+                className="absolute right-2 top-2"
               >
-                {showPasswordConfirm ? '🙈' : '👁️'}
+                👁️
+              </button>
+            </div>
+
+            <div className="relative mb-4">
+              <input
+                type={showExtraPass2 ? 'text' : 'password'}
+                className="w-full px-4 py-2 border rounded-lg pr-10"
+                placeholder="Confirmar contraseña"
+                value={extraPasswordConfirm}
+                onChange={(e) =>
+                  setExtraPasswordConfirm(
+                    e.target.value
+                  )
+                }
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setShowExtraPass2(
+                    !showExtraPass2
+                  )
+                }
+                className="absolute right-2 top-2"
+              >
+                👁️
               </button>
             </div>
           </>
         )}
 
         {/* ACTIONS */}
+
         <div className="flex justify-end gap-2 pt-4">
-          <button onClick={onClose} className="text-gray-600">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-600 hover:underline"
+          >
             Cancelar
           </button>
 
           <button
             onClick={submit}
             disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
           >
-            {loading ? 'Creando…' : 'Crear'}
+            {loading
+              ? 'Creando…'
+              : 'Crear cliente'}
           </button>
         </div>
+
       </div>
     </div>
   );
