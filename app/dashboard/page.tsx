@@ -7,6 +7,7 @@
 
 import { useAuth } from '@/app/context/AuthContext';
 import AdminDashboard from './AdminDashboard';
+import ClientDashboard from './ClientDashboard';
 
 export default function DashboardPage() {
   const { user, isAuthReady } = useAuth();
@@ -27,5 +28,18 @@ export default function DashboardPage() {
     );
   }
 
-  return <AdminDashboard />;
+  if (user.global_role) {
+    return <AdminDashboard />;
+  }
+  
+  if (user.client_role) {
+    return <ClientDashboard />;
+  }
+  
+  return (
+    <p className="text-red-500 p-6">
+      Usuario sin rol válido
+    </p>
+  );
+  
 }

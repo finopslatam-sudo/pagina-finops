@@ -32,7 +32,7 @@ export interface User {
   id: number;
   email: string;
 
-  global_role: "root" | "support" | null;
+  global_role: "root" | "admin" | "support" | null;
   client_role: "owner" | "finops_admin" | "viewer" | null;
   client_id: number | null;
 
@@ -70,6 +70,7 @@ interface AuthContextType {
 
   /* ===== PERMISOS DERIVADOS ===== */
   isRoot: boolean;
+  isAdmin: boolean;
   isSupport: boolean;
   isStaff: boolean;
 
@@ -128,8 +129,11 @@ export function AuthProvider({
   ========================== */
 
   const isRoot = user?.global_role === "root";
+  const isAdmin = user?.global_role === "admin";
   const isSupport = user?.global_role === "support";
-  const isStaff = isRoot || isSupport;
+  
+  const isStaff = isRoot || isAdmin || isSupport;
+  
 
   /* =========================
      LOGOUT
@@ -306,6 +310,7 @@ export function AuthProvider({
         token,
         planState,
         isRoot,
+        isAdmin,
         isSupport,
         isStaff,
         isAuthReady,
