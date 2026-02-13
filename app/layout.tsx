@@ -7,6 +7,7 @@ import './globals.css';
 
 import { AuthProvider } from './context/AuthContext';
 import PublicNavbar from './components/layout/PublicNavbar';
+import SessionExpiredModal from './components/Auth/SessionExpiredModal';
 
 /* =====================================================
    METADATA
@@ -54,9 +55,14 @@ export default function RootLayout({
         <AuthProvider>
 
           {/* =========================
+             MODAL GLOBAL DE SESIÓN EXPIRADA
+             - Se activa desde AuthContext
+             - No contiene lógica de negocio
+          ========================== */}
+          <SessionExpiredModal />
+
+          {/* =========================
              NAVBAR PÚBLICO / GLOBAL
-             - Reacciona a AuthContext internamente
-             - NO decide seguridad
           ========================== */}
           <PublicNavbar />
 

@@ -139,23 +139,31 @@ export function AuthProvider({
      LOGOUT
   ========================== */
 
-  const logout = () => {
+  const logout = (reason?: 'expired') => {
     if (isLoggingOutRef.current) return;
     isLoggingOutRef.current = true;
-
+  
     if (inactivityTimer.current) {
       clearTimeout(inactivityTimer.current);
     }
-
+  
     localStorage.removeItem("finops_token");
     localStorage.removeItem("finops_user");
-
+  
+    if (reason === 'expired') {
+      sessionStorage.setItem(
+        "session_expired",
+        "true"
+      );
+    }
+  
     setUser(null);
     setToken(null);
     setPlanState({ status: "none" });
-
-    window.location.href = "/";
+  
+    router.replace("/");
   };
+  
 
   /* =========================
      INACTIVITY
@@ -169,9 +177,10 @@ export function AuthProvider({
     }
 
     inactivityTimer.current = setTimeout(
-      logout,
+      () => logout('expired'),
       INACTIVITY_LIMIT
     );
+    
   };
 
   /* =========================
