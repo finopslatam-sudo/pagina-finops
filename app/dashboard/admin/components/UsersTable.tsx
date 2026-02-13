@@ -1,6 +1,7 @@
 'use client';
 
 import { AdminUser } from '../hooks/useAdminUsers';
+import { useAuth } from '@/app/context/AuthContext';
 
 interface Props {
   users: AdminUser[];
@@ -15,6 +16,7 @@ export function UsersTable({ users, onEdit }: Props) {
       </p>
     );
   }
+  const { user: currentUser } = useAuth();
 
   return (
     <div className="overflow-x-auto">
@@ -68,19 +70,46 @@ export function UsersTable({ users, onEdit }: Props) {
                 </td>
 
                 <td className="px-4 py-2 text-right">
-                  {onEdit ? (
+                {(() => {
+                  if (!onEdit) {
+                    return (
+                      <span className="text-gray-400">
+                        —
+                      </span>
+                    );
+                  }
+
+                  const canEdit =
+                    currentUser?.global_role === 'root' ||
+
+                    (
+                      currentUser?.global_role === 'admin' &&
+                      user.global_role !== 'root'
+                    ) ||
+
+                    (
+                      currentUser?.global_role === 'support' &&
+                      user.global_role === null
+                    );
+
+                  if (!canEdit) {
+                    return (
+                      <span className="text-gray-400">
+                        —
+                      </span>
+                    );
+                  }
+
+                  return (
                     <button
                       onClick={() => onEdit(user)}
                       className="text-blue-600 hover:underline"
                     >
                       Editar
                     </button>
-                  ) : (
-                    <span className="text-gray-400">
-                      —
-                    </span>
-                  )}
-                </td>
+                  );
+                })()}
+              </td>
               </tr>
             );
           })}

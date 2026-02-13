@@ -17,12 +17,19 @@ export default function UserFormModal({
   onClose,
   onSaved,
 }: Props) {
-  const { token } = useAuth();
-
+ 
   const isGlobalUser = user.type === 'global';
   const canEdit = user.can_edit === true;
 
   const [success, setSuccess] = useState(false);
+  const { token, user: currentUser } = useAuth();
+
+  const isRoot = currentUser?.global_role === 'root';
+  const isAdmin = currentUser?.global_role === 'admin';
+  const isSupport = currentUser?.global_role === 'support';
+
+  const isSelf = currentUser?.id === user.id;
+
 
   /* ============================
      FORM STATE - EDIT USER
@@ -187,17 +194,34 @@ export default function UserFormModal({
               Rol del sistema
             </label>
             <select
-              disabled={!canEdit}
+              disabled={
+                !canEdit ||
+                isSelf ||                         // nadie cambia su propio rol
+                (isSupport && user.global_role !== null) ||// support no edita global
+                (isAdmin && user.global_role === 'root') // admin no edita root
+              }
               value={globalRole}
               onChange={(e) =>
                 setGlobalRole(e.target.value)
               }
               className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
             >
-              <option value="root">Root</option>
-              <option value="admin">Admin</option>
-              <option value="support">Support</option>
+              {/* Root puede ver root */}
+              {isRoot && (
+                <option value="root">Root</option>
+              )}
+
+              {/* Root y Admin pueden ver admin */}
+              {(isRoot || isAdmin) && (
+                <option value="admin">Admin</option>
+              )}
+
+              {/* Root y Admin pueden ver support */}
+              {(isRoot || isAdmin) && (
+                <option value="support">Support</option>
+              )}
             </select>
+
           </div>
         )}
 

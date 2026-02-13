@@ -24,7 +24,7 @@ export default function CreateUserModal({
     useState<'owner' | 'finops_admin' | 'viewer'>('owner');
 
   const [globalRole, setGlobalRole] =
-    useState<'admin' | 'support'>('admin');
+    useState<'root' | 'admin' | 'support'>('admin');
 
   const [email, setEmail] = useState('');
   const [contactName, setContactName] = useState('');
@@ -41,6 +41,11 @@ export default function CreateUserModal({
   );
   const [success, setSuccess] =
     useState<string | null>(null);
+  
+  const { user: currentUser } = useAuth();
+  const isRoot = currentUser?.global_role === "root";
+  const isAdmin = currentUser?.global_role === "admin";
+  const isSupport = currentUser?.global_role === "support";
 
   // ===============================
   // Cargar clientes
@@ -168,27 +173,45 @@ export default function CreateUserModal({
           <option value="client">
             Comercial
           </option>
-          <option value="global">
-            Sistema
-          </option>
+
+          {/* Solo Root y Admin pueden crear sistema */}
+          {(isRoot || isAdmin) && (
+            <option value="global">
+              Sistema
+            </option>
+          )}
         </select>
 
         {/* GLOBAL */}
         {type === 'global' && (
           <select
-            className="w-full border rounded px-3 py-2"
-            value={globalRole}
-            onChange={(e) =>
-              setGlobalRole(e.target.value as any)
-            }
-          >
+          className="w-full border rounded px-3 py-2"
+          value={globalRole}
+          onChange={(e) =>
+            setGlobalRole(e.target.value as any)
+          }
+        >
+          {/* Root puede crear root */}
+          {isRoot && (
+            <option value="root">
+              Root
+            </option>
+          )}
+
+          {/* Root y Admin pueden crear admin */}
+          {(isRoot || isAdmin) && (
             <option value="admin">
               Admin
             </option>
+          )}
+
+          {/* Root y Admin pueden crear support */}
+          {(isRoot || isAdmin) && (
             <option value="support">
               Support
             </option>
-          </select>
+          )}
+        </select>
         )}
 
         {/* CLIENT */}
