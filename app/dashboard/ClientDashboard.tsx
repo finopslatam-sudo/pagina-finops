@@ -13,12 +13,6 @@ import { apiFetch } from '@/app/lib/api';
    TYPES
 ===================================================== */
 
-/**
- * Contrato EXACTO con:
- * GET /api/v1/reports/client/stats
- *
- * ⚠️ No agregar campos frontend-only
- */
 interface ClientStats {
   client_id: number;
   user_count: number;
@@ -30,10 +24,6 @@ interface ClientStats {
    UI COMPONENTS
 ===================================================== */
 
-/**
- * Card informativa reutilizable
- * (solo presentación)
- */
 const InfoCard = ({
   title,
   value,
@@ -64,20 +54,16 @@ export default function ClientDashboard() {
 
   /* =====================================================
      ACCESS CONTROL
-     - Solo usuarios de cliente
-     - Staff NO debe acceder
   ===================================================== */
 
   useEffect(() => {
     if (!isAuthReady) return;
 
-    // 🔐 Usuario no autenticado
     if (!user || !token) {
       router.replace('/');
       return;
     }
 
-    // 🚫 Staff no puede ver dashboard cliente
     if (isStaff) {
       router.replace('/dashboard');
       return;
@@ -86,8 +72,6 @@ export default function ClientDashboard() {
 
   /* =====================================================
      FETCH CLIENT STATS
-     - client_id viene desde JWT (backend)
-     - No se pasa por URL
   ===================================================== */
 
   useEffect(() => {
@@ -116,7 +100,13 @@ export default function ClientDashboard() {
     return <p className="text-red-500">{error}</p>;
   }
 
-  if (!stats) {
+  // 🔒 ENTERPRISE SAFE CHECK
+  if (
+    !stats ||
+    typeof stats !== 'object' ||
+    typeof stats.user_count !== 'number' ||
+    typeof stats.active_services !== 'number'
+  ) {
     return (
       <p className="text-gray-400">
         Cargando tu dashboard…
@@ -131,9 +121,6 @@ export default function ClientDashboard() {
   return (
     <div className="space-y-10">
 
-      {/* =========================
-         HEADER
-      ========================== */}
       <div>
         <h1 className="text-2xl font-semibold">
           Bienvenido a tu Dashboard FinOps
@@ -141,14 +128,13 @@ export default function ClientDashboard() {
         <p className="text-gray-500">
           Plan actual:{' '}
           <span className="font-medium">
-            {stats.plan ?? 'Sin plan asignado'}
+            {typeof stats.plan === 'string'
+              ? stats.plan
+              : 'Sin plan asignado'}
           </span>
         </p>
       </div>
 
-      {/* =========================
-         KPIs CLIENTE
-      ========================== */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
         <InfoCard
@@ -165,16 +151,16 @@ export default function ClientDashboard() {
 
         <InfoCard
           title="Estado del plan"
-          value={stats.plan ?? 'No asignado'}
+          value={
+            typeof stats.plan === 'string'
+              ? stats.plan
+              : 'No asignado'
+          }
           accent="from-purple-50 to-pink-50"
         />
 
       </div>
 
-      {/* =========================
-         PLACEHOLDERS FUTUROS
-         (ETL / AUDITORÍA REAL)
-      ========================== */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         <div className="bg-white p-6 rounded-xl border shadow-sm">
