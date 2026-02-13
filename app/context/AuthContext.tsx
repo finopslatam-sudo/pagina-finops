@@ -279,7 +279,31 @@ export function AuthProvider({
       JSON.stringify(data.user)
     );
 
+    setToken(data.access_token);
+    setUser(data.user);
+
+    localStorage.setItem(
+      "finops_token",
+      data.access_token
+    );
+    localStorage.setItem(
+      "finops_user",
+      JSON.stringify(data.user)
+    );
+
+    /**
+     * 🔐 Si el backend indica que debe cambiar password
+     * (reset por root/admin/support o forgot password)
+     * forzar redirección.
+     */
+    if (data.user.force_password_change === true) {
+      router.replace("/force-change-password");
+      return;
+    }
+
     router.replace("/dashboard");
+
+    
   };
 
   /* =========================
