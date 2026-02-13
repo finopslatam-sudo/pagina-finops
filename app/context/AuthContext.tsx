@@ -175,35 +175,46 @@ export function AuthProvider({
   };
 
   /* =========================
-     REHYDRATE SESSION
-  ========================== */
+   REHYDRATE SESSION (ENTERPRISE SAFE)
+   - Token es source of truth
+   - User siempre se valida contra backend
+========================== */
 
-  useEffect(() => {
+useEffect(() => {
+  const rehydrate = async () => {
     try {
       const savedToken = localStorage.getItem("finops_token");
-      const savedUser = localStorage.getItem("finops_user");
-   /* =========================
-      FORCE PASSWORD GUARD
-    ========================== */
 
-    useEffect(() => {
-      if (!user) return;
-
-      if (user.force_password_change === true) {
-        router.replace("/force-change-password");
+      if (!savedToken) {
+        setIsAuthReady(true);
+        return;
       }
-    }, [user]);
 
-      if (savedToken && savedUser) {
-        setToken(savedToken);
-        setUser(JSON.parse(savedUser));
-      }
-    } catch {
-      localStorage.clear();
+      setToken(savedToken);
+
+      // 🔎 Validamos sesión contra backend
+      const freshUser = await apiFetch<User>("/api/me", {
+        token: savedToken,
+      });
+
+      setUser(freshUser);
+
+      // Solo cache defensivo, NO source of truth
+      localStorage.setItem(
+        "finops_user",
+        JSON.stringify(freshUser)
+      );
+    } catch (err) {
+      console.warn("[REHYDRATE_FAILED]", err);
+      logout();
     } finally {
       setIsAuthReady(true);
     }
-  }, []);
+  };
+
+  rehydrate();
+}, []);
+
 
   /* =========================
      FETCH PLAN
@@ -285,22 +296,19 @@ export function AuthProvider({
       "finops_token",
       data.access_token
     );
+  
+    // Guardado defensivo, pero NO se usa como source of truth
     localStorage.setItem(
       "finops_user",
       JSON.stringify(data.user)
     );
   
-    /**
-     * 🔐 Si el backend indica que debe cambiar password
-     */
-    if (data.user.force_password_change === true) {
-      router.replace("/force-change-password");
-      return;
-    }
+    // 🚫 NO redirigimos aquí por force_password_change
+    // PrivateRoute se encarga del bloqueo
   
     router.replace("/dashboard");
   };
-  
+    
 
   /* =========================
      UPDATE USER (LOCAL)
