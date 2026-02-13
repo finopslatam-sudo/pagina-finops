@@ -19,16 +19,13 @@ export default function UserFormModal({
 }: Props) {
   const { token } = useAuth();
 
-  /**
-   * 🔑 SOURCE OF TRUTH
-   * Backend define tipo y permisos
-   */
   const isGlobalUser = user.type === 'global';
   const canEdit = user.can_edit === true;
+
   const [success, setSuccess] = useState(false);
 
   /* ============================
-     FORM STATE
+     FORM STATE - EDIT USER
   ============================ */
 
   const [email, setEmail] = useState(user.email);
@@ -46,7 +43,23 @@ export default function UserFormModal({
   const [error, setError] = useState<string | null>(null);
 
   /* ============================
-     SAVE HANDLER (REAL)
+     RESET PASSWORD STATE
+  ============================ */
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] =
+    useState('');
+  const [showPassword, setShowPassword] =
+    useState(false);
+  const [resetLoading, setResetLoading] =
+    useState(false);
+  const [resetSuccess, setResetSuccess] =
+    useState(false);
+  const [resetError, setResetError] =
+    useState<string | null>(null);
+
+  /* ============================
+     SAVE USER
   ============================ */
 
   const handleSave = async () => {
@@ -58,7 +71,7 @@ export default function UserFormModal({
     try {
       const body: any = {
         email,
-        is_active: isActive, // boolean real
+        is_active: isActive,
       };
 
       if (isGlobalUser) {
@@ -78,11 +91,58 @@ export default function UserFormModal({
       setTimeout(() => {
         onSaved();
       }, 800);
-
     } catch (err) {
       setError('No se pudo guardar el usuario');
     } finally {
       setSaving(false);
+    }
+  };
+
+  /* ============================
+     RESET PASSWORD HANDLER
+  ============================ */
+
+  const handleResetPassword = async () => {
+    if (!token || !canEdit) return;
+
+    setResetError(null);
+    setResetSuccess(false);
+
+    if (newPassword.length < 8) {
+      setResetError(
+        'La contraseña debe tener al menos 8 caracteres'
+      );
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setResetError('Las contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      setResetLoading(true);
+
+      await apiFetch(
+        `/api/admin/users/${user.id}/set-password`,
+        {
+          method: 'POST',
+          token,
+          body: {
+            password: newPassword,
+          },
+        }
+      );
+
+      setResetSuccess(true);
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      setResetError(
+        'No tienes permiso para resetear la contraseña'
+      );
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -120,7 +180,7 @@ export default function UserFormModal({
           />
         </div>
 
-        {/* USUARIO GLOBAL */}
+        {/* GLOBAL */}
         {isGlobalUser && (
           <div>
             <label className="block text-sm font-medium">
@@ -129,16 +189,19 @@ export default function UserFormModal({
             <select
               disabled={!canEdit}
               value={globalRole}
-              onChange={(e) => setGlobalRole(e.target.value)}
+              onChange={(e) =>
+                setGlobalRole(e.target.value)
+              }
               className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
             >
               <option value="root">Root</option>
+              <option value="admin">Admin</option>
               <option value="support">Support</option>
             </select>
           </div>
         )}
 
-        {/* USUARIO CLIENTE */}
+        {/* CLIENT */}
         {!isGlobalUser && (
           <div>
             <label className="block text-sm font-medium">
@@ -174,11 +237,93 @@ export default function UserFormModal({
           <span>Usuario activo</span>
         </div>
 
+        {/* ============================
+            RESET PASSWORD SECTION
+        ============================ */}
+
+        {canEdit && (
+          <>
+            <hr className="my-4" />
+
+            <h3 className="font-semibold text-lg">
+              Reset Password
+            </h3>
+
+            {/* NEW PASSWORD */}
+            <div>
+              <label className="block text-sm font-medium">
+                Nueva password
+              </label>
+              <div className="relative">
+                <input
+                  type={
+                    showPassword ? 'text' : 'password'
+                  }
+                  value={newPassword}
+                  onChange={(e) =>
+                    setNewPassword(e.target.value)
+                  }
+                  className="w-full border rounded px-3 py-2 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword(!showPassword)
+                  }
+                  className="absolute right-2 top-2 text-sm"
+                >
+                  👁
+                </button>
+              </div>
+            </div>
+
+            {/* CONFIRM PASSWORD */}
+            <div>
+              <label className="block text-sm font-medium">
+                Confirmar nueva password
+              </label>
+              <input
+                type={
+                  showPassword ? 'text' : 'password'
+                }
+                value={confirmPassword}
+                onChange={(e) =>
+                  setConfirmPassword(e.target.value)
+                }
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+
+            {resetError && (
+              <p className="text-sm text-red-600">
+                {resetError}
+              </p>
+            )}
+
+            {resetSuccess && (
+              <p className="text-sm text-green-600">
+                ✅ Password actualizada correctamente
+              </p>
+            )}
+
+            <button
+              onClick={handleResetPassword}
+              disabled={resetLoading}
+              className="px-4 py-2 bg-red-600 text-white rounded disabled:opacity-50"
+            >
+              {resetLoading
+                ? 'Reseteando...'
+                : 'Reset Password'}
+            </button>
+          </>
+        )}
+
         {error && (
           <p className="text-sm text-red-600">
             {error}
           </p>
         )}
+
         {success && (
           <p className="text-sm text-green-600">
             ✅ Usuario actualizado correctamente
