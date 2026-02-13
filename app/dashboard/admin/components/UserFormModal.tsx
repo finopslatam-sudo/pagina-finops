@@ -298,7 +298,7 @@ export default function UserFormModal({
                   }
                   className="absolute right-2 top-2 text-sm"
                 >
-                  👁
+                  {showPassword ? '🙈' : '👁'}
                 </button>
               </div>
             </div>
@@ -327,7 +327,7 @@ export default function UserFormModal({
                   }
                   className="absolute right-2 top-2 text-sm"
                 >
-                  👁
+                  {showConfirmPassword ? '🙈' : '👁'}
                 </button>
               </div>
             </div>
