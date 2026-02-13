@@ -6,6 +6,7 @@
 ===================================================== */
 
 import { useAuth } from '@/app/context/AuthContext';
+import PrivateRoute from '@/app/components/Auth/PrivateRoute';
 import AdminDashboard from './AdminDashboard';
 import ClientDashboard from './ClientDashboard';
 
@@ -28,18 +29,17 @@ export default function DashboardPage() {
     );
   }
 
-  if (user.global_role) {
-    return <AdminDashboard />;
-  }
-  
-  if (user.client_role) {
-    return <ClientDashboard />;
-  }
-  
   return (
-    <p className="text-red-500 p-6">
-      Usuario sin rol válido
-    </p>
+    <PrivateRoute>
+      {user.global_role ? (
+        <AdminDashboard />
+      ) : user.client_role ? (
+        <ClientDashboard />
+      ) : (
+        <p className="text-red-500 p-6">
+          Usuario sin rol válido
+        </p>
+      )}
+    </PrivateRoute>
   );
-  
 }
