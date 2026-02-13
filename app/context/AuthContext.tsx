@@ -182,6 +182,17 @@ export function AuthProvider({
     try {
       const savedToken = localStorage.getItem("finops_token");
       const savedUser = localStorage.getItem("finops_user");
+   /* =========================
+      FORCE PASSWORD GUARD
+    ========================== */
+
+    useEffect(() => {
+      if (!user) return;
+
+      if (user.force_password_change === true) {
+        router.replace("/force-change-password");
+      }
+    }, [user]);
 
       if (savedToken && savedUser) {
         setToken(savedToken);
@@ -258,7 +269,7 @@ export function AuthProvider({
     password: string
   ) => {
     isLoggingOutRef.current = false;
-
+  
     const data = await apiFetch<{
       access_token: string;
       user: User;
@@ -266,10 +277,10 @@ export function AuthProvider({
       method: "POST",
       body: { email, password },
     });
-
+  
     setToken(data.access_token);
     setUser(data.user);
-
+  
     localStorage.setItem(
       "finops_token",
       data.access_token
@@ -278,33 +289,18 @@ export function AuthProvider({
       "finops_user",
       JSON.stringify(data.user)
     );
-
-    setToken(data.access_token);
-    setUser(data.user);
-
-    localStorage.setItem(
-      "finops_token",
-      data.access_token
-    );
-    localStorage.setItem(
-      "finops_user",
-      JSON.stringify(data.user)
-    );
-
+  
     /**
      * 🔐 Si el backend indica que debe cambiar password
-     * (reset por root/admin/support o forgot password)
-     * forzar redirección.
      */
     if (data.user.force_password_change === true) {
       router.replace("/force-change-password");
       return;
     }
-
+  
     router.replace("/dashboard");
-
-    
   };
+  
 
   /* =========================
      UPDATE USER (LOCAL)
