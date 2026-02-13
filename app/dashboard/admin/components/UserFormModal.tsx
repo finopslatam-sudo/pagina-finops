@@ -58,6 +58,8 @@ export default function UserFormModal({
     useState('');
   const [showPassword, setShowPassword] =
     useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
   const [resetLoading, setResetLoading] =
     useState(false);
   const [resetSuccess, setResetSuccess] =
@@ -306,16 +308,28 @@ export default function UserFormModal({
               <label className="block text-sm font-medium">
                 Confirmar nueva password
               </label>
-              <input
-                type={
-                  showPassword ? 'text' : 'password'
-                }
-                value={confirmPassword}
-                onChange={(e) =>
-                  setConfirmPassword(e.target.value)
-                }
-                className="w-full border rounded px-3 py-2"
-              />
+              <div className="relative">
+                <input
+                  type={
+                    showConfirmPassword ? 'text' : 'password'
+                  }
+                  value={confirmPassword}
+                  onChange={(e) =>
+                    setConfirmPassword(e.target.value)
+                  }
+                  className="w-full border rounded px-3 py-2 pr-10"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                  className="absolute right-2 top-2 text-sm"
+                >
+                  👁
+                </button>
+              </div>
             </div>
 
             {resetError && (
@@ -333,7 +347,7 @@ export default function UserFormModal({
             <button
               onClick={handleResetPassword}
               disabled={resetLoading}
-              className="px-4 py-2 bg-red-600 text-white rounded disabled:opacity-50"
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50"
             >
               {resetLoading
                 ? 'Reseteando...'
