@@ -124,7 +124,6 @@ export default function PerfilPage() {
         'Perfil actualizado correctamente'
       );
       setEditContact(false);
-      setEditPhone(false);
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
@@ -212,7 +211,18 @@ export default function PerfilPage() {
               {/* INFO NO EDITABLE */}
               <div className="space-y-5">
                 <Input label="Empresa" value={user?.company_name} />
-                <Input label="Correo" value={user?.email} />
+                <EditableField
+                  label="Correo"
+                  value={form.email}
+                  editable={true}
+                  onEdit={() => {}}
+                  onChange={(v) =>
+                    setForm((p) => ({
+                      ...p,
+                      email: v,
+                    }))
+                  }
+                />
                 <Input
                   label="Plan"
                   value={
