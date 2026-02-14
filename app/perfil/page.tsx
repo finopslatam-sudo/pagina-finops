@@ -221,7 +221,7 @@ export default function PerfilPage() {
                 <Input
                   label="Plan"
                   value={
-                    planState.status === 'assigned'
+                    planState.status === 'assigned' && planState.plan
                       ? planState.plan.name
                       : '—'
                   }
