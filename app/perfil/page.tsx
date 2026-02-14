@@ -243,21 +243,6 @@ export default function PerfilPage() {
                   }
                 />
 
-                <EditableField
-                  label="Teléfono"
-                  value={form.phone}
-                  editable={editPhone}
-                  onEdit={() =>
-                    setEditPhone(!editPhone)
-                  }
-                  onChange={(v) =>
-                    setForm((p) => ({
-                      ...p,
-                      phone: v,
-                    }))
-                  }
-                />
-
                 <button
                   type="submit"
                   disabled={loadingProfile}
