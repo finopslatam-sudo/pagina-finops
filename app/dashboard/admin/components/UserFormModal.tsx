@@ -181,19 +181,6 @@ export default function UserFormModal({
 
       <div className="space-y-4">
 
-        {/* EMAIL */}
-        <div>
-          <label className="block text-sm font-medium">
-            Email
-          </label>
-          <input
-            disabled={!canEdit}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
-          />
-        </div>
-
         {/* CONTACT NAME */}
         <div>
           <label className="block text-sm font-medium">
@@ -205,6 +192,19 @@ export default function UserFormModal({
             onChange={(e) =>
               setContactName(e.target.value)
             }
+            className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
+          />
+        </div>
+
+        {/* EMAIL */}
+        <div>
+          <label className="block text-sm font-medium">
+            Email
+          </label>
+          <input
+            disabled={!canEdit}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
           />
         </div>
