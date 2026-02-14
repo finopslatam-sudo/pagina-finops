@@ -47,13 +47,12 @@ export default function PerfilPage() {
   ================================= */
 
   const [editContact, setEditContact] = useState(false);
-  const [editPhone, setEditPhone] = useState(false);
-
+  
   const [currentPassword, setCurrentPassword] = useState('');
 
   const [form, setForm] = useState({
+    email: '',
     contact_name: '',
-    phone: '',
     password: '',
     confirmPassword: '',
   });
@@ -72,8 +71,8 @@ export default function PerfilPage() {
     if (!user) return;
 
     setForm({
+      email: user.email || '',
       contact_name: user.contact_name || '',
-      phone: user.phone || '',
       password: '',
       confirmPassword: '',
     });
@@ -107,22 +106,18 @@ export default function PerfilPage() {
     setLoadingProfile(true);
 
     try {
-      await apiFetch('/api/users/me', {
+      await apiFetch('/api/me', {
         method: 'PUT',
         token,
         body: {
-          contact_name: editContact
-            ? form.contact_name
-            : undefined,
-          phone: editPhone
-            ? form.phone
-            : undefined,
+          email: form.email,
+          contact_name: form.contact_name,
         },
       });
 
       updateUser({
+        email: form.email,
         contact_name: form.contact_name,
-        phone: form.phone,
       });
 
       setSuccessProfile(
