@@ -209,14 +209,6 @@ export default function UserFormModal({
           />
         </div>
 
-          <input
-            disabled={!canEdit}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
-          />
-        </div>
-
         {/* GLOBAL */}
         {isGlobalUser && (
           <div>
