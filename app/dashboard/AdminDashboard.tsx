@@ -175,6 +175,21 @@ export default function AdminDashboard() {
     <div className="space-y-10 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-1 rounded-xl">
 
       {/* =========================
+         HEADER STAFF
+      ========================== */}
+      <div>
+        <h1 className="text-2xl font-semibold">
+          Panel Administrativo
+        </h1>
+        <p className="text-gray-500">
+          Sesión actual:{' '}
+          <span className="font-medium uppercase">
+            {user?.global_role}
+          </span>
+        </p>
+      </div>
+
+      {/* =========================
          KPIs
       ========================== */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
