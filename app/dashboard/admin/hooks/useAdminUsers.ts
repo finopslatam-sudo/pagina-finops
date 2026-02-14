@@ -21,6 +21,7 @@ export interface AdminUser {
   created_at: string | null;
   password_expires_at: string | null;
   company_name: string | null;
+  contact_name?: string | null;
 }
 
 export function useAdminUsers() {

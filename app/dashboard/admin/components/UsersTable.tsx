@@ -25,6 +25,7 @@ export function UsersTable({ users, onEdit }: Props) {
           <tr className="bg-gray-50 text-left text-sm">
             <th className="px-4 py-2">Email</th>
             <th className="px-4 py-2">Empresa</th>
+            <th className="px-4 py-2">Contacto</th>
             <th className="px-4 py-2">Rol</th>
             <th className="px-4 py-2">Estado</th>
             <th className="px-4 py-2 text-right">
@@ -47,6 +48,10 @@ export function UsersTable({ users, onEdit }: Props) {
               >
                 <td className="px-4 py-2">
                   {user.email}
+                </td>
+
+                <td className="px-4 py-2">
+                  {user.contact_name || '—'}
                 </td>
 
                 <td className="px-4 py-2">

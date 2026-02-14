@@ -36,6 +36,9 @@ export default function UserFormModal({
   ============================ */
 
   const [email, setEmail] = useState(user.email);
+  const [contactName, setContactName] = useState(
+    user.contact_name || ''
+  );  
   const [globalRole, setGlobalRole] = useState(
     user.global_role ?? ''
   );
@@ -80,6 +83,7 @@ export default function UserFormModal({
     try {
       const body: any = {
         email,
+        contact_name: contactName,
         is_active: isActive,
       };
 
@@ -181,6 +185,21 @@ export default function UserFormModal({
           <label className="block text-sm font-medium">
             Email
           </label>
+          {/* CONTACT NAME */}
+          <div>
+            <label className="block text-sm font-medium">
+              Nombre de contacto
+            </label>
+            <input
+              disabled={!canEdit}
+              value={contactName}
+              onChange={(e) =>
+                setContactName(e.target.value)
+              }
+              className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
+            />
+          </div>
+
           <input
             disabled={!canEdit}
             value={email}
