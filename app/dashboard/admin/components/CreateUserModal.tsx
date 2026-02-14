@@ -47,6 +47,21 @@ export default function CreateUserModal({
   const isAdmin = currentUser?.global_role === "admin";
   const isSupport = currentUser?.global_role === "support";
 
+  const resetForm = () => {
+    setEmail('');
+    setContactName('');
+    setPassword('');
+    setPasswordConfirm('');
+    setClientId(null);
+    setClientRole('owner');
+    setGlobalRole('admin');
+    setShowPass(false);
+    setShowPass2(false);
+    setError(null);
+    setSuccess(null);
+  };
+ 
+
   // ===============================
   // Cargar clientes
   // ===============================
@@ -67,6 +82,10 @@ export default function CreateUserModal({
 
     loadClients();
   }, [token]);
+
+  useEffect(() => {
+    resetForm();
+  }, []);
 
   // ===============================
   // SUBMIT
@@ -297,7 +316,7 @@ export default function CreateUserModal({
             }
             className="absolute right-2 top-2"
           >
-            👁️
+            {showPass ? '🙈' : '👁️'}
           </button>
         </div>
 
@@ -320,7 +339,7 @@ export default function CreateUserModal({
             }
             className="absolute right-2 top-2"
           >
-            👁️
+            {showPass2 ? '🙈' : '👁️'}
           </button>
         </div>
 

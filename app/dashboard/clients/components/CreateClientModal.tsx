@@ -5,7 +5,7 @@
    Cliente + Owner obligatorio + Usuarios adicionales
 ===================================================== */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PLANS } from '@/app/lib/plans';
 
 export type CreateClientPayload = {
@@ -88,6 +88,41 @@ export default function CreateClientModal({
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const resetForm = () => {
+    // CLIENT
+    setCompanyName('');
+    setEmail('');
+    setContactName('');
+    setPhone('');
+    setIsActive(true);
+    setPlanId(PLANS[0].id);
+  
+    // OWNER
+    setOwnerEmail('');
+    setOwnerName('');
+    setOwnerPassword('');
+    setOwnerPasswordConfirm('');
+    setShowOwnerPass(false);
+    setShowOwnerPass2(false);
+  
+    // EXTRA
+    setAddExtraUser(false);
+    setExtraEmail('');
+    setExtraName('');
+    setExtraRole('finops_admin');
+    setExtraPassword('');
+    setExtraPasswordConfirm('');
+    setShowExtraPass(false);
+    setShowExtraPass2(false);
+  
+    // UI
+    setError(null);
+  };
+
+  useEffect(() => {
+    resetForm();
+  }, []); 
 
   /* =========================
      SUBMIT
@@ -325,7 +360,7 @@ export default function CreateClientModal({
             }
             className="absolute right-2 top-2"
           >
-            👁️
+            {showOwnerPass ? '🙈' : '👁️'}
           </button>
         </div>
 
@@ -350,7 +385,7 @@ export default function CreateClientModal({
             }
             className="absolute right-2 top-2"
           >
-            👁️
+            {showOwnerPass2 ? '🙈' : '👁️'}
           </button>
         </div>
 
@@ -427,7 +462,7 @@ export default function CreateClientModal({
                 }
                 className="absolute right-2 top-2"
               >
-                👁️
+                {showExtraPass ? '🙈' : '👁️'}
               </button>
             </div>
 
@@ -452,7 +487,7 @@ export default function CreateClientModal({
                 }
                 className="absolute right-2 top-2"
               >
-                👁️
+                {showExtraPass2 ? '🙈' : '👁️'}
               </button>
             </div>
           </>
