@@ -62,22 +62,35 @@ export default function PerfilPage() {
 
   const [successProfile, setSuccessProfile] = useState('');
   const [error, setError] = useState('');
+  const [profile, setProfile] = useState<any>(null);
 
   /* ================================
      INIT FORM
   ================================= */
-
   useEffect(() => {
-    if (!user) return;
-
-    setForm({
-      email: user.email || '',
-      contact_name: user.contact_name || '',
-      password: '',
-      confirmPassword: '',
-    });
-  }, [user]);
-
+    if (!token) return;
+  
+    const loadProfile = async () => {
+      try {
+        const res = await apiFetch('/api/me', { token });
+  
+        setProfile(res);
+  
+        setForm({
+          email: res.email || '',
+          contact_name: res.contact_name || '',
+          password: '',
+          confirmPassword: '',
+        });
+  
+      } catch (err) {
+        console.error('Error cargando perfil');
+      }
+    };
+  
+    loadProfile();
+  }, [token]);
+  
   /* ================================
      PASSWORD VALIDATION UI
   ================================= */
@@ -119,6 +132,12 @@ export default function PerfilPage() {
         email: form.email,
         contact_name: form.contact_name,
       });
+
+      setProfile((prev: any) => ({
+        ...prev,
+        email: form.email,
+        contact_name: form.contact_name,
+      }));      
 
       setSuccessProfile(
         'Perfil actualizado correctamente'
@@ -210,7 +229,7 @@ export default function PerfilPage() {
 
               {/* INFO NO EDITABLE */}
               <div className="space-y-5">
-                <Input label="Empresa" value={user?.company_name} />
+              <Input label="Empresa" value={profile?.company_name} />
                 <EditableField
                   label="Correo"
                   value={form.email}
@@ -224,12 +243,8 @@ export default function PerfilPage() {
                   }
                 />
                 <Input
-                  label="Plan"
-                  value={
-                    planState.status === 'assigned' && planState.plan
-                      ? planState.plan.name
-                      : '—'
-                  }
+                label="Plan"
+                value={profile?.plan?.name || '—'}
                 />
               </div>
 
