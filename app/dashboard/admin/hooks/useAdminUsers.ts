@@ -63,6 +63,7 @@ export function useAdminUsers() {
           u.company_name ??
           u.client?.company_name ??
           null,
+        contact_name: u.contact_name ?? null, 
       }));
 
       setUsers(adapted);

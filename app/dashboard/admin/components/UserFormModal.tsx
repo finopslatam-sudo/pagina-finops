@@ -180,25 +180,34 @@ export default function UserFormModal({
       )}
 
       <div className="space-y-4">
+
         {/* EMAIL */}
         <div>
           <label className="block text-sm font-medium">
             Email
           </label>
-          {/* CONTACT NAME */}
-          <div>
-            <label className="block text-sm font-medium">
-              Nombre de contacto
-            </label>
-            <input
-              disabled={!canEdit}
-              value={contactName}
-              onChange={(e) =>
-                setContactName(e.target.value)
-              }
-              className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
-            />
-          </div>
+          <input
+            disabled={!canEdit}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
+          />
+        </div>
+
+        {/* CONTACT NAME */}
+        <div>
+          <label className="block text-sm font-medium">
+            Nombre de contacto
+          </label>
+          <input
+            disabled={!canEdit}
+            value={contactName}
+            onChange={(e) =>
+              setContactName(e.target.value)
+            }
+            className="w-full border rounded px-3 py-2 disabled:bg-gray-100"
+          />
+        </div>
 
           <input
             disabled={!canEdit}
