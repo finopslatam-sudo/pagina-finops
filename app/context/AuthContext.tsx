@@ -302,7 +302,23 @@ useEffect(() => {
     });
   
     setToken(data.access_token);
-    setUser(data.user);
+
+    localStorage.setItem(
+      "finops_token",
+      data.access_token
+    );
+    
+    // 🔎 Obtener usuario enriquecido real
+    const fullUser = await apiFetch<User>("/api/me", {
+      token: data.access_token,
+    });
+    
+    setUser(fullUser);
+    
+    localStorage.setItem(
+      "finops_user",
+      JSON.stringify(fullUser)
+    );
   
     localStorage.setItem(
       "finops_token",
