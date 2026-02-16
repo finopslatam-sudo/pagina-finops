@@ -202,7 +202,7 @@ export default function PerfilPage() {
               <h3 className="text-lg font-semibold">
                 Datos del perfil
               </h3>
-              
+
               <Input
                 label="Correo"
                 value={form.email}
@@ -210,7 +210,7 @@ export default function PerfilPage() {
 
               <Input
                 label="Rol"
-                value={user?.global_role || '—'}
+                value={user?.role || '—'}
               />
 
               {/* EDITABLE */}
