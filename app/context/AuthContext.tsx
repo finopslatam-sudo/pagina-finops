@@ -22,11 +22,16 @@ import { apiFetch } from "@/app/lib/api";
 export interface User {
   id: number;
   email: string;
-  role: string | null;
-  contact_name: string | null;
+
+  global_role: "root" | "admin" | "support" | null;
+  client_role: "owner" | "finops_admin" | "viewer" | null;
+
   is_active: boolean;
   force_password_change: boolean;
+
+  contact_name?: string | null;
 }
+
 
 interface AuthContextType {
   user: User | null;

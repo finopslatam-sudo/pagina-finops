@@ -210,7 +210,7 @@ export default function PerfilPage() {
 
               <Input
                 label="Rol"
-                value={user?.role || '—'}
+                value={user?.global_role || user?.client_role || '—'}
               />
 
               {/* EDITABLE */}
