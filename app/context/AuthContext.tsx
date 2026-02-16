@@ -41,14 +41,13 @@ export interface User {
   company_name?: string | null;
   contact_name?: string | null;
   phone?: string | null;
-}
-  /* ===== PLAN (JOIN client_subscriptions + plans) ===== */
+
   plan?: {
     id: number;
     code: string;
     name: string;
   } | null;
-
+}
 /**
  * Estado del plan del cliente
  * (no forma parte del User table)
