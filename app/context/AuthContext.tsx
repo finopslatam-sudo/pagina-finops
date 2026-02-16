@@ -297,11 +297,20 @@ useEffect(() => {
       body: { email, password },
     });
   
-    setToken(data.access_token);
-    setUser(data.user); // IMPORTANTE: mantener
-  
     localStorage.setItem("finops_token", data.access_token);
-    localStorage.setItem("finops_user", JSON.stringify(data.user));
+  
+    setToken(data.access_token);
+    setUser(data.user);
+  
+    // Esperamos que estado se estabilice
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  
+    const fullUser = await apiFetch<User>("/api/me", {
+      token: data.access_token,
+    });
+  
+    setUser(fullUser);
+    localStorage.setItem("finops_user", JSON.stringify(fullUser));
   
     router.replace("/dashboard");
   };
