@@ -286,57 +286,23 @@ useEffect(() => {
   /* =========================
      LOGIN
   ========================== */
-
-  const login = async (
-    email: string,
-    password: string
-  ) => {
+  const login = async (email: string, password: string) => {
     isLoggingOutRef.current = false;
   
     const data = await apiFetch<{
       access_token: string;
-      user: User;
     }>("/api/auth/login", {
       method: "POST",
       body: { email, password },
     });
   
+    localStorage.setItem("finops_token", data.access_token);
     setToken(data.access_token);
-
-    localStorage.setItem(
-      "finops_token",
-      data.access_token
-    );
-    
-    // 🔎 Obtener usuario enriquecido real
-    const fullUser = await apiFetch<User>("/api/me", {
-      token: data.access_token,
-    });
-    
-    setUser(fullUser);
-    
-    localStorage.setItem(
-      "finops_user",
-      JSON.stringify(fullUser)
-    );
   
-    localStorage.setItem(
-      "finops_token",
-      data.access_token
-    );
-  
-    // Guardado defensivo, pero NO se usa como source of truth
-    localStorage.setItem(
-      "finops_user",
-      JSON.stringify(data.user)
-    );
-  
-    // 🚫 NO redirigimos aquí por force_password_change
-    // PrivateRoute se encarga del bloqueo
-  
+    // No seteamos user aquí
     router.replace("/dashboard");
   };
-    
+  
 
   /* =========================
      UPDATE USER (LOCAL)
