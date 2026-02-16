@@ -286,7 +286,10 @@ useEffect(() => {
   /* =========================
      LOGIN
   ========================== */
-  const login = async (email: string, password: string) => {
+  const login = async (
+    email: string,
+    password: string
+  ) => {
     isLoggingOutRef.current = false;
   
     const data = await apiFetch<{
@@ -297,20 +300,22 @@ useEffect(() => {
       body: { email, password },
     });
   
-    localStorage.setItem("finops_token", data.access_token);
-  
     setToken(data.access_token);
     setUser(data.user);
   
-    // Esperamos que estado se estabilice
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    localStorage.setItem(
+      "finops_token",
+      data.access_token
+    );
   
-    const fullUser = await apiFetch<User>("/api/me", {
-      token: data.access_token,
-    });
+    // Guardado defensivo, pero NO se usa como source of truth
+    localStorage.setItem(
+      "finops_user",
+      JSON.stringify(data.user)
+    );
   
-    setUser(fullUser);
-    localStorage.setItem("finops_user", JSON.stringify(fullUser));
+    // 🚫 NO redirigimos aquí por force_password_change
+    // PrivateRoute se encarga del bloqueo
   
     router.replace("/dashboard");
   };
