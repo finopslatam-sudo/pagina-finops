@@ -87,9 +87,9 @@ export function AuthProvider({
      PERMISSIONS
   ========================== */
 
-  const isRoot = user?.role === "root";
-  const isAdmin = user?.role === "admin";
-  const isSupport = user?.role === "support";
+  const isRoot = user?.global_role === "root";
+  const isAdmin = user?.global_role === "admin";
+  const isSupport = user?.global_role === "support";
   const isStaff = isRoot || isAdmin || isSupport;
 
   /* =========================
