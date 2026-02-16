@@ -291,19 +291,21 @@ useEffect(() => {
   
     const data = await apiFetch<{
       access_token: string;
+      user: User;
     }>("/api/auth/login", {
       method: "POST",
       body: { email, password },
     });
   
-    localStorage.setItem("finops_token", data.access_token);
     setToken(data.access_token);
+    setUser(data.user); // IMPORTANTE: mantener
   
-    // No seteamos user aquí
+    localStorage.setItem("finops_token", data.access_token);
+    localStorage.setItem("finops_user", JSON.stringify(data.user));
+  
     router.replace("/dashboard");
   };
   
-
   /* =========================
      UPDATE USER (LOCAL)
   ========================== */
