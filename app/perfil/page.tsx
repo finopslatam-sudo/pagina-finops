@@ -40,8 +40,7 @@ import { PasswordFields } from '@/app/components/Auth/PasswordFields';
  * - Backend valida todo
  */
 export default function PerfilPage() {
-  const { user, token, updateUser, planState, logout } = useAuth();
-
+  const { user, token, updateUser, logout } = useAuth();
   /* ================================
      STATE
   ================================= */
@@ -203,27 +202,16 @@ export default function PerfilPage() {
               <h3 className="text-lg font-semibold">
                 Datos del perfil
               </h3>
+              
+              <Input
+                label="Correo"
+                value={form.email}
+              />
 
-              {/* INFO NO EDITABLE */}
-              <div className="space-y-5">
-              <Input label="Empresa" value={user?.company_name} />
-                <EditableField
-                  label="Correo"
-                  value={form.email}
-                  editable={true}
-                  onEdit={() => {}}
-                  onChange={(v) =>
-                    setForm((p) => ({
-                      ...p,
-                      email: v,
-                    }))
-                  }
-                />
-                <Input
-                label="Plan"
-                value={user?.plan?.name || '—'}
-                />
-              </div>
+              <Input
+                label="Rol"
+                value={user?.global_role || '—'}
+              />
 
               {/* EDITABLE */}
               <form
