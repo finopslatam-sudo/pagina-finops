@@ -13,12 +13,10 @@ export default function AdminPage() {
      ROUTE GUARD
   ========================= */
   useEffect(() => {
-    if (!isAuthReady) return;
-
     if (
       !user ||
-      !user.global_role ||
-      !['root', 'admin'].includes(user.global_role)
+      !user.role ||
+      !['root', 'admin'].includes(user.role)
     ) {
       router.replace('/dashboard');
     }
