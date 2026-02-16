@@ -51,21 +51,22 @@ export default function PerfilPage() {
   const [currentPassword, setCurrentPassword] = useState('');
 
   const [form, setForm] = useState({
-    useEffect(() => {
-      if (!user) return;
-    
-      setForm((prev) => ({
-        ...prev,
-        email: user.email || '',
-        contact_name: user.contact_name || '',
-      }));
-    }, [user]);
-    
     email: '',
     contact_name: '',
     password: '',
     confirmPassword: '',
   });
+  
+  useEffect(() => {
+    if (!user) return;
+  
+    setForm((prev) => ({
+      ...prev,
+      email: user.email || '',
+      contact_name: user.contact_name || '',
+    }));
+  }, [user]);
+  
 
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [loadingPassword, setLoadingPassword] = useState(false);
