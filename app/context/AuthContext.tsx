@@ -26,6 +26,8 @@ export interface User {
   global_role: "root" | "admin" | "support" | null;
   client_role: "owner" | "finops_admin" | "viewer" | null;
 
+  client_id: number | null;
+
   is_active: boolean;
   force_password_change: boolean;
 
