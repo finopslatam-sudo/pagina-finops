@@ -44,6 +44,12 @@ export interface User {
   contact_name?: string | null;
   phone?: string | null;
 }
+  /* ===== PLAN (JOIN client_subscriptions + plans) ===== */
+  plan?: {
+    id: number;
+    code: string;
+    name: string;
+  } | null;
 
 /**
  * Estado del plan del cliente

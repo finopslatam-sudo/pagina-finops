@@ -51,6 +51,16 @@ export default function PerfilPage() {
   const [currentPassword, setCurrentPassword] = useState('');
 
   const [form, setForm] = useState({
+    useEffect(() => {
+      if (!user) return;
+    
+      setForm((prev) => ({
+        ...prev,
+        email: user.email || '',
+        contact_name: user.contact_name || '',
+      }));
+    }, [user]);
+    
     email: '',
     contact_name: '',
     password: '',
@@ -62,34 +72,6 @@ export default function PerfilPage() {
 
   const [successProfile, setSuccessProfile] = useState('');
   const [error, setError] = useState('');
-  const [profile, setProfile] = useState<any>(null);
-
-  /* ================================
-     INIT FORM
-  ================================= */
-  useEffect(() => {
-    if (!token) return;
-  
-    const loadProfile = async () => {
-      try {
-        const res = await apiFetch('/api/me', { token });
-  
-        setProfile(res);
-  
-        setForm({
-          email: res.email || '',
-          contact_name: res.contact_name || '',
-          password: '',
-          confirmPassword: '',
-        });
-  
-      } catch (err) {
-        console.error('Error cargando perfil');
-      }
-    };
-  
-    loadProfile();
-  }, [token]);
   
   /* ================================
      PASSWORD VALIDATION UI
@@ -132,12 +114,6 @@ export default function PerfilPage() {
         email: form.email,
         contact_name: form.contact_name,
       });
-
-      setProfile((prev: any) => ({
-        ...prev,
-        email: form.email,
-        contact_name: form.contact_name,
-      }));      
 
       setSuccessProfile(
         'Perfil actualizado correctamente'
@@ -229,7 +205,7 @@ export default function PerfilPage() {
 
               {/* INFO NO EDITABLE */}
               <div className="space-y-5">
-              <Input label="Empresa" value={profile?.company_name} />
+              <Input label="Empresa" value={user?.company_name} />
                 <EditableField
                   label="Correo"
                   value={form.email}
@@ -244,7 +220,7 @@ export default function PerfilPage() {
                 />
                 <Input
                 label="Plan"
-                value={profile?.plan?.name || '—'}
+                value={user?.plan?.name || '—'}
                 />
               </div>
 
