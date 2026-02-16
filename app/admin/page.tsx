@@ -34,8 +34,8 @@ export default function AdminPage() {
   ========================= */
   if (
     !user ||
-    !user.global_role ||
-    !['root', 'admin'].includes(user.global_role)
+    !user.role ||
+    !['root', 'admin'].includes(user.role)
   ) {
     return null;
   }
