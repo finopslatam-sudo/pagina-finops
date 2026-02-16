@@ -13,13 +13,16 @@ export default function AdminPage() {
      ROUTE GUARD
   ========================= */
   useEffect(() => {
+    if (!isAuthReady) return;
+
     if (
       !user ||
-      !user.role ||
-      !['root', 'admin'].includes(user.role)
+      !user.global_role ||
+      !['root', 'admin'].includes(user.global_role)
     ) {
       router.replace('/dashboard');
     }
+    
   }, [user, isAuthReady, router]);
 
   /* =========================
@@ -34,8 +37,8 @@ export default function AdminPage() {
   ========================= */
   if (
     !user ||
-    !user.role ||
-    !['root', 'admin'].includes(user.role)
+    !user.global_role ||
+    !['root', 'admin'].includes(user.global_role)
   ) {
     return null;
   }
