@@ -28,7 +28,6 @@ import { apiFetch } from "@/app/lib/api";
  * Resultado real del backend (JOIN users + clients)
  */
 export interface User {
-  /* ===== CORE USERS TABLE ===== */
   id: number;
   email: string;
 
@@ -39,7 +38,6 @@ export interface User {
   is_active: boolean;
   force_password_change: boolean;
 
-  /* ===== CLIENT PROFILE (JOIN) ===== */
   company_name?: string | null;
   contact_name?: string | null;
   phone?: string | null;
