@@ -13,6 +13,8 @@ import FindingsDrawer from "./components/FindingsDrawer";
 
 import { Finding } from "./types";
 
+export const dynamic = "force-dynamic";
+
 export default function FindingsPage() {
   // ---------------- AUTH ----------------
   const { isClientUser } = useAuth();

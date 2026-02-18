@@ -10,6 +10,8 @@ import PrivateRoute from '@/app/components/Auth/PrivateRoute';
 import AdminDashboard from './AdminDashboard';
 import ClientDashboard from './ClientDashboard';
 
+export const dynamic = "force-dynamic";
+
 export default function DashboardPage() {
   const { user, isAuthReady } = useAuth();
 
