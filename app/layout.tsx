@@ -1,5 +1,4 @@
 import './globals.css';
-import ClientProviders from './ClientProviders';
 
 export const metadata = {
   title: 'FinOpsLatam',
@@ -14,9 +13,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="min-h-screen bg-white antialiased">
-        <ClientProviders>
-          <main>{children}</main>
-        </ClientProviders>
+        <main>{children}</main>
       </body>
     </html>
   );
