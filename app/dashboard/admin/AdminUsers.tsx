@@ -112,7 +112,7 @@ export default function AdminUsers() {
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">
-          Panel de Usuarios
+          
         </h1>
 
         <button
