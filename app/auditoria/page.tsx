@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = "force-dynamic";
+
 /* =====================================================
    AUDITORÍA — FINOPSLATAM
    Página protegida (requiere autenticación)
