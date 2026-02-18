@@ -12,6 +12,7 @@ import { apiFetch } from '@/app/lib/api';
 import { useFindings } from './findings/hooks/useFindings';
 import { useFindingsStats } from './findings/hooks/useFindingsStats';
 import FindingsTable from './findings/components/FindingsTable';
+import { useDashboardSummary } from './hooks/useDashboardSummary';
 
 /* =====================================================
    TYPES
@@ -38,7 +39,7 @@ const InfoCard = ({
   accent: string;
 }) => (
   <div
-    className={`bg-gradient-to-br ${accent} p-6 rounded-2xl border shadow-xl transition hover:shadow-2xl`}
+    className={`bg-linear-to-br ${accent} p-6 rounded-2xl border shadow-xl transition hover:shadow-2xl`}
   >
     <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-2">
       {title}
@@ -103,31 +104,37 @@ export default function ClientDashboard() {
   ===================================================== */
 
   const { stats: findingsStats } = useFindingsStats();
+  const {
+    data: dashboardSummary,
+    loading: dashboardLoading,
+    error: dashboardError,
+  } = useDashboardSummary();
+  
   const { data: latestFindings } = useFindings({
     page: 1,
   });
+  
 
   /* =====================================================
      STATES
 ===================================================== */
+if (error) {
+  return <p className="text-red-500">{error}</p>;
+}
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+if (dashboardError) {
+  return <p className="text-red-500">{dashboardError}</p>;
+}
 
-  if (
-    !stats ||
-    typeof stats.user_count !== 'number' ||
-    typeof stats.active_services !== 'number'
-  ) {
-    return (
-      <p className="text-gray-400">
-        Cargando tu dashboard…
-      </p>
-    );
-  }
+if (!dashboardSummary) {
+  return (
+    <p className="text-gray-400">
+      Cargando tu dashboard…
+    </p>
+  );
+}
 
-  /* =====================================================
+/* =====================================================
      RENDER
 ===================================================== */
 
@@ -135,14 +142,14 @@ export default function ClientDashboard() {
     <div className="space-y-12">
 
       {/* HEADER */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-8 rounded-3xl shadow-2xl">
+      <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white p-8 rounded-3xl shadow-2xl">
         <h1 className="text-3xl font-bold mb-2">
           Bienvenido a tu Dashboard FinOps
         </h1>
         <p className="opacity-90">
           Plan actual:{' '}
           <span className="font-semibold">
-            {stats.plan ?? 'Sin plan asignado'}
+            {stats?.plan ?? 'Sin plan asignado'}
           </span>
         </p>
       </div>
@@ -150,30 +157,32 @@ export default function ClientDashboard() {
       {/* CORE METRICS */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
-        <InfoCard
-          title="Usuarios asociados"
-          value={stats.user_count}
-          accent="from-blue-50 to-indigo-50"
-        />
+      <InfoCard
+        title="Findings activos"
+        value={dashboardSummary?.findings.active ?? 0}
+        accent="from-red-50 to-orange-50"
+      />
 
-        <InfoCard
-          title="Servicios activos"
-          value={stats.active_services}
-          accent="from-green-50 to-emerald-50"
-        />
+      <InfoCard
+        title="Ahorro potencial mensual"
+        value={`$${dashboardSummary?.findings.estimated_monthly_savings ?? 0}`}
+        accent="from-green-50 to-emerald-50"
+      />
 
-        <InfoCard
-          title="Findings activos"
-          value={findingsStats?.active ?? 0}
-          accent="from-red-50 to-orange-50"
-        />
+      <InfoCard
+        title="Cuentas AWS conectadas"
+        value={dashboardSummary?.accounts ?? 0}
+        accent="from-blue-50 to-indigo-50"
+      />
 
-        <InfoCard
-          title="Ahorro potencial mensual"
-          value={`$${findingsStats?.estimated_monthly_savings ?? 0}`}
-          accent="from-purple-50 to-pink-50"
-        />
+      <InfoCard
+        title="Recursos afectados"
+        value={dashboardSummary?.resources_affected ?? 0}
+        accent="from-purple-50 to-pink-50"
+      />
+
       </div>
+
 
       {/* ENTERPRISE CARDS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -214,7 +223,7 @@ export default function ClientDashboard() {
         </h2>
 
         <FindingsTable
-          findings={latestFindings.slice(0, 5)}
+          findings={(latestFindings ?? []).slice(0, 5)}
           onResolve={() => {}}
         />
 
