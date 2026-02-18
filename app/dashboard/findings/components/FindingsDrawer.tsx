@@ -2,6 +2,7 @@
 
 import { Finding } from "../types";
 import SeverityBadge from "./SeverityBadge";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface Props {
   finding: Finding | null;
@@ -14,6 +15,10 @@ export default function FindingsDrawer({
   onClose,
   onResolve,
 }: Props) {
+
+  // 🔥 EL HOOK VA AQUÍ DENTRO
+  const { isFinopsAdmin } = useAuth();
+
   if (!finding) return null;
 
   return (
@@ -71,8 +76,8 @@ export default function FindingsDrawer({
           </p>
         </div>
 
-        {/* Action */}
-        {!finding.resolved && (
+        {/* 🔥 Action - SOLO FINOPS ADMIN */}
+        {isFinopsAdmin && !finding.resolved && (
           <button
             onClick={() => onResolve(finding.id)}
             className="mt-6 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"

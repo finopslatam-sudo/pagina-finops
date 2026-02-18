@@ -43,6 +43,10 @@ interface AuthContextType {
   isAdmin: boolean;
   isSupport: boolean;
   isStaff: boolean;
+  isOwner: boolean;
+  isFinopsAdmin: boolean;
+  isViewer: boolean;
+  isClientUser: boolean;  
 
   isAuthReady: boolean;
 
@@ -93,6 +97,11 @@ export function AuthProvider({
   const isAdmin = user?.global_role === "admin";
   const isSupport = user?.global_role === "support";
   const isStaff = isRoot || isAdmin || isSupport;
+  const isOwner = user?.client_role === "owner";
+  const isFinopsAdmin = user?.client_role === "finops_admin";
+  const isViewer = user?.client_role === "viewer";
+
+  const isClientUser = !!user?.client_role;
 
   /* =========================
      LOGOUT
@@ -270,10 +279,17 @@ export function AuthProvider({
         isAdmin,
         isSupport,
         isStaff,
+
+        isOwner,
+        isFinopsAdmin,
+        isViewer,
+        isClientUser,
+        
         isAuthReady,
         login,
         logout,
         updateUser,
+
       }}
     >
       {children}

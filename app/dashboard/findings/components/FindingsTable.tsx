@@ -2,6 +2,9 @@
 
 import { Finding } from "../types";
 import SeverityBadge from "./SeverityBadge";
+import { useAuth } from "@/app/context/AuthContext";
+
+const { isFinopsAdmin } = useAuth();
 
 interface Props {
   findings: Finding[];
@@ -72,7 +75,7 @@ export default function FindingsTable({
               </td>
 
               <td className="p-3 text-sm">
-                {!f.resolved && (
+              {isFinopsAdmin && !f.resolved && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation(); // 🔥 evita abrir drawer

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
 
 import { useFindings } from "./hooks/useFindings";
 import { useFindingsStats } from "./hooks/useFindingsStats";
@@ -13,6 +14,9 @@ import FindingsDrawer from "./components/FindingsDrawer";
 import { Finding } from "./types";
 
 export default function FindingsPage() {
+  // ---------------- AUTH ----------------
+  const { isClientUser } = useAuth();
+
   // ---------------- STATE ----------------
   const [page, setPage] = useState(1);
   const [severity, setSeverity] = useState("");
@@ -40,6 +44,15 @@ export default function FindingsPage() {
     refetch: refetchStats,
   } = useFindingsStats();
 
+  // ---------------- PROTECTION ----------------
+  if (!isClientUser) {
+    return (
+      <div className="p-6 text-center text-red-500">
+        Unauthorized
+      </div>
+    );
+  }
+
   // ---------------- HANDLERS ----------------
 
   const handleFiltersChange = (filters: {
@@ -51,17 +64,15 @@ export default function FindingsPage() {
     if (filters.status !== undefined) setStatus(filters.status);
     if (filters.search !== undefined) setSearch(filters.search);
 
-    setPage(1); // reset pagination when filters change
+    setPage(1);
   };
 
   const handleResolve = async (id: number) => {
     await resolveFinding(id);
 
-    // Refetch data and stats
     await refetch();
     await refetchStats();
 
-    // Close drawer if open
     setSelectedFinding(null);
   };
 
@@ -76,7 +87,7 @@ export default function FindingsPage() {
   // ---------------- RENDER ----------------
   return (
     <div className="p-6 space-y-6">
-      
+
       {/* Stats */}
       {stats && <FindingsStatsCards stats={stats} />}
 
@@ -97,6 +108,7 @@ export default function FindingsPage() {
         <FindingsTable
           findings={data}
           onResolve={handleResolve}
+          onRowClick={handleRowClick}
         />
       )}
 

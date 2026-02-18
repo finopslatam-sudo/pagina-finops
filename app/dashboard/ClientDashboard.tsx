@@ -9,6 +9,10 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
 
+import { useFindings } from './findings/hooks/useFindings';
+import { useFindingsStats } from './findings/hooks/useFindingsStats';
+import FindingsTable from './findings/components/FindingsTable';
+
 /* =====================================================
    TYPES
 ===================================================== */
@@ -34,9 +38,11 @@ const InfoCard = ({
   accent: string;
 }) => (
   <div
-    className={`bg-gradient-to-br ${accent} p-6 rounded-2xl border shadow-lg`}
+    className={`bg-gradient-to-br ${accent} p-6 rounded-2xl border shadow-xl transition hover:shadow-2xl`}
   >
-    <h3 className="text-lg font-semibold mb-2">{title}</h3>
+    <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-2">
+      {title}
+    </h3>
     <p className="text-3xl font-bold">{value}</p>
   </div>
 );
@@ -71,7 +77,7 @@ export default function ClientDashboard() {
   }, [isAuthReady, user, token, isStaff, router]);
 
   /* =====================================================
-     FETCH CLIENT STATS
+     FETCH CLIENT STATS (LEGACY)
   ===================================================== */
 
   useEffect(() => {
@@ -93,6 +99,15 @@ export default function ClientDashboard() {
   }, [isAuthReady, user, token]);
 
   /* =====================================================
+     FINDINGS INTEGRATION
+  ===================================================== */
+
+  const { stats: findingsStats } = useFindingsStats();
+  const { data: latestFindings } = useFindings({
+    page: 1,
+  });
+
+  /* =====================================================
      STATES
 ===================================================== */
 
@@ -100,10 +115,8 @@ export default function ClientDashboard() {
     return <p className="text-red-500">{error}</p>;
   }
 
-  // 🔒 ENTERPRISE SAFE CHECK
   if (
     !stats ||
-    typeof stats !== 'object' ||
     typeof stats.user_count !== 'number' ||
     typeof stats.active_services !== 'number'
   ) {
@@ -119,23 +132,23 @@ export default function ClientDashboard() {
 ===================================================== */
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
 
-      <div>
-        <h1 className="text-2xl font-semibold">
+      {/* HEADER */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-8 rounded-3xl shadow-2xl">
+        <h1 className="text-3xl font-bold mb-2">
           Bienvenido a tu Dashboard FinOps
         </h1>
-        <p className="text-gray-500">
+        <p className="opacity-90">
           Plan actual:{' '}
-          <span className="font-medium">
-            {typeof stats.plan === 'string'
-              ? stats.plan
-              : 'Sin plan asignado'}
+          <span className="font-semibold">
+            {stats.plan ?? 'Sin plan asignado'}
           </span>
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* CORE METRICS */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
         <InfoCard
           title="Usuarios asociados"
@@ -144,53 +157,77 @@ export default function ClientDashboard() {
         />
 
         <InfoCard
-          title="Servicios cloud activos"
+          title="Servicios activos"
           value={stats.active_services}
           accent="from-green-50 to-emerald-50"
         />
 
         <InfoCard
-          title="Estado del plan"
-          value={
-            typeof stats.plan === 'string'
-              ? stats.plan
-              : 'No asignado'
-          }
-          accent="from-purple-50 to-pink-50"
+          title="Findings activos"
+          value={findingsStats?.active ?? 0}
+          accent="from-red-50 to-orange-50"
         />
 
+        <InfoCard
+          title="Ahorro potencial mensual"
+          value={`$${findingsStats?.estimated_monthly_savings ?? 0}`}
+          accent="from-purple-50 to-pink-50"
+        />
       </div>
 
+      {/* ENTERPRISE CARDS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-white p-6 rounded-2xl border shadow-lg">
           <h3 className="text-md font-semibold mb-2">
             Gasto mensual cloud
           </h3>
           <p className="text-gray-400 text-sm">
-            Próximamente: consumo real desde auditoría AWS.
+            Próximamente: consumo real desde AWS Cost Explorer.
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-white p-6 rounded-2xl border shadow-lg">
           <h3 className="text-md font-semibold mb-2">
-            Ahorro potencial
+            Proyección de ahorro
           </h3>
           <p className="text-gray-400 text-sm">
-            Próximamente: recomendaciones FinOps automáticas.
+            Basado en findings detectados y recomendaciones FinOps.
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-white p-6 rounded-2xl border shadow-lg">
           <h3 className="text-md font-semibold mb-2">
-            Proyecciones FinOps
+            Gobernanza & Compliance
           </h3>
           <p className="text-gray-400 text-sm">
-            Próximamente: forecast y control presupuestario.
+            Estado de tagging y políticas de control.
           </p>
         </div>
 
       </div>
+
+      {/* LATEST FINDINGS */}
+      <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-4">
+        <h2 className="text-xl font-semibold">
+          Últimos Findings Detectados
+        </h2>
+
+        <FindingsTable
+          findings={latestFindings.slice(0, 5)}
+          onResolve={() => {}}
+        />
+
+        <div className="text-right">
+          <button
+            onClick={() => router.push('/dashboard/findings')}
+            className="text-blue-600 font-medium hover:underline"
+          >
+            Ver todos los findings →
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }
