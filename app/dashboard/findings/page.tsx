@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = 'force-dynamic';
 
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
@@ -12,8 +13,6 @@ import FindingsFilters from "./components/FindingsFilters";
 import FindingsDrawer from "./components/FindingsDrawer";
 
 import { Finding } from "./types";
-
-export const dynamic = "force-dynamic";
 
 export default function FindingsPage() {
   // ---------------- AUTH ----------------
