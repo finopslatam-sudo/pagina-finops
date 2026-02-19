@@ -1,3 +1,5 @@
+'use client';
+
 import SessionExpiredModal from "@/app/components/Auth/SessionExpiredModal";
 
 export default function DashboardLayout({
