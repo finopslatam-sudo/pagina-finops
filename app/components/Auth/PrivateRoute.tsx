@@ -5,35 +5,33 @@
    Protección de rutas autenticadas
 ===================================================== */
 
-/* =====================================================
-   IMPORTS
-===================================================== */
-
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import ForceChangePasswordModal from '@/app/components/Auth/ForceChangePasswordModal';
-
-/* =====================================================
-   TYPES
-===================================================== */
 
 interface PrivateRouteProps {
   children: ReactNode;
 }
 
-/* =====================================================
-   COMPONENT
-===================================================== */
-
 export default function PrivateRoute({
   children,
 }: PrivateRouteProps) {
   const { user, isAuthReady } = useAuth();
+  const router = useRouter();
+
+  /* =====================================================
+     REDIRECT SI NO AUTENTICADO
+  ===================================================== */
+
+  useEffect(() => {
+    if (isAuthReady && !user) {
+      router.replace('/');
+    }
+  }, [isAuthReady, user, router]);
 
   /* =====================================================
      LOADING STATE
-     - Espera rehidratación del AuthContext
-     - Evita renders inconsistentes
   ===================================================== */
 
   if (!isAuthReady) {
@@ -45,9 +43,7 @@ export default function PrivateRoute({
   }
 
   /* =====================================================
-     USUARIO NO AUTENTICADO
-     - AuthContext se encarga del logout
-     - PrivateRoute NO redirige
+     SI NO HAY USUARIO → EVITA FLICKER
   ===================================================== */
 
   if (!user) {
@@ -55,21 +51,10 @@ export default function PrivateRoute({
   }
 
   /* =====================================================
-     🔐 BLOQUEO DE SEGURIDAD CRÍTICO
-     - Forzado por backend
-     - UI completamente bloqueada
+     FORZAR CAMBIO DE PASSWORD
   ===================================================== */
 
   if (user.force_password_change) {
-    /**
-     * Reglas:
-     * - No renderizar children
-     * - No permitir navegación
-     * - Modal bloquea toda la UI
-     *
-     * Este estado solo se libera
-     * cuando el backend confirma el cambio
-     */
     return <ForceChangePasswordModal />;
   }
 
