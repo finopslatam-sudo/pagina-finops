@@ -1,25 +1,16 @@
-import './globals.css';
-import ClientProviders from './ClientProviders';
-import PublicNavbar from './components/layout/PublicNavbar';
+"use client";
 
-export const metadata = {
-  title: 'FinOpsLatam',
-  description: 'Optimización de costos en la nube',
-};
+import SessionExpiredModal from "@/app/components/Auth/SessionExpiredModal";
 
-export default function RootLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <body className="min-h-screen bg-white antialiased">
-        <ClientProviders>
-          <PublicNavbar />
-          <main>{children}</main>
-        </ClientProviders>
-      </body>
-    </html>
+    <>
+      <SessionExpiredModal />
+      {children}
+    </>
   );
 }
