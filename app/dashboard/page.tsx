@@ -1,9 +1,22 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 
-import PrivateRoute from '@/app/components/Auth/PrivateRoute';
-import AdminDashboard from './AdminDashboard';
-import ClientDashboard from './ClientDashboard';
+const PrivateRoute = dynamic(
+  () => import('@/app/components/Auth/PrivateRoute'),
+  { ssr: false }
+);
+
+const AdminDashboard = dynamic(
+  () => import('./AdminDashboard'),
+  { ssr: false }
+);
+
+const ClientDashboard = dynamic(
+  () => import('./ClientDashboard'),
+  { ssr: false }
+);
+
 import { useAuth } from '@/app/context/AuthContext';
 
 function DashboardContent() {
@@ -17,17 +30,11 @@ function DashboardContent() {
     );
   }
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
-  if (user.global_role) {
-    return <AdminDashboard />;
-  }
+  if (user.global_role) return <AdminDashboard />;
 
-  if (user.client_role) {
-    return <ClientDashboard />;
-  }
+  if (user.client_role) return <ClientDashboard />;
 
   return (
     <p className="text-red-500 p-6">
