@@ -1,8 +1,5 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-export const revalidate = 0;
 
 import PrivateRoute from '@/app/components/Auth/PrivateRoute';
 import AdminDashboard from './AdminDashboard';
