@@ -21,7 +21,10 @@ export function useFindings(params: UseFindingsParams) {
   const [loading, setLoading] = useState(true);
 
   const fetchFindings = async () => {
-    if (!isAuthReady || !token) return;
+    if (!isAuthReady || !token) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
 
