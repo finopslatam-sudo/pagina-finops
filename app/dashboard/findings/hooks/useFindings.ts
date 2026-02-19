@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/app/lib/api";
+import { useAuth } from "@/app/context/AuthContext";
 import { Finding, FindingsResponse } from "../types";
 
 interface UseFindingsParams {
@@ -12,12 +13,16 @@ interface UseFindingsParams {
 }
 
 export function useFindings(params: UseFindingsParams) {
+  const { token, isAuthReady } = useAuth();
+
   const [data, setData] = useState<Finding[]>([]);
   const [total, setTotal] = useState(0);
   const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
   const fetchFindings = async () => {
+    if (!isAuthReady || !token) return;
+
     setLoading(true);
 
     const query = new URLSearchParams({
@@ -27,9 +32,10 @@ export function useFindings(params: UseFindingsParams) {
       search: params.search || "",
     });
 
-    const res = await apiFetch(`/api/client/findings?${query}`);
-
-    const json: FindingsResponse = await res.json();
+    const json = await apiFetch<FindingsResponse>(
+      `/api/client/findings?${query}`,
+      { token }
+    );
 
     setData(json.data);
     setTotal(json.total);
@@ -38,8 +44,11 @@ export function useFindings(params: UseFindingsParams) {
   };
 
   const resolveFinding = async (id: number) => {
+    if (!token) return;
+
     await apiFetch(`/api/client/findings/${id}/resolve`, {
       method: "PATCH",
+      token,
     });
 
     await fetchFindings();
@@ -47,7 +56,7 @@ export function useFindings(params: UseFindingsParams) {
 
   useEffect(() => {
     fetchFindings();
-  }, [params.page, params.severity, params.status, params.search]);
+  }, [params.page, params.severity, params.status, params.search, token, isAuthReady]);
 
   return {
     data,
