@@ -4,7 +4,6 @@ import { Finding } from "../types";
 import SeverityBadge from "./SeverityBadge";
 import { useAuth } from "@/app/context/AuthContext";
 
-const { isFinopsAdmin } = useAuth();
 
 interface Props {
   findings: Finding[];
@@ -17,6 +16,9 @@ export default function FindingsTable({
   onResolve,
   onRowClick,
 }: Props) {
+
+  const { isFinopsAdmin } = useAuth();
+
   if (!findings.length) {
     return (
       <div className="bg-white p-6 rounded shadow text-center text-gray-500">
