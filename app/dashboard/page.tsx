@@ -1,18 +1,15 @@
 'use client';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
-/* =====================================================
-   DASHBOARD PAGE
-   Ruta: /dashboard
-===================================================== */
-
-import { useAuth } from '@/app/context/AuthContext';
 import PrivateRoute from '@/app/components/Auth/PrivateRoute';
 import AdminDashboard from './AdminDashboard';
 import ClientDashboard from './ClientDashboard';
+import { useAuth } from '@/app/context/AuthContext';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { user, isAuthReady } = useAuth();
 
   if (!isAuthReady) {
@@ -24,24 +21,28 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return (
-      <p className="text-red-500 p-6">
-        Acceso no autorizado
-      </p>
-    );
+    return null;
+  }
+
+  if (user.global_role) {
+    return <AdminDashboard />;
+  }
+
+  if (user.client_role) {
+    return <ClientDashboard />;
   }
 
   return (
+    <p className="text-red-500 p-6">
+      Usuario sin rol válido
+    </p>
+  );
+}
+
+export default function DashboardPage() {
+  return (
     <PrivateRoute>
-      {user.global_role ? (
-        <AdminDashboard />
-      ) : user.client_role ? (
-        <ClientDashboard />
-      ) : (
-        <p className="text-red-500 p-6">
-          Usuario sin rol válido
-        </p>
-      )}
+      <DashboardContent />
     </PrivateRoute>
   );
 }

@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
 import { useState } from "react";
-import { useAuth } from "@/app/context/AuthContext";
 
 import { useFindings } from "./hooks/useFindings";
 import { useFindingsStats } from "./hooks/useFindingsStats";
@@ -16,9 +17,6 @@ import FindingsDrawer from "./components/FindingsDrawer";
 import { Finding } from "./types";
 
 export default function FindingsPage() {
-  // ---------------- AUTH ----------------
-  const { isClientUser } = useAuth();
-
   // ---------------- STATE ----------------
   const [page, setPage] = useState(1);
   const [severity, setSeverity] = useState("");
@@ -46,15 +44,6 @@ export default function FindingsPage() {
     refetch: refetchStats,
   } = useFindingsStats();
 
-  // ---------------- PROTECTION ----------------
-  if (!isClientUser) {
-    return (
-      <div className="p-6 text-center text-red-500">
-        Unauthorized
-      </div>
-    );
-  }
-
   // ---------------- HANDLERS ----------------
 
   const handleFiltersChange = (filters: {
@@ -71,10 +60,8 @@ export default function FindingsPage() {
 
   const handleResolve = async (id: number) => {
     await resolveFinding(id);
-
     await refetch();
     await refetchStats();
-
     setSelectedFinding(null);
   };
 
@@ -90,10 +77,8 @@ export default function FindingsPage() {
   return (
     <div className="p-6 space-y-6">
 
-      {/* Stats */}
       {stats && <FindingsStatsCards stats={stats} />}
 
-      {/* Filters */}
       <FindingsFilters
         severity={severity}
         status={status}
@@ -101,7 +86,6 @@ export default function FindingsPage() {
         onChange={handleFiltersChange}
       />
 
-      {/* Table */}
       {loading ? (
         <div className="text-center py-10 text-gray-500">
           Loading findings...
@@ -114,7 +98,6 @@ export default function FindingsPage() {
         />
       )}
 
-      {/* Pagination */}
       {pages > 1 && (
         <div className="flex justify-center gap-2">
           {Array.from({ length: pages }).map((_, i) => (
@@ -133,7 +116,6 @@ export default function FindingsPage() {
         </div>
       )}
 
-      {/* Drawer */}
       <FindingsDrawer
         finding={selectedFinding}
         onClose={handleCloseDrawer}

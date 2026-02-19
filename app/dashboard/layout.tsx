@@ -1,6 +1,8 @@
 "use client";
 
-import { AuthProvider } from "@/app/context/AuthContext";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import SessionExpiredModal from "@/app/components/Auth/SessionExpiredModal";
 
 export default function DashboardLayout({
@@ -9,9 +11,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthProvider>
+    <>
       <SessionExpiredModal />
       {children}
-    </AuthProvider>
+    </>
   );
 }

@@ -1,4 +1,8 @@
 import './globals.css';
+import ClientProviders from './ClientProviders';
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata = {
   title: 'FinOpsLatam',
@@ -13,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="min-h-screen bg-white antialiased">
-        <main>{children}</main>
+        <ClientProviders>
+          <main>{children}</main>
+        </ClientProviders>
       </body>
     </html>
   );
