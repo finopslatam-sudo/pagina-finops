@@ -127,51 +127,15 @@ export default function UserMenu() {
               </Link>
             )}
 
-            {/* =========================
-              CLIENT MENU
-            ========================== */}
+            {/* PERFIL — SOLO CLIENTES */}
             {!isStaff && (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="block px-4 py-3 hover:bg-blue-50 border-t"
-                  onClick={() => setOpen(false)}
-                >
-                  📊 Dashboard Ejecutivo
-                </Link>
-
-                <Link
-                  href="/dashboard/findings"
-                  className="block px-4 py-3 hover:bg-blue-50"
-                  onClick={() => setOpen(false)}
-                >
-                  🔍 Findings
-                </Link>
-
-                <Link
-                  href="/dashboard#costs"
-                  className="block px-4 py-3 hover:bg-blue-50"
-                  onClick={() => setOpen(false)}
-                >
-                  💰 Costos & Tendencias
-                </Link>
-
-                <Link
-                  href="/dashboard#governance"
-                  className="block px-4 py-3 hover:bg-blue-50"
-                  onClick={() => setOpen(false)}
-                >
-                  ⚙ Gobernanza
-                </Link>
-
-                <Link
-                  href="/perfil"
-                  className="block px-4 py-3 hover:bg-blue-50 border-t"
-                  onClick={() => setOpen(false)}
-                >
-                  👤 Mi Perfil
-                </Link>
-              </>
+              <Link
+                href="/perfil"
+                className="block px-4 py-3 hover:bg-blue-50 border-t"
+                onClick={() => setOpen(false)}
+              >
+                ✏️ Editar mi perfil
+              </Link>
             )}
 
             {/* LOGOUT */}
