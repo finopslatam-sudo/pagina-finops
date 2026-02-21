@@ -107,7 +107,7 @@ export default function ClientDashboard() {
   /* ================= RENDER ================= */
 
   return (
-    <div className="space-y-12">
+    <div className="max-w-7xl mx-auto px-6 space-y-12">
 
       {/* HEADER */}
       <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white p-8 rounded-3xl shadow-2xl">

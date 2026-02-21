@@ -94,28 +94,41 @@ export default function UserMenu() {
         {open && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden z-40"
+            className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border overflow-hidden z-40"
           >
-            {/* PANEL USUARIOS — STAFF */}
-            {isStaff && (
-              <Link
-                href="/dashboard/users"
-                className="block px-4 py-3 hover:bg-blue-50 border-t"
-                onClick={() => setOpen(false)}
-              >
-                👥 Panel de Usuarios
-              </Link>
-            )}
 
-            {/* PANEL CLIENTES — STAFF */}
+            {/* =========================
+              DASHBOARD EJECUTIVO — TODOS
+            ========================== */}
+            <Link
+              href="/dashboard"
+              className="block px-4 py-3 hover:bg-blue-50"
+              onClick={() => setOpen(false)}
+            >
+              📊 Dashboard Ejecutivo
+            </Link>
+
+            {/* =========================
+              STAFF MENU
+            ========================== */}
             {isStaff && (
-              <Link
-                href="/dashboard/clients"
-                className="block px-4 py-3 hover:bg-blue-50"
-                onClick={() => setOpen(false)}
-              >
-                🏢 Panel de Clientes
-              </Link>
+              <>
+                <Link
+                  href="/dashboard/users"
+                  className="block px-4 py-3 hover:bg-blue-50 border-t"
+                  onClick={() => setOpen(false)}
+                >
+                  👥 Panel de Usuarios
+                </Link>
+
+                <Link
+                  href="/dashboard/clients"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  🏢 Panel de Clientes
+                </Link>
+              </>
             )}
 
             {/* =========================
@@ -124,23 +137,15 @@ export default function UserMenu() {
             {!isStaff && (
               <>
                 <Link
-                  href="/dashboard"
-                  className="block px-4 py-3 hover:bg-blue-50 border-t"
-                  onClick={() => setOpen(false)}
-                >
-                  📊 Dashboard Ejecutivo
-                </Link>
-
-                <Link
                   href="/dashboard/findings"
-                  className="block px-4 py-3 hover:bg-blue-50"
+                  className="block px-4 py-3 hover:bg-blue-50 border-t"
                   onClick={() => setOpen(false)}
                 >
                   🔍 Findings
                 </Link>
 
                 <Link
-                  href="/dashboard#costs"
+                  href="/dashboard/costos"
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
@@ -148,7 +153,7 @@ export default function UserMenu() {
                 </Link>
 
                 <Link
-                  href="/dashboard#governance"
+                  href="/dashboard/gobernanza"
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
@@ -172,10 +177,10 @@ export default function UserMenu() {
             >
               🚪 Cerrar sesión
             </button>
+
           </div>
         )}
-      </div>
-
+         </div>
       {/* =========================
          LOGOUT TOAST
       ========================== */}
