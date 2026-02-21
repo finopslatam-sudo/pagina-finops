@@ -128,26 +128,52 @@ export default function ClientDashboard() {
         <InfoCard
           title="Findings activos"
           value={dashboardSummary.findings.active}
-          accent="from-red-50 to-orange-50"
+          accent="from-red-500 to-red-600"
         />
 
         <InfoCard
           title="Ahorro potencial mensual"
           value={`$${dashboardSummary.findings.estimated_monthly_savings}`}
-          accent="from-green-50 to-emerald-50"
+          accent="from-green-500 to-emerald-600"
         />
 
         <InfoCard
           title="Cuentas AWS conectadas"
           value={dashboardSummary.accounts}
-          accent="from-blue-50 to-indigo-50"
+          accent="from-blue-500 to-indigo-600"
         />
 
         <InfoCard
           title="Recursos afectados"
           value={dashboardSummary.resources_affected}
-          accent="from-purple-50 to-pink-50"
+          accent="from-purple-500 to-violet-600"
         />
+      </div>
+
+      {/* SERVICIOS EVALUADOS */}
+      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+        <h2 className="text-xl font-semibold mb-6">
+          Servicios evaluados
+        </h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {costsData?.service_breakdown
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 8)
+            .map((service) => (
+              <div
+                key={service.service}
+                className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl border hover:shadow-md transition"
+              >
+                <p className="text-sm text-gray-500 truncate">
+                  {service.service}
+                </p>
+                <p className="text-lg font-semibold">
+                  ${service.amount.toFixed(2)}
+                </p>
+              </div>
+            ))}
+        </div>
       </div>
 
       {/* FINANCIAL SECTION */}
@@ -161,9 +187,6 @@ export default function ClientDashboard() {
 
           <MonthlyCostChart data={costsData.monthly_cost} />
 
-          <ServiceBreakdownChart
-            data={costsData.service_breakdown}
-          />
         </>
       )}
 
@@ -195,7 +218,6 @@ export default function ClientDashboard() {
 /* =====================================================
    INFO CARD COMPONENT
 ===================================================== */
-
 function InfoCard({
   title,
   value,
@@ -207,12 +229,14 @@ function InfoCard({
 }) {
   return (
     <div
-      className={`bg-linear-to-br ${accent} p-6 rounded-2xl border shadow-xl transition hover:shadow-2xl`}
+      className={`p-6 rounded-2xl shadow-lg text-white bg-gradient-to-r ${accent}`}
     >
-      <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-2">
+      <h3 className="text-sm uppercase tracking-wide opacity-80 mb-2">
         {title}
       </h3>
-      <p className="text-3xl font-bold">{value}</p>
+      <p className="text-3xl font-bold">
+        {value}
+      </p>
     </div>
   );
 }
