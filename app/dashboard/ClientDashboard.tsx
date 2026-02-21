@@ -176,6 +176,17 @@ export default function ClientDashboard() {
         </div>
       </div>
 
+      {/* TENDENCIA EJECUTIVA */}
+      {costsData && (
+        <div className="bg-white p-8 rounded-3xl border shadow-xl">
+          <h2 className="text-xl font-semibold mb-6">
+            Tendencia ejecutiva (6 meses)
+          </h2>
+
+          <MonthlyCostChart data={costsData.monthly_cost} />
+        </div>
+      )}
+
       {/* FINANCIAL SECTION */}
       {costsData && (
         <>
