@@ -96,15 +96,6 @@ export default function UserMenu() {
             onClick={(e) => e.stopPropagation()}
             className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden z-40"
           >
-            {/* DASHBOARD — TODOS */}
-            <Link
-              href="/dashboard"
-              className="block px-4 py-3 hover:bg-blue-50"
-              onClick={() => setOpen(false)}
-            >
-              📊 Mi Dashboard
-            </Link>
-
             {/* PANEL USUARIOS — STAFF */}
             {isStaff && (
               <Link
