@@ -22,14 +22,9 @@ export default function ServiceBreakdownChart({ data }: Props) {
   // 🟡 Caso Free Tier / Sin consumo
   if (!filteredData.length) {
     return (
-      <div className="bg-white p-6 rounded-2xl border shadow-lg">
-        <h3 className="text-md font-semibold mb-4">
-          Distribución por servicio
-        </h3>
-        <p className="text-gray-400 text-sm">
-          No hay consumo registrado aún (Free Tier detectado).
-        </p>
-      </div>
+      <p className="text-gray-400 text-sm">
+        No hay consumo registrado aún (Free Tier detectado).
+      </p>
     );
   }
 
@@ -46,29 +41,24 @@ export default function ServiceBreakdownChart({ data }: Props) {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-2xl border shadow-lg">
-      <h3 className="text-md font-semibold mb-4">
-        Distribución por servicio
-      </h3>
+    <ResponsiveContainer width="100%" height={320}>
+      <PieChart>
+        <Pie
+          data={filteredData}
+          dataKey="amount"
+          nameKey="service"
+          outerRadius={120}
+          label
+        >
+          {filteredData.map((_, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={COLORS[index % COLORS.length]}
+            />
+          ))}
+        </Pie>
 
-      <ResponsiveContainer width="100%" height={320}>
-        <PieChart>
-          <Pie
-            data={filteredData}
-            dataKey="amount"
-            nameKey="service"
-            outerRadius={120}
-            label
-          >
-            {filteredData.map((_, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
-
-          <Tooltip
+        <Tooltip
           formatter={(value) => {
             const numericValue =
               typeof value === 'number'
@@ -79,9 +69,8 @@ export default function ServiceBreakdownChart({ data }: Props) {
 
             return `$${numericValue.toFixed(2)}`;
           }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
+        />
+      </PieChart>
+    </ResponsiveContainer>
   );
 }
