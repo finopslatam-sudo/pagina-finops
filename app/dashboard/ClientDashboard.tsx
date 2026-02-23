@@ -195,7 +195,7 @@ export default function ClientDashboard() {
                     key={service}
                     onClick={() =>
                       router.push(
-                        `/dashboard/inventory?service=${service}`
+                        `/dashboard/findings?service=${service}`
                       )
                     }
                     className={`

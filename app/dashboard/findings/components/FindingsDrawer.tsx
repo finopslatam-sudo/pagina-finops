@@ -71,7 +71,7 @@ export default function FindingsDrawer({
         {/* Message */}
         <div className="mt-6">
           <h3 className="font-semibold mb-2">Message</h3>
-          <p className="text-sm bg-gray-50 p-3 rounded">
+          <p className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl shadow-sm">
             {finding.message}
           </p>
         </div>

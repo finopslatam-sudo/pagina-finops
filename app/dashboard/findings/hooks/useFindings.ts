@@ -10,6 +10,7 @@ interface UseFindingsParams {
   severity?: string;
   status?: string;
   search?: string;
+  service?: string;
 }
 
 export function useFindings(params: UseFindingsParams) {
@@ -33,6 +34,7 @@ export function useFindings(params: UseFindingsParams) {
       severity: params.severity || "",
       status: params.status || "",
       search: params.search || "",
+      service: params.service || "",
     });
 
     const json = await apiFetch<FindingsResponse>(
@@ -59,7 +61,7 @@ export function useFindings(params: UseFindingsParams) {
 
   useEffect(() => {
     fetchFindings();
-  }, [params.page, params.severity, params.status, params.search, token, isAuthReady]);
+  }, [params.page, params.severity, params.status, params.search, params.service, token, isAuthReady]);
 
   return {
     data,

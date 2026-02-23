@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useFindings } from "./hooks/useFindings";
 import { useFindingsStats } from "./hooks/useFindingsStats";
@@ -10,8 +10,9 @@ import FindingsStatsCards from "./components/FindingsStatsCards";
 import FindingsTable from "./components/FindingsTable";
 import FindingsFilters from "./components/FindingsFilters";
 import FindingsDrawer from "./components/FindingsDrawer";
-
+import { useSearchParams } from "next/navigation";
 import { Finding } from "./types";
+
 
 export default function FindingsPage() {
 
@@ -20,6 +21,7 @@ export default function FindingsPage() {
   const [severity, setSeverity] = useState("");
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
+  const [service, setService] = useState("");
 
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
 
@@ -35,6 +37,7 @@ export default function FindingsPage() {
     severity,
     status,
     search,
+    service,
   });
 
   const {
@@ -44,16 +47,20 @@ export default function FindingsPage() {
 
   const { data: inventoryData } = useInventory();
 
+  
+
   // ---------------- HANDLERS ----------------
 
   const handleFiltersChange = (filters: {
     severity?: string;
     status?: string;
     search?: string;
+    service?: string;
   }) => {
     if (filters.severity !== undefined) setSeverity(filters.severity);
     if (filters.status !== undefined) setStatus(filters.status);
     if (filters.search !== undefined) setSearch(filters.search);
+    if (filters.service !== undefined) setService(filters.service);
 
     setPage(1);
   };
@@ -72,6 +79,15 @@ export default function FindingsPage() {
   const handleCloseDrawer = () => {
     setSelectedFinding(null);
   };
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const serviceParam = searchParams.get("service");
+    if (serviceParam) {
+      setService(serviceParam);
+    }
+  }, [searchParams]);
 
   // ---------------- RENDER ----------------
   return (
