@@ -4,7 +4,6 @@ import { Finding } from "../types";
 import SeverityBadge from "./SeverityBadge";
 import { useAuth } from "@/app/context/AuthContext";
 
-
 interface Props {
   findings: Finding[];
   onResolve: (id: number) => void;
@@ -32,6 +31,7 @@ export default function FindingsTable({
       <table className="w-full bg-white shadow rounded">
         <thead>
           <tr className="text-left border-b bg-gray-50 text-sm">
+            <th className="p-3">Service</th>
             <th className="p-3">Severity</th>
             <th className="p-3">Type</th>
             <th className="p-3">Resource</th>
@@ -48,11 +48,15 @@ export default function FindingsTable({
               className="border-b hover:bg-gray-50 cursor-pointer transition"
               onClick={() => onRowClick?.(f)}
             >
+              <td className="p-3 text-sm font-medium">
+                {f.resource_type}
+              </td>
+
               <td className="p-3">
                 <SeverityBadge severity={f.severity} />
               </td>
 
-              <td className="p-3 text-sm font-medium">
+              <td className="p-3 text-sm">
                 {f.finding_type}
               </td>
 
@@ -77,16 +81,18 @@ export default function FindingsTable({
               </td>
 
               <td className="p-3 text-sm">
-              {isFinopsAdmin && !f.resolved && (
+                {isFinopsAdmin && !f.resolved ? (
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // 🔥 evita abrir drawer
+                      e.stopPropagation();
                       onResolve(f.id);
                     }}
                     className="text-blue-600 hover:underline"
                   >
                     Mark as resolved
                   </button>
+                ) : (
+                  <span className="text-gray-400">—</span>
                 )}
               </td>
             </tr>

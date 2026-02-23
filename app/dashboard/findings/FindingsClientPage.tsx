@@ -1,10 +1,10 @@
 'use client';
 
-
 import { useState } from "react";
 
 import { useFindings } from "./hooks/useFindings";
 import { useFindingsStats } from "./hooks/useFindingsStats";
+import { useInventory } from "@/app/dashboard/hooks/useInventory";
 
 import FindingsStatsCards from "./components/FindingsStatsCards";
 import FindingsTable from "./components/FindingsTable";
@@ -14,6 +14,7 @@ import FindingsDrawer from "./components/FindingsDrawer";
 import { Finding } from "./types";
 
 export default function FindingsPage() {
+
   // ---------------- STATE ----------------
   const [page, setPage] = useState(1);
   const [severity, setSeverity] = useState("");
@@ -40,6 +41,8 @@ export default function FindingsPage() {
     stats,
     refetch: refetchStats,
   } = useFindingsStats();
+
+  const { data: inventoryData } = useInventory();
 
   // ---------------- HANDLERS ----------------
 
@@ -72,10 +75,57 @@ export default function FindingsPage() {
 
   // ---------------- RENDER ----------------
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-8">
 
+      {/* ================= INVENTARIO ================= */}
+      {inventoryData && (
+        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+          <h2 className="text-xl font-semibold">
+            Inventario Completo
+          </h2>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50 text-gray-600">
+                <tr>
+                  <th className="p-4 text-left">Servicio</th>
+                  <th className="p-4 text-left">ID</th>
+                  <th className="p-4 text-left">Región</th>
+                  <th className="p-4 text-left">Estado</th>
+                  <th className="p-4 text-left">Findings</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {inventoryData.resources.map((r) => (
+                  <tr key={r.resource_id} className="border-t">
+                    <td className="p-4 font-medium">
+                      {r.resource_type}
+                    </td>
+                    <td className="p-4">{r.resource_id}</td>
+                    <td className="p-4">{r.region}</td>
+                    <td className="p-4">{r.state}</td>
+                    <td className="p-4">
+                      {r.has_findings ? (
+                        <span className="text-red-600 font-semibold">
+                          {r.findings_count}
+                        </span>
+                      ) : (
+                        <span className="text-green-600">0</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ================= STATS ================= */}
       {stats && <FindingsStatsCards stats={stats} />}
 
+      {/* ================= FILTERS ================= */}
       <FindingsFilters
         severity={severity}
         status={status}
@@ -83,6 +133,7 @@ export default function FindingsPage() {
         onChange={handleFiltersChange}
       />
 
+      {/* ================= TABLE ================= */}
       {loading ? (
         <div className="text-center py-10 text-gray-500">
           Loading findings...
@@ -95,6 +146,7 @@ export default function FindingsPage() {
         />
       )}
 
+      {/* ================= PAGINATION ================= */}
       {pages > 1 && (
         <div className="flex justify-center gap-2">
           {Array.from({ length: pages }).map((_, i) => (
@@ -113,6 +165,7 @@ export default function FindingsPage() {
         </div>
       )}
 
+      {/* ================= DRAWER ================= */}
       <FindingsDrawer
         finding={selectedFinding}
         onClose={handleCloseDrawer}
