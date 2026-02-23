@@ -92,7 +92,7 @@ export default function FindingsTable({
                     Mark as resolved
                   </button>
                 ) : (
-                  <span className="text-gray-400">—</span>
+                  <span className="text-gray-400">—🔍</span>
                 )}
               </td>
             </tr>
