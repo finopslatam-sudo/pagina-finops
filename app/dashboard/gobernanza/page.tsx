@@ -20,10 +20,6 @@ export default function GobernanzaPage() {
     return <p className="p-6 text-red-500">Error al cargar datos</p>;
   }
 
-  /* =======================
-     MÉTRICAS DERIVADAS
-  ======================== */
-
   const totalActive =
     data.findings.high +
     data.findings.medium +
@@ -46,16 +42,16 @@ export default function GobernanzaPage() {
   const healthScore = Math.max(0, 100 - riskScore);
 
   let riskLabel = 'Riesgo Bajo';
-  let riskColor = 'bg-green-600';
+  let healthColor = 'bg-emerald-100 text-emerald-700';
 
   if (healthScore < 70) {
     riskLabel = 'Riesgo Medio';
-    riskColor = 'bg-yellow-500';
+    healthColor = 'bg-yellow-100 text-yellow-700';
   }
 
   if (healthScore < 40) {
     riskLabel = 'Riesgo Alto';
-    riskColor = 'bg-red-600';
+    healthColor = 'bg-red-100 text-red-700';
   }
 
   const severityData = [
@@ -64,7 +60,7 @@ export default function GobernanzaPage() {
     { name: 'LOW', value: data.findings.low },
   ];
 
-  const COLORS = ['#ef4444', '#f59e0b', '#3b82f6'];
+  const COLORS = ['#fca5a5', '#fde68a', '#93c5fd'];
 
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-14">
@@ -79,22 +75,22 @@ export default function GobernanzaPage() {
         </p>
       </div>
 
-      {/* KPI GRID */}
+      {/* KPI GRID PASTEL */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
 
-        <KpiCard title="HIGH" value={data.findings.high} color="bg-red-600" />
-        <KpiCard title="MEDIUM" value={data.findings.medium} color="bg-yellow-500" />
-        <KpiCard title="LOW" value={data.findings.low} color="bg-blue-600" />
-        <KpiCard title="Recursos afectados" value={data.resources_affected} color="bg-purple-600" />
+        <PastelCard title="HIGH" value={data.findings.high} bg="bg-red-50" text="text-red-600" />
+        <PastelCard title="MEDIUM" value={data.findings.medium} bg="bg-yellow-50" text="text-yellow-600" />
+        <PastelCard title="LOW" value={data.findings.low} bg="bg-blue-50" text="text-blue-600" />
+        <PastelCard title="Recursos afectados" value={data.resources_affected} bg="bg-purple-50" text="text-purple-600" />
 
-        <div className={`p-6 rounded-xl shadow text-white ${riskColor}`}>
+        <div className={`p-6 rounded-2xl border ${healthColor}`}>
           <h3 className="text-xs uppercase opacity-80">
             Salud general
           </h3>
           <p className="text-3xl font-bold">
             {healthScore}%
           </p>
-          <p className="text-sm mt-1 opacity-90">
+          <p className="text-sm mt-1">
             {riskLabel}
           </p>
         </div>
@@ -105,8 +101,8 @@ export default function GobernanzaPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
         {/* DONUT SEVERIDAD */}
-        <div className="bg-white p-8 rounded-3xl border shadow-xl">
-          <h2 className="text-xl font-semibold mb-6">
+        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+          <h2 className="text-xl font-semibold">
             Distribución por severidad
           </h2>
 
@@ -115,27 +111,51 @@ export default function GobernanzaPage() {
               No existen findings activos.
             </p>
           ) : (
-            <div style={{ width: '100%', height: 320 }}>
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie
-                    data={severityData}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={110}
-                    innerRadius={60}
-                  >
-                    {severityData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index]}
+            <>
+              <div style={{ width: '100%', height: 320 }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={severityData}
+                      dataKey="value"
+                      nameKey="name"
+                      outerRadius={110}
+                      innerRadius={60}
+                      label={(props) => {
+                        const percent = props.percent ?? 0;
+                        return `${(percent * 100).toFixed(0)}%`;
+                      }}
+                    >
+                      {severityData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Leyenda */}
+              <div className="space-y-2 text-sm">
+                {severityData.map((item, index) => (
+                  <div key={item.name} className="flex justify-between items-center bg-gray-50 px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: COLORS[index] }}
                       />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+                      <span>{item.name}</span>
+                    </div>
+                    <span className="font-semibold">
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
@@ -152,7 +172,7 @@ export default function GobernanzaPage() {
 
             <div className="w-full bg-gray-200 rounded-full h-4 mt-2">
               <div
-                className="bg-green-600 h-4 rounded-full transition-all duration-700"
+                className="bg-emerald-500 h-4 rounded-full transition-all duration-700"
                 style={{ width: `${resolvedPercentage}%` }}
               />
             </div>
@@ -164,24 +184,21 @@ export default function GobernanzaPage() {
 
           <div className="grid grid-cols-2 gap-6">
 
-            <div>
-              <p className="text-sm text-gray-500">
-                Total findings
-              </p>
-              <p className="text-2xl font-semibold">
-                {data.findings.total}
-              </p>
-            </div>
+            <Metric label="Total findings" value={data.findings.total} />
+            <Metric label="Activos" value={totalActive} />
 
-            <div>
-              <p className="text-sm text-gray-500">
-                Activos
-              </p>
-              <p className="text-2xl font-semibold">
-                {totalActive}
-              </p>
-            </div>
+          </div>
 
+          <div>
+            <p className="text-sm text-gray-500">
+              Risk Score ponderado
+            </p>
+            <p className="text-2xl font-bold text-gray-800">
+              {riskScore}
+            </p>
+            <p className="text-xs text-gray-400">
+              (HIGH x5 · MEDIUM x3 · LOW x1)
+            </p>
           </div>
 
           <div>
@@ -203,25 +220,38 @@ export default function GobernanzaPage() {
   );
 }
 
-/* =========================
-   KPI CARD COMPONENT
-========================= */
+/* COMPONENTES */
 
-function KpiCard({
+function PastelCard({
   title,
   value,
-  color,
+  bg,
+  text,
 }: {
   title: string;
   value: number;
-  color: string;
+  bg: string;
+  text: string;
 }) {
   return (
-    <div className={`p-6 rounded-xl shadow text-white ${color}`}>
-      <h3 className="text-xs uppercase opacity-80">
+    <div className={`${bg} p-6 rounded-2xl border`}>
+      <h3 className="text-xs uppercase text-gray-500">
         {title}
       </h3>
-      <p className="text-3xl font-bold">
+      <p className={`text-3xl font-bold ${text}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <p className="text-sm text-gray-500">
+        {label}
+      </p>
+      <p className="text-2xl font-semibold">
         {value}
       </p>
     </div>
