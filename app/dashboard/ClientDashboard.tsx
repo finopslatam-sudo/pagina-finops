@@ -16,6 +16,7 @@ import { useDashboardCosts } from './hooks/useDashboardCosts';
 
 import DashboardFinancialKPIs from './components/finance/DashboardFinancialKPIs';
 import MonthlyCostChart from './components/finance/MonthlyCostChart';
+import { useInventory } from './hooks/useInventory';
 
 /* =====================================================
    MAIN COMPONENT
@@ -60,6 +61,10 @@ export default function ClientDashboard() {
   /* ================= FINDINGS ================= */
 
   const { data: latestFindings } = useFindings({ page: 1 });
+
+  /* ================= INVENTARY ================= */
+
+  const { data: inventoryData } = useInventory();
 
   /* ================= STATES ================= */
 
@@ -114,6 +119,28 @@ export default function ClientDashboard() {
           />
         </div>
       </div>
+
+      {/* ================= ACTIVE SERVICES ================= */}
+
+      {inventoryData && (
+        <div className="bg-white p-8 rounded-3xl border shadow-xl">
+          <h2 className="text-xl font-semibold mb-6">
+            Servicios Detectados en tu Cuenta
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {Object.entries(inventoryData.summary).map(([service, count]) => (
+              <div
+                key={service}
+                className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl border"
+              >
+                <p className="text-sm text-gray-500">{service}</p>
+                <p className="text-2xl font-bold">{count}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ================= CORE METRICS ================= */}
 
