@@ -87,17 +87,30 @@ export default function ClientDashboard() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+
           <ExecutiveBadge
-            label="Postura General"
-            value={dashboardSummary.executive_summary.overall_posture}
+          label="Postura General"
+          value={
+            dashboardSummary.executive_summary?.overall_posture ?? '—'
+          }
           />
+
           <ExecutiveBadge
-            label="Risk Score"
-            value={`${dashboardSummary.risk.risk_score}%`}
+          label="Risk Score"
+          value={
+            dashboardSummary.risk
+              ? `${dashboardSummary.risk.risk_score ?? 0}%`
+              : '—'
+          }
           />
+
           <ExecutiveBadge
-            label="Governance"
-            value={`${dashboardSummary.governance.compliance_percentage}%`}
+          label="Governance"
+          value={
+            dashboardSummary.governance
+              ? `${dashboardSummary.governance.compliance_percentage ?? 0}%`
+              : '—'
+          }
           />
         </div>
       </div>
@@ -134,17 +147,34 @@ export default function ClientDashboard() {
 
       {costsData && (
         <>
+
           <DashboardFinancialKPIs
-            currentMonthCost={costsData.current_month_cost}
-            potentialSavings={costsData.potential_savings}
-            savingsPercentage={costsData.savings_percentage}
+          currentMonthCost={
+            typeof costsData.current_month_cost === 'number'
+              ? costsData.current_month_cost
+              : 0
+          }
+          potentialSavings={
+            typeof costsData.potential_savings === 'number'
+              ? costsData.potential_savings
+              : 0
+          }
+          savingsPercentage={
+            typeof costsData.savings_percentage === 'number'
+              ? costsData.savings_percentage
+              : 0
+          }
           />
 
           <div className="bg-white p-8 rounded-3xl border shadow-xl">
             <h2 className="text-xl font-semibold mb-6">
               Tendencia de Costos (6 meses)
             </h2>
-            <MonthlyCostChart data={costsData.monthly_cost} />
+            <MonthlyCostChart
+              data={Array.isArray(costsData.monthly_cost)
+                ? costsData.monthly_cost
+                : []}
+            />
           </div>
         </>
       )}
