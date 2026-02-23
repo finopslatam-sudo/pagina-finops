@@ -83,7 +83,7 @@ export default function ClientDashboard() {
         </h1>
 
         <p className="opacity-90 text-lg">
-          {dashboardSummary.executive_summary.message}
+          {dashboardSummary.executive_summary?.message ?? 'Cargando análisis ejecutivo...'}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
