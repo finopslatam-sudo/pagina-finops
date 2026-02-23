@@ -22,29 +22,45 @@ export default function DashboardFinancialKPIs({
       <Card
         title="Gasto actual mes"
         value={`$${safeCurrent.toFixed(2)}`}
+        bg="bg-blue-50"
+        border="border-blue-200"
       />
 
       <Card
         title="Ahorro potencial"
         value={`$${safeSavings.toFixed(2)}`}
+        bg="bg-emerald-50"
+        border="border-emerald-200"
       />
 
       <Card
         title="Potencial optimización"
         value={`${safePercentage}%`}
+        bg="bg-purple-50"
+        border="border-purple-200"
       />
 
     </div>
   );
 }
 
-function Card({ title, value }: { title: string; value: string }) {
+function Card({
+  title,
+  value,
+  bg,
+  border,
+}: {
+  title: string;
+  value: string;
+  bg: string;
+  border: string;
+}) {
   return (
-    <div className="bg-white p-6 rounded-2xl border shadow-lg">
-      <h3 className="text-sm text-gray-500 mb-2 uppercase">
+    <div className={`${bg} ${border} border p-6 rounded-2xl shadow-sm`}>
+      <h3 className="text-sm text-gray-600 mb-2 uppercase">
         {title}
       </h3>
-      <p className="text-3xl font-bold">{value}</p>
+      <p className="text-3xl font-bold text-gray-800">{value}</p>
     </div>
   );
 }
