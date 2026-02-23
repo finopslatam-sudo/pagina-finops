@@ -14,30 +14,65 @@ interface Props {
 
 export default function ServiceBreakdownChart({ data }: Props) {
 
-  // 🔎 Filtrar servicios con monto real
+  // 🔎 Filtrar servicios con monto real (> 0.01)
   const filteredData = (data || [])
     .filter(item => item.amount > 0.01)
     .sort((a, b) => b.amount - a.amount);
 
-  if (!filteredData.length) {
-    return (
-      <p className="text-gray-400 text-sm">
-        No hay consumo registrado aún (Free Tier detectado).
-      </p>
-    );
-  }
-
   // 🎨 Paleta pastel profesional
   const COLORS = [
-    '#93c5fd', // blue-300
-    '#86efac', // green-300
-    '#fca5a5', // red-300
-    '#c4b5fd', // purple-300
-    '#fdba74', // orange-300
-    '#67e8f9', // cyan-300
-    '#f9a8d4', // pink-300
-    '#fde68a', // yellow-300
+    '#93c5fd',
+    '#86efac',
+    '#fca5a5',
+    '#c4b5fd',
+    '#fdba74',
+    '#67e8f9',
+    '#f9a8d4',
+    '#fde68a',
   ];
+
+  // 🟡 Caso sin consumo facturable
+  if (!filteredData.length) {
+
+    const placeholderData = [
+      {
+        service: 'Aún no registran consumo facturable',
+        amount: 1,
+      },
+    ];
+
+    return (
+      <div className="space-y-6">
+
+        <ResponsiveContainer width="100%" height={350}>
+          <PieChart>
+            <Pie
+              data={placeholderData}
+              dataKey="amount"
+              nameKey="service"
+              outerRadius={120}
+              innerRadius={70}
+              isAnimationActive={true}
+              animationDuration={800}
+            >
+              <Cell fill="#e5e7eb" />
+            </Pie>
+
+            <Tooltip
+              formatter={() =>
+                'Sin consumo facturable aún'
+              }
+            />
+          </PieChart>
+        </ResponsiveContainer>
+
+        <div className="text-center text-gray-400 text-sm">
+          No se ha detectado consumo facturable en esta cuenta.
+        </div>
+
+      </div>
+    );
+  }
 
   const total = filteredData.reduce(
     (sum, item) => sum + item.amount,
@@ -47,7 +82,7 @@ export default function ServiceBreakdownChart({ data }: Props) {
   return (
     <div className="space-y-6">
 
-      {/* 🎯 Donut Chart */}
+      {/* 🎯 Donut real */}
       <ResponsiveContainer width="100%" height={350}>
         <PieChart>
           <Pie
@@ -70,8 +105,7 @@ export default function ServiceBreakdownChart({ data }: Props) {
               />
             ))}
           </Pie>
-
-          <Tooltip
+            <Tooltip
             formatter={(value) => {
               const numericValue =
                 typeof value === 'number'
@@ -86,7 +120,7 @@ export default function ServiceBreakdownChart({ data }: Props) {
         </PieChart>
       </ResponsiveContainer>
 
-      {/* 📌 Leyenda personalizada */}
+      {/* 📌 Leyenda */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
         {filteredData.map((item, index) => {
           const percentage =
@@ -117,6 +151,7 @@ export default function ServiceBreakdownChart({ data }: Props) {
           );
         })}
       </div>
+
     </div>
   );
 }
