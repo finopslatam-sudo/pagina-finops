@@ -1,9 +1,9 @@
 'use client';
 
 interface Props {
-  currentMonthCost: number;
-  potentialSavings: number;
-  savingsPercentage: number;
+  currentMonthCost?: number;
+  potentialSavings?: number;
+  savingsPercentage?: number;
 }
 
 export default function DashboardFinancialKPIs({
@@ -11,22 +11,27 @@ export default function DashboardFinancialKPIs({
   potentialSavings,
   savingsPercentage,
 }: Props) {
+
+  const safeCurrent = typeof currentMonthCost === "number" ? currentMonthCost : 0;
+  const safeSavings = typeof potentialSavings === "number" ? potentialSavings : 0;
+  const safePercentage = typeof savingsPercentage === "number" ? savingsPercentage : 0;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
       <Card
         title="Gasto actual mes"
-        value={`$${currentMonthCost.toFixed(2)}`}
+        value={`$${safeCurrent.toFixed(2)}`}
       />
 
       <Card
         title="Ahorro potencial"
-        value={`$${potentialSavings.toFixed(2)}`}
+        value={`$${safeSavings.toFixed(2)}`}
       />
 
       <Card
         title="Potencial optimización"
-        value={`${savingsPercentage}%`}
+        value={`${safePercentage}%`}
       />
 
     </div>
