@@ -122,22 +122,120 @@ export default function ClientDashboard() {
 
       {/* ================= ACTIVE SERVICES ================= */}
 
-      {inventoryData && (
+      {inventoryData?.summary && Object.keys(inventoryData.summary).length > 0 && (
         <div className="bg-white p-8 rounded-3xl border shadow-xl">
           <h2 className="text-xl font-semibold mb-6">
             Servicios Detectados en tu Cuenta
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {Object.entries(inventoryData.summary).map(([service, count]) => (
-              <div
-                key={service}
-                className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl border"
-              >
-                <p className="text-sm text-gray-500">{service}</p>
-                <p className="text-2xl font-bold">{count}</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {Object.entries(inventoryData.summary)
+              .sort((a, b) => b[1] - a[1])
+              .map(([service, count]) => {
+
+                /* ================= SERVICE STYLES ================= */
+
+                const serviceConfig: Record<
+                  string,
+                  {
+                    bg: string;
+                    border: string;
+                    icon: string;
+                  }
+                > = {
+                  EC2: {
+                    bg: "bg-blue-50",
+                    border: "border-blue-200",
+                    icon: "🖥️",
+                  },
+                  EBS: {
+                    bg: "bg-purple-50",
+                    border: "border-purple-200",
+                    icon: "💾",
+                  },
+                  S3: {
+                    bg: "bg-emerald-50",
+                    border: "border-emerald-200",
+                    icon: "🪣",
+                  },
+                  RDS: {
+                    bg: "bg-amber-50",
+                    border: "border-amber-200",
+                    icon: "🗄️",
+                  },
+                  Lambda: {
+                    bg: "bg-rose-50",
+                    border: "border-rose-200",
+                    icon: "⚡",
+                  },
+                  NAT: {
+                    bg: "bg-orange-50",
+                    border: "border-orange-200",
+                    icon: "🌐",
+                  },
+                };
+
+                const config =
+                  serviceConfig[service] || {
+                    bg: "bg-gray-50",
+                    border: "border-gray-200",
+                    icon: "☁️",
+                  };
+
+                /* ================= FINDINGS BADGE ================= */
+
+                const hasFindings =
+                  inventoryData.resources.filter(
+                    (r) =>
+                      r.resource_type === service && r.has_findings
+                  ).length > 0;
+
+                return (
+                  <div
+                    key={service}
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/inventory?service=${service}`
+                      )
+                    }
+                    className={`
+                      ${config.bg}
+                      ${config.border}
+                      border
+                      p-6
+                      rounded-2xl
+                      shadow-sm
+                      hover:shadow-lg
+                      hover:scale-[1.02]
+                      transition-all
+                      cursor-pointer
+                      relative
+                    `}
+                  >
+                    {/* Badge riesgo */}
+                    {hasFindings && (
+                      <span className="absolute top-3 right-3 text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-semibold">
+                        Riesgo
+                      </span>
+                    )}
+
+                    {/* Icon */}
+                    <div className="text-3xl mb-3">
+                      {config.icon}
+                    </div>
+
+                    {/* Service Name */}
+                    <p className="text-sm uppercase tracking-wide text-gray-600">
+                      {service}
+                    </p>
+
+                    {/* Count */}
+                    <p className="text-3xl font-bold text-gray-800 mt-1">
+                      {count}
+                    </p>
+                  </div>
+                );
+              })}
           </div>
         </div>
       )}
