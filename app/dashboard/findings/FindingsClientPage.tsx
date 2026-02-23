@@ -146,6 +146,7 @@ export default function FindingsPage() {
         severity={severity}
         status={status}
         search={search}
+        service={service} 
         onChange={handleFiltersChange}
       />
 
