@@ -14,7 +14,7 @@ interface ServiceBreakdown {
   amount: number;
 }
 
-interface DashboardCosts {
+export interface DashboardCosts {
   monthly_cost: MonthlyCost[];
   service_breakdown: ServiceBreakdown[];
   current_month_cost: number;
@@ -36,16 +36,13 @@ export function useDashboardCosts() {
       try {
         setLoading(true);
 
-        const response = await apiFetch<{
-          status: string;
-          data: DashboardCosts;
-        }>('/api/client/dashboard/costs', { token });
+        const response = await apiFetch<DashboardCosts>(
+          '/api/client/dashboard/costs',
+          { token }
+        );
 
-        if (response.status !== 'ok') {
-          throw new Error('Error loading costs');
-        }
-
-        setData(response.data);
+        setData(response);
+        setError('');
       } catch (err) {
         console.error('DASHBOARD COST ERROR:', err);
         setError('No se pudieron cargar los costos.');

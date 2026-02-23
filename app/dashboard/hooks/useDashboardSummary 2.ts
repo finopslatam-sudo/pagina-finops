@@ -5,7 +5,7 @@ import { apiFetch } from '@/app/lib/api';
 import { useAuth } from '@/app/context/AuthContext';
 
 /* =====================================================
-   TIPADO ALINEADO 100% CON BACKEND REAL
+   TYPES — ALINEADO 100% CON BACKEND
 ===================================================== */
 
 export interface DashboardSummary {

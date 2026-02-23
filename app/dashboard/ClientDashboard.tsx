@@ -7,28 +7,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
-import { apiFetch } from '@/app/lib/api';
 
 import { useFindings } from './findings/hooks/useFindings';
-import { useFindingsStats } from './findings/hooks/useFindingsStats';
 import FindingsTable from './findings/components/FindingsTable';
+
 import { useDashboardSummary } from './hooks/useDashboardSummary';
 import { useDashboardCosts } from './hooks/useDashboardCosts';
 
 import DashboardFinancialKPIs from './components/finance/DashboardFinancialKPIs';
 import MonthlyCostChart from './components/finance/MonthlyCostChart';
-import ServiceBreakdownChart from './components/finance/ServiceBreakdownChart';
-
-/* =====================================================
-   TYPES
-===================================================== */
-
-interface ClientStats {
-  client_id: number;
-  user_count: number;
-  active_services: number;
-  plan: string | null;
-}
 
 /* =====================================================
    MAIN COMPONENT
@@ -38,16 +25,21 @@ export default function ClientDashboard() {
   const router = useRouter();
   const { user, token, isAuthReady, isStaff } = useAuth();
 
-  const [stats, setStats] = useState<ClientStats | null>(null);
   const [error, setError] = useState<string>('');
 
-  /* ================= COSTS HOOK ================= */
+  /* ================= COSTS ================= */
 
   const {
     data: costsData,
-    loading: costsLoading,
     error: costsError,
   } = useDashboardCosts();
+
+  /* ================= SUMMARY ================= */
+
+  const {
+    data: dashboardSummary,
+    error: dashboardError,
+  } = useDashboardSummary();
 
   /* ================= ACCESS CONTROL ================= */
 
@@ -65,129 +57,81 @@ export default function ClientDashboard() {
     }
   }, [isAuthReady, user, token, isStaff, router]);
 
-  /* ================= FETCH CLIENT STATS ================= */
-
-  useEffect(() => {
-    if (!isAuthReady || !user || !token) return;
-
-    apiFetch<ClientStats>('/api/v1/reports/client/stats', {
-      token,
-    })
-      .then((data) => {
-        setStats(data);
-        setError('');
-      })
-      .catch((err) => {
-        console.error('CLIENT DASHBOARD ERROR:', err);
-        setError(
-          'No se pudieron cargar tus métricas. Intenta más tarde.'
-        );
-      });
-  }, [isAuthReady, user, token]);
-
   /* ================= FINDINGS ================= */
 
-  const {
-    data: dashboardSummary,
-    error: dashboardError,
-  } = useDashboardSummary();
-
-  const { data: latestFindings } = useFindings({
-    page: 1,
-  });
+  const { data: latestFindings } = useFindings({ page: 1 });
 
   /* ================= STATES ================= */
 
   if (error) return <p className="text-red-500">{error}</p>;
   if (dashboardError) return <p className="text-red-500">{dashboardError}</p>;
-  if (!dashboardSummary) {
-    return <p className="text-gray-400">Cargando tu dashboard…</p>;
-  }
+  if (costsError) return <p className="text-red-500">{costsError}</p>;
+  if (!dashboardSummary) return <p className="text-gray-400">Cargando dashboard…</p>;
 
-  /* ================= RENDER ================= */
+  /* =====================================================
+     RENDER
+  ===================================================== */
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-12">
+    <div className="space-y-12">
 
-      {/* HEADER */}
-      <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white p-8 rounded-3xl shadow-2xl">
-        <h1 className="text-3xl font-bold mb-2">
-          Bienvenido a tu Dashboard FinOps
+      {/* ================= EXECUTIVE SUMMARY ================= */}
+
+      <div className="bg-gradient-to-r from-indigo-700 to-blue-700 text-white p-8 rounded-3xl shadow-2xl space-y-4">
+        <h1 className="text-3xl font-bold">
+          Executive Overview
         </h1>
-        <p className="opacity-90">
-          Plan actual:{' '}
-          <span className="font-semibold">
-            {stats?.plan ?? 'Sin plan asignado'}
-          </span>
+
+        <p className="opacity-90 text-lg">
+          {dashboardSummary.executive_summary.message}
         </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+          <ExecutiveBadge
+            label="Postura General"
+            value={dashboardSummary.executive_summary.overall_posture}
+          />
+          <ExecutiveBadge
+            label="Risk Score"
+            value={`${dashboardSummary.risk.risk_score}%`}
+          />
+          <ExecutiveBadge
+            label="Governance"
+            value={`${dashboardSummary.governance.compliance_percentage}%`}
+          />
+        </div>
       </div>
 
-      {/* CORE METRICS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      {/* ================= CORE METRICS ================= */}
 
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <InfoCard
-          title="Findings activos"
+          title="Findings Activos"
           value={dashboardSummary.findings.active}
           accent="from-red-500 to-red-600"
         />
 
         <InfoCard
-          title="Ahorro potencial mensual"
+          title="Ahorro Potencial Mensual"
           value={`$${dashboardSummary.findings.estimated_monthly_savings}`}
           accent="from-green-500 to-emerald-600"
         />
 
         <InfoCard
-          title="Cuentas AWS conectadas"
+          title="Cuentas AWS"
           value={dashboardSummary.accounts}
           accent="from-blue-500 to-indigo-600"
         />
 
         <InfoCard
-          title="Recursos afectados"
+          title="Recursos Afectados"
           value={dashboardSummary.resources_affected}
           accent="from-purple-500 to-violet-600"
         />
       </div>
 
-      {/* SERVICIOS EVALUADOS */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
-        <h2 className="text-xl font-semibold mb-6">
-          Servicios evaluados
-        </h2>
+      {/* ================= COSTS ================= */}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {costsData?.service_breakdown
-            .sort((a, b) => b.amount - a.amount)
-            .slice(0, 8)
-            .map((service) => (
-              <div
-                key={service.service}
-                className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl border hover:shadow-md transition"
-              >
-                <p className="text-sm text-gray-500 truncate">
-                  {service.service}
-                </p>
-                <p className="text-lg font-semibold">
-                  ${service.amount.toFixed(2)}
-                </p>
-              </div>
-            ))}
-        </div>
-      </div>
-
-      {/* TENDENCIA EJECUTIVA */}
-      {costsData && (
-        <div className="bg-white p-8 rounded-3xl border shadow-xl">
-          <h2 className="text-xl font-semibold mb-6">
-            Tendencia ejecutiva (6 meses)
-          </h2>
-
-          <MonthlyCostChart data={costsData.monthly_cost} />
-        </div>
-      )}
-
-      {/* FINANCIAL SECTION */}
       {costsData && (
         <>
           <DashboardFinancialKPIs
@@ -196,12 +140,17 @@ export default function ClientDashboard() {
             savingsPercentage={costsData.savings_percentage}
           />
 
-          <MonthlyCostChart data={costsData.monthly_cost} />
-
+          <div className="bg-white p-8 rounded-3xl border shadow-xl">
+            <h2 className="text-xl font-semibold mb-6">
+              Tendencia de Costos (6 meses)
+            </h2>
+            <MonthlyCostChart data={costsData.monthly_cost} />
+          </div>
         </>
       )}
 
-      {/* LATEST FINDINGS */}
+      {/* ================= LATEST FINDINGS ================= */}
+
       <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-4">
         <h2 className="text-xl font-semibold">
           Últimos Findings Detectados
@@ -227,8 +176,9 @@ export default function ClientDashboard() {
 }
 
 /* =====================================================
-   INFO CARD COMPONENT
+   COMPONENTS
 ===================================================== */
+
 function InfoCard({
   title,
   value,
@@ -239,15 +189,26 @@ function InfoCard({
   accent: string;
 }) {
   return (
-    <div
-      className={`p-6 rounded-2xl shadow-lg text-white bg-gradient-to-r ${accent}`}
-    >
+    <div className={`p-6 rounded-2xl shadow-lg text-white bg-gradient-to-r ${accent}`}>
       <h3 className="text-sm uppercase tracking-wide opacity-80 mb-2">
         {title}
       </h3>
-      <p className="text-3xl font-bold">
-        {value}
-      </p>
+      <p className="text-3xl font-bold">{value}</p>
+    </div>
+  );
+}
+
+function ExecutiveBadge({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div className="bg-white/20 p-4 rounded-xl">
+      <p className="text-sm opacity-80">{label}</p>
+      <p className="text-xl font-semibold">{value}</p>
     </div>
   );
 }
