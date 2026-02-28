@@ -12,29 +12,11 @@ import { useAuth } from '@/app/context/AuthContext';
    COMPONENT
 ===================================================== */
 
-/**
- * UserMenu
- *
- * Menú contextual del usuario autenticado.
- *
- * - Visible solo con sesión activa
- * - Refleja permisos desde AuthContext
- * - Logout seguro y centralizado
- * - UX consistente para SaaS enterprise
- */
 export default function UserMenu() {
   const { user, logout, isStaff } = useAuth();
 
-  /* =========================
-     STATE
-  ========================== */
-
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
-
-  /* =====================================================
-     CLOSE MENU ON OUTSIDE CLICK
-  ===================================================== */
 
   useEffect(() => {
     const close = () => setOpen(false);
@@ -42,41 +24,19 @@ export default function UserMenu() {
     return () => window.removeEventListener('click', close);
   }, []);
 
-  /* =====================================================
-     GUARD
-     (No sesión → no render)
-  ===================================================== */
-
   if (!user) return null;
-
-  /* =====================================================
-     LOGOUT HANDLER
-     - UX suave
-     - Logout real delegado al context
-  ===================================================== */
 
   const handleLogout = () => {
     setOpen(false);
     setShowToast(true);
 
-    /**
-     * Delay solo visual.
-     * AuthContext maneja limpieza + redirect.
-     */
     setTimeout(() => {
-      logout(); // 🔐 Redirige a "/"
+      logout();
     }, 1200);
   };
 
-  /* =====================================================
-     RENDER
-  ===================================================== */
-
   return (
     <>
-      {/* =========================
-         MAIN BUTTON
-      ========================== */}
       <div className="relative">
         <button
           onClick={(e) => {
@@ -88,28 +48,23 @@ export default function UserMenu() {
           Mi cuenta
         </button>
 
-        {/* =========================
-           DROPDOWN MENU
-        ========================== */}
         {open && (
           <div
             onClick={(e) => e.stopPropagation()}
             className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border overflow-hidden z-40"
           >
 
-            {/* =========================
-              DASHBOARD EJECUTIVO — TODOS
-            ========================== */}
+            {/* DASHBOARD — TODOS */}
             <Link
               href="/dashboard"
               className="block px-4 py-3 hover:bg-blue-50"
               onClick={() => setOpen(false)}
             >
-              📊 Dashboard Ejecutivo
+              📊 Dashboard
             </Link>
 
             {/* =========================
-              STAFF MENU
+              STAFF MENU (SIN CAMBIOS)
             ========================== */}
             {isStaff && (
               <>
@@ -132,7 +87,7 @@ export default function UserMenu() {
             )}
 
             {/* =========================
-              CLIENT MENU
+              CLIENT MENU (ACTUALIZADO)
             ========================== */}
             {!isStaff && (
               <>
@@ -141,7 +96,15 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50 border-t"
                   onClick={() => setOpen(false)}
                 >
-                  🔍 Assets & Findings
+                  🔎 Risk & Findings
+                </Link>
+
+                <Link
+                  href="/dashboard/assets"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  📦 Assets
                 </Link>
 
                 <Link
@@ -149,7 +112,15 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  💰 Costos & Tendencias
+                  💰 Cost & Financials
+                </Link>
+
+                <Link
+                  href="/dashboard/optimization"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  🚀 Optimization
                 </Link>
 
                 <Link
@@ -157,7 +128,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  🏛 Gobernanza
+                  🏛 Governance
                 </Link>
 
                 <Link
@@ -165,7 +136,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50 border-t"
                   onClick={() => setOpen(false)}
                 >
-                  👤 Mi Perfil
+                  👤 Account
                 </Link>
               </>
             )}
@@ -175,15 +146,13 @@ export default function UserMenu() {
               onClick={handleLogout}
               className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 border-t"
             >
-              🚪 Cerrar sesión
+              🚪 Logout
             </button>
 
           </div>
         )}
-         </div>
-      {/* =========================
-         LOGOUT TOAST
-      ========================== */}
+      </div>
+
       {showToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-fade-in-out">
           <div className="bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg">
