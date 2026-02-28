@@ -5,10 +5,14 @@ import { apiFetch } from '@/app/lib/api';
 import { useAuth } from '@/app/context/AuthContext';
 
 /* =====================================================
-   TIPADO ALINEADO 100% CON BACKEND REAL
+   TIPADO REAL — ALINEADO CON BACKEND ACTUAL
 ===================================================== */
 
-export interface DashboardSummary {
+export interface DashboardResponse {
+  accounts: number;
+  last_sync: string | null;
+  resources_affected: number;
+
   findings: {
     total: number;
     active: number;
@@ -18,10 +22,6 @@ export interface DashboardSummary {
     low: number;
     estimated_monthly_savings: number;
   };
-
-  accounts: number;
-  last_sync: string | null;
-  resources_affected: number;
 
   governance: {
     compliance_percentage: number;
@@ -43,56 +43,67 @@ export interface DashboardSummary {
     overall_posture: string;
     governance_status: string;
     primary_risk_driver: string;
-    financial_exposure: number;
+    monthly_financial_exposure: number;
+    annual_financial_exposure: number;
     message: string;
+  };
+
+  cost: {
+    current_month_cost: number;
+    monthly_cost: { month: string; amount: number }[];
+    service_breakdown: { service: string; amount: number }[];
+    potential_savings: number;
+    savings_percentage: number;
   };
 
   roi_projection: {
     projected_risk_score: number;
     projected_risk_level: string;
     projected_governance: number;
-    high_savings_opportunity: number;
+    high_savings_opportunity_monthly: number;
+    high_savings_opportunity_annual: number;
   };
 
   priority_services: any[];
-  trend: any[];
+  trend: any;
   remediation: any;
+  risk_by_service: any;
 }
 
 /* =====================================================
-   HOOK
+   HOOK CONSOLIDADO
 ===================================================== */
 
-export function useDashboardSummary() {
+export function useDashboard() {
   const { token, isAuthReady } = useAuth();
 
-  const [data, setData] = useState<DashboardSummary | null>(null);
+  const [data, setData] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
     if (!isAuthReady || !token) return;
 
-    const fetchSummary = async () => {
+    const fetchDashboard = async () => {
       try {
         setLoading(true);
 
-        const response = await apiFetch<DashboardSummary>(
-          '/api/client/dashboard/summary',
+        const response = await apiFetch<DashboardResponse>(
+          '/api/client/dashboard/',
           { token }
         );
 
         setData(response);
         setError('');
       } catch (err: any) {
-        console.error('DASHBOARD SUMMARY ERROR:', err);
-        setError('No se pudo cargar el resumen del dashboard.');
+        console.error('DASHBOARD ERROR:', err);
+        setError('No se pudo cargar el dashboard.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSummary();
+    fetchDashboard();
   }, [isAuthReady, token]);
 
   return { data, loading, error };

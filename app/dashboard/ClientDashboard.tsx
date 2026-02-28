@@ -11,8 +11,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useFindings } from './findings/hooks/useFindings';
 import FindingsTable from './findings/components/FindingsTable';
 
-import { useDashboardSummary } from './hooks/useDashboardSummary';
-import { useDashboardCosts } from './hooks/useDashboardCosts';
+import { useDashboard } from './hooks/useDashboard';
 
 import DashboardFinancialKPIs from './components/finance/DashboardFinancialKPIs';
 import MonthlyCostChart from './components/finance/MonthlyCostChart';
@@ -26,21 +25,13 @@ export default function ClientDashboard() {
   const router = useRouter();
   const { user, token, isAuthReady, isStaff } = useAuth();
 
-  const [error, setError] = useState<string>('');
-
-  /* ================= COSTS ================= */
+  /* ================= COSTS AND SUMARY ================= */
 
   const {
-    data: costsData,
-    error: costsError,
-  } = useDashboardCosts();
-
-  /* ================= SUMMARY ================= */
-
-  const {
-    data: dashboardSummary,
-    error: dashboardError,
-  } = useDashboardSummary();
+    data: dashboardData,
+    loading,
+    error,
+  } = useDashboard();
 
   /* ================= ACCESS CONTROL ================= */
 
@@ -69,9 +60,8 @@ export default function ClientDashboard() {
   /* ================= STATES ================= */
 
   if (error) return <p className="text-red-500">{error}</p>;
-  if (dashboardError) return <p className="text-red-500">{dashboardError}</p>;
-  if (costsError) return <p className="text-red-500">{costsError}</p>;
-  if (!dashboardSummary) return <p className="text-gray-400">Cargando dashboard…</p>;
+  if (loading || !dashboardData)
+    return <p className="text-gray-400">Cargando dashboard…</p>;
 
   /* =====================================================
      RENDER
@@ -88,7 +78,7 @@ export default function ClientDashboard() {
         </h1>
 
         <p className="opacity-90 text-lg">
-          {dashboardSummary.executive_summary?.message ?? 'Cargando análisis ejecutivo...'}
+          {dashboardData.executive_summary?.message ?? 'Cargando análisis ejecutivo...'}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
@@ -96,15 +86,15 @@ export default function ClientDashboard() {
           <ExecutiveBadge
           label="Postura General"
           value={
-            dashboardSummary.executive_summary?.overall_posture ?? '—'
+            dashboardData.executive_summary?.overall_posture ?? '—'
           }
           />
 
           <ExecutiveBadge
           label="Risk Score"
           value={
-            dashboardSummary.risk
-              ? `${dashboardSummary.risk.risk_score ?? 0}%`
+            dashboardData.risk
+              ? `${dashboardData.risk.risk_score ?? 0}%`
               : '—'
           }
           />
@@ -112,8 +102,8 @@ export default function ClientDashboard() {
           <ExecutiveBadge
           label="Governance"
           value={
-            dashboardSummary.governance
-              ? `${dashboardSummary.governance.compliance_percentage ?? 0}%`
+            dashboardData.governance
+              ? `${dashboardData.governance.compliance_percentage ?? 0}%`
               : '—'
           }
           />
@@ -245,48 +235,48 @@ export default function ClientDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <InfoCard
           title="Findings Activos"
-          value={dashboardSummary.findings.active}
+          value={dashboardData.findings.active}
           accent="from-red-500 to-red-600"
         />
 
         <InfoCard
           title="Ahorro Potencial Mensual"
-          value={`$${dashboardSummary.findings.estimated_monthly_savings}`}
+          value={`$${dashboardData.findings.estimated_monthly_savings}`}
           accent="from-green-500 to-emerald-600"
         />
 
         <InfoCard
           title="Cuentas AWS"
-          value={dashboardSummary.accounts}
+          value={dashboardData.accounts}
           accent="from-blue-500 to-indigo-600"
         />
 
         <InfoCard
           title="Recursos Afectados"
-          value={dashboardSummary.resources_affected}
+          value={dashboardData.resources_affected}
           accent="from-purple-500 to-violet-600"
         />
       </div>
 
       {/* ================= COSTS ================= */}
 
-      {costsData && (
+      {dashboardData.cost && (
         <>
 
           <DashboardFinancialKPIs
           currentMonthCost={
-            typeof costsData.current_month_cost === 'number'
-              ? costsData.current_month_cost
+            typeof dashboardData.cost.current_month_cost === 'number'
+              ? dashboardData.cost.current_month_cost
               : 0
           }
           potentialSavings={
-            typeof costsData.potential_savings === 'number'
-              ? costsData.potential_savings
+            typeof dashboardData.cost.potential_savings === 'number'
+              ? dashboardData.cost.potential_savings
               : 0
           }
           savingsPercentage={
-            typeof costsData.savings_percentage === 'number'
-              ? costsData.savings_percentage
+            typeof dashboardData.cost.savings_percentage === 'number'
+              ? dashboardData.cost.savings_percentage
               : 0
           }
           />
@@ -296,8 +286,8 @@ export default function ClientDashboard() {
               Tendencia de Costos (6 meses)
             </h2>
             <MonthlyCostChart
-              data={Array.isArray(costsData.monthly_cost)
-                ? costsData.monthly_cost
+              data={Array.isArray(dashboardData.cost.monthly_cost)
+                ? dashboardData.cost.monthly_cost
                 : []}
             />
           </div>

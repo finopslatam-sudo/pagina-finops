@@ -1,6 +1,6 @@
 'use client';
 
-import { useDashboardSummary } from '../hooks/useDashboardSummary';
+import { useDashboard } from '../hooks/useDashboard';
 import {
   PieChart,
   Pie,
@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 
 export default function GobernanzaPage() {
-  const { data, loading } = useDashboardSummary();
+  const { data, loading } = useDashboard();
 
   if (loading) {
     return <p className="p-6 text-gray-400">Cargando gobernanza...</p>;
