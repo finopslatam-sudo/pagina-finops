@@ -4,7 +4,7 @@
    IMPORTS
 ===================================================== */
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
@@ -12,10 +12,9 @@ import { useFindings } from './findings/hooks/useFindings';
 import FindingsTable from './findings/components/FindingsTable';
 
 import { useDashboard } from './hooks/useDashboard';
-
-import DashboardFinancialKPIs from './components/finance/DashboardFinancialKPIs';
-import MonthlyCostChart from './components/finance/MonthlyCostChart';
 import { useInventory } from './hooks/useInventory';
+
+import MonthlyCostChart from './components/finance/MonthlyCostChart';
 
 /* =====================================================
    MAIN COMPONENT
@@ -25,13 +24,9 @@ export default function ClientDashboard() {
   const router = useRouter();
   const { user, token, isAuthReady, isStaff } = useAuth();
 
-  /* ================= COSTS AND SUMARY ================= */
-
-  const {
-    data: dashboardData,
-    loading,
-    error,
-  } = useDashboard();
+  const { data, loading, error } = useDashboard();
+  const { data: latestFindings } = useFindings({ page: 1 });
+  const { data: inventoryData } = useInventory();
 
   /* ================= ACCESS CONTROL ================= */
 
@@ -49,18 +44,8 @@ export default function ClientDashboard() {
     }
   }, [isAuthReady, user, token, isStaff, router]);
 
-  /* ================= FINDINGS ================= */
-
-  const { data: latestFindings } = useFindings({ page: 1 });
-
-  /* ================= INVENTARY ================= */
-
-  const { data: inventoryData } = useInventory();
-
-  /* ================= STATES ================= */
-
   if (error) return <p className="text-red-500">{error}</p>;
-  if (loading || !dashboardData)
+  if (loading || !data)
     return <p className="text-gray-400">Cargando dashboard…</p>;
 
   /* =====================================================
@@ -68,236 +53,145 @@ export default function ClientDashboard() {
   ===================================================== */
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-14">
 
-      {/* ================= EXECUTIVE SUMMARY ================= */}
+      {/* =====================================================
+         1️⃣ EXECUTIVE OVERVIEW
+      ===================================================== */}
 
-      <div className="bg-gradient-to-r from-indigo-700 to-blue-700 text-white p-8 rounded-3xl shadow-2xl space-y-4">
+      <div className="bg-gradient-to-r from-blue-800 to-blue-600 text-white p-10 rounded-3xl shadow-xl space-y-6">
         <h1 className="text-3xl font-bold">
           Executive Overview
         </h1>
 
-        <p className="opacity-90 text-lg">
-          {dashboardData.executive_summary?.message ?? 'Cargando análisis ejecutivo...'}
+        <p className="opacity-90 text-lg max-w-4xl">
+          {data.executive_summary?.message}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
 
           <ExecutiveBadge
-          label="Postura General"
-          value={
-            dashboardData.executive_summary?.overall_posture ?? '—'
-          }
+            label="Overall Posture"
+            value={data.executive_summary?.overall_posture ?? '—'}
           />
 
           <ExecutiveBadge
-          label="Risk Score"
-          value={
-            dashboardData.risk
-              ? `${dashboardData.risk.risk_score ?? 0}%`
-              : '—'
-          }
+            label="Risk Score"
+            value={`${data.risk?.risk_score ?? 0}%`}
           />
 
           <ExecutiveBadge
-          label="Governance"
-          value={
-            dashboardData.governance
-              ? `${dashboardData.governance.compliance_percentage ?? 0}%`
-              : '—'
-          }
+            label="Governance"
+            value={`${data.governance?.compliance_percentage ?? 0}%`}
           />
+
         </div>
       </div>
 
-      {/* ================= ACTIVE SERVICES ================= */}
+      {/* =====================================================
+         2️⃣ FINANCIAL SNAPSHOT
+      ===================================================== */}
 
-      {inventoryData?.summary && Object.keys(inventoryData.summary).length > 0 && (
-        <div className="bg-white p-8 rounded-3xl border shadow-xl">
-          <h2 className="text-xl font-semibold mb-6">
-            Servicios Detectados en tu Cuenta
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <BlueCard
+          title="Gasto Actual (Mes)"
+          value={`$${data.cost.current_month_cost}`}
+        />
+
+        <BlueCard
+          title="Ahorro Potencial"
+          value={`$${data.cost.potential_savings}`}
+        />
+
+        <BlueCard
+          title="Potencial Optimización"
+          value={`${data.cost.savings_percentage}%`}
+        />
+
+      </div>
+
+      {/* =====================================================
+         3️⃣ OPERATIONAL METRICS
+      ===================================================== */}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <BlueCard
+          title="Findings Activos"
+          value={data.findings.active}
+        />
+
+        <BlueCard
+          title="Cuentas AWS"
+          value={data.accounts}
+        />
+
+        <BlueCard
+          title="Recursos Afectados"
+          value={data.resources_affected}
+        />
+
+      </div>
+
+      {/* =====================================================
+         4️⃣ SERVICIOS ESCANEADOS
+      ===================================================== */}
+
+      {inventoryData?.summary && (
+        <div className="bg-white p-10 rounded-3xl border border-blue-100 shadow-xl space-y-8">
+
+          <h2 className="text-2xl font-semibold text-blue-800">
+            Servicios Escaneados
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {Object.entries(inventoryData.summary)
               .sort((a, b) => b[1] - a[1])
-              .map(([service, count]) => {
-
-                /* ================= SERVICE STYLES ================= */
-
-                const serviceConfig: Record<
-                  string,
-                  {
-                    bg: string;
-                    border: string;
-                    icon: string;
+              .map(([service, count]) => (
+                <div
+                  key={service}
+                  onClick={() =>
+                    router.push(`/dashboard/findings?service=${service}`)
                   }
-                > = {
-                  EC2: {
-                    bg: "bg-blue-50",
-                    border: "border-blue-200",
-                    icon: "🖥️",
-                  },
-                  EBS: {
-                    bg: "bg-purple-50",
-                    border: "border-purple-200",
-                    icon: "💾",
-                  },
-                  S3: {
-                    bg: "bg-emerald-50",
-                    border: "border-emerald-200",
-                    icon: "🪣",
-                  },
-                  RDS: {
-                    bg: "bg-amber-50",
-                    border: "border-amber-200",
-                    icon: "🗄️",
-                  },
-                  Lambda: {
-                    bg: "bg-rose-50",
-                    border: "border-rose-200",
-                    icon: "⚡",
-                  },
-                  NAT: {
-                    bg: "bg-orange-50",
-                    border: "border-orange-200",
-                    icon: "🌐",
-                  },
-                };
-
-                const config =
-                  serviceConfig[service] || {
-                    bg: "bg-gray-50",
-                    border: "border-gray-200",
-                    icon: "☁️",
-                  };
-
-                /* ================= FINDINGS BADGE ================= */
-
-                const hasFindings =
-                  inventoryData.resources.filter(
-                    (r) =>
-                      r.resource_type === service && r.has_findings
-                  ).length > 0;
-
-                return (
-                  <div
-                    key={service}
-                    onClick={() =>
-                      router.push(
-                        `/dashboard/findings?service=${service}`
-                      )
-                    }
-                    className={`
-                      ${config.bg}
-                      ${config.border}
-                      border
-                      p-6
-                      rounded-2xl
-                      shadow-sm
-                      hover:shadow-lg
-                      hover:scale-[1.02]
-                      transition-all
-                      cursor-pointer
-                      relative
-                    `}
-                  >
-                    {/* Badge riesgo */}
-                    {hasFindings && (
-                      <span className="absolute top-3 right-3 text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-semibold">
-                        Riesgo
-                      </span>
-                    )}
-
-                    {/* Icon */}
-                    <div className="text-3xl mb-3">
-                      {config.icon}
-                    </div>
-
-                    {/* Service Name */}
-                    <p className="text-sm uppercase tracking-wide text-gray-600">
-                      {service}
-                    </p>
-
-                    {/* Count */}
-                    <p className="text-3xl font-bold text-gray-800 mt-1">
-                      {count}
-                    </p>
-                  </div>
-                );
-              })}
+                  className="bg-blue-50 border border-blue-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:scale-[1.02] transition cursor-pointer"
+                >
+                  <p className="text-sm uppercase tracking-wide text-blue-700">
+                    {service}
+                  </p>
+                  <p className="text-3xl font-bold text-blue-900 mt-2">
+                    {count}
+                  </p>
+                </div>
+              ))}
           </div>
+
         </div>
       )}
 
-      {/* ================= CORE METRICS ================= */}
+      {/* =====================================================
+         5️⃣ TENDENCIA DE COSTOS
+      ===================================================== */}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <InfoCard
-          title="Findings Activos"
-          value={dashboardData.findings.active}
-          accent="from-red-500 to-red-600"
-        />
+      <div className="bg-white p-10 rounded-3xl border border-blue-100 shadow-xl">
+        <h2 className="text-2xl font-semibold text-blue-800 mb-6">
+          Tendencia de Costos (6 meses)
+        </h2>
 
-        <InfoCard
-          title="Ahorro Potencial Mensual"
-          value={`$${dashboardData.findings.estimated_monthly_savings}`}
-          accent="from-green-500 to-emerald-600"
-        />
-
-        <InfoCard
-          title="Cuentas AWS"
-          value={dashboardData.accounts}
-          accent="from-blue-500 to-indigo-600"
-        />
-
-        <InfoCard
-          title="Recursos Afectados"
-          value={dashboardData.resources_affected}
-          accent="from-purple-500 to-violet-600"
+        <MonthlyCostChart
+          data={Array.isArray(data.cost.monthly_cost)
+            ? data.cost.monthly_cost
+            : []}
         />
       </div>
 
-      {/* ================= COSTS ================= */}
+      {/* =====================================================
+         6️⃣ ÚLTIMOS FINDINGS
+      ===================================================== */}
 
-      {dashboardData.cost && (
-        <>
+      <div className="bg-white p-10 rounded-3xl border border-blue-100 shadow-xl space-y-6">
 
-          <DashboardFinancialKPIs
-          currentMonthCost={
-            typeof dashboardData.cost.current_month_cost === 'number'
-              ? dashboardData.cost.current_month_cost
-              : 0
-          }
-          potentialSavings={
-            typeof dashboardData.cost.potential_savings === 'number'
-              ? dashboardData.cost.potential_savings
-              : 0
-          }
-          savingsPercentage={
-            typeof dashboardData.cost.savings_percentage === 'number'
-              ? dashboardData.cost.savings_percentage
-              : 0
-          }
-          />
-
-          <div className="bg-white p-8 rounded-3xl border shadow-xl">
-            <h2 className="text-xl font-semibold mb-6">
-              Tendencia de Costos (6 meses)
-            </h2>
-            <MonthlyCostChart
-              data={Array.isArray(dashboardData.cost.monthly_cost)
-                ? dashboardData.cost.monthly_cost
-                : []}
-            />
-          </div>
-        </>
-      )}
-
-      {/* ================= LATEST FINDINGS ================= */}
-
-      <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-4">
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-2xl font-semibold text-blue-800">
           Últimos Findings Detectados
         </h2>
 
@@ -309,11 +203,12 @@ export default function ClientDashboard() {
         <div className="text-right">
           <button
             onClick={() => router.push('/dashboard/findings')}
-            className="text-blue-600 font-medium hover:underline"
+            className="text-blue-700 font-medium hover:underline"
           >
             Ver todos los findings →
           </button>
         </div>
+
       </div>
 
     </div>
@@ -324,21 +219,21 @@ export default function ClientDashboard() {
    COMPONENTS
 ===================================================== */
 
-function InfoCard({
+function BlueCard({
   title,
   value,
-  accent,
 }: {
   title: string;
   value: string | number;
-  accent: string;
 }) {
   return (
-    <div className={`p-6 rounded-2xl shadow-lg text-white bg-gradient-to-r ${accent}`}>
-      <h3 className="text-sm uppercase tracking-wide opacity-80 mb-2">
+    <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white p-8 rounded-2xl shadow-lg">
+      <p className="text-sm uppercase tracking-wide opacity-80 mb-2">
         {title}
-      </h3>
-      <p className="text-3xl font-bold">{value}</p>
+      </p>
+      <p className="text-3xl font-bold">
+        {value}
+      </p>
     </div>
   );
 }
