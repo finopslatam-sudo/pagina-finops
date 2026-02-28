@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 import { Finding, FindingsResponse } from "../types";
@@ -20,54 +20,112 @@ export function useFindings(params: UseFindingsParams) {
   const [total, setTotal] = useState(0);
   const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchFindings = async () => {
-    if (!isAuthReady || !token) {
+  /**
+   * =====================================================
+   * FETCH FINDINGS (Enterprise Safe)
+   * =====================================================
+   */
+  const fetchFindings = useCallback(async () => {
+    if (!isAuthReady) return;
+
+    if (!token) {
       setLoading(false);
+      setError("Authentication token not available");
       return;
     }
 
     setLoading(true);
+    setError(null);
 
-    const query = new URLSearchParams({
-      page: String(params.page || 1),
-      severity: params.severity || "",
-      status: params.status || "",
-      search: params.search || "",
-      service: params.service || "",
-    });
+    try {
+      const query = new URLSearchParams({
+        page: String(params.page ?? 1),
+        ...(params.severity ? { severity: params.severity } : {}),
+        ...(params.status ? { status: params.status } : {}),
+        ...(params.search ? { search: params.search } : {}),
+        ...(params.service ? { service: params.service } : {}),
+      });
 
-    const json = await apiFetch<FindingsResponse>(
-      `/api/client/findings?${query}`,
-      { token }
-    );
+      const json = await apiFetch<FindingsResponse>(
+        `/api/client/findings/?${query.toString()}`,
+        { token }
+      );
 
-    setData(json.data);
-    setTotal(json.total);
-    setPages(json.pages);
-    setLoading(false);
-  };
+      // Defensive validation
+      setData(Array.isArray(json?.data) ? json.data : []);
+      setTotal(typeof json?.total === "number" ? json.total : 0);
+      setPages(typeof json?.pages === "number" ? json.pages : 1);
 
-  const resolveFinding = async (id: number) => {
-    if (!token) return;
+    } catch (err: any) {
+      console.error("FINDINGS FETCH ERROR:", err);
 
-    await apiFetch(`/api/client/findings/${id}/resolve`, {
-      method: "PATCH",
-      token,
-    });
+      if (err?.status === 401) {
+        setError("Unauthorized request");
+      } else if (err?.status === 403) {
+        setError("Forbidden access");
+      } else {
+        setError("Failed to load findings");
+      }
 
-    await fetchFindings();
-  };
+      setData([]);
+      setTotal(0);
+      setPages(1);
 
+    } finally {
+      setLoading(false);
+    }
+
+  }, [
+    params.page,
+    params.severity,
+    params.status,
+    params.search,
+    params.service,
+    token,
+    isAuthReady,
+  ]);
+
+  /**
+   * =====================================================
+   * RESOLVE FINDING (Safe Mutation)
+   * =====================================================
+   */
+  const resolveFinding = useCallback(
+    async (id: number) => {
+      if (!token) return;
+
+      try {
+        await apiFetch(`/api/client/findings/${id}/resolve`, {
+          method: "PATCH",
+          token,
+        });
+
+        await fetchFindings();
+
+      } catch (err) {
+        console.error("RESOLVE FINDING ERROR:", err);
+      }
+    },
+    [token, fetchFindings]
+  );
+
+  /**
+   * =====================================================
+   * EFFECT
+   * =====================================================
+   */
   useEffect(() => {
     fetchFindings();
-  }, [params.page, params.severity, params.status, params.search, params.service, token, isAuthReady]);
+  }, [fetchFindings]);
 
   return {
     data,
     total,
     pages,
     loading,
+    error,
     refetch: fetchFindings,
     resolveFinding,
   };

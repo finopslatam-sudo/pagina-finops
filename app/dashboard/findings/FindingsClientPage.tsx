@@ -38,6 +38,7 @@ export default function FindingsPage() {
     data,
     pages,
     loading,
+    error,
     resolveFinding,
     refetch,
   } = useFindings({
@@ -63,6 +64,7 @@ export default function FindingsPage() {
     const serviceParam = searchParams.get("service");
     if (serviceParam) {
       setService(serviceParam);
+      setPage(1);
     }
   }, [searchParams]);
 
@@ -104,14 +106,14 @@ export default function FindingsPage() {
   ===================================================== */
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-12">
+    <div className="max-w-7xl mx-auto px-6 space-y-14">
 
       {/* ================= HEADER ================= */}
-      <div>
-        <h1 className="text-3xl font-bold">
+      <div className="bg-slate-100 border border-blue-300 p-8 rounded-3xl shadow-sm">
+        <h1 className="text-3xl font-semibold text-slate-800">
           Risk & Findings
         </h1>
-        <p className="text-gray-500 mt-2">
+        <p className="text-slate-600 mt-3">
           Hallazgos de riesgo detectados en tu entorno cloud y oportunidades de optimización.
         </p>
       </div>
@@ -130,15 +132,22 @@ export default function FindingsPage() {
         onChange={handleFiltersChange}
       />
 
+      {/* ================= ERROR STATE ================= */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-2xl">
+          {error}
+        </div>
+      )}
+
       {/* ================= TABLE ================= */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+      <div className="bg-white border border-blue-300 p-10 rounded-3xl shadow-sm">
 
         {loading ? (
-          <div className="text-center py-10 text-gray-500">
+          <div className="text-center py-16 text-slate-500">
             Cargando findings...
           </div>
         ) : data.length === 0 ? (
-          <div className="text-center py-10 text-gray-400">
+          <div className="text-center py-16 text-slate-400">
             No se encontraron findings con los filtros aplicados.
           </div>
         ) : (
@@ -150,17 +159,18 @@ export default function FindingsPage() {
         )}
 
         {/* ================= PAGINATION ================= */}
-        {pages > 1 && (
-          <div className="flex justify-center gap-2 mt-8">
+        {pages > 1 && !loading && (
+          <div className="flex justify-center gap-3 mt-10">
             {Array.from({ length: pages }).map((_, i) => (
               <button
                 key={i}
                 onClick={() => setPage(i + 1)}
-                className={`px-3 py-1 rounded ${
-                  page === i + 1
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200"
-                }`}
+                className={`px-4 py-2 rounded-lg border text-sm font-medium transition
+                  ${
+                    page === i + 1
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-slate-700 border-blue-200 hover:bg-blue-50"
+                  }`}
               >
                 {i + 1}
               </button>
