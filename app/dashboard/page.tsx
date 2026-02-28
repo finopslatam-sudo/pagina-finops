@@ -1,26 +1,36 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 
 const PrivateRoute = dynamic(
   () => import('@/app/components/Auth/PrivateRoute'),
   { ssr: false }
 );
 
-const AdminDashboard = dynamic(
-  () => import('./AdminDashboard'),
-  { ssr: false }
-);
-
-const ClientDashboard = dynamic(
-  () => import('./ClientDashboard'),
-  { ssr: false }
-);
-
-import { useAuth } from '@/app/context/AuthContext';
-
-function DashboardContent() {
+function DashboardGateway() {
+  const router = useRouter();
   const { user, isAuthReady } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthReady || !user) return;
+
+    // 🔵 STAFF → NO TOCAR ADMIN
+    if (user.global_role) {
+      router.replace('/dashboard/admin');
+      return;
+    }
+
+    // 🟢 CLIENTE → NUEVA RUTA OVERVIEW
+    if (user.client_role) {
+      router.replace('/dashboard/overview');
+      return;
+    }
+
+    router.replace('/');
+  }, [isAuthReady, user, router]);
 
   if (!isAuthReady) {
     return (
@@ -30,23 +40,13 @@ function DashboardContent() {
     );
   }
 
-  if (!user) return null;
-
-  if (user.global_role) return <AdminDashboard />;
-
-  if (user.client_role) return <ClientDashboard />;
-
-  return (
-    <p className="text-red-500 p-6">
-      Usuario sin rol válido
-    </p>
-  );
+  return null;
 }
 
 export default function DashboardPage() {
   return (
     <PrivateRoute>
-      <DashboardContent />
+      <DashboardGateway />
     </PrivateRoute>
   );
 }
