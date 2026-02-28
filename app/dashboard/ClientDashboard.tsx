@@ -96,23 +96,23 @@ export default function ClientDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-        <PastelCard
-          title="Gasto Actual (Mes)"
-          value={`$${data.cost.current_month_cost}`}
-          color="blue"
-        />
+      <PastelCard
+        title="Gasto Actual (Mes)"
+        value={`$${data.cost.current_month_cost}`}
+        variant="blue"
+      />
 
-        <PastelCard
-          title="Ahorro Potencial"
-          value={`$${data.cost.potential_savings}`}
-          color="blue"
-        />
+      <PastelCard
+        title="Ahorro Potencial"
+        value={`$${data.cost.potential_savings}`}
+        variant="green"
+      />
 
-        <PastelCard
-          title="Potencial Optimización"
-          value={`${data.cost.savings_percentage}%`}
-          color="blue"
-        />
+      <PastelCard
+        title="Potencial Optimización"
+        value={`${data.cost.savings_percentage}%`}
+        variant="amber"
+      />
 
       </div>
 
@@ -122,23 +122,23 @@ export default function ClientDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-        <PastelCard
-          title="Findings Activos"
-          value={data.findings.active}
-          color="indigo"
-        />
+      <PastelCard
+        title="Findings Activos"
+        value={data.findings.active}
+        variant="rose"
+      />
 
-        <PastelCard
-          title="Cuentas AWS"
-          value={data.accounts}
-          color="indigo"
-        />
+      <PastelCard
+        title="Cuentas AWS"
+        value={data.accounts}
+        variant="indigo"
+      />
 
-        <PastelCard
-          title="Recursos Afectados"
-          value={data.resources_affected}
-          color="indigo"
-        />
+      <PastelCard
+        title="Recursos Afectados"
+        value={data.resources_affected}
+        variant="sky"
+      />
 
       </div>
 
@@ -226,24 +226,36 @@ export default function ClientDashboard() {
 function PastelCard({
   title,
   value,
-  color,
+  variant,
 }: {
   title: string;
   value: string | number;
-  color: 'blue' | 'indigo';
+  variant:
+    | 'blue'
+    | 'green'
+    | 'amber'
+    | 'rose'
+    | 'indigo'
+    | 'sky';
 }) {
 
   const styles = {
-    blue: "bg-blue-50 border-blue-300 text-blue-900",
-    indigo: "bg-indigo-50 border-indigo-200 text-indigo-900",
+    blue: "bg-blue-50",
+    green: "bg-emerald-50",
+    amber: "bg-amber-50",
+    rose: "bg-rose-50",
+    indigo: "bg-indigo-50",
+    sky: "bg-sky-50",
   };
 
   return (
-    <div className={`p-8 rounded-2xl border shadow-sm ${styles[color]}`}>
-      <p className="text-sm uppercase mb-2 opacity-80">
+    <div
+      className={`p-8 rounded-2xl border border-blue-300 shadow-sm ${styles[variant]}`}
+    >
+      <p className="text-sm uppercase mb-2 text-slate-600">
         {title}
       </p>
-      <p className="text-3xl font-semibold">
+      <p className="text-3xl font-semibold text-slate-800">
         {value}
       </p>
     </div>
