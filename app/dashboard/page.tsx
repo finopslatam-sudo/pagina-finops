@@ -1,8 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
 const PrivateRoute = dynamic(
@@ -10,27 +8,18 @@ const PrivateRoute = dynamic(
   { ssr: false }
 );
 
-function DashboardGateway() {
-  const router = useRouter();
+const AdminDashboard = dynamic(
+  () => import('./AdminDashboard'),
+  { ssr: false }
+);
+
+const ClientDashboard = dynamic(
+  () => import('./ClientDashboard'),
+  { ssr: false }
+);
+
+function DashboardContent() {
   const { user, isAuthReady } = useAuth();
-
-  useEffect(() => {
-    if (!isAuthReady || !user) return;
-
-    // 🔵 STAFF → NO TOCAR ADMIN
-    if (user.global_role) {
-      router.replace('/dashboard/admin');
-      return;
-    }
-
-    // 🟢 CLIENTE → NUEVA RUTA OVERVIEW
-    if (user.client_role) {
-      router.replace('/dashboard/overview');
-      return;
-    }
-
-    router.replace('/');
-  }, [isAuthReady, user, router]);
 
   if (!isAuthReady) {
     return (
@@ -40,13 +29,35 @@ function DashboardGateway() {
     );
   }
 
-  return null;
+  if (!user) return null;
+
+  /**
+   * 🔵 Usuario sistema
+   * Mantiene comportamiento actual
+   */
+  if (user.global_role) {
+    return <AdminDashboard />;
+  }
+
+  /**
+   * 🟢 Usuario cliente
+   * Mantiene comportamiento actual
+   */
+  if (user.client_role) {
+    return <ClientDashboard />;
+  }
+
+  return (
+    <p className="text-red-500 p-6">
+      Usuario sin rol válido
+    </p>
+  );
 }
 
 export default function DashboardPage() {
   return (
     <PrivateRoute>
-      <DashboardGateway />
+      <DashboardContent />
     </PrivateRoute>
   );
 }
