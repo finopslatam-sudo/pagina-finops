@@ -4,18 +4,14 @@
    IMPORTS
 ===================================================== */
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
-import { useFindings } from './findings/hooks/useFindings';
-import FindingsTable from './findings/components/FindingsTable';
-
 import { useDashboard } from './hooks/useDashboard';
+import { useFindings } from './findings/hooks/useFindings';
 
-import DashboardFinancialKPIs from './components/finance/DashboardFinancialKPIs';
-import MonthlyCostChart from './components/finance/MonthlyCostChart';
-import { useInventory } from './hooks/useInventory';
+import FindingsTable from './findings/components/FindingsTable';
 
 /* =====================================================
    MAIN COMPONENT
@@ -25,13 +21,8 @@ export default function ClientDashboard() {
   const router = useRouter();
   const { user, token, isAuthReady, isStaff } = useAuth();
 
-  /* ================= COSTS AND SUMARY ================= */
-
-  const {
-    data: dashboardData,
-    loading,
-    error,
-  } = useDashboard();
+  const { data, loading, error } = useDashboard();
+  const { data: latestFindings } = useFindings({ page: 1 });
 
   /* ================= ACCESS CONTROL ================= */
 
@@ -49,18 +40,10 @@ export default function ClientDashboard() {
     }
   }, [isAuthReady, user, token, isStaff, router]);
 
-  /* ================= FINDINGS ================= */
-
-  const { data: latestFindings } = useFindings({ page: 1 });
-
-  /* ================= INVENTARY ================= */
-
-  const { data: inventoryData } = useInventory();
-
   /* ================= STATES ================= */
 
   if (error) return <p className="text-red-500">{error}</p>;
-  if (loading || !dashboardData)
+  if (loading || !data)
     return <p className="text-gray-400">Cargando dashboard…</p>;
 
   /* =====================================================
@@ -74,231 +57,64 @@ export default function ClientDashboard() {
 
       <div className="bg-gradient-to-r from-indigo-700 to-blue-700 text-white p-8 rounded-3xl shadow-2xl space-y-4">
         <h1 className="text-3xl font-bold">
-          Executive Overview
+          Overview
         </h1>
 
         <p className="opacity-90 text-lg">
-          {dashboardData.executive_summary?.message ?? 'Cargando análisis ejecutivo...'}
+          {data.executive_summary?.message ?? 'Análisis en progreso...'}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
 
           <ExecutiveBadge
-          label="Postura General"
-          value={
-            dashboardData.executive_summary?.overall_posture ?? '—'
-          }
+            label="Overall Posture"
+            value={data.executive_summary?.overall_posture ?? '—'}
           />
 
           <ExecutiveBadge
-          label="Risk Score"
-          value={
-            dashboardData.risk
-              ? `${dashboardData.risk.risk_score ?? 0}%`
-              : '—'
-          }
+            label="Risk Score"
+            value={`${data.risk?.risk_score ?? 0}%`}
           />
 
           <ExecutiveBadge
-          label="Governance"
-          value={
-            dashboardData.governance
-              ? `${dashboardData.governance.compliance_percentage ?? 0}%`
-              : '—'
-          }
+            label="Governance Score"
+            value={`${data.governance?.compliance_percentage ?? 0}%`}
           />
+
         </div>
       </div>
-
-      {/* ================= ACTIVE SERVICES ================= */}
-
-      {inventoryData?.summary && Object.keys(inventoryData.summary).length > 0 && (
-        <div className="bg-white p-8 rounded-3xl border shadow-xl">
-          <h2 className="text-xl font-semibold mb-6">
-            Servicios Detectados en tu Cuenta
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {Object.entries(inventoryData.summary)
-              .sort((a, b) => b[1] - a[1])
-              .map(([service, count]) => {
-
-                /* ================= SERVICE STYLES ================= */
-
-                const serviceConfig: Record<
-                  string,
-                  {
-                    bg: string;
-                    border: string;
-                    icon: string;
-                  }
-                > = {
-                  EC2: {
-                    bg: "bg-blue-50",
-                    border: "border-blue-200",
-                    icon: "🖥️",
-                  },
-                  EBS: {
-                    bg: "bg-purple-50",
-                    border: "border-purple-200",
-                    icon: "💾",
-                  },
-                  S3: {
-                    bg: "bg-emerald-50",
-                    border: "border-emerald-200",
-                    icon: "🪣",
-                  },
-                  RDS: {
-                    bg: "bg-amber-50",
-                    border: "border-amber-200",
-                    icon: "🗄️",
-                  },
-                  Lambda: {
-                    bg: "bg-rose-50",
-                    border: "border-rose-200",
-                    icon: "⚡",
-                  },
-                  NAT: {
-                    bg: "bg-orange-50",
-                    border: "border-orange-200",
-                    icon: "🌐",
-                  },
-                };
-
-                const config =
-                  serviceConfig[service] || {
-                    bg: "bg-gray-50",
-                    border: "border-gray-200",
-                    icon: "☁️",
-                  };
-
-                /* ================= FINDINGS BADGE ================= */
-
-                const hasFindings =
-                  inventoryData.resources.filter(
-                    (r) =>
-                      r.resource_type === service && r.has_findings
-                  ).length > 0;
-
-                return (
-                  <div
-                    key={service}
-                    onClick={() =>
-                      router.push(
-                        `/dashboard/findings?service=${service}`
-                      )
-                    }
-                    className={`
-                      ${config.bg}
-                      ${config.border}
-                      border
-                      p-6
-                      rounded-2xl
-                      shadow-sm
-                      hover:shadow-lg
-                      hover:scale-[1.02]
-                      transition-all
-                      cursor-pointer
-                      relative
-                    `}
-                  >
-                    {/* Badge riesgo */}
-                    {hasFindings && (
-                      <span className="absolute top-3 right-3 text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-semibold">
-                        Riesgo
-                      </span>
-                    )}
-
-                    {/* Icon */}
-                    <div className="text-3xl mb-3">
-                      {config.icon}
-                    </div>
-
-                    {/* Service Name */}
-                    <p className="text-sm uppercase tracking-wide text-gray-600">
-                      {service}
-                    </p>
-
-                    {/* Count */}
-                    <p className="text-3xl font-bold text-gray-800 mt-1">
-                      {count}
-                    </p>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-      )}
 
       {/* ================= CORE METRICS ================= */}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+
         <InfoCard
-          title="Findings Activos"
-          value={dashboardData.findings.active}
-          accent="from-red-500 to-red-600"
+          title="Active Findings"
+          value={data.findings.active}
         />
 
         <InfoCard
-          title="Ahorro Potencial Mensual"
-          value={`$${dashboardData.findings.estimated_monthly_savings}`}
-          accent="from-green-500 to-emerald-600"
+          title="Monthly Exposure"
+          value={`$${data.executive_summary?.monthly_financial_exposure ?? 0}`}
         />
 
         <InfoCard
-          title="Cuentas AWS"
-          value={dashboardData.accounts}
-          accent="from-blue-500 to-indigo-600"
+          title="AWS Accounts"
+          value={data.accounts}
         />
 
         <InfoCard
-          title="Recursos Afectados"
-          value={dashboardData.resources_affected}
-          accent="from-purple-500 to-violet-600"
+          title="Affected Resources"
+          value={data.resources_affected}
         />
+
       </div>
-
-      {/* ================= COSTS ================= */}
-
-      {dashboardData.cost && (
-        <>
-
-          <DashboardFinancialKPIs
-          currentMonthCost={
-            typeof dashboardData.cost.current_month_cost === 'number'
-              ? dashboardData.cost.current_month_cost
-              : 0
-          }
-          potentialSavings={
-            typeof dashboardData.cost.potential_savings === 'number'
-              ? dashboardData.cost.potential_savings
-              : 0
-          }
-          savingsPercentage={
-            typeof dashboardData.cost.savings_percentage === 'number'
-              ? dashboardData.cost.savings_percentage
-              : 0
-          }
-          />
-
-          <div className="bg-white p-8 rounded-3xl border shadow-xl">
-            <h2 className="text-xl font-semibold mb-6">
-              Tendencia de Costos (6 meses)
-            </h2>
-            <MonthlyCostChart
-              data={Array.isArray(dashboardData.cost.monthly_cost)
-                ? dashboardData.cost.monthly_cost
-                : []}
-            />
-          </div>
-        </>
-      )}
 
       {/* ================= LATEST FINDINGS ================= */}
 
       <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-4">
         <h2 className="text-xl font-semibold">
-          Últimos Findings Detectados
+          Latest Findings
         </h2>
 
         <FindingsTable
@@ -311,7 +127,7 @@ export default function ClientDashboard() {
             onClick={() => router.push('/dashboard/findings')}
             className="text-blue-600 font-medium hover:underline"
           >
-            Ver todos los findings →
+            View all findings →
           </button>
         </div>
       </div>
@@ -327,18 +143,18 @@ export default function ClientDashboard() {
 function InfoCard({
   title,
   value,
-  accent,
 }: {
   title: string;
   value: string | number;
-  accent: string;
 }) {
   return (
-    <div className={`p-6 rounded-2xl shadow-lg text-white bg-gradient-to-r ${accent}`}>
-      <h3 className="text-sm uppercase tracking-wide opacity-80 mb-2">
+    <div className="bg-white p-6 rounded-2xl border shadow-sm">
+      <p className="text-sm text-gray-500 mb-2">
         {title}
-      </h3>
-      <p className="text-3xl font-bold">{value}</p>
+      </p>
+      <p className="text-3xl font-bold text-gray-800">
+        {value}
+      </p>
     </div>
   );
 }
