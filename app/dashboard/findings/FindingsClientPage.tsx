@@ -1,31 +1,39 @@
 'use client';
 
+/* =====================================================
+   IMPORTS
+===================================================== */
+
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { useFindings } from "./hooks/useFindings";
 import { useFindingsStats } from "./hooks/useFindingsStats";
-import { useInventory } from "@/app/dashboard/hooks/useInventory";
 
 import FindingsStatsCards from "./components/FindingsStatsCards";
 import FindingsTable from "./components/FindingsTable";
 import FindingsFilters from "./components/FindingsFilters";
 import FindingsDrawer from "./components/FindingsDrawer";
-import { useSearchParams } from "next/navigation";
+
 import { Finding } from "./types";
 
+/* =====================================================
+   MAIN COMPONENT
+===================================================== */
 
 export default function FindingsPage() {
 
-  // ---------------- STATE ----------------
+  /* ================= STATE ================= */
+
   const [page, setPage] = useState(1);
   const [severity, setSeverity] = useState("");
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
   const [service, setService] = useState("");
-
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
 
-  // ---------------- HOOKS ----------------
+  /* ================= HOOKS ================= */
+
   const {
     data,
     pages,
@@ -45,11 +53,22 @@ export default function FindingsPage() {
     refetch: refetchStats,
   } = useFindingsStats();
 
-  const { data: inventoryData } = useInventory();
+  const searchParams = useSearchParams();
 
-  
+  /* =====================================================
+     EFFECTS
+  ===================================================== */
 
-  // ---------------- HANDLERS ----------------
+  useEffect(() => {
+    const serviceParam = searchParams.get("service");
+    if (serviceParam) {
+      setService(serviceParam);
+    }
+  }, [searchParams]);
+
+  /* =====================================================
+     HANDLERS
+  ===================================================== */
 
   const handleFiltersChange = (filters: {
     severity?: string;
@@ -80,107 +99,76 @@ export default function FindingsPage() {
     setSelectedFinding(null);
   };
 
-  const searchParams = useSearchParams();
+  /* =====================================================
+     RENDER
+  ===================================================== */
 
-  useEffect(() => {
-    const serviceParam = searchParams.get("service");
-    if (serviceParam) {
-      setService(serviceParam);
-    }
-  }, [searchParams]);
-
-  // ---------------- RENDER ----------------
   return (
-    <div className="p-6 space-y-8">
+    <div className="max-w-7xl mx-auto px-6 space-y-12">
 
-      {/* ================= INVENTARIO ================= */}
-      {inventoryData && (
-        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
-          <h2 className="text-xl font-semibold">
-            Inventario Completo
-          </h2>
-
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-50 text-gray-600">
-                <tr>
-                  <th className="p-4 text-left">Servicio</th>
-                  <th className="p-4 text-left">ID</th>
-                  <th className="p-4 text-left">Región</th>
-                  <th className="p-4 text-left">Estado</th>
-                  <th className="p-4 text-left">Findings</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {inventoryData.resources.map((r) => (
-                  <tr key={r.resource_id} className="border-t">
-                    <td className="p-4 font-medium">
-                      {r.resource_type}
-                    </td>
-                    <td className="p-4">{r.resource_id}</td>
-                    <td className="p-4">{r.region}</td>
-                    <td className="p-4">{r.state}</td>
-                    <td className="p-4">
-                      {r.has_findings ? (
-                        <span className="text-red-600 font-semibold">
-                          {r.findings_count}
-                        </span>
-                      ) : (
-                        <span className="text-green-600">0</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {/* ================= HEADER ================= */}
+      <div>
+        <h1 className="text-3xl font-bold">
+          Risk & Findings
+        </h1>
+        <p className="text-gray-500 mt-2">
+          Hallazgos de riesgo detectados en tu entorno cloud y oportunidades de optimización.
+        </p>
+      </div>
 
       {/* ================= STATS ================= */}
-      {stats && <FindingsStatsCards stats={stats} />}
+      {stats && (
+        <FindingsStatsCards stats={stats} />
+      )}
 
       {/* ================= FILTERS ================= */}
       <FindingsFilters
         severity={severity}
         status={status}
         search={search}
-        service={service} 
+        service={service}
         onChange={handleFiltersChange}
       />
 
       {/* ================= TABLE ================= */}
-      {loading ? (
-        <div className="text-center py-10 text-gray-500">
-          Loading findings...
-        </div>
-      ) : (
-        <FindingsTable
-          findings={data}
-          onResolve={handleResolve}
-          onRowClick={handleRowClick}
-        />
-      )}
+      <div className="bg-white p-8 rounded-3xl border shadow-xl">
 
-      {/* ================= PAGINATION ================= */}
-      {pages > 1 && (
-        <div className="flex justify-center gap-2">
-          {Array.from({ length: pages }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setPage(i + 1)}
-              className={`px-3 py-1 rounded ${
-                page === i + 1
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
-      )}
+        {loading ? (
+          <div className="text-center py-10 text-gray-500">
+            Cargando findings...
+          </div>
+        ) : data.length === 0 ? (
+          <div className="text-center py-10 text-gray-400">
+            No se encontraron findings con los filtros aplicados.
+          </div>
+        ) : (
+          <FindingsTable
+            findings={data}
+            onResolve={handleResolve}
+            onRowClick={handleRowClick}
+          />
+        )}
+
+        {/* ================= PAGINATION ================= */}
+        {pages > 1 && (
+          <div className="flex justify-center gap-2 mt-8">
+            {Array.from({ length: pages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i + 1)}
+                className={`px-3 py-1 rounded ${
+                  page === i + 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
+
+      </div>
 
       {/* ================= DRAWER ================= */}
       <FindingsDrawer
@@ -188,6 +176,7 @@ export default function FindingsPage() {
         onClose={handleCloseDrawer}
         onResolve={handleResolve}
       />
+
     </div>
   );
 }
