@@ -60,7 +60,7 @@ export default function ClientDashboard() {
          1️⃣ EXECUTIVE OVERVIEW
       ===================================================== */}
 
-      <div className="bg-slate-100 border border-blue-200 p-12 rounded-3xl shadow-sm space-y-8">
+      <div className="bg-slate-200 border border-blue-300 p-12 rounded-3xl shadow-sm space-y-8">
 
         <h1 className="text-4xl font-semibold text-slate-800">
           Executive Overview
