@@ -68,6 +68,11 @@ export interface DashboardResponse {
   trend: any;
   remediation: any;
   risk_by_service: any;
+
+  services_scanned: {
+    service: string;
+    total_resources: number;
+  }[];
 }
 
 /* =====================================================

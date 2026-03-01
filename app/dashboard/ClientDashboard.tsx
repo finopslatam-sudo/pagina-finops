@@ -17,6 +17,7 @@ export default function ClientDashboard() {
   const { user, token, isAuthReady, isStaff } = useAuth();
 
   const { data, loading, error } = useDashboard();
+  const dashboard = data;
   const { data: latestFindings } = useFindings({ page: 1 });
   const { data: inventoryData } = useInventory();
 
@@ -143,7 +144,7 @@ export default function ClientDashboard() {
       </div>
 
       {/* =====================================================
-         4️⃣ SERVICIOS ESCANEADOS
+        4️⃣ SERVICIOS ESCANEADOS
       ===================================================== */}
 
       <div className="bg-white border border-blue-200 p-10 rounded-3xl shadow-sm space-y-8">
@@ -152,27 +153,28 @@ export default function ClientDashboard() {
           Servicios Escaneados
         </h2>
 
-        {Object.keys(servicesMap).length === 0 ? (
+        {!dashboard || !dashboard.services_scanned || dashboard.services_scanned.length === 0 ? (
           <p className="text-slate-500">
             No se detectaron servicios activos.
           </p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {Object.entries(servicesMap)
-              .sort((a, b) => b[1] - a[1])
-              .map(([service, count]) => (
+            {dashboard.services_scanned
+              .sort((a: any, b: any) => b.total_resources - a.total_resources)
+              .map((service: any) => (
                 <div
-                  key={service}
+                  key={service.service}
                   onClick={() =>
-                    router.push(`/dashboard/findings?service=${service}`)
+                    router.push(`/dashboard/findings?service=${service.service}`)
                   }
                   className="bg-sky-50 border border-sky-200 p-6 rounded-2xl hover:bg-sky-100 transition cursor-pointer"
                 >
                   <p className="text-sm uppercase text-sky-700">
-                    {service}
+                    {service.service}
                   </p>
+
                   <p className="text-2xl font-semibold text-sky-900 mt-2">
-                    {count}
+                    {service.total_resources}
                   </p>
                 </div>
               ))}
