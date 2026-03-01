@@ -4,23 +4,46 @@ import { useEffect, useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import { useAuth } from '@/app/context/AuthContext';
 
+/* =====================================================
+   TYPES
+===================================================== */
+
+export type SeverityLevel = 'LOW' | 'MEDIUM' | 'HIGH' | null;
+
 interface InventoryResource {
   resource_id: string;
+  service_name: string;
   resource_type: string;
   region: string;
   state: string;
-  has_findings: boolean;
+
+  severity: SeverityLevel;
+  risk_label: string;
   findings_count: number;
-  tags: Record<string, string>;
-  metadata: any;
+
+  tags?: Record<string, string>;
+  detected_at?: string;
+  last_seen_at?: string;
+}
+
+interface PaginationInfo {
+  page: number;
+  per_page: number;
+  total: number;
+  pages: number;
 }
 
 interface InventoryResponse {
   summary: Record<string, number>;
   resources: InventoryResource[];
+  pagination: PaginationInfo;
 }
 
-export function useInventory() {
+/* =====================================================
+   HOOK
+===================================================== */
+
+export function useInventory(page: number = 1, perPage: number = 50) {
   const { token, isAuthReady } = useAuth();
 
   const [data, setData] = useState<InventoryResponse | null>(null);
@@ -37,10 +60,12 @@ export function useInventory() {
         const response = await apiFetch<{
           status: string;
           data: InventoryResponse;
-        }>('/api/client/inventory', { token });
+        }>(`/api/client/inventory?page=${page}&per_page=${perPage}`, {
+          token,
+        });
 
         if (response.status !== 'ok') {
-          throw new Error('Error loading inventory');
+          throw new Error('Inventory response not ok');
         }
 
         setData(response.data);
@@ -54,7 +79,7 @@ export function useInventory() {
     };
 
     fetchInventory();
-  }, [isAuthReady, token]);
+  }, [isAuthReady, token, page, perPage]);
 
   return { data, loading, error };
 }
