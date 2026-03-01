@@ -5,8 +5,11 @@ import { useInventory } from '../hooks/useInventory';
 
 export default function AssetsPage() {
   const { data, loading, error } = useInventory();
+
   const [severityFilter, setSeverityFilter] =
     useState<'ALL' | 'HIGH' | 'MEDIUM' | 'LOW'>('ALL');
+
+  /* ================= EARLY RETURNS ================= */
 
   if (loading) {
     return <div className="p-6 text-gray-400">Cargando inventario...</div>;
@@ -18,7 +21,7 @@ export default function AssetsPage() {
 
   if (!data) return null;
 
-  /* ================= FILTER ================= */
+  /* ================= FILTER (FUERA DEL RETURN) ================= */
 
   const filteredResources = useMemo(() => {
     if (severityFilter === 'ALL') return data.resources;
@@ -31,15 +34,23 @@ export default function AssetsPage() {
     const base = "px-3 py-1 rounded-full text-xs font-semibold";
 
     if (state.category === 'healthy')
-      return <span className={`${base} bg-green-100 text-green-700`}>{state.label}</span>;
+      return <span className={`${base} bg-green-100 text-green-700`}>
+        {state.label}
+      </span>;
 
     if (state.category === 'warning')
-      return <span className={`${base} bg-yellow-100 text-yellow-700`}>{state.label}</span>;
+      return <span className={`${base} bg-yellow-100 text-yellow-700`}>
+        {state.label}
+      </span>;
 
     if (state.category === 'waste')
-      return <span className={`${base} bg-red-100 text-red-700`}>{state.label}</span>;
+      return <span className={`${base} bg-red-100 text-red-700`}>
+        {state.label}
+      </span>;
 
-    return <span className={`${base} bg-gray-100 text-gray-600`}>{state.label}</span>;
+    return <span className={`${base} bg-gray-100 text-gray-600`}>
+      {state.label}
+    </span>;
   };
 
   /* ================= RISK BADGE ================= */
@@ -66,6 +77,8 @@ export default function AssetsPage() {
       🟢 Sin riesgos
     </span>;
   };
+
+  /* ================= RETURN ================= */
 
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-12">
@@ -129,6 +142,7 @@ export default function AssetsPage() {
           </table>
         </div>
       </div>
+
     </div>
   );
 }
