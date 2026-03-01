@@ -49,7 +49,7 @@ export default function FindingsTable({
               onClick={() => onRowClick?.(f)}
             >
               <td className="p-3 text-sm font-medium">
-                {f.resource_type}
+                {f.aws_service}
               </td>
 
               <td className="p-3">
