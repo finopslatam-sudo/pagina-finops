@@ -15,9 +15,14 @@ interface InventoryResource {
   service_name: string;
   resource_type: string;
   region: string;
-  state: string;
 
-  severity: SeverityLevel;
+  state: {
+    raw: string | null;
+    label: string;
+    category: 'healthy' | 'warning' | 'waste' | 'unknown';
+  };
+
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | null;
   risk_label: string;
   findings_count: number;
 
