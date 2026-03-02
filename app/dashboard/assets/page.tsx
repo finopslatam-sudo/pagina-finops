@@ -261,7 +261,6 @@ export default function AssetsPage() {
     </div>
   );
 }
-
 /* ================= FILTER COMPONENT ================= */
 
 function FilterSelect({ label, value, options, onChange }: any) {
