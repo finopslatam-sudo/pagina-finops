@@ -168,7 +168,7 @@ export default function AssetsPage() {
       {/* ================= HERO CARD ================= */}
       <div className="bg-gradient-to-r from-blue-50 to-white border border-blue-200 rounded-3xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-gray-900">
-          Assets & Risk Overview
+          Assets & Overview
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
           Hallazgos de riesgo detectados en tu entorno cloud y oportunidades
@@ -178,64 +178,69 @@ export default function AssetsPage() {
         </p>
       </div>
 
-      {/* ================= ANALYTICS CARD ================= */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-10">
+      {/* ================= ANALYTICS GRID ================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-        <div>
-          <h2 className="text-xl font-semibold mb-2">
-            Distribución de Riesgo
-          </h2>
-          <p className="text-sm text-gray-500 mb-6">
-            Proporción de recursos según nivel de severidad detectada.
-          </p>
+      {/* ===== RISK DISTRIBUTION ===== */}
+      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+        <h2 className="text-xl font-semibold mb-2">
+          Distribución de Riesgo
+        </h2>
+        <p className="text-sm text-gray-500 mb-6">
+          Proporción de recursos según nivel de severidad detectada.
+        </p>
 
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={riskDistribution}
-                  dataKey="value"
-                  outerRadius={100}
-                  label
-                >
-                  {riskDistribution.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={riskDistribution}
+                dataKey="value"
+                outerRadius={100}
+                label
+              >
+                {riskDistribution.map((_, index) => (
+                  <Cell key={index} fill={COLORS[index]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
+      </div>
 
-        <div>
-          <h2 className="text-xl font-semibold mb-2">
-            Distribución por Servicio
-          </h2>
-          <p className="text-sm text-gray-500 mb-6">
-            Inventario consolidado agrupado por tipo de servicio cloud.
-          </p>
+      {/* ===== SERVICE DISTRIBUTION ===== */}
+      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+        <h2 className="text-xl font-semibold mb-2">
+          Distribución por Servicio
+        </h2>
+        <p className="text-sm text-gray-500 mb-6">
+          Inventario consolidado agrupado por tipo de servicio cloud.
+        </p>
 
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={serviceDistribution}
-                  dataKey="value"
-                  outerRadius={100}
-                  label
-                >
-                  {serviceDistribution.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={serviceDistribution}
+                dataKey="value"
+                outerRadius={100}
+                label
+              >
+                {serviceDistribution.map((_, index) => (
+                  <Cell
+                    key={index}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
+      </div>
 
       </div>
 
