@@ -25,13 +25,15 @@ export default function CostosPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-12">
 
-      {/* ================= HEADER ================= */}
-      <div>
-        <h1 className="text-3xl font-bold">
+      {/* ================= HERO FINANCIAL CARD ================= */}
+      <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-8 shadow-sm">
+        <h1 className="text-3xl font-bold text-gray-900">
           Costos & Tendencias
         </h1>
-        <p className="text-gray-500 mt-2">
-          Análisis financiero detallado del consumo cloud.
+        <p className="text-gray-600 mt-3 max-w-3xl">
+          Análisis financiero consolidado del consumo cloud, exposición proyectada
+          y oportunidades estratégicas de optimización. Esta vista permite evaluar
+          eficiencia de gasto, ahorro potencial y evolución mensual del presupuesto.
         </p>
       </div>
 
@@ -46,18 +48,21 @@ export default function CostosPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <MetricCard
-          title="Exposición mensual estimada"
-          value={`$${data.executive_summary.monthly_financial_exposure ?? 0}`}
+        title="Exposición mensual estimada"
+        value={`$${data.executive_summary.monthly_financial_exposure ?? 0}`}
+        variant="blue"
         />
 
         <MetricCard
-          title="Exposición anual estimada"
-          value={`$${data.executive_summary.annual_financial_exposure ?? 0}`}
+        title="Exposición anual estimada"
+        value={`$${data.executive_summary.annual_financial_exposure ?? 0}`}
+        variant="purple"
         />
 
         <MetricCard
-          title="Oportunidad ahorro anual (HIGH)"
-          value={`$${data.roi_projection.high_savings_opportunity_annual ?? 0}`}
+        title="Oportunidad ahorro anual (HIGH)"
+        value={`$${data.roi_projection.high_savings_opportunity_annual ?? 0}`}
+        variant="green"
         />
 
       </div>
@@ -89,14 +94,24 @@ export default function CostosPage() {
 function MetricCard({
   title,
   value,
+  variant = 'default',
 }: {
   title: string;
   value: string;
+  variant?: 'blue' | 'green' | 'purple' | 'default';
 }) {
+
+  const variants = {
+    blue: "bg-blue-50 border-blue-200",
+    green: "bg-green-50 border-green-200",
+    purple: "bg-purple-50 border-purple-200",
+    default: "bg-gray-50 border-gray-200"
+  };
+
   return (
-    <div className="bg-white border rounded-2xl p-6 shadow-sm">
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-2xl font-semibold mt-2">{value}</p>
+    <div className={`${variants[variant]} border rounded-2xl p-6 shadow-sm`}>
+      <p className="text-sm text-gray-600">{title}</p>
+      <p className="text-2xl font-semibold mt-2 text-gray-900">{value}</p>
     </div>
   );
 }
