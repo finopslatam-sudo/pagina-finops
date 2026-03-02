@@ -88,8 +88,10 @@ export default function OptimizationPage() {
           Optimization & Commitments Strategy
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
-          Consolidated view of rightsizing opportunities and commitment coverage
-          across your cloud infrastructure.
+        Marco de optimización a nivel ejecutivo que consolida las oportunidades de dimensionamiento, 
+        la cobertura de los compromisos (Instancias Reservadas y Planes de Ahorro) y el impacto financiero proyectado 
+        en su entorno de nube. Esta sección permite tomar decisiones basadas en datos para mejorar la eficiencia, 
+        reducir el desperdicio estructural y maximizar el retorno a largo plazo de las inversiones en la nube.
         </p>
       </div>
 
@@ -203,11 +205,30 @@ function CoverageRow({ label, value }: { label: string; value: number }) {
   );
 }
 
-function MetricCard({ label, value }: { label: string; value: string | number }) {
+function MetricCard({
+  label,
+  value,
+  variant = "default",
+}: {
+  label: string;
+  value: string | number;
+  variant?: "orange" | "blue" | "purple" | "green" | "default";
+}) {
+
+  const variants = {
+    orange: "bg-orange-50 border-orange-200 text-orange-700",
+    blue: "bg-blue-50 border-blue-200 text-blue-700",
+    purple: "bg-purple-50 border-purple-200 text-purple-700",
+    green: "bg-emerald-50 border-emerald-200 text-emerald-700",
+    default: "bg-gray-50 border-gray-200 text-gray-700",
+  };
+
   return (
-    <div className="bg-gray-50 border rounded-2xl p-6 shadow-sm">
-      <p className="text-sm text-gray-600">{label}</p>
-      <p className="text-2xl font-semibold mt-2">{value}</p>
+    <div className={`${variants[variant]} border rounded-2xl p-6 shadow-sm`}>
+      <p className="text-sm opacity-80">{label}</p>
+      <p className="text-3xl font-semibold mt-2 text-gray-900">
+        {value}
+      </p>
     </div>
   );
 }
