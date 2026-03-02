@@ -97,10 +97,10 @@ export default function OptimizationPage() {
       {roi && (
         <SectionCard title="Strategic ROI Projection">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <MetricCard label="Projected Risk Score" value={`${roi.projected_risk_score}%`} />
-            <MetricCard label="Projected Governance" value={`${roi.projected_governance}%`} />
-            <MetricCard label="Projected Risk Level" value={roi.projected_risk_level} />
-            <MetricCard label="High Savings (Annual)" value={`$${roi.high_savings_opportunity_annual}`} />
+            <MetricCard label="PPuntuación de riesgo proyectada" value={`${roi.projected_risk_score}%`} />
+            <MetricCard label="Gobernanza proyectada" value={`${roi.projected_governance}%`} />
+            <MetricCard label="Nivel de riesgo proyectado" value={roi.projected_risk_level} />
+            <MetricCard label="Ahorro anual proyectado" value={`$${roi.high_savings_opportunity_annual}`} />
           </div>
         </SectionCard>
       )}

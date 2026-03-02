@@ -28,7 +28,7 @@ export default function CostosPage() {
       {/* ================= HERO FINANCIAL CARD ================= */}
       <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-gray-900">
-          Costos & Tendencias
+          Costs & Financials
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
           Análisis financiero consolidado del consumo cloud, exposición proyectada
@@ -48,19 +48,19 @@ export default function CostosPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <MetricCard
-        title="Exposición mensual estimada"
+        title="EXPOSICIÓN MENSUAL ESTIMADA"
         value={`$${data.executive_summary.monthly_financial_exposure ?? 0}`}
         variant="blue"
         />
 
         <MetricCard
-        title="Exposición anual estimada"
+        title="EXPOSICIÓN ANUAL ESTIMADA"
         value={`$${data.executive_summary.annual_financial_exposure ?? 0}`}
         variant="purple"
         />
 
         <MetricCard
-        title="Oportunidad ahorro anual (HIGH)"
+        title="OPORTUNIDAD AHORRO ANUAL (HIGH)"
         value={`$${data.roi_projection.high_savings_opportunity_annual ?? 0}`}
         variant="green"
         />

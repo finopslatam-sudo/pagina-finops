@@ -98,13 +98,13 @@ export default function ClientDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
       <PastelCard
-        title="Gasto Actual (Mes)"
+        title="Gasto Actual mensual"
         value={`$${data.cost.current_month_cost}`}
         variant="blue"
       />
 
       <PastelCard
-        title="Ahorro Potencial"
+        title="Ahorro Potencial mensual"
         value={`$${data.cost.potential_savings}`}
         variant="green"
       />
@@ -124,7 +124,7 @@ export default function ClientDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
       <PastelCard
-        title="Findings Activos"
+        title="Recomendaciones Activas"
         value={data.findings.active}
         variant="rose"
       />
