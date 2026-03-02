@@ -17,7 +17,15 @@ export default function AssetsPage() {
 
   /* ================= FILTER STATE ================= */
 
-  const [filters, setFilters] = useState({
+  type Filters = {
+    service: string;
+    region: string;
+    state: string;
+    severity: 'ALL' | 'HIGH' | 'MEDIUM' | 'LOW';
+    search: string;
+  };
+  
+  const [filters, setFilters] = useState<Filters>({
     service: 'ALL',
     region: 'ALL',
     state: 'ALL',
@@ -42,7 +50,12 @@ export default function AssetsPage() {
   );
 
   const uniqueStates = useMemo(
-    () => [...new Set(resources.map(r => r.state?.label))],
+    () =>
+      [...new Set(
+        resources
+          .map(r => r.state?.label)
+          .filter((v): v is string => Boolean(v))
+      )],
     [resources]
   );
 
@@ -93,9 +106,16 @@ export default function AssetsPage() {
 
   const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e'];
 
+  const severityOptions: Filters['severity'][] = [
+    'ALL',
+    'HIGH',
+    'MEDIUM',
+    'LOW'
+  ];
+
   /* ================= BADGES ================= */
 
-  const renderStateBadge = (state: any) => {
+  const renderStateBadge = (state: { label: string; category: string } | undefined) => {
     const base = "px-3 py-1 rounded-full text-xs font-semibold";
 
     if (!state) return null;
@@ -112,7 +132,10 @@ export default function AssetsPage() {
     return <span className={`${base} bg-gray-100 text-gray-600`}>{state.label}</span>;
   };
 
-  const renderRiskBadge = (r: any) => {
+  const renderRiskBadge = (r: {
+    severity: 'HIGH' | 'MEDIUM' | 'LOW' | null | undefined;
+    findings_count: number;
+  }) => {
     const base = "px-3 py-1 rounded-full text-xs font-semibold";
 
     if (r.severity === 'HIGH')
@@ -176,9 +199,12 @@ export default function AssetsPage() {
         <FilterSelect
           label="Riesgo"
           value={filters.severity}
-          options={['ALL', 'HIGH', 'MEDIUM', 'LOW']}
-          onChange={(value: string) =>
-            setFilters(prev => ({ ...prev, severity: value }))
+          options={severityOptions}
+          onChange={(value) =>
+            setFilters(prev => ({
+              ...prev,
+              severity: value as Filters['severity']
+            }))
           }
         />
 
@@ -263,7 +289,19 @@ export default function AssetsPage() {
 }
 /* ================= FILTER COMPONENT ================= */
 
-function FilterSelect({ label, value, options, onChange }: any) {
+type FilterSelectProps = {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+};
+
+function FilterSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: FilterSelectProps) {
   return (
     <div className="flex flex-col text-sm">
       <label className="text-gray-500 mb-1">{label}</label>
@@ -272,8 +310,10 @@ function FilterSelect({ label, value, options, onChange }: any) {
         onChange={(e) => onChange(e.target.value)}
         className="border rounded px-3 py-2"
       >
-        {options.map((opt: string) => (
-          <option key={opt}>{opt}</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
         ))}
       </select>
     </div>
