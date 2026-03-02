@@ -4,12 +4,24 @@ import { useState, useMemo } from 'react';
 import { useInventory } from '../hooks/useInventory';
 
 export default function AssetsPage() {
+
   const { data, loading, error } = useInventory();
 
   const [severityFilter, setSeverityFilter] =
     useState<'ALL' | 'HIGH' | 'MEDIUM' | 'LOW'>('ALL');
 
-  /* ================= EARLY RETURNS ================= */
+  /* ================= SAFE FALLBACK DATA ================= */
+
+  const resources = data?.resources ?? [];
+
+  /* ================= FILTER (HOOK SIEMPRE ARRIBA) ================= */
+
+  const filteredResources = useMemo(() => {
+    if (severityFilter === 'ALL') return resources;
+    return resources.filter(r => r.severity === severityFilter);
+  }, [resources, severityFilter]);
+
+  /* ================= EARLY RETURNS DESPUÉS DE HOOKS ================= */
 
   if (loading) {
     return <div className="p-6 text-gray-400">Cargando inventario...</div>;
@@ -21,17 +33,12 @@ export default function AssetsPage() {
 
   if (!data) return null;
 
-  /* ================= FILTER (FUERA DEL RETURN) ================= */
-
-  const filteredResources = useMemo(() => {
-    if (severityFilter === 'ALL') return data.resources;
-    return data.resources.filter(r => r.severity === severityFilter);
-  }, [data.resources, severityFilter]);
-
-  /* ================= STATE BADGE ================= */
+  /* ================= BADGES ================= */
 
   const renderStateBadge = (state: any) => {
     const base = "px-3 py-1 rounded-full text-xs font-semibold";
+
+    if (!state) return null;
 
     if (state.category === 'healthy')
       return <span className={`${base} bg-green-100 text-green-700`}>
@@ -52,8 +59,6 @@ export default function AssetsPage() {
       {state.label}
     </span>;
   };
-
-  /* ================= RISK BADGE ================= */
 
   const renderRiskBadge = (r: any) => {
     const base = "px-3 py-1 rounded-full text-xs font-semibold";
@@ -78,20 +83,16 @@ export default function AssetsPage() {
     </span>;
   };
 
-  /* ================= RETURN ================= */
-
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-12">
 
-      {/* HEADER */}
       <div>
         <h1 className="text-3xl font-bold">Assets</h1>
         <p className="text-gray-500 mt-2">
-          Vista ejecutiva del inventario cloud y su nivel de riesgo.
+          Vista ejecutiva del inventario cloud.
         </p>
       </div>
 
-      {/* FILTRO */}
       <div className="flex gap-3">
         {['ALL','HIGH','MEDIUM','LOW'].map(level => (
           <button
@@ -108,7 +109,6 @@ export default function AssetsPage() {
         ))}
       </div>
 
-      {/* TABLE */}
       <div className="bg-white p-8 rounded-3xl border shadow-xl">
         <h2 className="text-xl font-semibold mb-6">
           Recursos detectados
@@ -122,8 +122,8 @@ export default function AssetsPage() {
                 <th className="p-4 text-left">Tipo</th>
                 <th className="p-4 text-left">Recurso</th>
                 <th className="p-4 text-left">Región</th>
-                <th className="p-4 text-left">Estado Operacional</th>
-                <th className="p-4 text-left">Nivel de Riesgo</th>
+                <th className="p-4 text-left">Estado</th>
+                <th className="p-4 text-left">Riesgo</th>
               </tr>
             </thead>
 
