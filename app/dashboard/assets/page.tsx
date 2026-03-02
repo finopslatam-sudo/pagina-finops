@@ -104,6 +104,16 @@ export default function AssetsPage() {
     { name: 'Sin Riesgo', value: filteredResources.filter(r => !r.severity).length }
   ];
 
+  const serviceDistribution = Object.values(
+    filteredResources.reduce((acc, r) => {
+      if (!acc[r.service_name]) {
+        acc[r.service_name] = { name: r.service_name, value: 0 };
+      }
+      acc[r.service_name].value += 1;
+      return acc;
+    }, {} as Record<string, { name: string; value: number }>)
+  );
+
   const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e'];
 
   const severityOptions: Filters['severity'][] = [
@@ -155,99 +165,136 @@ export default function AssetsPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-12">
 
-      {/* HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold">Assets</h1>
-        <p className="text-gray-600 mt-2 max-w-3xl">
-          Vista consolidada del inventario cloud con análisis de riesgo,
-          estado operacional y exposición potencial. Permite identificar
-          recursos críticos, infraestructura subutilizada y prioridades
-          de optimización en tiempo real.
+      {/* ================= HERO CARD ================= */}
+      <div className="bg-gradient-to-r from-blue-50 to-white border border-blue-200 rounded-3xl p-8 shadow-sm">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Assets & Risk Overview
+        </h1>
+        <p className="text-gray-600 mt-3 max-w-3xl">
+          Hallazgos de riesgo detectados en tu entorno cloud y oportunidades
+          estratégicas de optimización. Esta vista consolida exposición,
+          estado operacional y distribución por servicio para apoyar decisiones
+          ejecutivas basadas en datos.
         </p>
       </div>
 
-      {/* ================= FILTER BAR ================= */}
-      <div className="bg-white p-6 rounded-2xl shadow border flex flex-wrap gap-4 items-end">
-
-        <FilterSelect
-          label="Servicio"
-          value={filters.service}
-          options={['ALL', ...uniqueServices]}
-          onChange={(value: string) =>
-            setFilters(prev => ({ ...prev, service: value }))
-          }
-        />
-
-        <FilterSelect
-          label="Región"
-          value={filters.region}
-          options={['ALL', ...uniqueRegions]}
-          onChange={(value: string) =>
-            setFilters(prev => ({ ...prev, region: value }))
-          }
-        />
-
-        <FilterSelect
-          label="Estado"
-          value={filters.state}
-          options={['ALL', ...uniqueStates]}
-          onChange={(value: string) =>
-            setFilters(prev => ({ ...prev, state: value }))
-          }
-        />
-
-        <FilterSelect
-          label="Riesgo"
-          value={filters.severity}
-          options={severityOptions}
-          onChange={(value) =>
-            setFilters(prev => ({
-              ...prev,
-              severity: value as Filters['severity']
-            }))
-          }
-        />
-
-        <div className="flex flex-col text-sm">
-          <label className="text-gray-500 mb-1">Buscar recurso</label>
-          <input
-            type="text"
-            placeholder="ID del recurso..."
-            value={filters.search}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFilters(prev => ({ ...prev, search: e.target.value }))
-            }
-            className="border rounded px-3 py-2"
-          />
-        </div>
-
-      </div>
-
       {/* ================= ANALYTICS CARD ================= */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
-        <h2 className="text-xl font-semibold mb-6">
-          Distribución de Riesgo
-        </h2>
+      <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-10">
 
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={riskDistribution}
-                dataKey="value"
-                outerRadius={120}
-                label
-              >
-                {riskDistribution.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+        <div>
+          <h2 className="text-xl font-semibold mb-2">
+            Distribución de Riesgo
+          </h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Proporción de recursos según nivel de severidad detectada.
+          </p>
+
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={riskDistribution}
+                  dataKey="value"
+                  outerRadius={100}
+                  label
+                >
+                  {riskDistribution.map((_, index) => (
+                    <Cell key={index} fill={COLORS[index]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
+
+        <div>
+          <h2 className="text-xl font-semibold mb-2">
+            Distribución por Servicio
+          </h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Inventario consolidado agrupado por tipo de servicio cloud.
+          </p>
+
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={serviceDistribution}
+                  dataKey="value"
+                  outerRadius={100}
+                  label
+                >
+                  {serviceDistribution.map((_, index) => (
+                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
       </div>
+
+            {/* ================= FILTER BAR ================= */}
+            <div className="bg-white p-6 rounded-2xl shadow border flex flex-wrap gap-4 items-end">
+
+              <FilterSelect
+                label="Servicio"
+                value={filters.service}
+                options={['ALL', ...uniqueServices]}
+                onChange={(value: string) =>
+                  setFilters(prev => ({ ...prev, service: value }))
+                }
+              />
+
+              <FilterSelect
+                label="Región"
+                value={filters.region}
+                options={['ALL', ...uniqueRegions]}
+                onChange={(value: string) =>
+                  setFilters(prev => ({ ...prev, region: value }))
+                }
+              />
+
+              <FilterSelect
+                label="Estado"
+                value={filters.state}
+                options={['ALL', ...uniqueStates]}
+                onChange={(value: string) =>
+                  setFilters(prev => ({ ...prev, state: value }))
+                }
+              />
+
+              <FilterSelect
+                label="Riesgo"
+                value={filters.severity}
+                options={severityOptions}
+                onChange={(value) =>
+                  setFilters(prev => ({
+                    ...prev,
+                    severity: value as Filters['severity']
+                  }))
+                }
+              />
+
+              <div className="flex flex-col text-sm">
+                <label className="text-gray-500 mb-1">Buscar recurso</label>
+                <input
+                  type="text"
+                  placeholder="Search resource..."
+                  value={filters.search}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setFilters(prev => ({ ...prev, search: e.target.value }))
+                  }
+                  className="border rounded px-3 py-2"
+                />
+              </div>
+
+              </div>
 
       {/* ================= TABLE ================= */}
       <div className="bg-white p-8 rounded-3xl border shadow-xl">
