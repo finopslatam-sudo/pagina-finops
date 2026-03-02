@@ -1,173 +1,213 @@
 'use client';
 
-/* =====================================================
-   IMPORTS
-===================================================== */
-
+import { useEffect, useState } from 'react';
 import { useDashboard } from '../hooks/useDashboard';
+import { useAuth } from '@/app/context/AuthContext';
 
-/* =====================================================
-   MAIN COMPONENT
-===================================================== */
+type RightsizingResponse = {
+  has_data: boolean;
+  total_recommendations: number;
+  total_estimated_monthly_savings: number;
+  supported_services: string[];
+  recommendations: any[];
+};
+
+type RIResponse = {
+  coverage_percentage: number;
+  has_reserved_instances: boolean;
+  has_data: boolean;
+  period_days: number;
+};
+
+type SPResponse = {
+  has_savings_plans: boolean;
+  has_data: boolean;
+  period_days: number;
+  services: { service: string; coverage_percentage: number }[];
+};
 
 export default function OptimizationPage() {
   const { data, loading, error } = useDashboard();
+  const { token } = useAuth();
 
-  /* ================= STATES ================= */
+  const [rightsizing, setRightsizing] = useState<RightsizingResponse | null>(null);
+  const [ri, setRI] = useState<RIResponse | null>(null);
+  const [sp, setSP] = useState<SPResponse | null>(null);
+  const [loadingFinops, setLoadingFinops] = useState(true);
 
-  if (loading) {
-    return (
-      <div className="p-6 text-gray-400">
-        Cargando optimización...
-      </div>
-    );
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchFinops = async () => {
+      try {
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+
+        const [r1, r2, r3] = await Promise.all([
+          fetch('/api/client/finops/rightsizing', { headers }),
+          fetch('/api/client/finops/ri-coverage', { headers }),
+          fetch('/api/client/finops/sp-coverage', { headers }),
+        ]);
+
+        const d1 = await r1.json();
+        const d2 = await r2.json();
+        const d3 = await r3.json();
+
+        setRightsizing(d1);
+        setRI(d2);
+        setSP(d3);
+      } catch (e) {
+        console.error('FinOps API error', e);
+      } finally {
+        setLoadingFinops(false);
+      }
+    };
+
+    fetchFinops();
+  }, [token]);
+
+  if (loading || loadingFinops) {
+    return <div className="p-6 text-gray-400">Cargando optimización...</div>;
   }
 
   if (error) {
-    return (
-      <div className="p-6 text-red-500">
-        {error}
-      </div>
-    );
+    return <div className="p-6 text-red-500">{error}</div>;
   }
 
   if (!data) return null;
 
   const roi = data.roi_projection;
 
-  /* =====================================================
-     RENDER
-  ===================================================== */
-
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-12">
+    <div className="max-w-7xl mx-auto px-6 space-y-16">
 
-      {/* ================= HERO OPTIMIZATION CARD ================= */}
+      {/* ================= HERO ================= */}
       <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-gray-900">
-          Optimization & Risk Strategy
+          Optimization & Commitments Strategy
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
-          Proyección estratégica de reducción de riesgo, fortalecimiento de gobernanza
-          y maximización del retorno financiero. Esta vista consolida el impacto
-          potencial de las acciones de optimización priorizadas sobre tu entorno cloud.
+          Consolidated view of rightsizing opportunities and commitment coverage
+          across your cloud infrastructure.
         </p>
       </div>
 
-      {/* ================= ROI PROJECTION ================= */}
+      {/* ================= ROI ================= */}
       {roi && (
-        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
-
-          <h2 className="text-xl font-semibold">
-            Proyección de mejora
-          </h2>
-
+        <SectionCard title="Strategic ROI Projection">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-
-            <MetricCard
-            label="Projected Risk Score"
-            value={`${roi.projected_risk_score}%`}
-            variant="orange"
-            />
-
-            <MetricCard
-            label="Projected Governance"
-            value={`${roi.projected_governance}%`}
-            variant="blue"
-            />
-
-            <MetricCard
-            label="Projected Risk Level"
-            value={roi.projected_risk_level}
-            variant="purple"
-            />
-
-            <MetricCard
-            label="High Savings Opportunity (Annual)"
-            value={`$${roi.high_savings_opportunity_annual}`}
-            variant="green"
-            />
-
+            <MetricCard label="Projected Risk Score" value={`${roi.projected_risk_score}%`} />
+            <MetricCard label="Projected Governance" value={`${roi.projected_governance}%`} />
+            <MetricCard label="Projected Risk Level" value={roi.projected_risk_level} />
+            <MetricCard label="High Savings (Annual)" value={`$${roi.high_savings_opportunity_annual}`} />
           </div>
-
-        </div>
+        </SectionCard>
       )}
 
-      {/* ================= PRIORITY SERVICES ================= */}
-      {data.priority_services && (
-        <div className="bg-white p-8 rounded-3xl border shadow-xl">
-          <h2 className="text-xl font-semibold mb-6">
-            Servicios prioritarios
-          </h2>
-
-          {data.priority_services.length === 0 ? (
-            <p className="text-gray-400">
-              No hay servicios prioritarios identificados.
-            </p>
-          ) : (
+      {/* ================= RIGHTSIZING ================= */}
+      <SectionCard title="Rightsizing (EC2 & RDS)">
+        {!rightsizing?.has_data ? (
+          <EmptyState message="No rightsizing opportunities detected for EC2 or RDS." />
+        ) : (
+          <>
+            <div className="mb-6">
+              <p className="text-sm text-gray-600">
+                Total Recommendations: {rightsizing.total_recommendations}
+              </p>
+              <p className="text-sm text-gray-600">
+                Estimated Monthly Savings: ${rightsizing.total_estimated_monthly_savings}
+              </p>
+            </div>
 
             <div className="space-y-4">
-              {data.priority_services.map((service: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="border rounded-2xl p-6 bg-gray-50 shadow-sm flex justify-between items-center"
-                >
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {service.service}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Risk Score: {service.risk_score}% · 
-                      Nivel: {service.risk_level}
-                    </p>
-                  </div>
-
-                  <div className="text-sm text-gray-600">
-                    <p>High: {service.high}</p>
-                    <p>Medium: {service.medium}</p>
-                    <p>Low: {service.low}</p>
-                  </div>
+              {rightsizing.recommendations.map((r: any) => (
+                <div key={r.id} className="border rounded-2xl p-5 bg-gray-50">
+                  <p className="font-semibold">{r.resource_id}</p>
+                  <p className="text-sm text-gray-600">{r.message}</p>
+                  <p className="text-sm text-emerald-600 mt-2">
+                    ${r.estimated_monthly_savings} monthly
+                  </p>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
+          </>
+        )}
+      </SectionCard>
+
+      {/* ================= RI ================= */}
+      <SectionCard title="Reserved Instances Coverage">
+        {!ri?.has_reserved_instances ? (
+          <EmptyState message="No Reserved Instances detected in the last 30 days." />
+        ) : (
+          <CoverageDisplay percentage={ri.coverage_percentage} />
+        )}
+      </SectionCard>
+
+      {/* ================= SP ================= */}
+      <SectionCard title="Savings Plans Coverage">
+        {!sp?.has_savings_plans ? (
+          <EmptyState message="No Savings Plans active in this account." />
+        ) : (
+          <div className="space-y-4">
+            {sp.services.map((s, idx) => (
+              <CoverageRow key={idx} label={s.service} value={s.coverage_percentage} />
+            ))}
+          </div>
+        )}
+      </SectionCard>
 
     </div>
   );
 }
 
-/* =====================================================
-   COMPONENTS
-===================================================== */
+/* ================= UI COMPONENTS ================= */
 
-function MetricCard({
-  label,
-  value,
-  variant = "default",
-}: {
-  label: string;
-  value: string | number;
-  variant?: "blue" | "green" | "purple" | "orange" | "default";
-}) {
-
-  const variants = {
-    blue: "bg-blue-50 border-blue-200",
-    green: "bg-green-50 border-green-200",
-    purple: "bg-purple-50 border-purple-200",
-    orange: "bg-orange-50 border-orange-200",
-    default: "bg-gray-50 border-gray-200",
-  };
-
+function SectionCard({ title, children }: any) {
   return (
-    <div className={`${variants[variant]} border rounded-2xl p-6 shadow-sm`}>
-      <p className="text-sm text-gray-600">
-        {label}
-      </p>
-      <p className="text-2xl font-semibold mt-2 text-gray-900">
-        {value}
-      </p>
+    <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+      <h2 className="text-xl font-semibold">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="bg-gray-50 border rounded-2xl p-6 text-gray-500 text-sm">
+      {message}
+    </div>
+  );
+}
+
+function CoverageDisplay({ percentage }: { percentage: number }) {
+  return (
+    <div>
+      <p className="text-3xl font-bold text-indigo-600">{percentage}%</p>
+      <div className="w-full bg-gray-200 rounded-full h-4 mt-4">
+        <div
+          className="bg-indigo-500 h-4 rounded-full transition-all"
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function CoverageRow({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex justify-between items-center bg-gray-50 border rounded-2xl p-4">
+      <p className="font-medium">{label}</p>
+      <p className="font-semibold text-indigo-600">{value}%</p>
+    </div>
+  );
+}
+
+function MetricCard({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="bg-gray-50 border rounded-2xl p-6 shadow-sm">
+      <p className="text-sm text-gray-600">{label}</p>
+      <p className="text-2xl font-semibold mt-2">{value}</p>
     </div>
   );
 }
