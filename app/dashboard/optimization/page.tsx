@@ -42,13 +42,15 @@ export default function OptimizationPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-12">
 
-      {/* ================= HEADER ================= */}
-      <div>
-        <h1 className="text-3xl font-bold">
-          Optimization
+      {/* ================= HERO OPTIMIZATION CARD ================= */}
+      <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-sm">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Optimization & Risk Strategy
         </h1>
-        <p className="text-gray-500 mt-2">
-          Proyección de mejora, reducción de riesgo y oportunidades financieras.
+        <p className="text-gray-600 mt-3 max-w-3xl">
+          Proyección estratégica de reducción de riesgo, fortalecimiento de gobernanza
+          y maximización del retorno financiero. Esta vista consolida el impacto
+          potencial de las acciones de optimización priorizadas sobre tu entorno cloud.
         </p>
       </div>
 
@@ -63,23 +65,27 @@ export default function OptimizationPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 
             <MetricCard
-              label="Projected Risk Score"
-              value={`${roi.projected_risk_score}%`}
+            label="Projected Risk Score"
+            value={`${roi.projected_risk_score}%`}
+            variant="orange"
             />
 
             <MetricCard
-              label="Projected Governance"
-              value={`${roi.projected_governance}%`}
+            label="Projected Governance"
+            value={`${roi.projected_governance}%`}
+            variant="blue"
             />
 
             <MetricCard
-              label="Projected Risk Level"
-              value={roi.projected_risk_level}
+            label="Projected Risk Level"
+            value={roi.projected_risk_level}
+            variant="purple"
             />
 
             <MetricCard
             label="High Savings Opportunity (Annual)"
             value={`$${roi.high_savings_opportunity_annual}`}
+            variant="green"
             />
 
           </div>
@@ -99,16 +105,31 @@ export default function OptimizationPage() {
               No hay servicios prioritarios identificados.
             </p>
           ) : (
-            <ul className="space-y-3">
+
+            <div className="space-y-4">
               {data.priority_services.map((service: any, idx: number) => (
-                <li
+                <div
                   key={idx}
-                  className="border rounded-xl p-4 bg-gray-50"
+                  className="border rounded-2xl p-6 bg-gray-50 shadow-sm flex justify-between items-center"
                 >
-                  {JSON.stringify(service)}
-                </li>
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {service.service}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Risk Score: {service.risk_score}% · 
+                      Nivel: {service.risk_level}
+                    </p>
+                  </div>
+
+                  <div className="text-sm text-gray-600">
+                    <p>High: {service.high}</p>
+                    <p>Medium: {service.medium}</p>
+                    <p>Low: {service.low}</p>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       )}
@@ -124,16 +145,27 @@ export default function OptimizationPage() {
 function MetricCard({
   label,
   value,
+  variant = "default",
 }: {
   label: string;
   value: string | number;
+  variant?: "blue" | "green" | "purple" | "orange" | "default";
 }) {
+
+  const variants = {
+    blue: "bg-blue-50 border-blue-200",
+    green: "bg-green-50 border-green-200",
+    purple: "bg-purple-50 border-purple-200",
+    orange: "bg-orange-50 border-orange-200",
+    default: "bg-gray-50 border-gray-200",
+  };
+
   return (
-    <div className="border rounded-xl p-6 bg-gray-50 shadow-sm">
-      <p className="text-sm text-gray-500">
+    <div className={`${variants[variant]} border rounded-2xl p-6 shadow-sm`}>
+      <p className="text-sm text-gray-600">
         {label}
       </p>
-      <p className="text-2xl font-semibold mt-2">
+      <p className="text-2xl font-semibold mt-2 text-gray-900">
         {value}
       </p>
     </div>
