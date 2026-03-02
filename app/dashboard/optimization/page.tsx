@@ -234,17 +234,26 @@ function MetricCard({
   variant?: "orange" | "blue" | "purple" | "green" | "default";
 }) {
 
-  const variants = {
-    orange: "bg-orange-50 border-orange-200 text-orange-700",
-    blue: "bg-blue-50 border-blue-200 text-blue-700",
-    purple: "bg-purple-50 border-purple-200 text-purple-700",
-    green: "bg-emerald-50 border-emerald-200 text-emerald-700",
-    default: "bg-gray-50 border-gray-200 text-gray-700",
-  };
+  let classes =
+    "border rounded-2xl p-6 shadow-sm ";
+
+  if (variant === "orange") {
+    classes += "bg-orange-50 border-orange-200";
+  } else if (variant === "blue") {
+    classes += "bg-blue-50 border-blue-200";
+  } else if (variant === "purple") {
+    classes += "bg-purple-50 border-purple-200";
+  } else if (variant === "green") {
+    classes += "bg-emerald-50 border-emerald-200";
+  } else {
+    classes += "bg-gray-50 border-gray-200";
+  }
 
   return (
-    <div className={`${variants[variant]} border rounded-2xl p-6 shadow-sm`}>
-      <p className="text-sm opacity-80">{label}</p>
+    <div className={classes}>
+      <p className="text-sm text-gray-600">
+        {label}
+      </p>
       <p className="text-3xl font-semibold mt-2 text-gray-900">
         {value}
       </p>
