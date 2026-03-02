@@ -65,14 +65,21 @@ export default function GobernanzaPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-14">
 
-      {/* HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold">
+
+      {/* ================= HERO GOVERNANCE CARD ================= */}
+      <div className="bg-gradient-to-r from-indigo-50 via-white to-white border border-indigo-200 rounded-3xl p-10 shadow-sm">
+
+        <h1 className="text-3xl font-bold text-gray-900">
           Gobernanza & Compliance
         </h1>
-        <p className="text-gray-500 mt-2">
-          Control de riesgo, estado operativo y salud general del entorno cloud.
+
+        <p className="text-gray-600 mt-4 max-w-4xl leading-relaxed text-lg">
+          Evaluación integral del nivel de riesgo, madurez operativa y cumplimiento
+          de buenas prácticas en tu entorno cloud. Esta vista consolida la exposición
+          actual, el progreso de remediación y la salud estructural de la infraestructura,
+          permitiendo priorizar decisiones estratégicas basadas en impacto real.
         </p>
+
       </div>
 
       {/* KPI GRID PASTEL */}
