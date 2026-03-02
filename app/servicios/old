@@ -220,18 +220,18 @@ export default function Servicios() {
 
       {/* PLANES */}
       <section className="px-6 py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
 
         <Plan
           title="FinOps Foundation"
           description="Visibilidad y control financiero cloud."
           features={[
-            "Diagnóstico inicial del entorno AWS",
-            "Dashboard ejecutivo de costos y riesgo",
-            "Inventario completo de recursos cloud",
-            "Costos por servicio y análisis mensual",
-            "Risk & Governance Score",
-            "Reporte ejecutivo mensual",
+            "Cloud Assessment inicial",
+            "Inventario completo de recursos",
+            "Costos por servicio y proyecto",
+            "Dashboards básicos",
+            "Alertas simples",
+            "Línea base FinOps",
           ]}
           bg="bg-gradient-to-br from-slate-200 via-slate-100 to-white"
           border="border border-slate-300"
@@ -244,11 +244,11 @@ export default function Servicios() {
           description="Optimización activa y decisiones basadas en datos."
           features={[
             "Todo Foundation",
-            "Rightsizing EC2 y RDS",
-            "Análisis de Savings Plans y Reserved Instances",
-            "Proyección financiera (ROI & Savings)",
-            "Forecast y seguimiento presupuestario",
-            "Reunión estratégica quincenal",
+            "Forecasting y budget tracking",
+            "Cost allocation por tags",
+            "Savings Plans & RI analysis",
+            "Optimización técnica recomendada",
+            "IA FinOps asistida",
           ]}
           bg="bg-gradient-to-br from-blue-50 to-blue-100"
           border="border-2 border-blue-600"
@@ -262,33 +262,16 @@ export default function Servicios() {
           description="Gobierno completo y automatización avanzada."
           features={[
             "Todo Professional",
-            "Multi-account visibility",
-            "Roadmap estratégico FinOps",
-            "Modelo operativo FinOps (definición inicial)",
-            "Sesión ejecutiva mensual",
-            "Acompañamiento en implementación de compromisos",
+            "Optimización automatizada",
+            "Anomaly Detection avanzado",
+            "IA FinOps predictiva",
+            "Operating Model FinOps",
+            "Compliance y gobierno cloud",
           ]}
           bg="bg-gradient-to-br from-purple-50 to-purple-100"
           border="border border-purple-300"
           button="bg-purple-700"
           onClick={() => setSelectedPlan("FinOps Enterprise")}
-        />
-
-        <Plan
-          title="Consultoría FinOps Estratégica"
-          description="Diagnóstico, implementación y acompañamiento especializado en optimización cloud."
-          features={[
-            "Auditoría FinOps completa",
-            "Identificación de desperdicio y quick wins",
-            "Diseño de estrategia de ahorro",
-            "Implementación de políticas FinOps",
-            "Definición de gobernanza cloud",
-            "Presentación ejecutiva a dirección",
-          ]}
-          bg="bg-gradient-to-br from-emerald-50 to-emerald-100"
-          border="border border-emerald-300"
-          button="bg-emerald-700"
-          onClick={() => setSelectedPlan("Consultoría FinOps Estratégica")}
         />
 
         </div>
