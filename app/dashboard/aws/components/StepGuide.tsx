@@ -3,19 +3,19 @@ export default function StepGuide() {
     const steps = [
       {
         title: "Descargar Template",
-        image: "/aws_steps/step1.png"
+        image: "/1 CLOUDF.png"
       },
       {
         title: "Abrir CloudFormation",
-        image: "/aws_steps/step2.png"
+        image: "/2 CLOUDF.png"
       },
       {
         title: "Subir YAML",
-        image: "/aws_steps/step3.png"
+        image: "/3 CLOUDF.png"
       },
       {
         title: "Deploy Stack",
-        image: "/aws_steps/step4.png"
+        image: "/4 CLOUDF.png"
       }
     ];
   

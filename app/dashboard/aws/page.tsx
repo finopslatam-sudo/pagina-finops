@@ -306,7 +306,7 @@ export default function AwsIntegrationPage() {
         </div>
 
       )}
-      
+
             {/* ================= STEP GUIDE ================= */}
 
             <StepGuide />
