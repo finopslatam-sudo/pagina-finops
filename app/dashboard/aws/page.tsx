@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 import StepGuide from "./components/StepGuide";
+import { Copy, Check } from "lucide-react";
 
 
 export default function AwsIntegrationPage() {
@@ -16,6 +17,7 @@ export default function AwsIntegrationPage() {
   const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
   const [accountInfo, setAccountInfo] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+
 
   /* =====================================================
      LOAD STATUS
@@ -290,27 +292,21 @@ export default function AwsIntegrationPage() {
 
             {externalId && (
 
-                <div className="mt-4 bg-white border border-blue-200 rounded-xl p-4">
-
-                <p className="text-sm text-gray-500 mb-2">
-                External ID (copiar este valor)
-                </p>
-
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
 
                 <p className="text-lg font-mono font-semibold text-blue-700 break-all">
-                    {externalId}
+                {externalId}
                 </p>
 
                 <button
-                    onClick={() => {
+                onClick={() => {
                     navigator.clipboard.writeText(externalId);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                }}
+                className="text-gray-500 hover:text-blue-600 transition"
                 >
-                    {copied ? "Copied ✓" : "Copy"}
+                {copied ? <Check size={18} /> : <Copy size={18} />}
                 </button>
 
                 </div>
