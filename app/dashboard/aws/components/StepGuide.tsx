@@ -158,7 +158,7 @@ export default function StepGuide() {
               className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-4xl hover:opacity-70"
             >
               ›
-            </button>
+            </button> 
 
           </div>
 
