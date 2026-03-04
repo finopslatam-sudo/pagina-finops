@@ -6,21 +6,29 @@ export default function StepGuide() {
 
   const steps = [
     {
-      title: "Descargar Template",
+      title: "Create stack",
       image: "/1 CLOUDF.png"
     },
     {
-      title: "Abrir CloudFormation",
+      title: "Cargar archivo YAML",
       image: "/2 CLOUDF.png"
     },
     {
-      title: "Subir YAML",
+      title: "ASignar nombre, Pegar External ID entregado anteriormente, Ingresa tu Account ID",
       image: "/3 CLOUDF.png"
     },
     {
-      title: "Deploy Stack",
+      title: "Baja al final y acepta las condiciones",
       image: "/4 CLOUDF.png"
-    }
+    },
+    {
+        title: "Revisa el resumen y Submit",
+        image: "/5 CLOUDF.png"
+    },
+    {
+        title: "Espera a que el status sea CREATE_COMPLETE",
+        image: "/6 CLOUDF.png"
+    },
   ];
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
