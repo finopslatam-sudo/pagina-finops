@@ -68,8 +68,8 @@ export default function Home() {
             Optimización de Costos en la Nube
           </h1>
           <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-            Ayudamos a empresas a controlar, visualizar y reducir sus costos en AWS 
-            aplicando mejores prácticas FinOps y automatización.
+            Ayudamos a empresas a controlar, visualizar y optimizar sus costos en AWS
+            aplicando mejores prácticas FinOps y análisis estratégico basado en datos.
           </p>
 
           <div className="flex justify-center gap-4">
@@ -271,12 +271,12 @@ export default function Home() {
               </p>
 
               <ul className="space-y-3 text-gray-700 mb-10">
-                <li>✔ Cloud Assessment inicial</li>
-                <li>✔ Inventario completo de recursos</li>
-                <li>✔ Costos por servicio y proyecto</li>
-                <li>✔ Dashboards básicos</li>
-                <li>✔ Alertas simples</li>
-                <li>✔ Línea base FinOps</li>
+                <li>✔ Diagnóstico inicial del entorno AWS</li>
+                <li>✔ Dashboard ejecutivo de costos y riesgo</li>
+                <li>✔ Inventario completo de recursos cloud</li>
+                <li>✔ Análisis mensual de costos por servicio</li>
+                <li>✔ Risk & Governance Score</li>
+                <li>✔ Reporte ejecutivo mensual</li>
               </ul>
 
               <div className="mt-auto">
@@ -310,11 +310,11 @@ export default function Home() {
 
               <ul className="space-y-3 text-gray-700 mb-10">
                 <li>✔ Todo Foundation</li>
-                <li>✔ Forecasting y budget tracking</li>
-                <li>✔ Cost allocation por tags</li>
-                <li>✔ Savings Plans & RI analysis</li>
-                <li>✔ Optimización técnica recomendada</li>
-                <li>✔ IA FinOps asistida</li>
+                <li>✔ Rightsizing EC2 y RDS</li>
+                <li>✔ Análisis de Savings Plans y Reserved Instances</li>
+                <li>✔ Proyección financiera (ROI & Savings)</li>
+                <li>✔ Forecast y seguimiento presupuestario</li>
+                <li>✔ Reunión estratégica quincenal</li>
               </ul>
 
               <div className="mt-auto">
@@ -345,11 +345,11 @@ export default function Home() {
 
               <ul className="space-y-3 text-gray-700 mb-10">
                 <li>✔ Todo Professional</li>
-                <li>✔ Optimización automatizada</li>
-                <li>✔ Anomaly Detection avanzado</li>
-                <li>✔ IA FinOps predictiva</li>
-                <li>✔ Operating Model FinOps</li>
-                <li>✔ Compliance y gobierno cloud</li>
+                <li>✔ Multi-account visibility</li>
+                <li>✔ Roadmap estratégico FinOps</li>
+                <li>✔ Modelo operativo FinOps (definición inicial)</li>
+                <li>✔ Sesión ejecutiva mensual</li>
+                <li>✔ Acompañamiento en compromisos cloud</li>
               </ul>
 
               <div className="mt-auto">

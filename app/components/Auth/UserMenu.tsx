@@ -131,6 +131,17 @@ export default function UserMenu() {
                   🏛 Governance
                 </Link>
 
+                {(user.client_role === "owner" ||
+                  user.client_role === "finops_admin") && (
+                  <Link
+                    href="/dashboard/aws"
+                    className="block px-4 py-3 hover:bg-blue-50"
+                    onClick={() => setOpen(false)}
+                  >
+                    ☁️ AWS Integration
+                  </Link>
+                )}
+
                 <Link
                   href="/perfil"
                   className="block px-4 py-3 hover:bg-blue-50 border-t"
