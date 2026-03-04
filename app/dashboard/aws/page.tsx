@@ -288,11 +288,22 @@ export default function AwsIntegrationPage() {
             Open AWS CloudFormation
             </a>
 
-          {externalId && (
-            <p className="text-xs text-gray-500 mt-2">
-              External ID: {externalId}
-            </p>
-          )}
+
+            {externalId && (
+
+                <div className="mt-4 bg-white border border-blue-200 rounded-xl p-4">
+            
+                <p className="text-sm text-gray-500 mb-1">
+                    External ID (copiar este valor)
+                </p>
+            
+                <p className="text-lg font-mono font-semibold text-blue-700 break-all">
+                    {externalId}
+                </p>
+            
+                </div>
+            
+            )}
 
         </div>
 
