@@ -1,53 +1,44 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 
-interface AwsStatus {
-  connected: boolean;
-  account_id?: string;
-  role_arn?: string;
-  audit_status?: string;
-}
-
 export default function AwsIntegrationPage() {
 
   const { token } = useAuth();
 
-  const [loading, setLoading] = useState(true);
-  const [connecting, setConnecting] = useState(false);
-  const [auditLoading, setAuditLoading] = useState(false);
-
-  const [awsStatus, setAwsStatus] = useState<AwsStatus>({
-    connected: false
-  });
-
+  const [loading, setLoading] = useState(false);
   const [cloudformationUrl, setCloudformationUrl] = useState<string | null>(null);
   const [externalId, setExternalId] = useState<string | null>(null);
+  const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
 
   /* =====================================================
-     LOAD AWS STATUS
+     LOAD STATUS
   ===================================================== */
 
-  const fetchAwsStatus = async () => {
+  useEffect(() => {
+    checkConnection();
+  }, []);
+
+  const checkConnection = async () => {
 
     try {
 
-      const res = await apiFetch<AwsStatus>("/api/client/aws/status", {
+      const res = await apiFetch<{
+        status: string
+      }>("/api/client/aws/status", {
         token
       });
 
-      setAwsStatus(res);
+      if (res.status === "connected") {
+        setStatus("connected");
+      } else {
+        setStatus("disconnected");
+      }
 
-    } catch (error) {
-
-      console.error("AWS status error:", error);
-
-    } finally {
-
-      setLoading(false);
-
+    } catch {
+      setStatus("disconnected");
     }
 
   };
@@ -60,7 +51,7 @@ export default function AwsIntegrationPage() {
 
     try {
 
-      setConnecting(true);
+      setLoading(true);
 
       const response = await apiFetch<{
         cloudformation_url: string;
@@ -72,214 +63,263 @@ export default function AwsIntegrationPage() {
 
       setCloudformationUrl(response.cloudformation_url);
       setExternalId(response.external_id);
+      setStatus("pending");
 
     } catch (error) {
 
-      console.error("Error connecting AWS:", error);
-      alert("Error generating CloudFormation link");
+      console.error(error);
+      alert("Error generating CloudFormation stack");
 
     } finally {
 
-      setConnecting(false);
+      setLoading(false);
 
     }
 
   };
 
   /* =====================================================
-     RUN MANUAL AUDIT
+     RUN AUDIT
   ===================================================== */
 
   const runAudit = async () => {
 
     try {
 
-      setAuditLoading(true);
+      setLoading(true);
 
       await apiFetch("/api/client/audit/run", {
         method: "POST",
         token
       });
 
-      fetchAwsStatus();
+      alert("Audit started successfully");
 
     } catch (error) {
 
-      console.error("Audit error:", error);
-      alert("Failed to start audit");
+      console.error(error);
+      alert("Error running audit");
 
     } finally {
 
-      setAuditLoading(false);
+      setLoading(false);
 
     }
 
   };
 
   /* =====================================================
-     LOAD ON PAGE ENTER
+     STATUS SEMAPHORE
   ===================================================== */
 
-  useEffect(() => {
+  const statusConfig = {
+    connected: {
+      label: "Cuenta conectada",
+      color: "bg-emerald-100 text-emerald-700",
+      dot: "bg-emerald-500"
+    },
+    pending: {
+      label: "Conexión pendiente",
+      color: "bg-yellow-100 text-yellow-700",
+      dot: "bg-yellow-500"
+    },
+    disconnected: {
+      label: "Cuenta no conectada",
+      color: "bg-red-100 text-red-700",
+      dot: "bg-red-500"
+    }
+  };
 
-    if (!token) return;
-
-    fetchAwsStatus();
-
-  }, [token]);
-
-  /* =====================================================
-     LOADING STATE
-  ===================================================== */
-
-  if (loading) {
-
-    return (
-
-      <div className="p-8">
-        Loading AWS integration...
-      </div>
-
-    );
-
-  }
+  const current = statusConfig[status];
 
   return (
 
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="max-w-7xl mx-auto px-6 space-y-14">
 
-      <h1 className="text-3xl font-bold mb-8">
-        AWS Integration
-      </h1>
+      {/* ================= HERO ================= */}
 
-      <div className="bg-white shadow rounded-xl p-6 border">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-white border border-blue-200 rounded-3xl p-10 shadow-sm">
 
-        {/* =============================================
-           AWS CONNECTED
-        ============================================= */}
+        <h1 className="text-3xl font-bold text-gray-900">
+          AWS Integration
+        </h1>
 
-        {awsStatus.connected && (
-
-          <div className="space-y-4">
-
-            <div>
-
-              <span className="text-gray-500 text-sm">
-                Status
-              </span>
-
-              <div className="text-green-600 font-medium">
-                Connected
-              </div>
-
-            </div>
-
-            <div>
-
-              <span className="text-gray-500 text-sm">
-                AWS Account
-              </span>
-
-              <div className="font-medium">
-                {awsStatus.account_id}
-              </div>
-
-            </div>
-
-            <div>
-
-              <span className="text-gray-500 text-sm">
-                Role ARN
-              </span>
-
-              <div className="font-mono text-sm">
-                {awsStatus.role_arn}
-              </div>
-
-            </div>
-
-            <div>
-
-              <span className="text-gray-500 text-sm">
-                Last Audit Status
-              </span>
-
-              <div className="font-medium">
-                {awsStatus.audit_status || "Unknown"}
-              </div>
-
-            </div>
-
-            <div className="flex gap-3 pt-4">
-
-              <button
-                onClick={runAudit}
-                disabled={auditLoading}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                {auditLoading ? "Running audit..." : "Run Audit"}
-              </button>
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* =============================================
-           NOT CONNECTED
-        ============================================= */}
-
-        {!awsStatus.connected && (
-
-          <div>
-
-            <p className="text-gray-600 mb-4">
-              No AWS account connected.
-            </p>
-
-            {!cloudformationUrl && (
-
-              <button
-                onClick={handleConnectAws}
-                disabled={connecting}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                {connecting ? "Generating..." : "Connect AWS Account"}
-              </button>
-
-            )}
-
-            {cloudformationUrl && (
-
-              <div className="mt-6">
-
-                <p className="mb-2">
-                  Step 1: Open CloudFormation
-                </p>
-
-                <a
-                  href={cloudformationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline"
-                >
-                  Open CloudFormation Stack
-                </a>
-
-                <p className="mt-4 text-sm text-gray-600">
-                  External ID: {externalId}
-                </p>
-
-              </div>
-
-            )}
-
-          </div>
-
-        )}
+        <p className="text-gray-600 mt-4 max-w-4xl leading-relaxed text-lg">
+          Conecta tu cuenta de AWS de forma segura mediante un rol de solo lectura.
+          Esta integración permite analizar recursos, detectar riesgos FinOps y
+          descubrir oportunidades de optimización de costos en tu infraestructura cloud.
+        </p>
 
       </div>
+
+      {/* ================= STATUS CARD ================= */}
+
+      <div className={`p-6 rounded-2xl border ${current.color}`}>
+
+        <div className="flex items-center gap-3">
+
+          <div className={`w-3 h-3 rounded-full ${current.dot}`} />
+
+          <h3 className="text-lg font-semibold">
+            {current.label}
+          </h3>
+
+        </div>
+
+        <p className="text-sm mt-2 opacity-80">
+
+          {status === "connected" &&
+            "FinOpsLatam puede acceder a tu cuenta AWS para auditoría y análisis FinOps."}
+
+          {status === "pending" &&
+            "Completa el despliegue de CloudFormation para finalizar la conexión."}
+
+          {status === "disconnected" &&
+            "No existe una cuenta AWS conectada a tu organización."}
+
+        </p>
+
+      </div>
+
+      {/* ================= INTEGRATION STEPS ================= */}
+
+      <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+
+        <h2 className="text-xl font-semibold">
+          Pasos para conectar tu cuenta AWS
+        </h2>
+
+        <ol className="space-y-4 text-gray-600 list-decimal ml-6">
+
+          <li>
+            Genera el stack de CloudFormation para crear el rol de auditoría seguro.
+          </li>
+
+          <li>
+            Despliega el stack en tu cuenta AWS.
+          </li>
+
+          <li>
+            FinOpsLatam validará automáticamente el acceso y comenzará la auditoría.
+          </li>
+
+        </ol>
+
+      </div>
+
+      {/* ================= ACTIONS ================= */}
+
+      <div className="grid md:grid-cols-3 gap-6">
+
+        <ActionCard
+          title="Conectar AWS"
+          description="Generar stack CloudFormation para integrar tu cuenta."
+          button="Connect AWS Account"
+          onClick={handleConnectAws}
+          loading={loading}
+        />
+
+        <ActionCard
+          title="Descargar Template"
+          description="Descarga el archivo YAML de CloudFormation manualmente."
+          button="Download YAML"
+          link="/api/client/aws/template"
+        />
+
+        <ActionCard
+          title="Ejecutar Auditoría"
+          description="Lanza un escaneo inmediato de recursos cloud."
+          button="Run Audit"
+          onClick={runAudit}
+          loading={loading}
+        />
+
+      </div>
+
+      {/* ================= CLOUD FORMATION LINK ================= */}
+
+      {cloudformationUrl && (
+
+        <div className="bg-blue-50 border border-blue-200 p-6 rounded-2xl">
+
+          <h3 className="font-semibold text-blue-900">
+            CloudFormation Stack
+          </h3>
+
+          <p className="text-sm mt-2 text-blue-700">
+            Abre el siguiente enlace para desplegar el stack en tu cuenta AWS.
+          </p>
+
+          <a
+            href={cloudformationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline block mt-3"
+          >
+            Open CloudFormation Stack
+          </a>
+
+          {externalId && (
+            <p className="text-xs text-gray-500 mt-2">
+              External ID: {externalId}
+            </p>
+          )}
+
+        </div>
+
+      )}
+
+    </div>
+
+  );
+
+}
+
+/* =====================================================
+   ACTION CARD
+===================================================== */
+
+function ActionCard({
+  title,
+  description,
+  button,
+  onClick,
+  loading,
+  link
+}: any) {
+
+  return (
+
+    <div className="bg-white border rounded-2xl p-6 shadow-sm space-y-4">
+
+      <h3 className="font-semibold text-lg">
+        {title}
+      </h3>
+
+      <p className="text-sm text-gray-600">
+        {description}
+      </p>
+
+      {link ? (
+
+        <a
+          href={link}
+          className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          {button}
+        </a>
+
+      ) : (
+
+        <button
+          onClick={onClick}
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          {loading ? "Processing..." : button}
+        </button>
+
+      )}
 
     </div>
 
