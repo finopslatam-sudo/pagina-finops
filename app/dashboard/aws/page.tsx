@@ -226,14 +226,6 @@ export default function AwsIntegrationPage() {
           link="/api/client/aws/template"
         />
 
-        <ActionCard
-          title="Ejecutar Auditoría"
-          description="Lanza un escaneo inmediato de recursos cloud."
-          button="Run Audit"
-          onClick={runAudit}
-          loading={loading}
-        />
-
       </div>
 
       {/* ================= CLOUD FORMATION LINK ================= */}
@@ -251,13 +243,13 @@ export default function AwsIntegrationPage() {
           </p>
 
           <a
-            href={cloudformationUrl}
+            href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 underline block mt-3"
-          >
-            Open CloudFormation Stack
-          </a>
+            >
+            Open AWS CloudFormation
+            </a>
 
           {externalId && (
             <p className="text-xs text-gray-500 mt-2">
