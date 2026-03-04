@@ -302,12 +302,21 @@ function ActionCard({
 
       {link ? (
 
-        <a
-          href={link}
-          className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {button}
-        </a>
+        <button
+        onClick={() => {
+          const downloadLink = document.createElement("a");
+      
+          downloadLink.href = "https://api.finopslatam.com/api/client/aws/template";
+          downloadLink.download = "finopslatam-cloudformation.yaml";
+      
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        }}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        {button}
+      </button>
 
       ) : (
 
