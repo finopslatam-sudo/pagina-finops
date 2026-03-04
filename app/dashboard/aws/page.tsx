@@ -300,7 +300,7 @@ export default function AwsIntegrationPage() {
 
                 <button
                 onClick={() => {
-                    navigator.clipboard.writeText(externalId);
+                    navigator.clipboard.writeText(externalId ?? "");
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                 }}
@@ -308,8 +308,6 @@ export default function AwsIntegrationPage() {
                 >
                 {copied ? <Check size={18} /> : <Copy size={18} />}
                 </button>
-
-                </div>
 
                 </div>
             
