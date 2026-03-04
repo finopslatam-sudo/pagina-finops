@@ -240,10 +240,6 @@ export default function AwsIntegrationPage() {
 
       </div>
 
-      {/* ================= STEP GUIDE ================= */}
-
-        <StepGuide />
-
 
       {/* ================= ACTIONS ================= */}
 
@@ -265,6 +261,9 @@ export default function AwsIntegrationPage() {
         />
 
         </div>
+      {/* ================= STEP GUIDE ================= */}
+
+      <StepGuide />
 
       {/* ================= CLOUD FORMATION LINK ================= */}
 
