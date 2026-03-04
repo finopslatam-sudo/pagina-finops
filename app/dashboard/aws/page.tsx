@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
+import StepGuide from "./components/StepGuide";
+
 
 export default function AwsIntegrationPage() {
 
@@ -12,6 +14,7 @@ export default function AwsIntegrationPage() {
   const [cloudformationUrl, setCloudformationUrl] = useState<string | null>(null);
   const [externalId, setExternalId] = useState<string | null>(null);
   const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
+  const [accountInfo, setAccountInfo] = useState<any>(null);
 
   /* =====================================================
      LOAD STATUS
@@ -41,6 +44,28 @@ export default function AwsIntegrationPage() {
       setStatus("disconnected");
     }
 
+  };
+
+  /* =====================================================
+     LOAD STATUS
+  ===================================================== */
+
+  const loadAccountInfo = async () => {
+
+    try {
+  
+      const res = await apiFetch("/api/client/aws/account", {
+        token
+      });
+  
+      if (res.connected) {
+        setAccountInfo(res);
+      }
+  
+    } catch (err) {
+      console.error(err);
+    }
+  
   };
 
   /* =====================================================
@@ -182,6 +207,7 @@ export default function AwsIntegrationPage() {
       </div>
 
       {/* ================= INTEGRATION STEPS ================= */}
+      <StepGuide />
 
       <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
 
@@ -209,24 +235,24 @@ export default function AwsIntegrationPage() {
 
       {/* ================= ACTIONS ================= */}
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 gap-6">
 
         <ActionCard
-          title="Conectar AWS"
-          description="Generar stack CloudFormation para integrar tu cuenta."
-          button="Connect AWS Account"
-          onClick={handleConnectAws}
-          loading={loading}
+        title="Conectar AWS"
+        description="Generar stack CloudFormation para integrar tu cuenta."
+        button="Connect AWS Account"
+        onClick={handleConnectAws}
+        loading={loading}
         />
 
         <ActionCard
-          title="Descargar Template"
-          description="Descarga el archivo YAML de CloudFormation manualmente."
-          button="Download YAML"
-          link="/api/client/aws/template"
+        title="Descargar Template"
+        description="Descarga el archivo YAML de CloudFormation manualmente."
+        button="Download YAML"
+        link="/api/client/aws/template"
         />
 
-      </div>
+        </div>
 
       {/* ================= CLOUD FORMATION LINK ================= */}
 
