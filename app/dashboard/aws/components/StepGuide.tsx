@@ -14,7 +14,7 @@ export default function StepGuide() {
       image: "/2 CLOUDF.png"
     },
     {
-      title: "ASignar nombre, Pegar External ID entregado anteriormente, Ingresa tu Account ID",
+      title: "Asignar nombre, Pegar External ID entregado anteriormente, Ingresa tu Account ID",
       image: "/3 CLOUDF.png"
     },
     {

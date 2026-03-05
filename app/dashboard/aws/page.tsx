@@ -14,6 +14,7 @@ export default function AwsIntegrationPage() {
   const [loading, setLoading] = useState(false);
   const [cloudformationUrl, setCloudformationUrl] = useState<string | null>(null);
   const [externalId, setExternalId] = useState<string | null>(null);
+  const [accounts, setAccounts] = useState<any[]>([]);
   const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
   const [accountInfo, setAccountInfo] = useState<any>(null);
   const [copied, setCopied] = useState(false);
@@ -24,31 +25,36 @@ export default function AwsIntegrationPage() {
   ===================================================== */
 
   useEffect(() => {
-    checkConnection();
-  }, []);
+    if (token) {
+      checkConnection();
+    }
+  }, [token]);
 
   const checkConnection = async () => {
 
     try {
-
+  
       const res = await apiFetch<{
         status: string
+        accounts: any[]
       }>("/api/client/aws/status", {
         token
       });
-
-      if (res.status === "connected") {
+  
+      setAccounts(res.accounts || []);
+  
+      if (res.accounts && res.accounts.length > 0) {
         setStatus("connected");
       } else {
         setStatus("disconnected");
       }
-
+  
     } catch {
       setStatus("disconnected");
+      setAccounts([]);
     }
-
+  
   };
-
   /* =====================================================
      LOAD STATUS
   ===================================================== */
@@ -92,6 +98,8 @@ export default function AwsIntegrationPage() {
       setCloudformationUrl(response.cloudformation_url);
       setExternalId(response.external_id);
       setStatus("pending");
+
+      await checkConnection();      
 
     } catch (error) {
 
@@ -189,15 +197,18 @@ export default function AwsIntegrationPage() {
           <div className={`w-3 h-3 rounded-full ${current.dot}`} />
 
           <h3 className="text-lg font-semibold">
-            {current.label}
+            {status === "pending"
+              ? "Conexión en progreso"
+              : `${accounts.length} cuenta(s) AWS conectadas`}
           </h3>
 
         </div>
 
         <p className="text-sm mt-2 opacity-80">
 
-          {status === "connected" &&
-            "FinOpsLatam puede acceder a tu cuenta AWS para auditoría y análisis FinOps."}
+          {accounts.length > 0 &&
+            `FinOpsLatam tiene acceso a ${accounts.length} cuenta(s) AWS para auditoría y análisis FinOps.`
+          }
 
           {status === "pending" &&
             "Completa el despliegue de CloudFormation para finalizar la conexión."}
@@ -208,6 +219,62 @@ export default function AwsIntegrationPage() {
         </p>
 
       </div>
+
+      {accounts.length > 0 && (
+
+        <div className="bg-white border rounded-2xl p-6 shadow-sm">
+
+          <h3 className="text-lg font-semibold mb-4">
+            Cuentas AWS conectadas
+          </h3>
+
+          <div className="overflow-x-auto">
+
+            <table className="w-full text-sm">
+
+              <thead className="border-b">
+
+                <tr className="text-left text-gray-600">
+                  <th className="py-2">Account ID</th>
+                  <th className="py-2">Nombre</th>
+                  <th className="py-2">Estado</th>
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                {accounts.map((acc) => (
+
+                  <tr key={acc.id} className="border-b">
+
+                    <td className="py-2 font-mono">
+                      {acc.account_id}
+                    </td>
+
+                    <td className="py-2">
+                      {acc.account_name}
+                    </td>
+
+                    <td className="py-2">
+                      <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs">
+                        Conectada
+                      </span>
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+        )}
 
       {/* ================= INTEGRATION STEPS ================= */}
 
@@ -251,7 +318,7 @@ export default function AwsIntegrationPage() {
         <ActionCard
         title="Conectar AWS"
         description="Generar stack CloudFormation para integrar tu cuenta."
-        button="Connect AWS Account"
+        button="Add AWS Account"
         onClick={handleConnectAws}
         loading={loading}
         />
