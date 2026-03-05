@@ -10,25 +10,29 @@ export default function StepGuide() {
       image: "/1 CLOUDF.png"
     },
     {
-      title: "Cargar archivo YAML",
+      title: "Descarga el archivo YAML y copia el External ID",
       image: "/2 CLOUDF.png"
     },
     {
-      title: "Asignar nombre, Pegar External ID entregado anteriormente, Ingresa tu Account ID",
+      title: "Cargar archivo YAML",
       image: "/3 CLOUDF.png"
     },
     {
-      title: "Baja al final y acepta las condiciones",
+      title: "Asignar nombre, Pegar External ID entregado anteriormente, Ingresa tu Account ID",
       image: "/4 CLOUDF.png"
     },
     {
-        title: "Revisa el resumen y Submit",
+        title: "Baja al final y acepta las condiciones",
         image: "/5 CLOUDF.png"
     },
     {
-        title: "Espera a que el status sea CREATE_COMPLETE",
+        title: "Revisa el resumen y Submit",
         image: "/6 CLOUDF.png"
     },
+    {
+      title: "Espera a que el status sea CREATE_COMPLETE",
+      image: "/7 CLOUDF.png"
+  },
   ];
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
