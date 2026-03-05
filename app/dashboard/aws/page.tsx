@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 import StepGuide from "./components/StepGuide";
@@ -18,6 +18,7 @@ export default function AwsIntegrationPage() {
   const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
   const [copied, setCopied] = useState(false);
   const [showConnectionFlow, setShowConnectionFlow] = useState(false);
+  const stepsRef = useRef<HTMLDivElement | null>(null);
 
   /* =====================================================
      LOAD STATUS
@@ -208,10 +209,19 @@ export default function AwsIntegrationPage() {
           </h3>
 
           <button
-            onClick={() => setShowConnectionFlow(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          onClick={() => {
+            setShowConnectionFlow(true);
+
+            setTimeout(() => {
+              stepsRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+              });
+            }, 200);
+          }}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           >
-            + Add AWS Account
+          + Add AWS Account
           </button>
 
         </div>
@@ -278,7 +288,10 @@ export default function AwsIntegrationPage() {
       {showConnectionFlow && (
         <>
 
-      <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+      <div
+        ref={stepsRef}
+        className="bg-white p-8 rounded-3xl border shadow-xl space-y-6"
+      >
 
         <h2 className="text-xl font-semibold">
           Pasos para conectar tu cuenta AWS
@@ -383,7 +396,6 @@ export default function AwsIntegrationPage() {
         </div>
 
       )}
-      
       <div className="flex justify-end mt-4">
 
         <button
