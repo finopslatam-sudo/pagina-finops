@@ -331,7 +331,7 @@ export default function AwsIntegrationPage() {
         <ActionCard
         title="Conectar AWS"
         description="Generar stack CloudFormation para integrar tu cuenta."
-        button="External ID"
+        button="Create External ID"
         onClick={handleConnectAws}
         loading={loading}
         />
