@@ -12,29 +12,11 @@ import { useAuth } from '@/app/context/AuthContext';
    COMPONENT
 ===================================================== */
 
-/**
- * UserMenu
- *
- * Menú contextual del usuario autenticado.
- *
- * - Visible solo con sesión activa
- * - Refleja permisos desde AuthContext
- * - Logout seguro y centralizado
- * - UX consistente para SaaS enterprise
- */
 export default function UserMenu() {
   const { user, logout, isStaff } = useAuth();
 
-  /* =========================
-     STATE
-  ========================== */
-
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
-
-  /* =====================================================
-     CLOSE MENU ON OUTSIDE CLICK
-  ===================================================== */
 
   useEffect(() => {
     const close = () => setOpen(false);
@@ -42,41 +24,19 @@ export default function UserMenu() {
     return () => window.removeEventListener('click', close);
   }, []);
 
-  /* =====================================================
-     GUARD
-     (No sesión → no render)
-  ===================================================== */
-
   if (!user) return null;
-
-  /* =====================================================
-     LOGOUT HANDLER
-     - UX suave
-     - Logout real delegado al context
-  ===================================================== */
 
   const handleLogout = () => {
     setOpen(false);
     setShowToast(true);
 
-    /**
-     * Delay solo visual.
-     * AuthContext maneja limpieza + redirect.
-     */
     setTimeout(() => {
-      logout(); // 🔐 Redirige a "/"
+      logout();
     }, 1200);
   };
 
-  /* =====================================================
-     RENDER
-  ===================================================== */
-
   return (
     <>
-      {/* =========================
-         MAIN BUTTON
-      ========================== */}
       <div className="relative">
         <button
           onClick={(e) => {
@@ -88,54 +48,108 @@ export default function UserMenu() {
           Mi cuenta
         </button>
 
-        {/* =========================
-           DROPDOWN MENU
-        ========================== */}
         {open && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border overflow-hidden z-40"
+            className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border overflow-hidden z-40"
           >
+
             {/* DASHBOARD — TODOS */}
             <Link
               href="/dashboard"
               className="block px-4 py-3 hover:bg-blue-50"
               onClick={() => setOpen(false)}
             >
-              📊 Mi Dashboard
+              📊 Dashboard
             </Link>
 
-            {/* PANEL USUARIOS — STAFF */}
+            {/* =========================
+              STAFF MENU (SIN CAMBIOS)
+            ========================== */}
             {isStaff && (
-              <Link
-                href="/dashboard/users"
-                className="block px-4 py-3 hover:bg-blue-50 border-t"
-                onClick={() => setOpen(false)}
-              >
-                👥 Panel de Usuarios
-              </Link>
+              <>
+                <Link
+                  href="/dashboard/users"
+                  className="block px-4 py-3 hover:bg-blue-50 border-t"
+                  onClick={() => setOpen(false)}
+                >
+                  👥 Panel de Usuarios
+                </Link>
+
+                <Link
+                  href="/dashboard/clients"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  🏢 Panel de Clientes
+                </Link>
+              </>
             )}
 
-            {/* PANEL CLIENTES — STAFF */}
-            {isStaff && (
-              <Link
-                href="/dashboard/clients"
-                className="block px-4 py-3 hover:bg-blue-50"
-                onClick={() => setOpen(false)}
-              >
-                🏢 Panel de Clientes
-              </Link>
-            )}
-
-            {/* PERFIL — SOLO CLIENTES */}
+            {/* =========================
+              CLIENT MENU (ACTUALIZADO)
+            ========================== */}
             {!isStaff && (
-              <Link
-                href="/perfil"
-                className="block px-4 py-3 hover:bg-blue-50 border-t"
-                onClick={() => setOpen(false)}
-              >
-                ✏️ Editar mi perfil
-              </Link>
+              <>
+                <Link
+                  href="/dashboard/findings"
+                  className="block px-4 py-3 hover:bg-blue-50 border-t"
+                  onClick={() => setOpen(false)}
+                >
+                  🔎 Risk & Findings
+                </Link>
+
+                <Link
+                  href="/dashboard/assets"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  📦 Assets
+                </Link>
+
+                <Link
+                  href="/dashboard/costos"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  💰 Cost & Financials
+                </Link>
+
+                <Link
+                  href="/dashboard/optimization"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  🚀 Optimization
+                </Link>
+
+                <Link
+                  href="/dashboard/gobernanza"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  🏛 Governance
+                </Link>
+
+                {(user.client_role === "owner" ||
+                  user.client_role === "finops_admin") && (
+                  <Link
+                    href="/dashboard/aws"
+                    className="block px-4 py-3 hover:bg-blue-50"
+                    onClick={() => setOpen(false)}
+                  >
+                    ☁️ AWS Integration
+                  </Link>
+                )}
+
+                <Link
+                  href="/perfil"
+                  className="block px-4 py-3 hover:bg-blue-50 border-t"
+                  onClick={() => setOpen(false)}
+                >
+                  👤 Account
+                </Link>
+              </>
             )}
 
             {/* LOGOUT */}
@@ -143,15 +157,13 @@ export default function UserMenu() {
               onClick={handleLogout}
               className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 border-t"
             >
-              🚪 Cerrar sesión
+              🚪 Logout
             </button>
+
           </div>
         )}
       </div>
 
-      {/* =========================
-         LOGOUT TOAST
-      ========================== */}
       {showToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-fade-in-out">
           <div className="bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg">
