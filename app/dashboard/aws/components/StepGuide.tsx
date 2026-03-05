@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function StepGuide() {
 
@@ -48,6 +48,34 @@ export default function StepGuide() {
     if (activeIndex === null) return;
     setActiveIndex((activeIndex - 1 + steps.length) % steps.length);
   };
+
+  useEffect(() => {
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+  
+      if (activeIndex === null) return;
+  
+      if (event.key === "ArrowRight") {
+        setActiveIndex((activeIndex + 1) % steps.length);
+      }
+  
+      if (event.key === "ArrowLeft") {
+        setActiveIndex((activeIndex - 1 + steps.length) % steps.length);
+      }
+  
+      if (event.key === "Escape") {
+        close();
+      }
+  
+    };
+  
+    window.addEventListener("keydown", handleKeyDown);
+  
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  
+  }, [activeIndex]);
 
   return (
 
