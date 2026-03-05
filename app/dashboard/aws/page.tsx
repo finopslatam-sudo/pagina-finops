@@ -16,9 +16,8 @@ export default function AwsIntegrationPage() {
   const [externalId, setExternalId] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<any[]>([]);
   const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
-  const [accountInfo, setAccountInfo] = useState<any>(null);
   const [copied, setCopied] = useState(false);
-
+  const [showConnectionFlow, setShowConnectionFlow] = useState(false);
 
   /* =====================================================
      LOAD STATUS
@@ -55,28 +54,6 @@ export default function AwsIntegrationPage() {
     }
   
   };
-  /* =====================================================
-     LOAD STATUS
-  ===================================================== */
-
-  const loadAccountInfo = async () => {
-
-    try {
-  
-      const res = await apiFetch("/api/client/aws/account", {
-        token
-      });
-  
-      if (res.connected) {
-        setAccountInfo(res);
-      }
-  
-    } catch (err) {
-      console.error(err);
-    }
-  
-  };
-
   /* =====================================================
      CONNECT AWS
   ===================================================== */
@@ -224,9 +201,28 @@ export default function AwsIntegrationPage() {
 
         <div className="bg-white border rounded-2xl p-6 shadow-sm">
 
-          <h3 className="text-lg font-semibold mb-4">
+        <div className="flex justify-between items-center mb-4">
+
+          <h3 className="text-lg font-semibold">
             Cuentas AWS conectadas
           </h3>
+
+          <button
+            onClick={() => setShowConnectionFlow(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            + Add AWS Account
+          </button>
+
+        </div>
+
+        {accounts.length === 0 ? (
+
+          <p className="text-gray-500 text-sm">
+            No hay cuentas AWS conectadas todavía.
+          </p>
+
+        ) : (
 
           <div className="overflow-x-auto">
 
@@ -272,11 +268,15 @@ export default function AwsIntegrationPage() {
 
           </div>
 
+        )}
+
         </div>
 
         )}
 
       {/* ================= INTEGRATION STEPS ================= */}
+      {showConnectionFlow && (
+        <>
 
       <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
 
@@ -383,10 +383,25 @@ export default function AwsIntegrationPage() {
         </div>
 
       )}
+      <div className="flex justify-end mt-4">
+
+        <button
+          onClick={async () => {
+            await checkConnection();
+            setShowConnectionFlow(false);
+          }}
+          className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
+        >
+          Probar conexión
+        </button>
+
+        </div>
 
             {/* ================= STEP GUIDE ================= */}
 
             <StepGuide />
+        </>
+        )}
 
     </div>
 
