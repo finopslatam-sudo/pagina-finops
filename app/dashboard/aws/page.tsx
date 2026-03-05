@@ -300,7 +300,7 @@ export default function AwsIntegrationPage() {
         <ol className="space-y-4 text-gray-600 list-decimal ml-6">
 
           <li>
-            Genera el stack de CloudFormation para crear el rol de auditoría seguro.
+            Genera el stack de CloudFormation con nuevo EXTERNAL ID.
           </li>
 
           <li>
@@ -331,7 +331,7 @@ export default function AwsIntegrationPage() {
         <ActionCard
         title="Conectar AWS"
         description="Generar stack CloudFormation para integrar tu cuenta."
-        button="Add AWS Account"
+        button="Add EXTERNAL ID"
         onClick={handleConnectAws}
         loading={loading}
         />
@@ -366,31 +366,47 @@ export default function AwsIntegrationPage() {
             rel="noopener noreferrer"
             className="text-blue-600 underline block mt-3"
             >
-            Open AWS CloudFormation
+            Link AWS CloudFormation
             </a>
 
 
             {externalId && (
 
-                <div className="flex items-center gap-3">
+              <div className="mt-5">
 
-                <p className="text-lg font-mono font-semibold text-blue-700 break-all">
-                {externalId}
+                {/* separator */}
+
+                <div className="border-t border-blue-200 my-4"></div>
+
+                {/* external id label */}
+
+                <p className="text-xs font-semibold text-blue-900 tracking-wide">
+                  EXTERNAL ID: 
                 </p>
 
-                <button
-                onClick={() => {
-                    navigator.clipboard.writeText(externalId ?? "");
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                }}
-                className="text-gray-500 hover:text-blue-600 transition"
-                >
-                {copied ? <Check size={18} /> : <Copy size={18} />}
-                </button>
+                {/* value + copy */}
+
+                <div className="flex items-center gap-3 mt-2">
+
+                  <p className="text-lg font-mono font-semibold text-blue-700 break-all">
+                    {externalId}
+                  </p>
+
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(externalId ?? "");
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="text-gray-500 hover:text-blue-600 transition"
+                  >
+                    {copied ? <Check size={18} /> : <Copy size={18} />}
+                  </button>
 
                 </div>
-            
+
+              </div>
+
             )}
 
         </div>
