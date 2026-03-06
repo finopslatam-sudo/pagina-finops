@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 
-export default function AdminPlanUpgradesPage() {
+export default function AdminUpgradesPage() {
 
   const { token } = useAuth();
 
@@ -91,26 +91,18 @@ export default function AdminPlanUpgradesPage() {
   if (loading) {
     return (
       <p className="p-6 text-gray-400">
-        Cargando solicitudes de upgrade...
+        Cargando solicitudes...
       </p>
     );
   }
 
   return (
 
-    <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+    <div className="p-6 space-y-6">
 
-      <div>
-
-        <h1 className="text-3xl font-bold">
-          Plan Upgrade Requests
-        </h1>
-
-        <p className="text-gray-600 mt-2">
-          Solicitudes de cambio de plan enviadas por clientes.
-        </p>
-
-      </div>
+      <h1 className="text-2xl font-bold">
+        Solicitudes de Upgrade de Plan
+      </h1>
 
       {requests.length === 0 && (
 
@@ -122,7 +114,7 @@ export default function AdminPlanUpgradesPage() {
 
       {requests.length > 0 && (
 
-        <div className="bg-white border rounded-xl overflow-hidden shadow">
+        <div className="bg-white border rounded-xl overflow-hidden">
 
           <table className="w-full text-sm">
 
@@ -130,11 +122,11 @@ export default function AdminPlanUpgradesPage() {
 
               <tr>
 
-                <th className="text-left p-4">Client ID</th>
-                <th className="text-left p-4">Requested Plan</th>
-                <th className="text-left p-4">Requested By</th>
-                <th className="text-left p-4">Date</th>
-                <th className="text-left p-4">Action</th>
+                <th className="p-4 text-left">Cliente</th>
+                <th className="p-4 text-left">Plan solicitado</th>
+                <th className="p-4 text-left">Solicitado por</th>
+                <th className="p-4 text-left">Fecha</th>
+                <th className="p-4 text-left">Acciones</th>
 
               </tr>
 
