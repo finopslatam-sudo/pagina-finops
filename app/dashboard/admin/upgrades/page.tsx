@@ -100,9 +100,20 @@ export default function AdminUpgradesPage() {
 
     <div className="p-6 space-y-6">
 
-      <h1 className="text-2xl font-bold">
-        Solicitudes de Upgrade de Plan
-      </h1>
+    {/* HEADER CARD */}
+
+    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+
+    <h1 className="text-2xl font-bold text-blue-900">
+        Plan Upgrade Requests
+    </h1>
+
+    <p className="text-blue-700 mt-2">
+        Solicitudes de cambio de plan enviadas por clientes.
+        Revisa el impacto antes de aprobar upgrades.
+    </p>
+
+    </div>
 
       {requests.length === 0 && (
 
@@ -120,13 +131,15 @@ export default function AdminUpgradesPage() {
 
             <thead className="bg-gray-50 border-b">
 
-              <tr>
+                <tr>
 
-                <th className="p-4 text-left">Cliente</th>
+                <th className="p-4 text-left">Cliente ID</th>
+                <th className="p-4 text-left">Empresa</th>
+                <th className="p-4 text-left">Email</th>
+                <th className="p-4 text-left">Plan actual</th>
                 <th className="p-4 text-left">Plan solicitado</th>
-                <th className="p-4 text-left">Solicitado por</th>
                 <th className="p-4 text-left">Fecha</th>
-                <th className="p-4 text-left">Acciones</th>
+                <th className="p-4 text-left">Acción</th>
 
               </tr>
 
@@ -141,21 +154,34 @@ export default function AdminUpgradesPage() {
                   className="border-b hover:bg-gray-50"
                 >
 
-                  <td className="p-4">
-                    {r.client_id}
-                  </td>
 
                   <td className="p-4 font-semibold">
-                    {r.requested_plan}
-                  </td>
+                    {r.client_id}
+                    </td>
 
-                  <td className="p-4">
-                    {r.requested_by_user_id}
-                  </td>
+                    <td className="p-4">
+                    {r.company_name || "-"}
+                    </td>
 
-                  <td className="p-4">
+                    <td className="p-4 text-gray-600">
+                    {r.email || "-"}
+                    </td>
+
+                    <td className="p-4">
+                    <span className="bg-gray-100 px-2 py-1 rounded text-xs">
+                        {r.current_plan}
+                    </span>
+                    </td>
+
+                    <td className="p-4">
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">
+                        {r.requested_plan}
+                    </span>
+                    </td>
+
+                    <td className="p-4 text-gray-500">
                     {new Date(r.created_at).toLocaleString()}
-                  </td>
+                    </td>
 
                   <td className="p-4 space-x-2">
 
