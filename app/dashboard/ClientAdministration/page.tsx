@@ -15,6 +15,9 @@ export default function ClientAdministrationPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [awsAccounts, setAwsAccounts] = useState<number>(0);
 
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
+
   useEffect(() => {
     loadData();
   }, []);
@@ -45,6 +48,40 @@ export default function ClientAdministrationPage() {
 
     }
 
+  };
+
+  const upgradePlan = async (planCode: string) => {
+
+    try {
+  
+      setUpgrading(true);
+  
+      await apiFetch("/api/client/subscription/upgrade", {
+        method: "POST",
+        token,
+        body: {
+          plan_code: planCode
+        }
+      });
+  
+      alert("Plan actualizado correctamente");
+  
+      setShowUpgradeModal(false);
+  
+      await loadData();
+  
+    } catch (err) {
+  
+      console.error(err);
+  
+      alert("No se pudo actualizar el plan");
+  
+    } finally {
+  
+      setUpgrading(false);
+  
+    }
+  
   };
 
   if (loading) {
@@ -148,8 +185,11 @@ export default function ClientAdministrationPage() {
 
               </div>
 
-              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Upgrade Plan
+              <button
+                onClick={() => setShowUpgradeModal(true)}
+                className="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition shadow-lg"
+              >
+                🚀 Upgrade Plan
               </button>
 
             </>
@@ -240,6 +280,106 @@ export default function ClientAdministrationPage() {
         </div>
 
       </div>
+      {/* =========================
+        UPGRADE MODAL
+      ========================= */}
+
+      {showUpgradeModal && (
+
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+        <div className="bg-white rounded-2xl shadow-xl w-[520px] max-h-[80vh] overflow-y-auto p-8 space-y-6">
+
+          <div className="flex justify-between items-center">
+
+            <h2 className="text-xl font-semibold">
+              Upgrade Plan
+            </h2>
+
+            <button
+              onClick={() => setShowUpgradeModal(false)}
+              className="text-gray-400 hover:text-gray-700"
+            >
+              ✕
+            </button>
+
+          </div>
+
+          <p className="text-gray-600 text-sm">
+            Mejora tu plan para desbloquear funcionalidades avanzadas de FinOpsLatam.
+          </p>
+
+          {/* PROFESSIONAL */}
+
+          {subscription?.plan_code === "FINOPS_FOUNDATION" && (
+
+            <div className="border rounded-xl p-6 space-y-4">
+
+              <h3 className="text-lg font-semibold text-blue-700">
+                FinOps Professional
+              </h3>
+
+              <ul className="text-sm space-y-1 text-gray-600">
+                <li>✔ Governance & Compliance</li>
+                <li>✔ Optimization insights</li>
+                <li>✔ Advanced dashboards</li>
+                <li>✔ Multi-account support</li>
+              </ul>
+
+              <button
+                disabled={upgrading}
+                onClick={() => upgradePlan("FINOPS_PROFESSIONAL")}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Upgrade
+              </button>
+
+            </div>
+
+          )}
+
+          {/* ENTERPRISE */}
+
+          {subscription?.plan_code !== "FINOPS_ENTERPRISE" && (
+
+            <div className="border rounded-xl p-6 space-y-4">
+
+              <h3 className="text-lg font-semibold text-purple-700">
+                FinOps Enterprise
+              </h3>
+
+              <ul className="text-sm space-y-1 text-gray-600">
+                <li>✔ Todo lo incluido en Professional</li>
+                <li>✔ Escaneo completo FinOps</li>
+                <li>✔ Reporting avanzado</li>
+                <li>✔ Máximo nivel de optimización</li>
+              </ul>
+
+              <button
+                disabled={upgrading}
+                onClick={() => upgradePlan("FINOPS_ENTERPRISE")}
+                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+              >
+                Upgrade
+              </button>
+
+            </div>
+
+          )}
+
+          {subscription?.plan_code === "FINOPS_ENTERPRISE" && (
+
+            <div className="text-center text-gray-500">
+              Ya estás utilizando el plan más avanzado.
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
+      )}
 
     </div>
 
@@ -299,6 +439,8 @@ function Feature({ text }: any) {
       <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
 
       <span>{text}</span>
+
+    
 
     </div>
 
