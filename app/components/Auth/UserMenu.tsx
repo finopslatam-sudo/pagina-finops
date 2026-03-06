@@ -85,29 +85,39 @@ export default function UserMenu() {
             {/* =========================
               STAFF MENU (SIN CAMBIOS)
             ========================== */}
-
             {isStaff && (
 
-              <>
+            <>
 
-                <Link
-                  href="/dashboard/users"
-                  className="block px-4 py-3 hover:bg-blue-50 border-t"
-                  onClick={() => setOpen(false)}
-                >
-                  👥 Panel de Usuarios
-                </Link>
+              <Link
+                href="/dashboard/users"
+                className="block px-4 py-3 hover:bg-blue-50 border-t"
+                onClick={() => setOpen(false)}
+              >
+                👥 Panel de Usuarios
+              </Link>
 
-                <Link
-                  href="/dashboard/clients"
-                  className="block px-4 py-3 hover:bg-blue-50"
-                  onClick={() => setOpen(false)}
-                >
-                  🏢 Panel de Clientes
-                </Link>
+              <Link
+                href="/dashboard/clients"
+                className="block px-4 py-3 hover:bg-blue-50"
+                onClick={() => setOpen(false)}
+              >
+                🏢 Panel de Clientes
+              </Link>
 
-              </>
+              {/* =========================
+                  PLAN UPGRADE APPROVALS
+              ========================== */}
 
+              <Link
+                href="/dashboard/admin/upgrades"
+                className="block px-4 py-3 hover:bg-blue-50"
+                onClick={() => setOpen(false)}
+              >
+                📈 Aprobaciones de Upgrade
+              </Link>
+
+            </>
             )}
 
 
