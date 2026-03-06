@@ -18,6 +18,7 @@ export default function ClientAdministrationPage() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
   const [upgradeSuccess, setUpgradeSuccess] = useState(false);
+  const [showProcessingModal, setShowProcessingModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -57,6 +58,10 @@ export default function ClientAdministrationPage() {
   
       setUpgrading(true);
   
+      setShowUpgradeModal(false);
+  
+      setShowProcessingModal(true);
+  
       await apiFetch("/api/client/subscription/upgrade", {
         method: "POST",
         token,
@@ -65,7 +70,7 @@ export default function ClientAdministrationPage() {
         }
       });
   
-      setShowUpgradeModal(false);
+      setShowProcessingModal(false);
   
       setUpgradeSuccess(true);
   
@@ -74,6 +79,8 @@ export default function ClientAdministrationPage() {
     } catch (err) {
   
       console.error(err);
+  
+      setShowProcessingModal(false);
   
       alert("No se pudo actualizar el plan");
   
@@ -411,6 +418,31 @@ export default function ClientAdministrationPage() {
           >
             Entendido
           </button>
+
+        </div>
+
+      </div>
+
+      )}
+
+      {/* PROCESSING MODAL */}
+
+      {showProcessingModal && (
+
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+        <div className="bg-white rounded-2xl shadow-xl w-[360px] p-8 text-center space-y-6">
+
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+
+          <h2 className="text-lg font-semibold">
+            Procesando upgrade...
+          </h2>
+
+          <p className="text-gray-500 text-sm">
+            Estamos actualizando tu plan.
+            Esto puede tardar unos segundos.
+          </p>
 
         </div>
 
