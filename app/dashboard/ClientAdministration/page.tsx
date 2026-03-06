@@ -17,6 +17,7 @@ export default function ClientAdministrationPage() {
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
+  const [upgradeSuccess, setUpgradeSuccess] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -64,9 +65,9 @@ export default function ClientAdministrationPage() {
         }
       });
   
-      alert("Plan actualizado correctamente");
-  
       setShowUpgradeModal(false);
+  
+      setUpgradeSuccess(true);
   
       await loadData();
   
@@ -329,9 +330,9 @@ export default function ClientAdministrationPage() {
               <button
                 disabled={upgrading}
                 onClick={() => upgradePlan("FINOPS_PROFESSIONAL")}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
               >
-                Upgrade
+                {upgrading ? "Procesando..." : "Upgrade"}
               </button>
 
             </div>
@@ -374,6 +375,42 @@ export default function ClientAdministrationPage() {
             </div>
 
           )}
+
+        </div>
+
+      </div>
+
+      )}
+
+      {/* SUCCESS MODAL */}
+
+      {upgradeSuccess && (
+
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+        <div className="bg-white rounded-2xl shadow-xl w-[420px] p-8 text-center space-y-6">
+
+          <div className="text-5xl">
+            ✅
+          </div>
+
+          <h2 className="text-xl font-semibold">
+            Upgrade solicitado con éxito
+          </h2>
+
+          <p className="text-gray-600 text-sm leading-relaxed">
+            Un administrador debe aprobar tu solicitud antes de que el cambio
+            de plan sea aplicado.
+            <br /><br />
+            Recibirás un correo cuando el upgrade esté activo.
+          </p>
+
+          <button
+            onClick={() => setUpgradeSuccess(false)}
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Entendido
+          </button>
 
         </div>
 
