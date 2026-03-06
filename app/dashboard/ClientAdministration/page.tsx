@@ -370,7 +370,7 @@ export default function ClientAdministrationPage() {
           {subscription?.plan_code === "FINOPS_ENTERPRISE" && (
 
             <div className="text-center text-gray-500">
-              Ya estás utilizando el plan más avanzado.
+              🎉 Ya estás utilizando el plan más avanzado. 🎉
             </div>
 
           )}
