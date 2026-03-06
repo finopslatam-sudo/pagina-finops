@@ -32,6 +32,8 @@ export interface User {
   force_password_change: boolean;
 
   contact_name?: string | null;
+
+  plan_code?: string | null;
 }
 
 
@@ -43,10 +45,19 @@ interface AuthContextType {
   isAdmin: boolean;
   isSupport: boolean;
   isStaff: boolean;
+
   isOwner: boolean;
   isFinopsAdmin: boolean;
   isViewer: boolean;
-  isClientUser: boolean;  
+  isClientUser: boolean;
+
+  /* =========================
+     PLAN FLAGS
+  ========================== */
+
+  isFoundation: boolean;
+  isProfessional: boolean;
+  isEnterprise: boolean;
 
   isAuthReady: boolean;
 
@@ -102,6 +113,9 @@ export function AuthProvider({
   const isViewer = user?.client_role === "viewer";
 
   const isClientUser = !!user?.client_role;
+  const isFoundation = user?.plan_code === "FINOPS_FOUNDATION";
+  const isProfessional = user?.plan_code === "FINOPS_PROFESSIONAL";
+  const isEnterprise = user?.plan_code === "FINOPS_ENTERPRISE";
 
   /* =========================
      LOGOUT
@@ -284,6 +298,10 @@ export function AuthProvider({
         isFinopsAdmin,
         isViewer,
         isClientUser,
+
+        isFoundation,
+        isProfessional,
+        isEnterprise,
         
         isAuthReady,
         login,

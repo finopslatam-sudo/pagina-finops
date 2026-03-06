@@ -14,7 +14,7 @@ import { useAuth } from '@/app/context/AuthContext';
 
 export default function UserMenu() {
 
-  const { user, logout, isStaff } = useAuth();
+  const { user, logout, isStaff, isFoundation } = useAuth();
 
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -143,6 +143,8 @@ export default function UserMenu() {
                   💰 Cost & Financials
                 </Link>
 
+                {!isFoundation && (
+
                 <Link
                   href="/dashboard/optimization"
                   className="block px-4 py-3 hover:bg-blue-50"
@@ -150,6 +152,9 @@ export default function UserMenu() {
                 >
                   🚀 Optimization
                 </Link>
+                )}
+
+                {!isFoundation && (
 
                 <Link
                   href="/dashboard/gobernanza"
@@ -158,6 +163,7 @@ export default function UserMenu() {
                 >
                   🏛 Governance
                 </Link>
+              )}
 
 
                 {/* =========================
