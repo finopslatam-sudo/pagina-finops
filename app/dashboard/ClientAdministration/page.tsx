@@ -30,7 +30,7 @@ export default function ClientAdministrationPage() {
         apiFetch("/api/client/aws/status", { token })
       ]);
 
-      setClient(clientRes.data);
+      setClient(clientRes);
       setSubscription(subRes.data);
       setUsers(usersRes.data || []);
       setAwsAccounts(awsRes.accounts?.length || 0);
