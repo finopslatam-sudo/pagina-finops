@@ -62,13 +62,17 @@ export default function ClientAdministrationPage() {
   
       setShowProcessingModal(true);
   
-      await apiFetch("/api/client/subscription/upgrade", {
+      const res = await apiFetch("/api/client/subscription/upgrade", {
         method: "POST",
         token,
         body: {
           plan_code: planCode
         }
       });
+      
+      if (!res || res.status !== "pending") {
+        throw new Error("Upgrade request failed");
+      }
   
       setShowProcessingModal(false);
   
@@ -83,7 +87,7 @@ export default function ClientAdministrationPage() {
     
       setShowProcessingModal(false);
     
-      const message = err?.response?.data?.error;
+      const message = err?.message || err?.response?.data?.error;
     
       if (message === "Upgrade request already pending") {
     
