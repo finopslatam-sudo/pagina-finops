@@ -13,8 +13,12 @@ export default function AdminUpgradesPage() {
   const [processingId, setProcessingId] = useState<number | null>(null);
 
   useEffect(() => {
+
+    if (!token) return;
+  
     loadRequests();
-  }, []);
+  
+  }, [token]);
 
   const loadRequests = async () => {
 
@@ -22,7 +26,7 @@ export default function AdminUpgradesPage() {
 
       const res = await apiFetch("/api/admin/upgrades", { token });
 
-      setRequests(res.data || []);
+      setRequests(res?.data ?? []);
 
     } catch (err) {
 
@@ -169,7 +173,7 @@ export default function AdminUpgradesPage() {
 
                     <td className="p-4">
                     <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                        {r.current_plan}
+                        {r.current_plan || "-"}
                     </span>
                     </td>
 
