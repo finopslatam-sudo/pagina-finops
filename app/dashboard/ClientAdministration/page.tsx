@@ -76,15 +76,36 @@ export default function ClientAdministrationPage() {
   
       await loadData();
   
-    } catch (err) {
-  
+    } 
+    catch (err: any) {
+
       console.error(err);
-  
+    
       setShowProcessingModal(false);
-  
-      alert("No se pudo actualizar el plan");
-  
-    } finally {
+    
+      const message = err?.response?.data?.error;
+    
+      if (message === "Upgrade request already pending") {
+    
+        alert(
+          "Ya existe una solicitud de upgrade pendiente. Un administrador debe aprobarla antes de solicitar otra."
+        );
+    
+      } else if (message === "Downgrade not allowed") {
+    
+        alert(
+          "No es posible cambiar a un plan inferior."
+        );
+    
+      } else {
+    
+        alert("No se pudo actualizar el plan");
+    
+      }
+    
+    }
+    
+    finally {
   
       setUpgrading(false);
   
