@@ -156,6 +156,9 @@ export default function ClientAdministrationPage() {
     setShowUserModal(true);
   
   };
+  /* =====================================================
+     Creear Usuario
+  ===================================================== */
 
   const createUser = async () => {
 
@@ -215,7 +218,34 @@ export default function ClientAdministrationPage() {
     }
   
   };
+  /* =====================================================
+     Eeliminar Usuario
+  ===================================================== */
+  const deleteUser = async (userId:number) => {
 
+    if(!confirm("¿Eliminar este usuario?")) return;
+  
+    try {
+  
+      await apiFetch(`/api/client/users/${userId}`,{
+        method:"DELETE",
+        token
+      });
+  
+      setSuccessMessage("Usuario eliminado con éxito");
+  
+      await loadData();
+  
+    } catch(err:any){
+  
+      alert(err?.message || "No se pudo eliminar el usuario");
+  
+    }
+  
+  };
+  /* =====================================================
+     Actualziar Usuario
+  ===================================================== */
   const updateUser = async () => {
 
     try {
@@ -433,28 +463,36 @@ export default function ClientAdministrationPage() {
                     )}
                   </td>
 
-                  <td className="py-3">
+                  <td className="py-3 flex gap-3">
 
-                    <button
-                      onClick={() => {
+                  <button
+                    onClick={() => {
 
-                        setEditingUser(u);
+                      setEditingUser(u);
 
-                        setUserForm({
-                          name: u.contact_name || "",
-                          email: u.email,
-                          role: u.client_role,
-                          password: "",
-                          confirmPassword: ""
-                        });
+                      setUserForm({
+                        name: u.contact_name || "",
+                        email: u.email,
+                        role: u.client_role,
+                        password: "",
+                        confirmPassword: ""
+                      });
 
-                        setShowUserModal(true);
+                      setShowUserModal(true);
 
-                      }}
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      Editar
-                    </button>
+                    }}
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    Editar
+                  </button>
+
+                  <button
+
+                    onClick={() => deleteUser(u.id)}
+                    className="text-red-600 hover:underline text-sm"
+                  >
+                    Eliminar
+                  </button>
 
                   </td>
 
