@@ -143,6 +143,11 @@ export default function ClientAdministrationPage() {
 
   const openCreateUser = () => {
 
+    if(userLimitReached){
+      alert(`Tu plan permite máximo ${userLimit} usuarios.`);
+      return;
+    }
+  
     setEditingUser(null);
   
     setUserForm({
@@ -337,6 +342,22 @@ export default function ClientAdministrationPage() {
   const admins = users.filter(u => u.client_role === "finops_admin").length;
   const viewers = users.filter(u => u.client_role === "viewer").length;
 
+  /* =====================================================
+   USER LIMIT BY PLAN
+  ===================================================== */
+
+  let userLimit = 3;
+
+  if (subscription?.plan_code === "FINOPS_PROFESSIONAL") {
+    userLimit = 9;
+  }
+
+  if (subscription?.plan_code === "FINOPS_ENTERPRISE") {
+    userLimit = 12;
+  }
+
+  const userLimitReached = users.length >= userLimit;
+
   return (
 
     <div className="max-w-7xl mx-auto px-6 space-y-14">
@@ -453,15 +474,27 @@ export default function ClientAdministrationPage() {
 
         <div className="flex justify-between items-center">
 
+          <div className="flex items-center gap-3">
+
           <h2 className="text-xl font-semibold">
             Usuarios de la organización
           </h2>
 
+          <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+            {users.length} / {userLimit}
+          </span>
+
+          </div>
+
           <button
             onClick={openCreateUser}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            disabled={userLimitReached}
+            className={`px-4 py-2 rounded text-white 
+            ${userLimitReached 
+              ? "bg-gray-400 cursor-not-allowed" 
+              : "bg-blue-600 hover:bg-blue-700"}`}
           >
-            + Añadir usuario
+            {userLimitReached ? "Límite alcanzado" : "+ Añadir usuario"}
           </button>
 
         </div>
