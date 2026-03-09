@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/app/context/AuthContext';
+import { useEffect } from "react";
 
 const PrivateRoute = dynamic(
   () => import('@/app/components/Auth/PrivateRoute'),
@@ -20,6 +21,11 @@ const ClientDashboard = dynamic(
 
 function DashboardContent() {
   const { user, isAuthReady } = useAuth();
+  const { refreshUser } = useAuth();
+
+  useEffect(() => {
+    refreshUser();
+  }, []);
 
   if (!isAuthReady) {
     return (

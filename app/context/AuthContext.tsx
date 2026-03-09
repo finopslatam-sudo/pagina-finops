@@ -50,6 +50,7 @@ interface AuthContextType {
   isFinopsAdmin: boolean;
   isViewer: boolean;
   isClientUser: boolean;
+  refreshUser: () => Promise<void>;
 
   /* =========================
      PLAN FLAGS
@@ -280,6 +281,35 @@ export function AuthProvider({
     });
   };
 
+  // =========================
+  // REFRESH USER FROM API
+  // =========================
+
+  const refreshUser = async () => {
+
+    if (!token) return;
+
+    try {
+
+      const freshUser = await apiFetch<User>("/api/me", {
+        token,
+      });
+
+      setUser(freshUser);
+
+      localStorage.setItem(
+        "finops_user",
+        JSON.stringify(freshUser)
+      );
+
+    } catch (err) {
+
+      console.warn("[USER_REFRESH_FAILED]", err);
+
+    }
+
+  };
+
   /* =========================
      PROVIDER EXPORT
   ========================== */
@@ -307,6 +337,7 @@ export function AuthProvider({
         login,
         logout,
         updateUser,
+        refreshUser
 
       }}
     >
