@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useDashboard } from '../hooks/useDashboard';
 import { useAuth } from '@/app/context/AuthContext';
+import { hasFeature } from '@/app/lib/hasFeature';
 
 type RightsizingResponse = {
   has_data: boolean;
@@ -16,6 +17,7 @@ type RIResponse = {
   coverage_percentage: number;
   has_reserved_instances: boolean;
   has_data: boolean;
+
   period_days: number;
 };
 
@@ -28,7 +30,7 @@ type SPResponse = {
 
 export default function OptimizationPage() {
   const { data, loading, error } = useDashboard();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
   const [rightsizing, setRightsizing] = useState<RightsizingResponse | null>(null);
   const [ri, setRI] = useState<RIResponse | null>(null);

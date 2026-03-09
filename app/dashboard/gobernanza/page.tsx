@@ -8,10 +8,25 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useAuth } from '@/app/context/AuthContext';
+import { hasFeature } from '@/app/lib/hasFeature';
 
 export default function GobernanzaPage() {
   const { data, loading } = useDashboard();
+  const { user } = useAuth();
 
+  // =============================
+  // PLAN FEATURE CHECK
+  // =============================
+
+  if (!hasFeature(user?.plan_code, "gobernanza")) {
+    return (
+      <div className="p-6 text-red-500">
+        Este módulo requiere plan Professional o Enterprise
+      </div>
+    );
+  }
+  
   if (loading) {
     return <p className="p-6 text-gray-400">Cargando gobernanza...</p>;
   }
