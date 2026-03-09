@@ -22,13 +22,6 @@ export default function ClientAdministrationPage() {
   const [showProcessingModal, setShowProcessingModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  /* =====================================================
-    RESET PASSWORD CONFIRMATION
-  ===================================================== */
-
-  const [resetUserId, setResetUserId] = useState<number | null>(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-
   // ==========================
   // USER MODALS
   // ==========================
@@ -45,6 +38,12 @@ export default function ClientAdministrationPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  /* =====================================================
+    RESET PASSWORD OPTION
+  ===================================================== */
+
+  const [resetPasswordEnabled, setResetPasswordEnabled] = useState(false);
 
   useEffect(() => {
 
@@ -165,6 +164,7 @@ export default function ClientAdministrationPage() {
       confirmPassword: ""
     });
   
+    setResetPasswordEnabled(false);
     setShowUserModal(true);
   
   };
@@ -231,7 +231,7 @@ export default function ClientAdministrationPage() {
   
   };
   /* =====================================================
-     Eeliminar Usuario
+     Eliminar Usuario
   ===================================================== */
   const deleteUser = async (userId:number) => {
 
@@ -251,36 +251,6 @@ export default function ClientAdministrationPage() {
     } catch(err:any){
   
       alert(err?.message || "No se pudo eliminar el usuario");
-  
-    }
-  
-  };
-
-  /* =====================================================
-    Reset Password Usuario
-  ===================================================== */
-
-  const resetPassword = async () => {
-
-    if(!resetUserId) return;
-  
-    try {
-  
-      await apiFetch(`/api/client/users/${resetUserId}/reset-password`,{
-        method:"POST",
-        token
-      });
-  
-      setShowResetConfirm(false);
-      setResetUserId(null);
-  
-      setSuccessMessage(
-        "Se generó una contraseña temporal y fue enviada por correo al usuario."
-      );
-  
-    } catch(err:any){
-  
-      alert(err?.message || "No se pudo resetear la contraseña");
   
     }
   
@@ -328,8 +298,34 @@ export default function ClientAdministrationPage() {
         }
       });
   
+      /* =====================================
+         RESET PASSWORD OPCIONAL
+      ===================================== */
+  
+      if(resetPasswordEnabled){
+  
+        if(!userForm.password || userForm.password.length < 8){
+          alert("La nueva contraseña debe tener al menos 8 caracteres");
+          return;
+        }
+  
+        if(userForm.password !== userForm.confirmPassword){
+          alert("Las contraseñas no coinciden");
+          return;
+        }
+  
+        await apiFetch(`/api/client/users/${editingUser.id}/set-password`,{
+          method:"POST",
+          token,
+          body:{
+            password:userForm.password
+          }
+        });
+  
+      }
+  
       setShowUserModal(false);
-
+  
       setSuccessMessage("Cambios guardados con éxito");
   
       await loadData();
@@ -589,21 +585,23 @@ export default function ClientAdministrationPage() {
                   <td className="py-3 flex items-center gap-4">
 
                   <button
-                    onClick={() => {
+                  onClick={() => {
 
-                      setEditingUser(u);
+                    setEditingUser(u);
 
-                      setUserForm({
-                        name: u.contact_name || "",
-                        email: u.email,
-                        role: u.client_role,
-                        password: "",
-                        confirmPassword: ""
-                      });
+                    setUserForm({
+                      name: u.contact_name || "",
+                      email: u.email,
+                      role: u.client_role,
+                      password: "",
+                      confirmPassword: ""
+                    });
 
-                      setShowUserModal(true);
+                    setResetPasswordEnabled(false);
 
-                    }}
+                    setShowUserModal(true);
+
+                  }}
                     className="text-blue-600 hover:underline text-sm"
                   >
                     Editar
@@ -867,6 +865,75 @@ export default function ClientAdministrationPage() {
 
           </select>
 
+          {/* RESET PASSWORD SOLO EDICION */}
+
+          {editingUser && (
+
+          <div className="border rounded-lg p-4 space-y-4">
+
+          <label className="flex items-center gap-2 text-sm">
+
+          <input
+            type="checkbox"
+            checked={resetPasswordEnabled}
+            onChange={(e)=>setResetPasswordEnabled(e.target.checked)}
+          />
+
+          <span>Resetear contraseña del usuario</span>
+
+          </label>
+
+          {resetPasswordEnabled && (
+
+          <>
+          <div className="relative">
+
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Nueva contraseña"
+            value={userForm.password}
+            onChange={(e)=>setUserForm({...userForm,password:e.target.value})}
+            className="w-full border rounded p-2 pr-10"
+          />
+
+          <button
+            type="button"
+            onClick={()=>setShowPassword(!showPassword)}
+            className="absolute right-3 top-2.5 text-gray-500"
+          >
+          {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+          </button>
+
+          </div>
+
+          <div className="relative">
+
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Confirmar nueva contraseña"
+            value={userForm.confirmPassword}
+            onChange={(e)=>setUserForm({...userForm,confirmPassword:e.target.value})}
+            className="w-full border rounded p-2 pr-10"
+          />
+
+          <button
+            type="button"
+            onClick={()=>setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-3 top-2.5 text-gray-500"
+          >
+          {showConfirmPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+          </button>
+
+          </div>
+
+          </>
+
+          )}
+
+          </div>
+
+          )}
+
           {/* PASSWORD SOLO CREACION */}
 
           {!editingUser && (
@@ -918,89 +985,22 @@ export default function ClientAdministrationPage() {
           {/* BOTON */}
 
           <button
-            onClick={editingUser ? updateUser : createUser}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          onClick={editingUser ? updateUser : createUser}
+          disabled={
+            resetPasswordEnabled &&
+            (!userForm.password || !userForm.confirmPassword)
+          }
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
           >
 
             {editingUser ? "Guardar cambios" : "Crear usuario"}
 
-          {/* RESET PASSWORD SOLO EN EDICION */}
-
-          {editingUser && (
-
-          <button
-            onClick={() => {
-              setResetUserId(editingUser.id);
-              setShowResetConfirm(true);
-            }}
-            className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700"
-          >
-            Resetear contraseña
-          </button>
-
-          )}
 
           </button>
 
         </div>
 
         
-
-      </div>
-
-      )}
-
-      {/* =========================
-        RESET PASSWORD CONFIRM MODAL
-      ========================= */}
-
-      {showResetConfirm && (
-
-      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-
-        <div className="bg-white rounded-2xl shadow-xl w-[420px] p-8 text-center space-y-6">
-
-          <div className="text-4xl">
-            🔐
-          </div>
-
-          <h2 className="text-lg font-semibold">
-            Resetear contraseña
-          </h2>
-
-          <p className="text-gray-600 text-sm leading-relaxed">
-
-            Se generará una contraseña temporal para este usuario
-            y será enviada automáticamente a su correo electrónico.
-
-            <br /><br />
-
-            El usuario deberá cambiarla al iniciar sesión.
-
-          </p>
-
-          <div className="flex gap-3 justify-center">
-
-            <button
-              onClick={()=>{
-                setShowResetConfirm(false);
-                setResetUserId(null);
-              }}
-              className="px-4 py-2 rounded border"
-            >
-              Cancelar
-            </button>
-
-            <button
-              onClick={resetPassword}
-              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-            >
-              Resetear contraseña
-            </button>
-
-          </div>
-
-        </div>
 
       </div>
 
