@@ -22,6 +22,13 @@ export default function ClientAdministrationPage() {
   const [showProcessingModal, setShowProcessingModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  /* =====================================================
+    RESET PASSWORD CONFIRMATION
+  ===================================================== */
+
+  const [resetUserId, setResetUserId] = useState<number | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
   // ==========================
   // USER MODALS
   // ==========================
@@ -253,25 +260,30 @@ export default function ClientAdministrationPage() {
     Reset Password Usuario
   ===================================================== */
 
-  const resetPassword = async (userId:number) => {
+  const resetPassword = async () => {
 
-    if(!confirm("¿Resetear la contraseña de este usuario?")) return;
-
+    if(!resetUserId) return;
+  
     try {
-
-      await apiFetch(`/api/client/users/${userId}/reset-password`,{
+  
+      await apiFetch(`/api/client/users/${resetUserId}/reset-password`,{
         method:"POST",
         token
       });
-
-      setSuccessMessage("Password temporal generado y enviado por correo");
-
+  
+      setShowResetConfirm(false);
+      setResetUserId(null);
+  
+      setSuccessMessage(
+        "Se generó una contraseña temporal y fue enviada por correo al usuario."
+      );
+  
     } catch(err:any){
-
+  
       alert(err?.message || "No se pudo resetear la contraseña");
-
+  
     }
-
+  
   };
 
   /* =====================================================
@@ -528,17 +540,17 @@ export default function ClientAdministrationPage() {
 
         <div className="overflow-x-auto">
 
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
 
             <thead className="border-b text-gray-500">
 
               <tr>
 
-                <th className="py-2 text-left">Nombre</th>
-                <th className="py-2 text-left">Email</th>
-                <th className="py-2 text-left">Rol</th>
-                <th className="py-2 text-left">Estado</th>
-                <th className="py-2 text-left">Acción</th>
+                <th className="py-2 text-left w-1/5">Nombre</th>
+                <th className="py-2 text-left w-2/5">Email</th>
+                <th className="py-2 text-left w-1/5">Rol</th>
+                <th className="py-2 text-left w-1/5">Estado</th>
+                <th className="py-2 text-left w-1/5">Acción</th>
 
               </tr>
 
@@ -574,7 +586,7 @@ export default function ClientAdministrationPage() {
                     )}
                   </td>
 
-                  <td className="py-3 flex gap-3">
+                  <td className="py-3 flex items-center gap-4">
 
                   <button
                     onClick={() => {
@@ -615,17 +627,6 @@ export default function ClientAdministrationPage() {
                     className="text-emerald-600 hover:underline text-sm"
                   >
                     Activar
-                  </button>
-
-                  )}
-
-                  {u.client_role !== "owner" && (
-
-                  <button
-                    onClick={() => resetPassword(u.id)}
-                    className="text-purple-600 hover:underline text-sm"
-                  >
-                    Reset password
                   </button>
 
                   )}
@@ -923,11 +924,83 @@ export default function ClientAdministrationPage() {
 
             {editingUser ? "Guardar cambios" : "Crear usuario"}
 
+          {/* RESET PASSWORD SOLO EN EDICION */}
+
+          {editingUser && (
+
+          <button
+            onClick={() => {
+              setResetUserId(editingUser.id);
+              setShowResetConfirm(true);
+            }}
+            className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700"
+          >
+            Resetear contraseña
+          </button>
+
+          )}
+
           </button>
 
         </div>
 
         
+
+      </div>
+
+      )}
+
+      {/* =========================
+        RESET PASSWORD CONFIRM MODAL
+      ========================= */}
+
+      {showResetConfirm && (
+
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+        <div className="bg-white rounded-2xl shadow-xl w-[420px] p-8 text-center space-y-6">
+
+          <div className="text-4xl">
+            🔐
+          </div>
+
+          <h2 className="text-lg font-semibold">
+            Resetear contraseña
+          </h2>
+
+          <p className="text-gray-600 text-sm leading-relaxed">
+
+            Se generará una contraseña temporal para este usuario
+            y será enviada automáticamente a su correo electrónico.
+
+            <br /><br />
+
+            El usuario deberá cambiarla al iniciar sesión.
+
+          </p>
+
+          <div className="flex gap-3 justify-center">
+
+            <button
+              onClick={()=>{
+                setShowResetConfirm(false);
+                setResetUserId(null);
+              }}
+              className="px-4 py-2 rounded border"
+            >
+              Cancelar
+            </button>
+
+            <button
+              onClick={resetPassword}
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+            >
+              Resetear contraseña
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 
