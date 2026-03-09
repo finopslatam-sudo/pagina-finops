@@ -70,7 +70,8 @@ export default function ClientAdministrationPage() {
         }
       });
       
-      if (!res || res.status !== "pending") {
+      if (!res || !res.data || res.data.status !== "pending") {
+        console.error("Unexpected API response:", res);
         throw new Error("Upgrade request failed");
       }
   
@@ -465,8 +466,8 @@ export default function ClientAdministrationPage() {
           </h2>
 
           <p className="text-gray-500 text-sm">
-            Estamos actualizando tu plan.
-            Esto puede tardar unos segundos.
+            Enviando solicitud de upgrade...
+            Un administrador debe aprobar tu solicitud.
           </p>
 
         </div>
