@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function ClientAdministrationPage() {
 
@@ -19,6 +20,7 @@ export default function ClientAdministrationPage() {
   const [upgrading, setUpgrading] = useState(false);
   const [upgradeSuccess, setUpgradeSuccess] = useState(false);
   const [showProcessingModal, setShowProcessingModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // ==========================
   // USER MODALS
@@ -34,6 +36,8 @@ export default function ClientAdministrationPage() {
     password: "",
     confirmPassword: ""
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
 
@@ -192,6 +196,8 @@ export default function ClientAdministrationPage() {
   
       setShowUserModal(false);
 
+      setSuccessMessage("Usuario creado con éxito");
+
       setUserForm({
         name: "",
         email: "",
@@ -225,6 +231,8 @@ export default function ClientAdministrationPage() {
       });
   
       setShowUserModal(false);
+
+      setSuccessMessage("Cambios guardados con éxito");
   
       await loadData();
   
@@ -689,21 +697,45 @@ export default function ClientAdministrationPage() {
           {!editingUser && (
 
             <>
+            <div className="relative">
+
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Contraseña"
               value={userForm.password}
               onChange={(e)=>setUserForm({...userForm,password:e.target.value})}
-              className="w-full border rounded p-2"
+              className="w-full border rounded p-2 pr-10"
             />
 
+            <button
+              type="button"
+              onClick={()=>setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 text-gray-500"
+            >
+              {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+            </button>
+
+            </div>
+
+            <div className="relative">
+
             <input
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirmar contraseña"
               value={userForm.confirmPassword}
               onChange={(e)=>setUserForm({...userForm,confirmPassword:e.target.value})}
-              className="w-full border rounded p-2"
+              className="w-full border rounded p-2 pr-10"
             />
+
+            <button
+              type="button"
+              onClick={()=>setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-2.5 text-gray-500"
+            >
+              {showConfirmPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+            </button>
+
+            </div>
             </>
 
           )}
@@ -721,11 +753,46 @@ export default function ClientAdministrationPage() {
 
         </div>
 
+        
+
       </div>
 
       )}
 
-    </div>
+      {/* =========================
+        USER SUCCESS MODAL
+      ========================= */}
+
+      {successMessage && (
+
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+          <div className="bg-white rounded-2xl shadow-xl w-[380px] p-8 text-center space-y-6">
+
+            <div className="text-4xl">
+              🎉
+            </div>
+
+            <h2 className="text-lg font-semibold">
+              {successMessage}
+            </h2>
+
+            <button
+              onClick={()=>setSuccessMessage(null)}
+              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            >
+              Entendido
+            </button>
+
+          </div>
+
+        </div>
+
+      )}
+
+      </div>
+
+    
 
   );
 
