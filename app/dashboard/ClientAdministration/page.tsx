@@ -499,6 +499,33 @@ export default function ClientAdministrationPage() {
 
         </div>
 
+        {userLimitReached && (
+
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+
+          <div className="text-sm text-amber-800">
+
+            <p className="font-semibold">
+              ⚠️ Has alcanzado el límite de usuarios de tu plan.
+            </p>
+
+            <p>
+              Actualiza tu suscripción para agregar más usuarios y cuentas AWS.
+            </p>
+
+          </div>
+
+          <button
+            onClick={() => setShowUpgradeModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+          >
+            Upgrade Plan
+          </button>
+
+        </div>
+
+        )}
+
         <div className="overflow-x-auto">
 
           <table className="w-full text-sm">
