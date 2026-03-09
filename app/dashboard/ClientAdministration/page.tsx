@@ -243,6 +243,57 @@ export default function ClientAdministrationPage() {
     }
   
   };
+
+  /* =====================================================
+    Reset Password Usuario
+  ===================================================== */
+
+  const resetPassword = async (userId:number) => {
+
+    if(!confirm("¿Resetear la contraseña de este usuario?")) return;
+
+    try {
+
+      await apiFetch(`/api/client/users/${userId}/reset-password`,{
+        method:"POST",
+        token
+      });
+
+      setSuccessMessage("Password temporal generado y enviado por correo");
+
+    } catch(err:any){
+
+      alert(err?.message || "No se pudo resetear la contraseña");
+
+    }
+
+  };
+
+  /* =====================================================
+    Activar Usuario
+  ===================================================== */
+
+  const activateUser = async (userId:number) => {
+
+    try {
+
+      await apiFetch(`/api/client/users/${userId}/activate`,{
+        method:"PATCH",
+        token
+      });
+
+      setSuccessMessage("Usuario reactivado con éxito");
+
+      await loadData();
+
+    } catch(err:any){
+
+      alert(err?.message || "No se pudo activar el usuario");
+
+    }
+
+  };
+
   /* =====================================================
      Actualziar Usuario
   ===================================================== */
@@ -486,13 +537,38 @@ export default function ClientAdministrationPage() {
                     Editar
                   </button>
 
-                  <button
+                  {u.client_role !== "owner" && u.is_active && (
 
+                  <button
                     onClick={() => deleteUser(u.id)}
                     className="text-red-600 hover:underline text-sm"
                   >
-                    Eliminar
+                    Desactivar
                   </button>
+
+                  )}
+
+                  {!u.is_active && (
+
+                  <button
+                    onClick={() => activateUser(u.id)}
+                    className="text-emerald-600 hover:underline text-sm"
+                  >
+                    Activar
+                  </button>
+
+                  )}
+
+                  {u.client_role !== "owner" && (
+
+                  <button
+                    onClick={() => resetPassword(u.id)}
+                    className="text-purple-600 hover:underline text-sm"
+                  >
+                    Reset password
+                  </button>
+
+                  )}
 
                   </td>
 
