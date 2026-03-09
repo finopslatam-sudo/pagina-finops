@@ -20,9 +20,28 @@ export default function ClientAdministrationPage() {
   const [upgradeSuccess, setUpgradeSuccess] = useState(false);
   const [showProcessingModal, setShowProcessingModal] = useState(false);
 
+  // ==========================
+  // USER MODALS
+  // ==========================
+
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
+
+  const [userForm, setUserForm] = useState({
+    name: "",
+    email: "",
+    role: "viewer",
+    password: "",
+    confirmPassword: ""
+  });
+
   useEffect(() => {
-    loadData();
-  }, []);
+
+    if (token) {
+      loadData();
+    }
+  
+  }, [token]);
 
   const loadData = async () => {
 
@@ -113,6 +132,105 @@ export default function ClientAdministrationPage() {
     finally {
   
       setUpgrading(false);
+  
+    }
+  
+  };
+
+  const openCreateUser = () => {
+
+    setEditingUser(null);
+  
+    setUserForm({
+      name: "",
+      email: "",
+      role: "viewer",
+      password: "",
+      confirmPassword: ""
+    });
+  
+    setShowUserModal(true);
+  
+  };
+
+  const createUser = async () => {
+
+    // ==========================
+    // VALIDAR CAMPOS OBLIGATORIOS
+    // ==========================
+  
+    if (
+      !userForm.name.trim() ||
+      !userForm.email.trim() ||
+      !userForm.password.trim()
+    ) {
+      alert("Todos los campos son obligatorios");
+      return;
+    }
+  
+    // ==========================
+    // VALIDAR CONTRASEÑAS
+    // ==========================
+  
+    if (userForm.password !== userForm.confirmPassword) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+  
+    try {
+  
+      await apiFetch("/api/client/users", {
+        method: "POST",
+        token,
+        body: {
+          name: userForm.name,
+          email: userForm.email,
+          role: userForm.role,
+          password: userForm.password
+        }
+      });
+  
+      setShowUserModal(false);
+
+      setUserForm({
+        name: "",
+        email: "",
+        role: "viewer",
+        password: "",
+        confirmPassword: ""
+      });
+  
+      await loadData();
+  
+    } catch (err:any) {
+  
+      alert(err?.message || "No se pudo crear el usuario");
+  
+    }
+  
+  };
+
+  const updateUser = async () => {
+
+    try {
+  
+      await apiFetch(`/api/client/users/${editingUser.id}`, {
+        method: "PUT",
+        token,
+        body: {
+          name: userForm.name,
+          email: userForm.email,
+          role: userForm.role
+        }
+      });
+  
+      setShowUserModal(false);
+  
+      await loadData();
+  
+    } catch (err:any) {
+  
+      alert(err?.message || "No se pudo actualizar el usuario");
   
     }
   
@@ -250,7 +368,10 @@ export default function ClientAdministrationPage() {
             Usuarios de la organización
           </h2>
 
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          <button
+            onClick={openCreateUser}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
             + Añadir usuario
           </button>
 
@@ -268,6 +389,7 @@ export default function ClientAdministrationPage() {
                 <th className="py-2 text-left">Email</th>
                 <th className="py-2 text-left">Rol</th>
                 <th className="py-2 text-left">Estado</th>
+                <th className="py-2 text-left">Acción</th>
 
               </tr>
 
@@ -302,6 +424,32 @@ export default function ClientAdministrationPage() {
                       </span>
                     )}
                   </td>
+
+                  <td className="py-3">
+
+                    <button
+                      onClick={() => {
+
+                        setEditingUser(u);
+
+                        setUserForm({
+                          name: u.contact_name || "",
+                          email: u.email,
+                          role: u.client_role,
+                          password: "",
+                          confirmPassword: ""
+                        });
+
+                        setShowUserModal(true);
+
+                      }}
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      Editar
+                    </button>
+
+                  </td>
+
 
                 </tr>
 
@@ -469,6 +617,107 @@ export default function ClientAdministrationPage() {
             Enviando solicitud de upgrade...
             Un administrador debe aprobar tu solicitud.
           </p>
+
+        </div>
+
+      </div>
+
+      )}
+
+      {showUserModal && (
+
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+        <div className="bg-white rounded-2xl shadow-xl w-[480px] p-8 space-y-6">
+
+          <div className="flex justify-between items-center">
+
+            <h2 className="text-xl font-semibold">
+
+              {editingUser ? "Editar usuario" : "Crear usuario"}
+
+            </h2>
+
+            <button
+              onClick={() => {
+                setShowUserModal(false);
+                setEditingUser(null);
+              }}
+              className="text-gray-400 hover:text-gray-700"
+            >
+              ✕
+            </button>
+
+          </div>
+
+          {/* NOMBRE */}
+
+          <input
+            type="text"
+            placeholder="Nombre"
+            value={userForm.name}
+            onChange={(e)=>setUserForm({...userForm,name:e.target.value})}
+            className="w-full border rounded p-2"
+          />
+
+          {/* EMAIL */}
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={userForm.email}
+            onChange={(e)=>setUserForm({...userForm,email:e.target.value})}
+            className="w-full border rounded p-2"
+          />
+
+          {/* ROLE */}
+
+          <select
+            value={userForm.role}
+            onChange={(e)=>setUserForm({...userForm,role:e.target.value})}
+            className="w-full border rounded p-2"
+          >
+
+            <option value="viewer">Viewer</option>
+            <option value="finops_admin">FinOps Admin</option>
+            <option value="owner">Owner</option>
+
+          </select>
+
+          {/* PASSWORD SOLO CREACION */}
+
+          {!editingUser && (
+
+            <>
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={userForm.password}
+              onChange={(e)=>setUserForm({...userForm,password:e.target.value})}
+              className="w-full border rounded p-2"
+            />
+
+            <input
+              type="password"
+              placeholder="Confirmar contraseña"
+              value={userForm.confirmPassword}
+              onChange={(e)=>setUserForm({...userForm,confirmPassword:e.target.value})}
+              className="w-full border rounded p-2"
+            />
+            </>
+
+          )}
+
+          {/* BOTON */}
+
+          <button
+            onClick={editingUser ? updateUser : createUser}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          >
+
+            {editingUser ? "Guardar cambios" : "Crear usuario"}
+
+          </button>
 
         </div>
 
