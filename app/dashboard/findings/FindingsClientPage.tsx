@@ -35,6 +35,7 @@ export default function FindingsPage() {
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
 
   const [scanModal, setScanModal] = useState(false);
+  const [scanSuccess, setScanSuccess] = useState(false);
   const { token } = useAuth();
   const [runningAudit, setRunningAudit] = useState(false);
   const [lastScan, setLastScan] = useState<string | null>(null);
@@ -142,16 +143,16 @@ export default function FindingsPage() {
         token
       });
   
-      // Toast notification
-      alert("✔ Audit started successfully");
-  
-      // Esperar unos segundos para que backend procese
+      // Esperar procesamiento del backend
       setTimeout(async () => {
   
         await refetch();
         await refetchStats();
   
         setScanModal(false);
+  
+        setScanSuccess(true);
+  
         setLastScan(new Date().toISOString());
   
       }, 7000);
@@ -194,6 +195,8 @@ export default function FindingsPage() {
 
         </div>
 
+        <div className="flex flex-col items-end">
+
         <button
           onClick={runAudit}
           disabled={runningAudit}
@@ -208,9 +211,21 @@ export default function FindingsPage() {
         )}
 
         {runningAudit ? "Scanning..." : "Run Scan"}
+
         </button>
 
-      </div>
+        {lastScan && (
+
+        <p className="text-xs text-gray-500 mt-2">
+
+        Last scan: {new Date(lastScan).toLocaleString()}
+
+        </p>
+
+        )}
+
+        </div>
+        </div>
 
       {/* ================= STATS ================= */}
       {stats && (
@@ -292,6 +307,40 @@ export default function FindingsPage() {
             FinOpsLatam está analizando tu infraestructura cloud.
             Este proceso puede tardar unos segundos.
           </p>
+
+        </div>
+
+      </div>
+
+      )}
+
+      {/* ================= SCAN SUCCESS ================= */}
+
+      {scanSuccess && (
+
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+        <div className="bg-white rounded-2xl shadow-xl w-[420px] p-8 text-center space-y-6">
+
+          <div className="text-5xl">
+            ✅
+          </div>
+
+          <h2 className="text-lg font-semibold">
+            Scan completed successfully
+          </h2>
+
+          <p className="text-gray-500 text-sm">
+            FinOpsLatam terminó de analizar tu infraestructura cloud.
+            Los findings han sido actualizados.
+          </p>
+
+          <button
+            onClick={() => setScanSuccess(false)}
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Entendido
+          </button>
 
         </div>
 
