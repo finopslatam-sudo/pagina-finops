@@ -16,6 +16,8 @@ import FindingsFilters from "./components/FindingsFilters";
 import FindingsDrawer from "./components/FindingsDrawer";
 
 import { Finding } from "./types";
+import { apiFetch } from "@/app/lib/api";
+import { useAuth } from "@/app/context/AuthContext";
 
 /* =====================================================
    MAIN COMPONENT
@@ -31,6 +33,8 @@ export default function FindingsPage() {
   const [search, setSearch] = useState("");
   const [service, setService] = useState("");
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
+  const { token } = useAuth();
+  const [runningAudit, setRunningAudit] = useState(false);
 
   /* ================= HOOKS ================= */
 
@@ -101,6 +105,33 @@ export default function FindingsPage() {
     setSelectedFinding(null);
   };
 
+  const runAudit = async () => {
+
+    try {
+  
+      setRunningAudit(true);
+  
+      await apiFetch("/api/client/audit/run", {
+        method: "POST",
+        token
+      });
+  
+      await refetch();
+      await refetchStats();
+  
+    } catch (err) {
+  
+      console.error(err);
+      alert("Error ejecutando auditoría");
+  
+    } finally {
+  
+      setRunningAudit(false);
+  
+    }
+  
+  };
+
   /* =====================================================
      RENDER
   ===================================================== */
@@ -109,13 +140,33 @@ export default function FindingsPage() {
     <div className="max-w-7xl mx-auto px-6 space-y-14">
 
       {/* ================= HEADER ================= */}
-      <div className="bg-slate-100 border border-blue-300 p-8 rounded-3xl shadow-sm">
-        <h1 className="text-3xl font-semibold text-slate-800">
-          Risk & Findings
-        </h1>
-        <p className="text-slate-600 mt-3">
-          Hallazgos de riesgo detectados en tu entorno cloud y oportunidades de optimización.
-        </p>
+
+      <div className="bg-slate-100 border border-blue-300 p-8 rounded-3xl shadow-sm flex justify-between items-center">
+
+        <div>
+
+          <h1 className="text-3xl font-semibold text-slate-800">
+            Risk & Findings
+          </h1>
+
+          <p className="text-slate-600 mt-3">
+            Hallazgos de riesgo detectados en tu entorno cloud y oportunidades de optimización.
+          </p>
+
+        </div>
+
+        <button
+          onClick={runAudit}
+          disabled={runningAudit}
+          className={`px-5 py-3 rounded-xl text-white font-semibold
+          ${runningAudit
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"}
+          `}
+        >
+          {runningAudit ? "Running audit..." : "Run Scan"}
+        </button>
+
       </div>
 
       {/* ================= STATS ================= */}
