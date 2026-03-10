@@ -393,10 +393,10 @@ export default function ClientAdministrationPage() {
             Información de la organización
           </h2>
 
-          <Info label="Empresa" value={client.company_name} />
-          <Info label="Email" value={client.email} />
-          <Info label="Contacto" value={client.contact_name || "—"} />
-          <Info label="Teléfono" value={client.phone || "—"} />
+          <Info label="Empresa" value={client?.company_name || "—"} />
+          <Info label="Email" value={client?.email || "—"} />
+          <Info label="Contacto" value={client?.contact_name || "—"} />
+          <Info label="Teléfono" value={client?.phone || "—"} />
 
         </div>
 
