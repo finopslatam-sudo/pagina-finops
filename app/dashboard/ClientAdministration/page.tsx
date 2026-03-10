@@ -21,7 +21,7 @@ export default function ClientAdministrationPage() {
   const [upgradeSuccess, setUpgradeSuccess] = useState(false);
   const [showProcessingModal, setShowProcessingModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
+  const [savingUser, setSavingUser] = useState(false);
   // ==========================
   // USER MODALS
   // ==========================
@@ -287,7 +287,9 @@ export default function ClientAdministrationPage() {
   const updateUser = async () => {
 
     try {
-
+  
+      setSavingUser(true);
+  
       await apiFetch(`/api/client/users/${editingUser.id}`, {
         method: "PUT",
         token,
@@ -297,32 +299,36 @@ export default function ClientAdministrationPage() {
           role: userForm.role
         }
       });
-
+  
       if(resetPasswordEnabled){
-
+  
         await apiFetch(`/api/client/users/${editingUser.id}/reset-password`,{
           method:"POST",
           token
         });
-
+  
       }
-
+  
       setShowUserModal(false);
-
+  
       setSuccessMessage(
         resetPasswordEnabled
           ? "Usuario actualizado y contraseña temporal enviada al correo."
           : "Cambios guardados con éxito"
       );
-
+  
       await loadData();
-
+  
     } catch (err:any) {
-
+  
       alert(err?.message || "No se pudo actualizar el usuario");
-
+  
+    } finally {
+  
+      setSavingUser(false);
+  
     }
-
+  
   };
 
   /* =====================================================
@@ -928,10 +934,18 @@ export default function ClientAdministrationPage() {
 
           <button
           onClick={editingUser ? updateUser : createUser}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          disabled={savingUser}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
           >
 
-            {editingUser ? "Guardar cambios" : "Crear usuario"}
+          {savingUser ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              Guardando...
+            </>
+          ) : (
+            editingUser ? "Guardar cambios" : "Crear usuario"
+          )}
 
 
           </button>
