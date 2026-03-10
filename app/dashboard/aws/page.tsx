@@ -31,12 +31,24 @@ export default function AwsIntegrationPage() {
     }
   }, [token]);
 
+  useEffect(() => {
+
+    const interval = setInterval(() => {
+      if (token) {
+        checkConnection();
+      }
+    }, 8000);
+  
+    return () => clearInterval(interval);
+  
+  }, [token]);
+
   const checkConnection = async () => {
 
     try {
   
       const res = await apiFetch<{
-        status: string
+        status: "connected" | "pending" | "disconnected"
         accounts: any[]
         accounts_limit: number
         accounts_used: number
@@ -47,15 +59,20 @@ export default function AwsIntegrationPage() {
       setAccounts(res.accounts || []);
       setAccountLimit(res.accounts_limit || 1);
   
+      // usar status del backend directamente
+      setStatus(res.status || "disconnected");
+  
+      // si ya hay cuentas, cerrar flow
       if (res.accounts && res.accounts.length > 0) {
-        setStatus("connected");
-      } else {
-        setStatus("disconnected");
+        setShowConnectionFlow(false);
       }
   
-    } catch {
+    } catch (err) {
+  
+      console.error(err);
       setStatus("disconnected");
       setAccounts([]);
+  
     }
   
   };
@@ -465,8 +482,14 @@ export default function AwsIntegrationPage() {
         
             <button
               onClick={async () => {
+
                 await checkConnection();
-                setShowConnectionFlow(false);
+
+                // refrescar inmediatamente UI
+                setTimeout(async () => {
+                  await checkConnection();
+                }, 1500);
+
               }}
               className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
             >
