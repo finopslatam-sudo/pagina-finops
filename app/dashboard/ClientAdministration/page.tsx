@@ -282,24 +282,12 @@ export default function ClientAdministrationPage() {
   };
 
   /* =====================================================
-     Actualziar Usuario
+    Actualizar Usuario
   ===================================================== */
   const updateUser = async () => {
 
     try {
-  
-      if(resetPasswordEnabled){
-  
-        const confirmReset = confirm(
-          "Se generará una contraseña temporal para este usuario y será enviada por correo. ¿Deseas continuar?"
-        );
-  
-        if(!confirmReset){
-          return;
-        }
-  
-      }
-  
+
       await apiFetch(`/api/client/users/${editingUser.id}`, {
         method: "PUT",
         token,
@@ -309,45 +297,40 @@ export default function ClientAdministrationPage() {
           role: userForm.role
         }
       });
-  
+
       if(resetPasswordEnabled){
-  
+
         await apiFetch(`/api/client/users/${editingUser.id}/reset-password`,{
           method:"POST",
           token
         });
-  
+
       }
-  
+
       setShowUserModal(false);
-  
-      setSuccessMessage("Cambios guardados con éxito");
-  
+
+      setSuccessMessage(
+        resetPasswordEnabled
+          ? "Usuario actualizado y contraseña temporal enviada al correo."
+          : "Cambios guardados con éxito"
+      );
+
       await loadData();
-  
+
     } catch (err:any) {
-  
+
       alert(err?.message || "No se pudo actualizar el usuario");
-  
+
     }
-  
+
   };
-
-  if (loading) {
-    return <p className="p-6 text-gray-400">Cargando administración...</p>;
-  }
-
-  if (!client) {
-    return <p className="p-6 text-red-500">Error cargando datos</p>;
-  }
-
-  const owners = users.filter(u => u.client_role === "owner").length;
-  const admins = users.filter(u => u.client_role === "finops_admin").length;
-  const viewers = users.filter(u => u.client_role === "viewer").length;
 
   /* =====================================================
    USER LIMIT BY PLAN
   ===================================================== */
+  const owners = users.filter((u:any) => u.client_role === "owner").length;
+  const admins = users.filter((u:any) => u.client_role === "finops_admin").length;
+  const viewers = users.filter((u:any) => u.client_role === "viewer").length;
 
   let userLimit = 3;
 
@@ -360,6 +343,7 @@ export default function ClientAdministrationPage() {
   }
 
   const userLimitReached = users.length >= userLimit;
+
 
   return (
 
