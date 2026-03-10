@@ -14,6 +14,7 @@ export default function AwsIntegrationPage() {
   const [loading, setLoading] = useState(false);
   const [cloudformationUrl, setCloudformationUrl] = useState<string | null>(null);
   const [externalId, setExternalId] = useState<string | null>(null);
+  const [roleArn, setRoleArn] = useState("");
   const [accounts, setAccounts] = useState<any[]>([]);
   const [accountLimit, setAccountLimit] = useState<number>(1);
   const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
@@ -456,6 +457,23 @@ export default function AwsIntegrationPage() {
                     <p className="text-lg font-mono font-semibold text-blue-700 break-all">
                       {externalId}
                     </p>
+                    {/* ROLE ARN INPUT */}
+
+                    <div className="mt-4">
+
+                    <p className="text-xs font-semibold text-blue-900 tracking-wide">
+                      ROLE ARN
+                    </p>
+
+                    <input
+                      type="text"
+                      placeholder="arn:aws:iam::123456789012:role/FinOpsLatamRole"
+                      value={roleArn}
+                      onChange={(e) => setRoleArn(e.target.value)}
+                      className="border rounded px-3 py-2 w-full mt-2"
+                    />
+
+                    </div>
         
                     <button
                       onClick={() => {
@@ -482,11 +500,14 @@ export default function AwsIntegrationPage() {
         
             <button
             onClick={async () => {
-            
+
               try {
-            
-                const roleArn = `arn:aws:iam::${externalId}:role/FinOpsLatamRole`;
-            
+
+                if (!roleArn || !externalId) {
+                  alert("Debes ingresar el Role ARN");
+                  return;
+                }
+
                 await apiFetch("/api/client/aws/validate", {
                   method: "POST",
                   token,
@@ -495,18 +516,18 @@ export default function AwsIntegrationPage() {
                     external_id: externalId
                   })
                 });
-            
+
                 await checkConnection();
-            
+
                 setShowConnectionFlow(false);
-            
+
               } catch (err) {
-            
+
                 console.error(err);
                 alert("Error validating AWS connection");
-            
+
               }
-            
+
             }}
             className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
             >
