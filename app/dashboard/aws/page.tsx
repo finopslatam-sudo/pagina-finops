@@ -481,19 +481,36 @@ export default function AwsIntegrationPage() {
           <div className="flex justify-end mt-4">
         
             <button
-              onClick={async () => {
-
+            onClick={async () => {
+            
+              try {
+            
+                const roleArn = `arn:aws:iam::${externalId}:role/FinOpsLatamRole`;
+            
+                await apiFetch("/api/client/aws/validate", {
+                  method: "POST",
+                  token,
+                  body: JSON.stringify({
+                    role_arn: roleArn,
+                    external_id: externalId
+                  })
+                });
+            
                 await checkConnection();
-
-                // refrescar inmediatamente UI
-                setTimeout(async () => {
-                  await checkConnection();
-                }, 1500);
-
-              }}
-              className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
+            
+                setShowConnectionFlow(false);
+            
+              } catch (err) {
+            
+                console.error(err);
+                alert("Error validating AWS connection");
+            
+              }
+            
+            }}
+            className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
             >
-              Probar conexión
+            Probar conexión
             </button>
         
           </div>
