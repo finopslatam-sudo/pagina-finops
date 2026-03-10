@@ -82,7 +82,9 @@ export default function FindingsPage() {
   
       try {
   
-        const res = await apiFetch("/api/client/dashboard/last-scan");
+        const res = await apiFetch("/api/client/dashboard/last-scan", {
+          token
+        });
   
         if (res.last_scan) {
           setLastScan(res.last_scan);

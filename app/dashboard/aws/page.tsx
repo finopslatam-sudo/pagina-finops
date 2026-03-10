@@ -187,7 +187,7 @@ export default function AwsIntegrationPage() {
 
         </div>
 
-        <p className="text-sm mt-2 opacity-80">
+        <div className="text-sm mt-2 opacity-80">
 
           {accounts.length > 0 &&
             `FinOpsLatam tiene acceso a ${accounts.length} cuenta(s) AWS para auditoría y análisis FinOps.`
@@ -199,13 +199,32 @@ export default function AwsIntegrationPage() {
           {status === "disconnected" &&
             "No existe una cuenta AWS conectada a tu organización."}
 
-        </p>
+          </div>
+
+          {status === "connected" && (
+
+          <div className="mt-4">
+
+          <button
+            onClick={runAudit}
+            disabled={loading}
+            className={`px-4 py-2 rounded-lg text-white
+            ${loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-emerald-600 hover:bg-emerald-700"}
+            `}
+          >
+            {loading ? "Running audit..." : "Run Audit Scan"}
+          </button>
+
+          </div>
+
+          )}
+
 
       </div>
 
-      {accounts.length > 0 && (
-
-        <div className="bg-white border rounded-2xl p-6 shadow-sm">
+      <div className="bg-white border rounded-2xl p-6 shadow-sm">
 
         <div className="flex justify-between items-center mb-4">
 
@@ -231,7 +250,7 @@ export default function AwsIntegrationPage() {
               </p>
 
               <p>
-                Actualiza tu suscripción para agregar más usuarios y cuentas AWS.
+                Actualiza tu suscripción para agregar más usuarios y cuentas AWS. 
               </p>
 
             </div>
@@ -332,161 +351,144 @@ export default function AwsIntegrationPage() {
 
         </div>
 
-        )}
-
       {/* ================= INTEGRATION STEPS ================= */}
       {showConnectionFlow && (
-        <>
 
-      <div
-        ref={stepsRef}
-        className="bg-white p-8 rounded-3xl border shadow-xl space-y-6"
-      >
-
-        <h2 className="text-xl font-semibold">
-          Pasos para conectar tu cuenta AWS
-        </h2>
-
-        <ol className="space-y-4 text-gray-600 list-decimal ml-6">
-
-          <li>
-            Genera el stack de CloudFormation con nuevo EXTERNAL ID.
-          </li>
-
-          <li>
-          Descargar el archivo YAML.
-          </li>
-
-          <li>
-            Has click en el hipervinculo "Open AWS CloudFormation".
-          </li>
-
-          <li>
-            Copia el contenido numeral de "External ID" lo necesitaras mas adelante.
-          </li>
-
-          <li>
-            Luego sigue los pasos de las imagenes.
-          </li>
-
-        </ol>
-
-      </div>
-
-
-      {/* ================= ACTIONS ================= */}
-
-      <div className="grid md:grid-cols-2 gap-6">
-
-        <ActionCard
-        title="Conectar AWS"
-        description="Generar stack CloudFormation para integrar tu cuenta."
-        button="Create External ID"
-        onClick={handleConnectAws}
-        loading={loading}
-        />
-
-        <ActionCard
-        title="Descargar Template"
-        description="Descarga el archivo YAML de CloudFormation."
-        button="Download YAML"
-        link="/api/client/aws/template"
-        />
-
-        </div>
-
-
-      {/* ================= CLOUD FORMATION LINK ================= */}
-
-      {cloudformationUrl && (
-
-        <div className="bg-blue-50 border border-blue-200 p-6 rounded-2xl">
-
-          <h3 className="font-semibold text-blue-900">
-            CloudFormation Stack
-          </h3>
-
-          <p className="text-sm mt-2 text-blue-700">
-            Abre el siguiente enlace para desplegar el stack en tu cuenta AWS.
-          </p>
-
-          <a
-            href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline block mt-3"
-            >
-            Link AWS CloudFormation
-            </a>
-
-
-            {externalId && (
-
-              <div className="mt-5">
-
-                {/* separator */}
-
-                <div className="border-t border-blue-200 my-4"></div>
-
-                {/* external id label */}
-
-                <p className="text-xs font-semibold text-blue-900 tracking-wide">
-                  EXTERNAL ID: 
-                </p>
-
-                {/* value + copy */}
-
-                <div className="flex items-center gap-3 mt-2">
-
-                  <p className="text-lg font-mono font-semibold text-blue-700 break-all">
-                    {externalId}
+        <div className="space-y-10">
+        
+          <div
+            ref={stepsRef}
+            className="bg-white p-8 rounded-3xl border shadow-xl space-y-6"
+          >
+        
+            <h2 className="text-xl font-semibold">
+              Pasos para conectar tu cuenta AWS
+            </h2>
+        
+            <ol className="space-y-4 text-gray-600 list-decimal ml-6">
+        
+              <li>Genera el stack de CloudFormation con nuevo EXTERNAL ID.</li>
+              <li>Descargar el archivo YAML.</li>
+              <li>Has click en el hipervinculo "Open AWS CloudFormation".</li>
+              <li>Copia el contenido numeral de "External ID" lo necesitaras mas adelante.</li>
+              <li>Luego sigue los pasos de las imagenes.</li>
+        
+            </ol>
+        
+          </div>
+        
+        
+          {/* ================= ACTIONS ================= */}
+        
+          <div className="grid md:grid-cols-2 gap-6">
+        
+            <ActionCard
+              title="Conectar AWS"
+              description="Generar stack CloudFormation para integrar tu cuenta."
+              button="Create External ID"
+              onClick={handleConnectAws}
+              loading={loading}
+            />
+        
+            <ActionCard
+              title="Descargar Template"
+              description="Descarga el archivo YAML de CloudFormation."
+              button="Download YAML"
+              link="/api/client/aws/template"
+            />
+        
+          </div>
+        
+        
+          {/* ================= CLOUD FORMATION LINK ================= */}
+        
+          {cloudformationUrl && (
+        
+            <div className="bg-blue-50 border border-blue-200 p-6 rounded-2xl">
+        
+              <h3 className="font-semibold text-blue-900">
+                CloudFormation Stack
+              </h3>
+        
+              <p className="text-sm mt-2 text-blue-700">
+                Abre el siguiente enlace para desplegar el stack en tu cuenta AWS.
+              </p>
+        
+              <a
+                href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline block mt-3"
+              >
+                Link AWS CloudFormation
+              </a>
+        
+        
+              {externalId && (
+        
+                <div className="mt-5">
+        
+                  <div className="border-t border-blue-200 my-4"></div>
+        
+                  <p className="text-xs font-semibold text-blue-900 tracking-wide">
+                    EXTERNAL ID:
                   </p>
-
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(externalId ?? "");
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className="text-gray-500 hover:text-blue-600 transition"
-                  >
-                    {copied ? <Check size={18} /> : <Copy size={18} />}
-                  </button>
-
+        
+                  <div className="flex items-center gap-3 mt-2">
+        
+                    <p className="text-lg font-mono font-semibold text-blue-700 break-all">
+                      {externalId}
+                    </p>
+        
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(externalId ?? "");
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="text-gray-500 hover:text-blue-600 transition"
+                    >
+                      {copied ? <Check size={18} /> : <Copy size={18} />}
+                    </button>
+        
+                  </div>
+        
                 </div>
-
-              </div>
-
-            )}
-
+        
+              )}
+        
+            </div>
+        
+          )}
+        
+          <div className="flex justify-end mt-4">
+        
+            <button
+              onClick={async () => {
+                await checkConnection();
+                setShowConnectionFlow(false);
+              }}
+              className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
+            >
+              Probar conexión
+            </button>
+        
+          </div>
+        
+        
+          {/* ================= STEP GUIDE ================= */}
+        
+          <StepGuide />
+        
         </div>
-
-      )}
-      <div className="flex justify-end mt-4">
-
-        <button
-          onClick={async () => {
-            await checkConnection();
-            setShowConnectionFlow(false);
-          }}
-          className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
-        >
-          Probar conexión
-        </button>
-
-        </div>
-
-            {/* ================= STEP GUIDE ================= */}
-
-            <StepGuide />
-        </>
+        
         )}
-
-    </div>
-
-  );
-
-}
+        
+        </div>
+        
+        );
+        
+        }
 
 /* =====================================================
    ACTION CARD
