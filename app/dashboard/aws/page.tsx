@@ -15,6 +15,7 @@ export default function AwsIntegrationPage() {
   const [cloudformationUrl, setCloudformationUrl] = useState<string | null>(null);
   const [externalId, setExternalId] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<any[]>([]);
+  const [accountLimit, setAccountLimit] = useState<number>(1);
   const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
   const [copied, setCopied] = useState(false);
   const [showConnectionFlow, setShowConnectionFlow] = useState(false);
@@ -37,11 +38,14 @@ export default function AwsIntegrationPage() {
       const res = await apiFetch<{
         status: string
         accounts: any[]
+        accounts_limit: number
+        accounts_used: number
       }>("/api/client/aws/status", {
         token
       });
   
       setAccounts(res.accounts || []);
+      setAccountLimit(res.accounts_limit || 1);
   
       if (res.accounts && res.accounts.length > 0) {
         setStatus("connected");
@@ -145,6 +149,7 @@ export default function AwsIntegrationPage() {
   };
 
   const current = statusConfig[status];
+  const accountLimitReached = accounts.length >= accountLimit;
 
   return (
 
@@ -204,12 +209,52 @@ export default function AwsIntegrationPage() {
 
         <div className="flex justify-between items-center mb-4">
 
+        <div className="flex items-center gap-3">
+
           <h3 className="text-lg font-semibold">
             Cuentas AWS conectadas
           </h3>
 
+          <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+            {accounts.length} / {accountLimit}
+          </span>
+
+          </div>
+          {accountLimitReached && (
+
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between mb-4">
+
+            <div className="text-sm text-amber-800">
+
+              <p className="font-semibold">
+                ⚠️ Has alcanzado el límite de cuentas AWS de tu plan.
+              </p>
+
+              <p>
+                Actualiza tu suscripción para agregar más usuarios y cuentas AWS.
+              </p>
+
+            </div>
+
+            <button
+              onClick={() => window.location.href="/dashboard/ClientAdministration"}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+            >
+              Upgrade Plan
+            </button>
+
+          </div>
+
+          )}
+
           <button
+          disabled={accountLimitReached}
           onClick={() => {
+
+            if(accountLimitReached){
+              return;
+            }
+
             setShowConnectionFlow(true);
 
             setTimeout(() => {
@@ -218,8 +263,13 @@ export default function AwsIntegrationPage() {
                 block: "start"
               });
             }, 200);
+
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className={`px-4 py-2 rounded-lg text-white
+          ${accountLimitReached
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"}
+          `}
           >
           + Add AWS Account
           </button>
