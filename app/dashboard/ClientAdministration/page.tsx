@@ -288,6 +288,18 @@ export default function ClientAdministrationPage() {
 
     try {
   
+      if(resetPasswordEnabled){
+  
+        const confirmReset = confirm(
+          "Se generará una contraseña temporal para este usuario y será enviada por correo. ¿Deseas continuar?"
+        );
+  
+        if(!confirmReset){
+          return;
+        }
+  
+      }
+  
       await apiFetch(`/api/client/users/${editingUser.id}`, {
         method: "PUT",
         token,
@@ -298,28 +310,11 @@ export default function ClientAdministrationPage() {
         }
       });
   
-      /* =====================================
-         RESET PASSWORD OPCIONAL
-      ===================================== */
-  
       if(resetPasswordEnabled){
   
-        if(!userForm.password || userForm.password.length < 8){
-          alert("La nueva contraseña debe tener al menos 8 caracteres");
-          return;
-        }
-  
-        if(userForm.password !== userForm.confirmPassword){
-          alert("Las contraseñas no coinciden");
-          return;
-        }
-  
-        await apiFetch(`/api/client/users/${editingUser.id}/set-password`,{
+        await apiFetch(`/api/client/users/${editingUser.id}/reset-password`,{
           method:"POST",
-          token,
-          body:{
-            password:userForm.password
-          }
+          token
         });
   
       }
@@ -869,66 +864,29 @@ export default function ClientAdministrationPage() {
 
           {editingUser && (
 
-          <div className="border rounded-lg p-4 space-y-4">
+          <div className="border rounded-lg p-4 space-y-3">
 
-          <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm">
 
-          <input
-            type="checkbox"
-            checked={resetPasswordEnabled}
-            onChange={(e)=>setResetPasswordEnabled(e.target.checked)}
-          />
+              <input
+                type="checkbox"
+                checked={resetPasswordEnabled}
+                onChange={(e)=>setResetPasswordEnabled(e.target.checked)}
+              />
 
-          <span>Resetear contraseña del usuario</span>
+              <span>Resetear contraseña del usuario</span>
 
-          </label>
+            </label>
 
-          {resetPasswordEnabled && (
+            {resetPasswordEnabled && (
 
-          <>
-          <div className="relative">
+              <p className="text-xs text-amber-600">
 
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Nueva contraseña"
-            value={userForm.password}
-            onChange={(e)=>setUserForm({...userForm,password:e.target.value})}
-            className="w-full border rounded p-2 pr-10"
-          />
+                ⚠ Se generará una contraseña temporal y el usuario deberá cambiarla al iniciar sesión.
 
-          <button
-            type="button"
-            onClick={()=>setShowPassword(!showPassword)}
-            className="absolute right-3 top-2.5 text-gray-500"
-          >
-          {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
-          </button>
+              </p>
 
-          </div>
-
-          <div className="relative">
-
-          <input
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="Confirmar nueva contraseña"
-            value={userForm.confirmPassword}
-            onChange={(e)=>setUserForm({...userForm,confirmPassword:e.target.value})}
-            className="w-full border rounded p-2 pr-10"
-          />
-
-          <button
-            type="button"
-            onClick={()=>setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-2.5 text-gray-500"
-          >
-          {showConfirmPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
-          </button>
-
-          </div>
-
-          </>
-
-          )}
+            )}
 
           </div>
 
@@ -986,10 +944,6 @@ export default function ClientAdministrationPage() {
 
           <button
           onClick={editingUser ? updateUser : createUser}
-          disabled={
-            resetPasswordEnabled &&
-            (!userForm.password || !userForm.confirmPassword)
-          }
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
           >
 
