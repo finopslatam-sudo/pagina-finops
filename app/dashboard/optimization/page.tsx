@@ -69,6 +69,18 @@ export default function OptimizationPage() {
     fetchFinops();
   }, [token]);
 
+  // =============================
+  // PLAN FEATURE CHECK
+  // =============================
+
+  if (!hasFeature(user?.plan_code, "optimization")) {
+    return (
+      <div className="p-6 text-red-500">
+        Este módulo requiere plan Professional o Enterprise
+      </div>
+    );
+  }
+
   if (loading || loadingFinops) {
     return <div className="p-6 text-gray-400">Cargando optimización...</div>;
   }
