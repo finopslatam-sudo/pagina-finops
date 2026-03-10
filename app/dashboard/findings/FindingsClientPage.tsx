@@ -33,8 +33,11 @@ export default function FindingsPage() {
   const [search, setSearch] = useState("");
   const [service, setService] = useState("");
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
+
+  const [scanModal, setScanModal] = useState(false);
   const { token } = useAuth();
   const [runningAudit, setRunningAudit] = useState(false);
+  const [lastScan, setLastScan] = useState<string | null>(null);
 
   /* ================= HOOKS ================= */
 
@@ -71,6 +74,28 @@ export default function FindingsPage() {
       setPage(1);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+
+    const loadLastScan = async () => {
+  
+      try {
+  
+        const res = await apiFetch("/api/client/dashboard/last-scan");
+  
+        if (res.last_scan) {
+          setLastScan(res.last_scan);
+        }
+  
+      } catch (err) {
+        console.error(err);
+      }
+  
+    };
+  
+    loadLastScan();
+  
+  }, []);
 
   /* =====================================================
      HANDLERS
@@ -110,19 +135,33 @@ export default function FindingsPage() {
     try {
   
       setRunningAudit(true);
+      setScanModal(true);
   
       await apiFetch("/api/client/audit/run", {
         method: "POST",
         token
       });
   
-      await refetch();
-      await refetchStats();
+      // Toast notification
+      alert("✔ Audit started successfully");
+  
+      // Esperar unos segundos para que backend procese
+      setTimeout(async () => {
+  
+        await refetch();
+        await refetchStats();
+  
+        setScanModal(false);
+        setLastScan(new Date().toISOString());
+  
+      }, 7000);
   
     } catch (err) {
   
       console.error(err);
       alert("Error ejecutando auditoría");
+  
+      setScanModal(false);
   
     } finally {
   
@@ -158,13 +197,17 @@ export default function FindingsPage() {
         <button
           onClick={runAudit}
           disabled={runningAudit}
-          className={`px-5 py-3 rounded-xl text-white font-semibold
+          className={`px-5 py-3 rounded-xl text-white font-semibold flex items-center gap-2
           ${runningAudit
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-blue-600 hover:bg-blue-700"}
           `}
         >
-          {runningAudit ? "Running audit..." : "Run Scan"}
+        {runningAudit && (
+        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+        )}
+
+        {runningAudit ? "Scanning..." : "Run Scan"}
         </button>
 
       </div>
@@ -230,6 +273,31 @@ export default function FindingsPage() {
         )}
 
       </div>
+
+      {/* ================= SCAN MODAL ================= */}
+
+      {scanModal && (
+
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+        <div className="bg-white rounded-2xl shadow-xl w-[420px] p-8 text-center space-y-6">
+
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+
+          <h2 className="text-lg font-semibold">
+            Scanning AWS resources...
+          </h2>
+
+          <p className="text-gray-500 text-sm">
+            FinOpsLatam está analizando tu infraestructura cloud.
+            Este proceso puede tardar unos segundos.
+          </p>
+
+        </div>
+
+      </div>
+
+      )}
 
       {/* ================= DRAWER ================= */}
       <FindingsDrawer
