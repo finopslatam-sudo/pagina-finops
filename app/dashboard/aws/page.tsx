@@ -511,10 +511,10 @@ export default function AwsIntegrationPage() {
                 await apiFetch("/api/client/aws/validate", {
                   method: "POST",
                   token,
-                  body: JSON.stringify({
+                  body: {
                     role_arn: roleArn,
                     external_id: externalId
-                  })
+                  }
                 });
 
                 await checkConnection();
