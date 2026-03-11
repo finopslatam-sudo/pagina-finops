@@ -3,21 +3,21 @@
 interface Props {
   connected: boolean;
   accountId?: string;
-  roleArn?: string;
   onConnect: () => void;
   onDisconnect: () => void;
   onRunAudit: () => void;
   loading?: boolean;
+  onTestConnection: () => void;
 }
 
 export default function AwsConnectionCard({
   connected,
   accountId,
-  roleArn,
   onConnect,
   onDisconnect,
   onRunAudit,
-  loading
+  loading,
+  onTestConnection
 }: Props) {
 
   return (
@@ -76,18 +76,6 @@ export default function AwsConnectionCard({
 
           </div>
 
-          <div>
-
-            <span className="text-gray-500 text-sm">
-              Role ARN
-            </span>
-
-            <div className="font-mono text-sm">
-              {roleArn}
-            </div>
-
-          </div>
-
           <div className="flex gap-3 pt-3">
 
             <button
@@ -95,6 +83,13 @@ export default function AwsConnectionCard({
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             >
               Run Audit
+            </button>
+
+            <button
+              onClick={onTestConnection}
+              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+            >
+              Test Connection
             </button>
 
             <button

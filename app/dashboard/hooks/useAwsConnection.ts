@@ -4,11 +4,16 @@ import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 
-interface AwsConnectionStatus {
-  connected: boolean;
-  account_id?: string;
-  role_arn?: string;
-  external_id?: string;
+interface AwsAccount {
+  account_id: string;
+  role_arn: string;
+}
+
+interface AwsStatus {
+  status: "connected" | "disconnected";
+  accounts: AwsAccount[];
+  accounts_used: number;
+  accounts_limit: number;
 }
 
 export function useAwsConnection() {
@@ -18,9 +23,7 @@ export function useAwsConnection() {
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
 
-  const [connection, setConnection] = useState<AwsConnectionStatus>({
-    connected: false
-  });
+  const [status, setStatus] = useState<AwsStatus | null>(null);
 
   /* ============================================
      GET CONNECTION STATUS
@@ -34,24 +37,18 @@ export function useAwsConnection() {
 
       setLoading(true);
 
-      const res = await apiFetch<{
-        connected: boolean;
-        account_id?: string;
-        role_arn?: string;
-        external_id?: string;
-      }>("/api/client/aws/status", {
-        token
-      });
+      const res = await apiFetch<AwsStatus>(
+        "/api/client/aws/status",
+        { token }
+      );
 
-      setConnection(res);
+      setStatus(res);
 
     } catch (error) {
 
       console.error("AWS status error:", error);
 
-      setConnection({
-        connected: false
-      });
+      setStatus(null);
 
     } finally {
 
@@ -95,43 +92,31 @@ export function useAwsConnection() {
   };
 
   /* ============================================
-     VALIDATE ROLE
+     VALIDATE CONNECTION
   ============================================ */
 
-  const validateRole = async (roleArn: string) => {
+  const validateConnection = async (
+    accountId: string,
+    externalId: string
+  ) => {
 
-    const res = await apiFetch("/api/client/aws/validate", {
-      method: "POST",
-      token,
-      body: {
-        role_arn: roleArn
+    const res = await apiFetch(
+      "/api/client/aws/validate",
+      {
+        method: "POST",
+        token,
+        body: {
+          account_id: accountId,
+          external_id: externalId
+        }
       }
-    });
+    );
 
     await fetchStatus();
 
     return res;
 
   };
-
-  /* ============================================
-     DISCONNECT AWS
-  ============================================ */
-
-  const disconnectAws = async () => {
-
-    await apiFetch("/api/client/aws/disconnect", {
-      method: "POST",
-      token
-    });
-
-    await fetchStatus();
-
-  };
-
-  /* ============================================
-     LOAD STATUS
-  ============================================ */
 
   useEffect(() => {
 
@@ -144,11 +129,10 @@ export function useAwsConnection() {
     loading,
     connecting,
 
-    connection,
+    status,
 
     connectAws,
-    validateRole,
-    disconnectAws,
+    validateConnection,
     refresh: fetchStatus
 
   };
