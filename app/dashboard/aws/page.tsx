@@ -14,7 +14,7 @@ export default function AwsIntegrationPage() {
   const [loading, setLoading] = useState(false);
   const [cloudformationUrl, setCloudformationUrl] = useState<string | null>(null);
   const [externalId, setExternalId] = useState<string | null>(null);
-  const [roleArn, setRoleArn] = useState("");
+  const [accountId, setAccountId] = useState("");
   const [accounts, setAccounts] = useState<any[]>([]);
   const [accountLimit, setAccountLimit] = useState<number>(1);
   const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
@@ -433,7 +433,9 @@ export default function AwsIntegrationPage() {
               </p>
         
               <a
-                href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create"
+                /*href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create" */
+
+                href={cloudformationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 underline block mt-3"
@@ -462,14 +464,14 @@ export default function AwsIntegrationPage() {
                     <div className="mt-4">
 
                     <p className="text-xs font-semibold text-blue-900 tracking-wide">
-                      ROLE ARN
+                      AWS ACCOUNT ID
                     </p>
 
                     <input
                       type="text"
-                      placeholder="arn:aws:iam::123456789012:role/FinOpsLatamRole"
-                      value={roleArn}
-                      onChange={(e) => setRoleArn(e.target.value)}
+                      placeholder="123456789012"
+                      value={accountId}
+                      onChange={(e) => setAccountId(e.target.value)}
                       className="border rounded px-3 py-2 w-full mt-2"
                     />
 
@@ -503,8 +505,13 @@ export default function AwsIntegrationPage() {
 
               try {
 
-                if (!roleArn || !externalId) {
-                  alert("Debes ingresar el Role ARN");
+                if (!accountId || !externalId) {
+                  alert("Debes ingresar el AWS Account ID");
+                  return;
+                }
+                
+                if (!/^\d{12}$/.test(accountId)) {
+                  alert("AWS Account ID debe tener 12 dígitos");
                   return;
                 }
 
@@ -512,7 +519,7 @@ export default function AwsIntegrationPage() {
                   method: "POST",
                   token,
                   body: {
-                    role_arn: roleArn,
+                    account_id: accountId,
                     external_id: externalId
                   }
                 });

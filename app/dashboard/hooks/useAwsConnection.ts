@@ -31,7 +31,10 @@ export function useAwsConnection() {
 
   const fetchStatus = useCallback(async () => {
 
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     try {
 
@@ -100,7 +103,10 @@ export function useAwsConnection() {
     externalId: string
   ) => {
 
-    const res = await apiFetch(
+    const res = await apiFetch<{
+      status: string;
+      account_id: string;
+    }>(
       "/api/client/aws/validate",
       {
         method: "POST",
@@ -124,17 +130,27 @@ export function useAwsConnection() {
 
   }, [fetchStatus]);
 
+  const connected = status?.status === "connected";
+
+  const primaryAccount: AwsAccount | null =
+    status?.accounts && status.accounts.length > 0
+      ? status.accounts[0]
+      : null; 
+
   return {
 
     loading,
     connecting,
-
+  
     status,
-
+  
+    connected,
+    primaryAccount,
+  
     connectAws,
     validateConnection,
     refresh: fetchStatus
-
+  
   };
 
 }

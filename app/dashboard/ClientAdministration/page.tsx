@@ -15,6 +15,7 @@ export default function ClientAdministrationPage() {
   const [subscription, setSubscription] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [awsAccounts, setAwsAccounts] = useState<number>(0);
+  const [awsAccountsLimit, setAwsAccountsLimit] = useState<number>(0);
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
@@ -67,11 +68,14 @@ export default function ClientAdministrationPage() {
       setClient(clientRes);
       setSubscription(subRes.data);
       setUsers(usersRes.data || []);
-      setAwsAccounts(awsRes.accounts?.length || 0);
+      setAwsAccounts(awsRes.accounts_used || 0);
+      setAwsAccountsLimit(awsRes.accounts_limit || 0);
 
-    } catch (err) {
+    } catch (err: any) {
 
       console.error(err);
+
+      console.error("Error al cargar los datos de administración del cliente:", err);
 
     } finally {
 
