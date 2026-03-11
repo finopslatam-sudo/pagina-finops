@@ -455,40 +455,42 @@ export default function AwsIntegrationPage() {
                   </p>
         
                   <div className="flex items-center gap-3 mt-2">
-        
-                    <p className="text-lg font-mono font-semibold text-blue-700 break-all">
-                      {externalId}
-                    </p>
-                    {/* ROLE ARN INPUT */}
 
-                    <div className="mt-4">
+                  <p className="text-lg font-mono font-semibold text-blue-700 break-all">
+                    {externalId}
+                  </p>
 
-                    <p className="text-xs font-semibold text-blue-900 tracking-wide">
-                      AWS ACCOUNT ID
-                    </p>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(externalId ?? "");
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="text-gray-500 hover:text-blue-600 transition"
+                  >
+                    {copied ? <Check size={18} /> : <Copy size={18} />}
+                  </button>
 
-                    <input
-                      type="text"
-                      placeholder="123456789012"
-                      value={accountId}
-                      onChange={(e) => setAccountId(e.target.value)}
-                      className="border rounded px-3 py-2 w-full mt-2"
-                    />
-
-                    </div>
-        
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(externalId ?? "");
-                        setCopied(true);
-                        setTimeout(() => setCopied(false), 2000);
-                      }}
-                      className="text-gray-500 hover:text-blue-600 transition"
-                    >
-                      {copied ? <Check size={18} /> : <Copy size={18} />}
-                    </button>
-        
                   </div>
+
+                  {/* AWS ACCOUNT ID INPUT */}
+
+                  <div className="mt-6">
+
+                  <p className="text-xs font-semibold text-blue-900 tracking-wide">
+                    AWS ACCOUNT ID
+                  </p>
+
+                  <input
+                    type="text"
+                    placeholder="123456789012"
+                    value={accountId}
+                    onChange={(e) => setAccountId(e.target.value)}
+                    className="border rounded px-3 py-2 w-72 mt-2"
+                  />
+
+                  </div>
+      
         
                 </div>
         
