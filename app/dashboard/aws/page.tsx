@@ -30,7 +30,7 @@ export default function AwsIntegrationPage() {
     if (token) {
       checkConnection();
     }
-  }, [token, showConnectionFlow]);
+  }, [token]);
 
   useEffect(() => {
 
@@ -63,10 +63,7 @@ export default function AwsIntegrationPage() {
       // usar status del backend directamente
       setStatus(res.status || "disconnected");
   
-      if (res.accounts && res.accounts.length > 0 && !showConnectionFlow) {
-        setShowConnectionFlow(false);
-      }
-  
+
     } catch (err) {
   
       console.error(err);
