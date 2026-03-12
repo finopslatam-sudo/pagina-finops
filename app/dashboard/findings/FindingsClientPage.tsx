@@ -32,7 +32,7 @@ export default function FindingsPage() {
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
   const [service, setService] = useState("");
-  const [account, setAccount] = useState("");
+  const [account, setAccount] = useState<number | "">("");
   const [region, setRegion] = useState("");
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
 
@@ -121,14 +121,16 @@ export default function FindingsPage() {
     status?: string;
     search?: string;
     service?: string;
-    account?: string;
+    account?: number | "";
     region?: string;
   }) => {
     if (filters.severity !== undefined) setSeverity(filters.severity);
     if (filters.status !== undefined) setStatus(filters.status);
     if (filters.search !== undefined) setSearch(filters.search);
     if (filters.service !== undefined) setService(filters.service);
-    if (filters.account !== undefined) setAccount(filters.account);
+    if (filters.account !== undefined) {
+      setAccount(filters.account);
+    }
     if (filters.region !== undefined) setRegion(filters.region);  
 
     setPage(1);

@@ -8,7 +8,7 @@ interface Props {
   status: string;
   search: string;
   service: string;
-  account: string;
+  account: number | "";
   region: string;
   availableRegions: string[];
 
@@ -17,7 +17,7 @@ interface Props {
     status?: string;
     search?: string;
     service?: string;
-    account?: string;
+    account?: number | "";
     region?: string;
   }) => void;
 }
@@ -59,14 +59,18 @@ export default function FindingsFilters({
       {/* Account */}
       <select
         value={account}
-        onChange={(e) => onChange({ account: e.target.value })}
+        onChange={(e) =>
+          onChange({
+            account: e.target.value === "" ? "" : Number(e.target.value),
+          })
+        }
         className="border p-2 rounded"
       >
 
         <option value="">All Accounts</option>
 
         {accounts.map((a: { id: number; account_name: string }) => (
-          <option key={a.id} value={a.account_name}>
+          <option key={a.id} value={a.id}>
             {a.account_name}
           </option>
         ))}

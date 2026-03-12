@@ -11,7 +11,7 @@ interface UseFindingsParams {
   status?: string;
   search?: string;
   service?: string;
-  account?: string;
+  account?: number | "";
   region?: string;
 }
 
@@ -48,7 +48,7 @@ export function useFindings(params: UseFindingsParams) {
         ...(params.status ? { status: params.status } : {}),
         ...(params.search ? { search: params.search } : {}),
         ...(params.service ? { service: params.service } : {}),
-        ...(params.account ? { account: params.account } : {}),
+        ...(params.account ? { aws_account_id: String(params.account) } : {}),
         ...(params.region ? { region: params.region } : {}),
       });
 
