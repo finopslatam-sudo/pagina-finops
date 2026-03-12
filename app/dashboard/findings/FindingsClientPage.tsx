@@ -68,6 +68,14 @@ export default function FindingsPage() {
 
   const searchParams = useSearchParams();
 
+  const availableRegions: string[] = Array.from(
+    new Set(
+      data
+        .map((f) => f.region)
+        .filter((r): r is string => Boolean(r))
+    )
+  );
+
   /* =====================================================
      EFFECTS
   ===================================================== */
@@ -251,6 +259,7 @@ export default function FindingsPage() {
         service={service}
         account={account}
         region={region}
+        availableRegions={availableRegions}
         onChange={handleFiltersChange}
       />
 

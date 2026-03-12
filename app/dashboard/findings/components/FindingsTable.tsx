@@ -32,6 +32,7 @@ export default function FindingsTable({
         <thead>
           <tr className="text-left border-b bg-gray-50 text-sm">
             <th className="p-3">Service</th>
+            <th className="p-3">Account</th>
             <th className="p-3">Severity</th>
             <th className="p-3">Type</th>
             <th className="p-3">Resource</th>

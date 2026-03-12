@@ -34,7 +34,7 @@ export default function StepGuide() {
       image: "/7 CLOUDF.png"
   },
     {
-      title: "Espera a que el status sea CREATE_COMPLETE",
+      title: "Pega el ACCOUNT ID y Probar Conexión",
       image: "/8 CLOUDF.png"
   },
   ];

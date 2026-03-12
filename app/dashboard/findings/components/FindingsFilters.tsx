@@ -10,6 +10,7 @@ interface Props {
   service: string;
   account: string;
   region: string;
+  availableRegions: string[];
 
   onChange: (filters: {
     severity?: string;
@@ -28,18 +29,13 @@ export default function FindingsFilters({
   service,
   account,
   region,
+  availableRegions,
   onChange,
 }: Props) {
 
   const services = useFindingServices();
   const { accounts } = useAwsAccounts();
-  const regions = Array.from(
-    new Set(
-      services
-        .map((s: any) => s.region)
-        .filter(Boolean)
-    )
-  );
+  const regions = availableRegions || [];
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm mb-6 grid grid-cols-1 md:grid-cols-6 gap-4">
