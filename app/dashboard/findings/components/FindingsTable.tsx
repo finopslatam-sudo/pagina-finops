@@ -35,6 +35,7 @@ export default function FindingsTable({
             <th className="p-3">Severity</th>
             <th className="p-3">Type</th>
             <th className="p-3">Resource</th>
+            <th className="p-3">Region</th>
             <th className="p-3">Savings</th>
             <th className="p-3">Status</th>
             <th className="p-3">Action</th>
@@ -62,6 +63,10 @@ export default function FindingsTable({
 
               <td className="p-3 text-sm text-gray-600">
                 {f.resource_id}
+              </td>
+
+              <td className="p-3 text-sm text-gray-600">
+                {f.region || "-"}
               </td>
 
               <td className="p-3 text-sm">

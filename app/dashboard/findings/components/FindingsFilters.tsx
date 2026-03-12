@@ -1,6 +1,7 @@
 "use client";
 
 import { useFindingServices } from "../hooks/useFindingServices";
+import { useAwsAccounts } from "@/app/dashboard/hooks/useAwsAccounts";
 
 interface Props {
   severity: string;
@@ -31,6 +32,14 @@ export default function FindingsFilters({
 }: Props) {
 
   const services = useFindingServices();
+  const { accounts } = useAwsAccounts();
+  const regions = Array.from(
+    new Set(
+      services
+        .map((s: any) => s.region)
+        .filter(Boolean)
+    )
+  );
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm mb-6 grid grid-cols-1 md:grid-cols-6 gap-4">
@@ -52,13 +61,21 @@ export default function FindingsFilters({
       </select>
 
       {/* Account */}
-      <input
-        type="text"
-        placeholder="Account name..."
+      <select
         value={account}
         onChange={(e) => onChange({ account: e.target.value })}
         className="border p-2 rounded"
-      />
+      >
+
+        <option value="">All Accounts</option>
+
+        {accounts.map((a: { id: number; account_name: string }) => (
+          <option key={a.id} value={a.account_name}>
+            {a.account_name}
+          </option>
+        ))}
+
+      </select>
 
       {/* Severity */}
       <select
@@ -83,14 +100,23 @@ export default function FindingsFilters({
         <option value="resolved">Resolved</option>
       </select>
 
+
       {/* Region */}
-      <input
-        type="text"
-        placeholder="Region (ex: us-east-1)"
+      <select
         value={region}
         onChange={(e) => onChange({ region: e.target.value })}
         className="border p-2 rounded"
-      />
+      >
+
+        <option value="">All Regions</option>
+
+        {regions.map((r) => (
+          <option key={r} value={r}>
+            {r}
+          </option>
+        ))}
+
+      </select>
 
       {/* Search */}
       <input

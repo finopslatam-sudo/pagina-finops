@@ -3,6 +3,7 @@ export interface Finding {
     resource_id: string;
     resource_type: string;
     aws_service: string;
+    region?: string;
     finding_type: string;
     severity: "HIGH" | "MEDIUM" | "LOW";
     message: string;
