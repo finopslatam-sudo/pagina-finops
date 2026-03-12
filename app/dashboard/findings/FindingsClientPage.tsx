@@ -308,7 +308,7 @@ export default function FindingsPage() {
 
           <p className="text-gray-500 text-sm">
             FinOpsLatam está analizando tu infraestructura cloud.
-            Este proceso puede tardar unos segundos.
+            Este proceso puede tardar entre 3 a 5 minutos.
           </p>
 
         </div>
