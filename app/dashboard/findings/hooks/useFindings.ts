@@ -11,6 +11,8 @@ interface UseFindingsParams {
   status?: string;
   search?: string;
   service?: string;
+  account?: string;
+  region?: string;
 }
 
 export function useFindings(params: UseFindingsParams) {
@@ -46,6 +48,8 @@ export function useFindings(params: UseFindingsParams) {
         ...(params.status ? { status: params.status } : {}),
         ...(params.search ? { search: params.search } : {}),
         ...(params.service ? { service: params.service } : {}),
+        ...(params.account ? { account: params.account } : {}),
+        ...(params.region ? { region: params.region } : {}),
       });
 
       const json = await apiFetch<FindingsResponse>(
@@ -83,6 +87,8 @@ export function useFindings(params: UseFindingsParams) {
     params.status,
     params.search,
     params.service,
+    params.account,
+    params.region,
     token,
     isAuthReady,
   ]);

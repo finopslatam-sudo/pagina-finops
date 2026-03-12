@@ -32,6 +32,8 @@ export default function FindingsPage() {
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
   const [service, setService] = useState("");
+  const [account, setAccount] = useState("");
+  const [region, setRegion] = useState("");
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
 
   const [scanModal, setScanModal] = useState(false);
@@ -55,6 +57,8 @@ export default function FindingsPage() {
     status,
     search,
     service,
+    account,
+    region,
   });
 
   const {
@@ -109,11 +113,15 @@ export default function FindingsPage() {
     status?: string;
     search?: string;
     service?: string;
+    account?: string;
+    region?: string;
   }) => {
     if (filters.severity !== undefined) setSeverity(filters.severity);
     if (filters.status !== undefined) setStatus(filters.status);
     if (filters.search !== undefined) setSearch(filters.search);
     if (filters.service !== undefined) setService(filters.service);
+    if (filters.account !== undefined) setAccount(filters.account);
+    if (filters.region !== undefined) setRegion(filters.region);  
 
     setPage(1);
   };
@@ -241,6 +249,8 @@ export default function FindingsPage() {
         status={status}
         search={search}
         service={service}
+        account={account}
+        region={region}
         onChange={handleFiltersChange}
       />
 

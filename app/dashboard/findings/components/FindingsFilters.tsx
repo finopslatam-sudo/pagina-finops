@@ -7,12 +7,16 @@ interface Props {
   status: string;
   search: string;
   service: string;
+  account: string;
+  region: string;
 
   onChange: (filters: {
     severity?: string;
     status?: string;
     search?: string;
     service?: string;
+    account?: string;
+    region?: string;
   }) => void;
 }
 
@@ -21,13 +25,15 @@ export default function FindingsFilters({
   status,
   search,
   service,
+  account,
+  region,
   onChange,
 }: Props) {
 
   const services = useFindingServices();
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="bg-white p-6 rounded-2xl shadow-sm mb-6 grid grid-cols-1 md:grid-cols-6 gap-4">
 
       {/* Service */}
       <select
@@ -44,6 +50,15 @@ export default function FindingsFilters({
         ))}
 
       </select>
+
+      {/* Account */}
+      <input
+        type="text"
+        placeholder="Account name..."
+        value={account}
+        onChange={(e) => onChange({ account: e.target.value })}
+        className="border p-2 rounded"
+      />
 
       {/* Severity */}
       <select
@@ -67,6 +82,15 @@ export default function FindingsFilters({
         <option value="active">Active</option>
         <option value="resolved">Resolved</option>
       </select>
+
+      {/* Region */}
+      <input
+        type="text"
+        placeholder="Region (ex: us-east-1)"
+        value={region}
+        onChange={(e) => onChange({ region: e.target.value })}
+        className="border p-2 rounded"
+      />
 
       {/* Search */}
       <input
