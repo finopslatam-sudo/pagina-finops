@@ -33,6 +33,10 @@ export default function StepGuide() {
       title: "Espera a que el status sea CREATE_COMPLETE",
       image: "/7 CLOUDF.png"
   },
+    {
+      title: "Espera a que el status sea CREATE_COMPLETE",
+      image: "/8 CLOUDF.png"
+  },
   ];
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
