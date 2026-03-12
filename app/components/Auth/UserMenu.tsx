@@ -134,7 +134,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50 border-t"
                   onClick={() => setOpen(false)}
                 >
-                  🔎 Risk & Findings
+                  🔎 Findings
                 </Link>
 
                 <Link
@@ -142,7 +142,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  📦 Assets
+                  📦 Risk & Assets
                 </Link>
 
                 <Link

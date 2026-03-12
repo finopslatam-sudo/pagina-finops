@@ -192,7 +192,8 @@ export default function FindingsPage() {
           </h1>
 
           <p className="text-slate-600 mt-3">
-            Hallazgos de riesgo detectados en tu entorno cloud y oportunidades de optimización.
+          Detección automática de recursos huérfanos, configuraciones ineficientes y desperdicio de infraestructura en tu entorno cloud. 
+          Identifica instancias olvidadas, volúmenes sin uso, almacenamiento innecesario y otras oportunidades de optimización que generan costos ocultos.
           </p>
 
         </div>
