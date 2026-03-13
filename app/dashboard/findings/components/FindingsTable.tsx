@@ -53,6 +53,10 @@ export default function FindingsTable({
               <td className="p-3 text-sm font-medium">
                 {f.aws_service}
               </td>
+              
+              <td className="p-3 text-sm">
+                {f.aws_account_name}
+              </td>
 
               <td className="p-3">
                 <SeverityBadge severity={f.severity} />

@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 
 import { useFindings } from "./hooks/useFindings";
 import { useFindingsStats } from "./hooks/useFindingsStats";
+import { useAuditStatus } from "../hooks/useAuditStatus";
 
 import FindingsStatsCards from "./components/FindingsStatsCards";
 import FindingsTable from "./components/FindingsTable";
@@ -39,6 +40,7 @@ export default function FindingsPage() {
   const [scanModal, setScanModal] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
   const { token } = useAuth();
+  const { fetchStatus } = useAuditStatus();
   const [runningAudit, setRunningAudit] = useState(false);
   const [lastScan, setLastScan] = useState<string | null>(null);
 
@@ -71,10 +73,10 @@ export default function FindingsPage() {
   const availableRegions: string[] = Array.from(
     new Set(
       data
-        .map((f) => f.region)
+        .map((f) => f.region?.trim().toLowerCase().slice(0,9))
         .filter((r): r is string => Boolean(r))
     )
-  );
+  ).sort();
 
   /* =====================================================
      EFFECTS
@@ -163,29 +165,42 @@ export default function FindingsPage() {
         token
       });
   
-      // Esperar procesamiento del backend
-      setTimeout(async () => {
+      const pollAudit = async () => {
   
-        await refetch();
-        await refetchStats();
+        const accounts = await fetchStatus();
   
-        setScanModal(false);
+        const stillRunning = accounts?.some(
+          (a: any) => a.status === "running"
+        );
   
-        setScanSuccess(true);
+        if (stillRunning) {
   
-        setLastScan(new Date().toISOString());
+          setTimeout(pollAudit, 5000);
   
-      }, 7000);
+        } else {
+  
+          await refetch();
+          await refetchStats();
+  
+          setScanModal(false);
+          setScanSuccess(true);
+  
+          setLastScan(new Date().toISOString());
+          setRunningAudit(false);
+  
+        }
+  
+      };
+  
+      setTimeout(pollAudit, 4000);
   
     } catch (err) {
   
       console.error(err);
+  
       alert("Error ejecutando auditoría");
   
       setScanModal(false);
-  
-    } finally {
-  
       setRunningAudit(false);
   
     }
