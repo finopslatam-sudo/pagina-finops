@@ -7,6 +7,7 @@ import ServiceBreakdownChart from '../components/finance/ServiceBreakdownChart';
 import AwsAccountSelector from "../components/AwsAccountSelector";
 
 export default function CostosPage() {
+
   const { data, loading, error } = useDashboard();
 
   if (loading) {
@@ -27,28 +28,23 @@ export default function CostosPage() {
     <div className="max-w-7xl mx-auto px-6 space-y-12">
 
       {/* ================= HERO FINANCIAL CARD ================= */}
-      <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-8 shadow-sm space-y-6">
+      <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-8 shadow-sm">
 
-        <div>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Costs & Financials
+        </h1>
 
-          <h1 className="text-3xl font-bold text-gray-900">
-            Costs & Financials
-          </h1>
+        <p className="text-gray-600 mt-3 max-w-3xl">
+          Análisis financiero consolidado del consumo cloud, exposición proyectada
+          y oportunidades estratégicas de optimización.
+        </p>
 
-          <p className="text-gray-600 mt-3 max-w-3xl">
-            Análisis financiero consolidado del consumo cloud, exposición proyectada
-            y oportunidades estratégicas de optimización.
-          </p>
+      </div>
 
-        </div>
-
-        {/* ACCOUNT FILTER */}
-
-        <div className="flex justify-end">
-          <AwsAccountSelector />
-        </div>
-
-        </div>
+      {/* ================= ACCOUNT FILTER ================= */}
+      <div className="flex justify-end">
+        <AwsAccountSelector />
+      </div>
 
       {/* ================= KPIs PRINCIPALES ================= */}
       <DashboardFinancialKPIs
@@ -61,21 +57,21 @@ export default function CostosPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <MetricCard
-        title="EXPOSICIÓN MENSUAL ESTIMADA"
-        value={`$${data.executive_summary.monthly_financial_exposure ?? 0}`}
-        variant="blue"
+          title="EXPOSICIÓN MENSUAL ESTIMADA"
+          value={`$${data.executive_summary.monthly_financial_exposure ?? 0}`}
+          variant="blue"
         />
 
         <MetricCard
-        title="EXPOSICIÓN ANUAL ESTIMADA"
-        value={`$${data.executive_summary.annual_financial_exposure ?? 0}`}
-        variant="purple"
+          title="EXPOSICIÓN ANUAL ESTIMADA"
+          value={`$${data.executive_summary.annual_financial_exposure ?? 0}`}
+          variant="purple"
         />
 
         <MetricCard
-        title="OPORTUNIDAD AHORRO ANUAL (HIGH)"
-        value={`$${data.roi_projection.high_savings_opportunity_annual ?? 0}`}
-        variant="green"
+          title="OPORTUNIDAD AHORRO ANUAL (HIGH)"
+          value={`$${data.roi_projection.high_savings_opportunity_annual ?? 0}`}
+          variant="green"
         />
 
       </div>
