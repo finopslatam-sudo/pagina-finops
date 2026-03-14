@@ -42,4 +42,3 @@ export interface Finding {
     low: number;
     estimated_monthly_savings: number;
   }
-  

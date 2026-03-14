@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDashboard } from '../hooks/useDashboard';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
+import { useAwsAccount } from "../context/AwsAccountContext";
 
 type RightsizingResponse = {
   has_data: boolean;
@@ -31,14 +32,17 @@ type SPResponse = {
 export default function OptimizationPage() {
   const { data, loading, error } = useDashboard();
   const { token, user } = useAuth();
-
+  const { selectedAccount } = useAwsAccount();
   const [rightsizing, setRightsizing] = useState<RightsizingResponse | null>(null);
   const [ri, setRI] = useState<RIResponse | null>(null);
   const [sp, setSP] = useState<SPResponse | null>(null);
   const [loadingFinops, setLoadingFinops] = useState(true);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setLoadingFinops(false);
+      return;
+    }
 
     const fetchFinops = async () => {
       try {
@@ -46,10 +50,14 @@ export default function OptimizationPage() {
           Authorization: `Bearer ${token}`,
         };
 
+        const accountQuery = selectedAccount
+        ? `?aws_account_id=${selectedAccount}`
+        : '';
+      
         const [r1, r2, r3] = await Promise.all([
-          fetch('/api/client/finops/rightsizing', { headers }),
-          fetch('/api/client/finops/ri-coverage', { headers }),
-          fetch('/api/client/finops/sp-coverage', { headers }),
+          fetch(`/api/client/finops/rightsizing${accountQuery}`, { headers }),
+          fetch(`/api/client/finops/ri-coverage${accountQuery}`, { headers }),
+          fetch(`/api/client/finops/sp-coverage${accountQuery}`, { headers }),
         ]);
 
         const d1 = await r1.json();
@@ -67,7 +75,7 @@ export default function OptimizationPage() {
     };
 
     fetchFinops();
-  }, [token]);
+  }, [token, selectedAccount]);
 
   // =============================
   // PLAN FEATURE CHECK

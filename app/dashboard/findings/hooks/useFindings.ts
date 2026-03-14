@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
+import { useAwsAccount } from "@/app/dashboard/context/AwsAccountContext";
 import { Finding, FindingsResponse } from "../types";
 
 interface UseFindingsParams {
@@ -16,7 +17,9 @@ interface UseFindingsParams {
 }
 
 export function useFindings(params: UseFindingsParams) {
+
   const { token, isAuthReady } = useAuth();
+  const { selectedAccount } = useAwsAccount();
 
   const [data, setData] = useState<Finding[]>([]);
   const [total, setTotal] = useState(0);
@@ -24,12 +27,8 @@ export function useFindings(params: UseFindingsParams) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * =====================================================
-   * FETCH FINDINGS (Enterprise Safe)
-   * =====================================================
-   */
   const fetchFindings = useCallback(async () => {
+
     if (!isAuthReady) return;
 
     if (!token) {
@@ -42,6 +41,7 @@ export function useFindings(params: UseFindingsParams) {
     setError(null);
 
     try {
+
       const query = new URLSearchParams({
         page: String(params.page ?? 1),
         ...(params.severity ? { severity: params.severity } : {}),
@@ -52,17 +52,21 @@ export function useFindings(params: UseFindingsParams) {
         ...(params.region ? { region: params.region } : {}),
       });
 
+      if (selectedAccount) {
+        query.append("aws_account_id", String(selectedAccount));
+      }
+
       const json = await apiFetch<FindingsResponse>(
         `/api/client/findings/?${query.toString()}`,
         { token }
       );
 
-      // Defensive validation
       setData(Array.isArray(json?.data) ? json.data : []);
       setTotal(typeof json?.total === "number" ? json.total : 0);
       setPages(typeof json?.pages === "number" ? json.pages : 1);
 
     } catch (err: any) {
+
       console.error("FINDINGS FETCH ERROR:", err);
 
       if (err?.status === 401) {
@@ -78,7 +82,9 @@ export function useFindings(params: UseFindingsParams) {
       setPages(1);
 
     } finally {
+
       setLoading(false);
+
     }
 
   }, [
@@ -91,37 +97,30 @@ export function useFindings(params: UseFindingsParams) {
     params.region,
     token,
     isAuthReady,
+    selectedAccount
   ]);
 
-  /**
-   * =====================================================
-   * RESOLVE FINDING (Safe Mutation)
-   * =====================================================
-   */
-  const resolveFinding = useCallback(
-    async (id: number) => {
-      if (!token) return;
+  const resolveFinding = useCallback(async (id: number) => {
 
-      try {
-        await apiFetch(`/api/client/findings/${id}/resolve`, {
-          method: "PATCH",
-          token,
-        });
+    if (!token) return;
 
-        await fetchFindings();
+    try {
 
-      } catch (err) {
-        console.error("RESOLVE FINDING ERROR:", err);
-      }
-    },
-    [token, fetchFindings]
-  );
+      await apiFetch(`/api/client/findings/${id}/resolve`, {
+        method: "PATCH",
+        token,
+      });
 
-  /**
-   * =====================================================
-   * EFFECT
-   * =====================================================
-   */
+      await fetchFindings();
+
+    } catch (err) {
+
+      console.error("RESOLVE FINDING ERROR:", err);
+
+    }
+
+  }, [token, fetchFindings]);
+
   useEffect(() => {
     fetchFindings();
   }, [fetchFindings]);
@@ -135,4 +134,5 @@ export function useFindings(params: UseFindingsParams) {
     refetch: fetchFindings,
     resolveFinding,
   };
+
 }

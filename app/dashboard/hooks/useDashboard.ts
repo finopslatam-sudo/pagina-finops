@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import { useAuth } from '@/app/context/AuthContext';
+import { useAwsAccount } from '../context/AwsAccountContext';
 
 /* =====================================================
    TIPADO REAL — ALINEADO CON BACKEND ACTUAL
@@ -80,36 +81,53 @@ export interface DashboardResponse {
 ===================================================== */
 
 export function useDashboard() {
+
   const { token, isAuthReady } = useAuth();
+  const { selectedAccount } = useAwsAccount();
 
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+
     if (!isAuthReady || !token) return;
 
     const fetchDashboard = async () => {
+
       try {
+
         setLoading(true);
 
+        const endpoint = selectedAccount
+          ? `/api/client/dashboard/?aws_account_id=${selectedAccount}`
+          : `/api/client/dashboard/`;
+
         const response = await apiFetch<DashboardResponse>(
-          '/api/client/dashboard/',
+          endpoint,
           { token }
         );
 
         setData(response);
         setError('');
+
       } catch (err: any) {
+
         console.error('DASHBOARD ERROR:', err);
         setError('No se pudo cargar el dashboard.');
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
     fetchDashboard();
-  }, [isAuthReady, token]);
+
+  }, [isAuthReady, token, selectedAccount]);
 
   return { data, loading, error };
+
 }

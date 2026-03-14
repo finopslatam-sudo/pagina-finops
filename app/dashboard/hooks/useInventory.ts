@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import { useAuth } from '@/app/context/AuthContext';
+import { useAwsAccount } from '../context/AwsAccountContext';
 
 /* =====================================================
    TYPES
@@ -49,23 +50,34 @@ interface InventoryResponse {
 ===================================================== */
 
 export function useInventory(page: number = 1, perPage: number = 50) {
+
   const { token, isAuthReady } = useAuth();
+  const { selectedAccount } = useAwsAccount();
 
   const [data, setData] = useState<InventoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+
     if (!isAuthReady || !token) return;
 
     const fetchInventory = async () => {
+
       try {
+
         setLoading(true);
+
+        let endpoint = `/api/client/inventory?page=${page}&per_page=${perPage}`;
+
+        if (selectedAccount) {
+          endpoint += `&aws_account_id=${selectedAccount}`;
+        }
 
         const response = await apiFetch<{
           status: string;
           data: InventoryResponse;
-        }>(`/api/client/inventory?page=${page}&per_page=${perPage}`, {
+        }>(endpoint, {
           token,
         });
 
@@ -75,16 +87,23 @@ export function useInventory(page: number = 1, perPage: number = 50) {
 
         setData(response.data);
         setError('');
+
       } catch (err) {
+
         console.error('INVENTORY ERROR:', err);
         setError('No se pudo cargar el inventario.');
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
     fetchInventory();
-  }, [isAuthReady, token, page, perPage]);
+
+  }, [isAuthReady, token, page, perPage, selectedAccount]);
 
   return { data, loading, error };
 }
