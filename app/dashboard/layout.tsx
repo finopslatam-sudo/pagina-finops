@@ -20,11 +20,9 @@ export default function DashboardLayout({
 
         <div className="flex justify-between items-center">
 
-          <h1 className="text-xl font-semibold text-gray-800">
-            FinOps Dashboard
-          </h1>
-
-          <AwsAccountSelector />
+        <h1 className="text-xl font-semibold text-gray-800">
+          FinOps Dashboard
+        </h1>
 
         </div>
 
