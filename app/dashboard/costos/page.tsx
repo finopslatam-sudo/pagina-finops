@@ -42,7 +42,7 @@ export default function CostosPage() {
       </div>
 
       {/* ================= ACCOUNT FILTER ================= */}
-      <div className="flex justify-end">
+      <div className="flex items-center gap-4 pt-2">
         <AwsAccountSelector />
       </div>
 
