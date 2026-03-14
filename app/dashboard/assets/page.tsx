@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Legend
 } from 'recharts';
+import AwsAccountSelector from "../components/AwsAccountSelector";
 
 export default function AssetsPage() {
 
@@ -176,6 +177,11 @@ export default function AssetsPage() {
           estado operacional y distribución por servicio para apoyar decisiones
           ejecutivas basadas en datos.
         </p>
+      </div>
+
+      {/* ================= ACCOUNT FILTER ================= */}
+      <div className="flex items-center gap-4 pt-2">
+        <AwsAccountSelector />
       </div>
 
       {/* ================= ANALYTICS GRID ================= */}

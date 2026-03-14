@@ -2,7 +2,6 @@
 
 import SessionExpiredModal from "@/app/components/Auth/SessionExpiredModal";
 import { AwsAccountProvider } from "./context/AwsAccountContext";
-import AwsAccountSelector from "./components/AwsAccountSelector";
 
 export default function DashboardLayout({
   children,
@@ -18,11 +17,11 @@ export default function DashboardLayout({
 
         {/* ================= HEADER GLOBAL ================= */}
 
-        <div className="flex justify-between items-center">
+        <div className="flex items-center">
 
-        <h1 className="text-xl font-semibold text-gray-800">
-          FinOps Dashboard
-        </h1>
+          <h1 className="text-xl font-semibold text-gray-800">
+            FinOps Dashboard
+          </h1>
 
         </div>
 
