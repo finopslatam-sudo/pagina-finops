@@ -5,6 +5,7 @@ import { useDashboard } from '../hooks/useDashboard';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
 import { useAwsAccount } from "../context/AwsAccountContext";
+import AwsAccountSelector from "../components/AwsAccountSelector";
 
 type RightsizingResponse = {
   has_data: boolean;
@@ -115,6 +116,11 @@ export default function OptimizationPage() {
         en su entorno de nube. Esta sección permite tomar decisiones basadas en datos para mejorar la eficiencia, 
         reducir el desperdicio estructural y maximizar el retorno a largo plazo de las inversiones en la nube.
         </p>
+      </div>
+
+      {/* ================= ACCOUNT FILTER ================= */}
+      <div className="flex items-center gap-4 pt-2">
+        <AwsAccountSelector />
       </div>
 
       {/* ================= ROI ================= */}

@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
+import AwsAccountSelector from "../components/AwsAccountSelector";
 
 export default function GobernanzaPage() {
   const { data, loading } = useDashboard();
@@ -95,6 +96,11 @@ export default function GobernanzaPage() {
           permitiendo priorizar decisiones estratégicas basadas en impacto real.
         </p>
 
+      </div>
+
+      {/* ================= ACCOUNT FILTER ================= */}
+      <div className="flex items-center gap-4 pt-2">
+        <AwsAccountSelector />
       </div>
 
       {/* KPI GRID PASTEL */}
