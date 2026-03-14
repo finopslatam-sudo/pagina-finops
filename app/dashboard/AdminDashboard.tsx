@@ -21,6 +21,7 @@ import {
   YAxis,
   CartesianGrid,
 } from 'recharts';
+import AwsAccountSelector from "@/app/dashboard/components/AwsAccountSelector";
 
 /* =====================================================
    TYPES
@@ -187,6 +188,11 @@ export default function AdminDashboard() {
             {user?.global_role}
           </span>
         </p>
+      </div>
+
+      {/* ================= ACCOUNT FILTER ================= */}
+      <div className="flex items-center gap-4 pt-2">
+        <AwsAccountSelector />
       </div>
 
       {/* =========================
