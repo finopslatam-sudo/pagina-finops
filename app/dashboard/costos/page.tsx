@@ -4,6 +4,7 @@ import { useDashboard } from '../hooks/useDashboard';
 import DashboardFinancialKPIs from '../components/finance/DashboardFinancialKPIs';
 import MonthlyCostChart from '../components/finance/MonthlyCostChart';
 import ServiceBreakdownChart from '../components/finance/ServiceBreakdownChart';
+import AwsAccountSelector from "../components/AwsAccountSelector";
 
 export default function CostosPage() {
   const { data, loading, error } = useDashboard();
@@ -26,16 +27,28 @@ export default function CostosPage() {
     <div className="max-w-7xl mx-auto px-6 space-y-12">
 
       {/* ================= HERO FINANCIAL CARD ================= */}
-      <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-8 shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Costs & Financials
-        </h1>
-        <p className="text-gray-600 mt-3 max-w-3xl">
-          Análisis financiero consolidado del consumo cloud, exposición proyectada
-          y oportunidades estratégicas de optimización. Esta vista permite evaluar
-          eficiencia de gasto, ahorro potencial y evolución mensual del presupuesto.
-        </p>
-      </div>
+      <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-8 shadow-sm space-y-6">
+
+        <div>
+
+          <h1 className="text-3xl font-bold text-gray-900">
+            Costs & Financials
+          </h1>
+
+          <p className="text-gray-600 mt-3 max-w-3xl">
+            Análisis financiero consolidado del consumo cloud, exposición proyectada
+            y oportunidades estratégicas de optimización.
+          </p>
+
+        </div>
+
+        {/* ACCOUNT FILTER */}
+
+        <div className="flex justify-end">
+          <AwsAccountSelector />
+        </div>
+
+        </div>
 
       {/* ================= KPIs PRINCIPALES ================= */}
       <DashboardFinancialKPIs
