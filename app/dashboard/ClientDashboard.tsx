@@ -116,6 +116,7 @@ export default function ClientDashboard() {
         title="Ahorro Potencial mensual"
         value={formatUSD(data.cost.potential_savings)}
         variant="green"
+        tooltip="El ahorro potencial solo considera hallazgos con impacto económico directo. Las recomendaciones de revisión se muestran por separado."
       />
 
       <PastelCard
@@ -125,11 +126,6 @@ export default function ClientDashboard() {
       />
 
       </div>
-
-      <p className="text-sm text-slate-500 -mt-4">
-        El ahorro potencial solo considera hallazgos con impacto económico directo.
-        Las recomendaciones de revisión se muestran por separado.
-      </p>
 
       {/* =====================================================
          3️⃣ OPERATIONAL METRICS
@@ -255,6 +251,7 @@ function PastelCard({
   title,
   value,
   variant,
+  tooltip,
 }: {
   title: string;
   value: string | number;
@@ -265,6 +262,7 @@ function PastelCard({
     | 'rose'
     | 'indigo'
     | 'sky';
+  tooltip?: string;
 }) {
 
   const styles = {
@@ -280,9 +278,28 @@ function PastelCard({
     <div
       className={`p-8 rounded-2xl border border-blue-300 shadow-sm ${styles[variant]}`}
     >
-      <p className="text-sm uppercase mb-2 text-slate-600">
-        {title}
-      </p>
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <p className="text-sm uppercase text-slate-600">
+          {title}
+        </p>
+
+        {tooltip ? (
+          <div className="group relative shrink-0">
+            <button
+              type="button"
+              aria-label={`Informacion sobre ${title}`}
+              className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 bg-white/80 text-xs font-semibold text-slate-600 shadow-sm transition hover:bg-white"
+            >
+              i
+            </button>
+
+            <div className="pointer-events-none absolute right-0 top-8 z-10 w-64 rounded-xl border border-slate-200 bg-white p-3 text-xs normal-case text-slate-600 opacity-0 shadow-lg transition duration-200 group-hover:opacity-100">
+              {tooltip}
+            </div>
+          </div>
+        ) : null}
+      </div>
+
       <p className="text-3xl font-semibold text-slate-800">
         {value}
       </p>
