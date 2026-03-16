@@ -1,7 +1,6 @@
 "use client";
 
 import { Finding } from "../types";
-import SeverityBadge from "./SeverityBadge";
 import { useAuth } from "@/app/context/AuthContext";
 
 interface Props {
@@ -33,7 +32,6 @@ export default function FindingsTable({
           <tr className="text-left border-b bg-gray-50 text-sm">
             <th className="p-3">Service</th>
             <th className="p-3">Account</th>
-            <th className="p-3">Severity</th>
             <th className="p-3">Type</th>
             <th className="p-3">Resource</th>
             <th className="p-3">Region</th>
@@ -56,10 +54,6 @@ export default function FindingsTable({
               
               <td className="p-3 text-sm">
                 {f.aws_account_name}
-              </td>
-
-              <td className="p-3">
-                <SeverityBadge severity={f.severity} />
               </td>
 
               <td className="p-3 text-sm">

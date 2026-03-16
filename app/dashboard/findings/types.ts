@@ -33,7 +33,7 @@ export interface Finding {
     data: Finding[];
   }
   
-  export interface FindingsStats {
+export interface FindingsStats {
     total: number;
     active: number;
     resolved: number;
@@ -41,4 +41,6 @@ export interface Finding {
     medium: number;
     low: number;
     estimated_monthly_savings: number;
+    financial_opportunities: number;
+    review_recommendations: number;
   }
