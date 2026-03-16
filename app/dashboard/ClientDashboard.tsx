@@ -12,6 +12,8 @@ import { useInventory } from './hooks/useInventory';
 
 import MonthlyCostChart from './components/finance/MonthlyCostChart';
 
+import AwsAccountSelector from "@/app/dashboard/components/AwsAccountSelector";
+
 export default function ClientDashboard() {
   const router = useRouter();
   const { user, token, isAuthReady, isStaff } = useAuth();
@@ -89,6 +91,11 @@ export default function ClientDashboard() {
           />
 
         </div>
+      </div>
+
+      {/* ================= ACCOUNT FILTER ================= */}
+      <div className="flex items-center gap-4 pt-2">
+        <AwsAccountSelector />
       </div>
 
       {/* =====================================================
