@@ -126,11 +126,28 @@ export default function ClientDashboard() {
 
       </div>
 
+      <p className="text-sm text-slate-500 -mt-4">
+        El ahorro potencial solo considera hallazgos con impacto económico directo.
+        Las recomendaciones de revisión se muestran por separado.
+      </p>
+
       {/* =====================================================
          3️⃣ OPERATIONAL METRICS
       ===================================================== */}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-8">
+
+      <PastelCard
+        title="Oportunidades de ahorro"
+        value={data.findings.financial_opportunities ?? 0}
+        variant="green"
+      />
+
+      <PastelCard
+        title="Revisiones recomendadas"
+        value={data.findings.review_recommendations ?? 0}
+        variant="amber"
+      />
 
       <PastelCard
         title="Recomendaciones Activas"

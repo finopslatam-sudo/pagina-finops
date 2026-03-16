@@ -53,6 +53,11 @@ export default function CostosPage() {
         savingsPercentage={cost.savings_percentage ?? 0}
       />
 
+      <p className="text-sm text-gray-500 -mt-8">
+        Este bloque solo contabiliza oportunidades con ahorro económico directo.
+        Los hallazgos de revisión y gobernanza no inflan este indicador.
+      </p>
+
       {/* ================= KPIs ADICIONALES ================= */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 

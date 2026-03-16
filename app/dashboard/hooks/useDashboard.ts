@@ -22,6 +22,8 @@ export interface DashboardResponse {
     medium: number;
     low: number;
     estimated_monthly_savings: number;
+    financial_opportunities: number;
+    review_recommendations: number;
   };
 
   governance: {
