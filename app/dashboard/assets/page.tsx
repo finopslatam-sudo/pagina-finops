@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useInventory } from '../hooks/useInventory';
 import {
   PieChart,
@@ -15,6 +15,8 @@ import AwsAccountSelector from "../components/AwsAccountSelector";
 export default function AssetsPage() {
 
   const { data, loading, error } = useInventory();
+  const [page, setPage] = useState(1);
+  const perPage = 10;
 
   /* ================= FILTER STATE ================= */
 
@@ -89,6 +91,26 @@ export default function AssetsPage() {
       );
     });
   }, [resources, filters]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredResources.length / perPage)
+  );
+
+  const paginatedResources = useMemo(() => {
+    const start = (page - 1) * perPage;
+    return filteredResources.slice(start, start + perPage);
+  }, [filteredResources, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
 
   /* ================= EARLY RETURNS ================= */
 
@@ -251,7 +273,9 @@ export default function AssetsPage() {
       </div>
 
             {/* ================= FILTER BAR ================= */}
-            <div className="bg-white p-6 rounded-2xl shadow border flex flex-wrap gap-4 items-end">
+            <div className="bg-white p-6 rounded-2xl shadow border">
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
 
               <FilterSelect
                 label="Servicio"
@@ -292,7 +316,7 @@ export default function AssetsPage() {
                 }
               />
 
-              <div className="flex flex-col text-sm">
+              <div className="flex flex-col text-sm w-full">
                 <label className="text-gray-500 mb-1">Buscar recurso</label>
                 <input
                   type="text"
@@ -301,11 +325,12 @@ export default function AssetsPage() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFilters(prev => ({ ...prev, search: e.target.value }))
                   }
-                  className="border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2"
                 />
               </div>
 
               </div>
+            </div>
 
       {/* ================= TABLE ================= */}
       <div className="bg-white p-8 rounded-3xl border shadow-xl">
@@ -327,7 +352,7 @@ export default function AssetsPage() {
             </thead>
 
             <tbody>
-              {filteredResources.map((r) => (
+              {paginatedResources.map((r) => (
                 <tr key={r.resource_id} className="border-t hover:bg-gray-50 transition">
                   <td className="p-4 font-semibold">{r.service_name}</td>
                   <td className="p-4 text-gray-600">{r.resource_type}</td>
@@ -340,6 +365,40 @@ export default function AssetsPage() {
             </tbody>
           </table>
         </div>
+
+        {filteredResources.length === 0 ? (
+          <div className="py-10 text-center text-gray-400">
+            No se encontraron recursos con los filtros aplicados.
+          </div>
+        ) : (
+          <div className="mt-6 flex items-center justify-between gap-4">
+            <p className="text-sm text-gray-500">
+              Mostrando {paginatedResources.length} de {filteredResources.length} recursos
+            </p>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Anterior
+              </button>
+
+              <span className="text-sm text-gray-600">
+                Pagina {page} de {totalPages}
+              </span>
+
+              <button
+                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={page === totalPages}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
     </div>
@@ -361,12 +420,12 @@ function FilterSelect({
   onChange,
 }: FilterSelectProps) {
   return (
-    <div className="flex flex-col text-sm">
+    <div className="flex flex-col text-sm w-full">
       <label className="text-gray-500 mb-1">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border rounded px-3 py-2"
+        className="w-full border rounded px-3 py-2"
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>
