@@ -14,6 +14,8 @@ import MonthlyCostChart from './components/finance/MonthlyCostChart';
 
 import AwsAccountSelector from "@/app/dashboard/components/AwsAccountSelector";
 
+import { formatUSD, formatPercentage } from "@/app/lib/finopsFormat";
+
 export default function ClientDashboard() {
   const router = useRouter();
   const { user, token, isAuthReady, isStaff } = useAuth();
@@ -106,19 +108,19 @@ export default function ClientDashboard() {
 
       <PastelCard
         title="Gasto Actual mensual"
-        value={`$${data.cost.current_month_cost}`}
+        value={formatUSD(data.cost.current_month_cost)}
         variant="blue"
       />
 
       <PastelCard
         title="Ahorro Potencial mensual"
-        value={`$${data.cost.potential_savings}`}
+        value={formatUSD(data.cost.potential_savings)}
         variant="green"
       />
 
       <PastelCard
         title="Potencial Optimización"
-        value={`${data.cost.savings_percentage}%`}
+        value={formatPercentage(data.cost.savings_percentage)}
         variant="amber"
       />
 

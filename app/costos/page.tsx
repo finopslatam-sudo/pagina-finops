@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 ===================================================== */
 
 import PrivateRoute from '@/app/components/Auth/PrivateRoute';
+import { formatUSD, formatPercentage } from "@/app/lib/finopsFormat";
 
 /* =====================================================
    COMPONENT
