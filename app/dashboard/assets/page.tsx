@@ -377,21 +377,28 @@ export default function AssetsPage() {
             </p>
 
             {totalPages > 1 && (
-              <div className="flex justify-center gap-3">
-                {Array.from({ length: totalPages }).map((_, i) => (
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-sm text-gray-500">
+                  Pagina {page} de {totalPages}
+                </p>
+
+                <div className="flex items-center gap-2">
                   <button
-                    key={i}
-                    onClick={() => setPage(i + 1)}
-                    className={`px-4 py-2 rounded-lg border text-sm font-medium transition
-                      ${
-                        page === i + 1
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-slate-700 border-blue-200 hover:bg-blue-50"
-                      }`}
+                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={page === 1}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {i + 1}
+                    Anterior
                   </button>
-                ))}
+
+                  <button
+                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={page === totalPages}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Siguiente
+                  </button>
+                </div>
               </div>
             )}
           </div>
