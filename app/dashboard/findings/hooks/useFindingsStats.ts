@@ -4,12 +4,19 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 import { FindingsStats } from "../types";
-import { useAwsAccount } from "@/app/dashboard/context/AwsAccountContext";
 
-export function useFindingsStats() {
+interface UseFindingsStatsParams {
+  severity?: string;
+  status?: string;
+  search?: string;
+  service?: string;
+  account?: number | "";
+  region?: string;
+}
+
+export function useFindingsStats(params: UseFindingsStatsParams = {}) {
 
   const { token, isAuthReady } = useAuth();
-  const { selectedAccount } = useAwsAccount();
 
   const [stats, setStats] = useState<FindingsStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,8 +36,17 @@ export function useFindingsStats() {
          BUILD ENDPOINT WITH ACCOUNT FILTER
       ===================================================== */
 
-      const endpoint = selectedAccount
-        ? `/api/client/findings/stats?aws_account_id=${selectedAccount}`
+      const query = new URLSearchParams({
+        ...(params.severity ? { severity: params.severity } : {}),
+        ...(params.status ? { status: params.status } : {}),
+        ...(params.search ? { search: params.search } : {}),
+        ...(params.service ? { service: params.service } : {}),
+        ...(params.account ? { aws_account_id: String(params.account) } : {}),
+        ...(params.region ? { region: params.region } : {}),
+      });
+
+      const endpoint = query.toString()
+        ? `/api/client/findings/stats?${query.toString()}`
         : `/api/client/findings/stats`;
 
       const json = await apiFetch<{ data: FindingsStats }>(
@@ -54,7 +70,16 @@ export function useFindingsStats() {
 
   useEffect(() => {
     fetchStats();
-  }, [token, isAuthReady, selectedAccount]);
+  }, [
+    token,
+    isAuthReady,
+    params.severity,
+    params.status,
+    params.search,
+    params.service,
+    params.account,
+    params.region
+  ]);
 
   return {
     stats,

@@ -66,7 +66,14 @@ export default function FindingsPage() {
   const {
     stats,
     refetch: refetchStats,
-  } = useFindingsStats();
+  } = useFindingsStats({
+    severity,
+    status,
+    search,
+    service,
+    account,
+    region,
+  });
 
   const searchParams = useSearchParams();
 
