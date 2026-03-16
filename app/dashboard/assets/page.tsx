@@ -371,32 +371,29 @@ export default function AssetsPage() {
             No se encontraron recursos con los filtros aplicados.
           </div>
         ) : (
-          <div className="mt-6 flex items-center justify-between gap-4">
+          <div className="mt-6 space-y-4">
             <p className="text-sm text-gray-500">
               Mostrando {paginatedResources.length} de {filteredResources.length} recursos
             </p>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                disabled={page === 1}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Anterior
-              </button>
-
-              <span className="text-sm text-gray-600">
-                Pagina {page} de {totalPages}
-              </span>
-
-              <button
-                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={page === totalPages}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Siguiente
-              </button>
-            </div>
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-3">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setPage(i + 1)}
+                    className={`px-4 py-2 rounded-lg border text-sm font-medium transition
+                      ${
+                        page === i + 1
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "bg-white text-slate-700 border-blue-200 hover:bg-blue-50"
+                      }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
