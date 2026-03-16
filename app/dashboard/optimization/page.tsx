@@ -155,17 +155,17 @@ export default function OptimizationPage() {
       )}
 
       {/* ================= RIGHTSIZING ================= */}
-      <SectionCard title="Optimization Opportunities by Service">
+      <SectionCard title="Rightsizing">
         {!rightsizing?.has_data ? (
-          <EmptyState message="No optimization opportunities were detected for the scanned services." />
+          <EmptyState message="No se detectaron oportunidades de rightsizing para los servicios evaluados." />
         ) : (
           <>
             <div className="mb-6">
               <p className="text-sm text-gray-600">
-                Total Recommendations: {rightsizing.total_recommendations}
+                Recomendaciones totales: {rightsizing.total_recommendations}
               </p>
               <p className="text-sm text-gray-600">
-                Estimated Monthly Savings: ${rightsizing.total_estimated_monthly_savings}
+                Ahorro mensual estimado: ${rightsizing.total_estimated_monthly_savings}
               </p>
             </div>
 
