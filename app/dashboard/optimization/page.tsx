@@ -155,9 +155,9 @@ export default function OptimizationPage() {
       )}
 
       {/* ================= RIGHTSIZING ================= */}
-      <SectionCard title="Rightsizing (EC2 & RDS)">
+      <SectionCard title="Optimization Opportunities by Service">
         {!rightsizing?.has_data ? (
-          <EmptyState message="No rightsizing opportunities detected for EC2 or RDS." />
+          <EmptyState message="No optimization opportunities were detected for the scanned services." />
         ) : (
           <>
             <div className="mb-6">
@@ -172,7 +172,12 @@ export default function OptimizationPage() {
             <div className="space-y-4">
               {rightsizing.recommendations.map((r: any) => (
                 <div key={r.id} className="border rounded-2xl p-5 bg-gray-50">
-                  <p className="font-semibold">{r.resource_id}</p>
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="font-semibold">{r.resource_id}</p>
+                    <span className="text-xs font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-700">
+                      {r.aws_service}
+                    </span>
+                  </div>
                   <p className="text-sm text-gray-600">{r.message}</p>
                   <p className="text-sm text-emerald-600 mt-2">
                     ${r.estimated_monthly_savings} monthly
