@@ -61,9 +61,12 @@ interface AuthContextType {
   isEnterprise: boolean;
 
   isAuthReady: boolean;
+  sessionWarningVisible: boolean;
+  sessionCountdown: number;
 
   login: (email: string, password: string) => Promise<void>;
   logout: (reason?: "expired") => void;
+  staySignedIn: () => void;
   updateUser: (partial: Partial<User>) => void;
 }
 
@@ -78,6 +81,8 @@ const AuthContext = createContext<AuthContextType | null>(null);
 ===================================================== */
 
 const INACTIVITY_LIMIT = 10 * 60 * 1000;
+const SESSION_WARNING_DURATION = 10 * 1000;
+const SESSION_WARNING_SECONDS = 10;
 
 /* =====================================================
    PROVIDER
@@ -97,8 +102,14 @@ export function AuthProvider({
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [sessionWarningVisible, setSessionWarningVisible] = useState(false);
+  const [sessionCountdown, setSessionCountdown] = useState(
+    SESSION_WARNING_SECONDS
+  );
 
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const warningTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const isLoggingOutRef = useRef(false);
 
   /* =========================
@@ -130,15 +141,21 @@ export function AuthProvider({
       clearTimeout(inactivityTimer.current);
     }
 
+    if (warningTimer.current) {
+      clearTimeout(warningTimer.current);
+    }
+
+    if (countdownTimer.current) {
+      clearInterval(countdownTimer.current);
+    }
+
     localStorage.removeItem("finops_token");
     localStorage.removeItem("finops_user");
 
-    if (reason === "expired") {
-      sessionStorage.setItem("session_expired", "true");
-    }
-
     setUser(null);
     setToken(null);
+    setSessionWarningVisible(false);
+    setSessionCountdown(SESSION_WARNING_SECONDS);
 
     router.replace("/");
   };
@@ -147,17 +164,62 @@ export function AuthProvider({
      INACTIVITY
   ========================== */
 
+  const startSessionWarning = () => {
+    setSessionWarningVisible(true);
+    setSessionCountdown(SESSION_WARNING_SECONDS);
+
+    if (countdownTimer.current) {
+      clearInterval(countdownTimer.current);
+    }
+
+    countdownTimer.current = setInterval(() => {
+      setSessionCountdown((prev) => {
+        if (prev <= 1) {
+          if (countdownTimer.current) {
+            clearInterval(countdownTimer.current);
+          }
+          return 0;
+        }
+
+        return prev - 1;
+      });
+    }, 1000);
+
+    inactivityTimer.current = setTimeout(
+      () => logout("expired"),
+      SESSION_WARNING_DURATION
+    );
+  };
+
   const resetInactivityTimer = () => {
     if (!token) return;
+
+    setSessionWarningVisible(false);
+    setSessionCountdown(SESSION_WARNING_SECONDS);
 
     if (inactivityTimer.current) {
       clearTimeout(inactivityTimer.current);
     }
 
-    inactivityTimer.current = setTimeout(
-      () => logout("expired"),
-      INACTIVITY_LIMIT
+    if (warningTimer.current) {
+      clearTimeout(warningTimer.current);
+    }
+
+    if (countdownTimer.current) {
+      clearInterval(countdownTimer.current);
+    }
+
+    warningTimer.current = setTimeout(
+      startSessionWarning,
+      INACTIVITY_LIMIT - SESSION_WARNING_DURATION
     );
+  };
+
+  const staySignedIn = () => {
+    if (!token) return;
+
+    isLoggingOutRef.current = false;
+    resetInactivityTimer();
   };
 
   /* =========================
@@ -226,6 +288,12 @@ export function AuthProvider({
       );
       if (inactivityTimer.current) {
         clearTimeout(inactivityTimer.current);
+      }
+      if (warningTimer.current) {
+        clearTimeout(warningTimer.current);
+      }
+      if (countdownTimer.current) {
+        clearInterval(countdownTimer.current);
       }
     };
   }, [user, token]);
@@ -334,8 +402,11 @@ export function AuthProvider({
         isEnterprise,
         
         isAuthReady,
+        sessionWarningVisible,
+        sessionCountdown,
         login,
         logout,
+        staySignedIn,
         updateUser,
         refreshUser
 

@@ -1,43 +1,51 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function SessionExpiredModal() {
-  const [visible, setVisible] = useState(false);
+  const {
+    sessionWarningVisible,
+    sessionCountdown,
+    staySignedIn,
+    logout,
+  } = useAuth();
 
-  useEffect(() => {
-    const expired = sessionStorage.getItem(
-      "session_expired"
-    );
-
-    if (expired === "true") {
-      setVisible(true);
-      sessionStorage.removeItem(
-        "session_expired"
-      );
-    }
-  }, []);
-
-  if (!visible) return null;
+  if (!sessionWarningVisible) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]">
-      <div className="bg-white rounded-xl p-6 w-full max-w-sm text-center space-y-4 shadow-xl">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md text-center space-y-4 shadow-xl">
         <h2 className="text-lg font-semibold">
-          Sesión expirada
+          Tu sesion esta por expirar
         </h2>
 
         <p className="text-sm text-gray-600">
-          Por seguridad tu sesión fue cerrada por inactividad.
-          Debes volver a iniciar sesión.
+          Por seguridad, tu sesion se cerrara automaticamente en{" "}
+          <span className="font-semibold text-gray-900">
+            {sessionCountdown}
+          </span>{" "}
+          segundo{sessionCountdown === 1 ? "" : "s"} por inactividad.
         </p>
 
-        <button
-          onClick={() => setVisible(false)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-        >
-          Entendido
-        </button>
+        <p className="text-sm text-gray-600">
+          Si deseas continuar trabajando, puedes mantener tu sesion activa.
+        </p>
+
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <button
+            onClick={staySignedIn}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+          >
+            Mantener sesion
+          </button>
+
+          <button
+            onClick={() => logout("expired")}
+            className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg"
+          >
+            Cerrar sesion
+          </button>
+        </div>
       </div>
     </div>
   );
