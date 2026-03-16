@@ -13,7 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { apiFetch } from "@/app/lib/api";
+import { AUTH_LOGOUT_EVENT, apiFetch } from "@/app/lib/api";
 
 /* =====================================================
    TYPES
@@ -257,6 +257,24 @@ export function AuthProvider({
     };
 
     rehydrate();
+  }, []);
+
+  useEffect(() => {
+    const handleForcedLogout = () => {
+      logout("expired");
+    };
+
+    window.addEventListener(
+      AUTH_LOGOUT_EVENT,
+      handleForcedLogout
+    );
+
+    return () => {
+      window.removeEventListener(
+        AUTH_LOGOUT_EVENT,
+        handleForcedLogout
+      );
+    };
   }, []);
 
   /* =========================
