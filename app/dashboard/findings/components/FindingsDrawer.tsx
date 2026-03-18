@@ -21,6 +21,16 @@ export default function FindingsDrawer({
 
   if (!finding) return null;
 
+  const translateMessage = (msg?: string) => {
+    if (!msg) return "";
+    const lower = msg.toLowerCase();
+    if (lower.includes("ec2 instance is stopped")) return "La instancia EC2 está detenida";
+    if (lower.includes("missing required tag: owner")) return "Falta la etiqueta obligatoria: Owner";
+    if (lower.includes("missing required tag: environment")) return "Falta la etiqueta obligatoria: Environment";
+    if (lower.includes("log group has unlimited retention")) return "El grupo de logs no tiene retención configurada";
+    return msg;
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-end z-50">
       <div className="w-[400px] bg-white h-full shadow-xl p-6 overflow-y-auto">
@@ -72,7 +82,7 @@ export default function FindingsDrawer({
         <div className="mt-6">
           <h3 className="font-semibold mb-2">Mensaje</h3>
           <p className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl shadow-sm">
-            {finding.message}
+            {translateMessage(finding.message)}
           </p>
         </div>
 
