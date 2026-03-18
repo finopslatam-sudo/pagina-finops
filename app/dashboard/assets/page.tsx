@@ -207,7 +207,7 @@ export default function AssetsPage() {
       </div>
 
       {/* ================= ANALYTICS GRID ================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
       {/* ===== RISK DISTRIBUTION ===== */}
       <div className="bg-white p-8 rounded-3xl border shadow-xl">
@@ -235,29 +235,7 @@ export default function AssetsPage() {
               <Legend />
             </PieChart>
           </ResponsiveContainer>
-        </div>
-      {/* ===== HEALTH OVERVIEW (api/client/inventory/health) ===== */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
-        <h2 className="text-xl font-semibold mb-2">
-          Health Overview
-        </h2>
-        <p className="text-sm text-gray-500 mb-6">
-          Resumen de salud operacional desde <code>/api/client/inventory/health</code>.
-        </p>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          {healthMeta ? (
-            <>
-              <HealthBadge label="Healthy" value={healthMeta.healthy} color="emerald" />
-              <HealthBadge label="Warning" value={healthMeta.warning} color="yellow" />
-              <HealthBadge label="Waste" value={healthMeta.waste} color="red" />
-              <HealthBadge label="Unknown" value={healthMeta.unknown} color="gray" />
-            </>
-          ) : (
-            <p className="text-gray-400">Sin datos de health</p>
-          )}
-        </div>
       </div>
-
       </div>
 
       {/* ===== SERVICE DISTRIBUTION ===== */}

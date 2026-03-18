@@ -17,13 +17,7 @@ export default function DashboardLayout({
 
         {/* ================= HEADER GLOBAL ================= */}
 
-        <div className="flex items-center">
-
-          <h1 className="text-xl font-semibold text-gray-800">
-            Dashboard
-          </h1>
-
-        </div>
+        <div className="flex items-center" />
 
         {/* ================= CONTENIDO ================= */}
 
