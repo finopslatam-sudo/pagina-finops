@@ -440,7 +440,7 @@ export default function ClientAdministrationPage() {
                 <Feature text="Governance & Compliance" />
                 <Feature text="FinOps Risk Analysis" />
                 <Feature text="Multi-account AWS Support" />
-                <Feature text="Advanced FinOps Dashboard" />
+                <Feature text="Panel avanzado de métricas" />
 
               </div>
 

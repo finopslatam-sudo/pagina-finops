@@ -20,7 +20,7 @@ export default function DashboardLayout({
         <div className="flex items-center">
 
           <h1 className="text-xl font-semibold text-gray-800">
-            FinOps Dashboard
+            Dashboard
           </h1>
 
         </div>
