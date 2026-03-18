@@ -193,7 +193,7 @@ export default function AwsIntegrationPage() {
             </p>
           </div>
           <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50 text-sm text-amber-900">
-            <p className="font-semibold">Cómo habilitarlo (estilo CloudHealth)</p>
+            <p className="font-semibold">Cómo habilitarlo</p>
             <p className="mt-2">
               1) Crea o actualiza el rol de solo lectura para FinOpsLatam incluyendo las políticas de Cost Explorer y CUR.{" "}
               2) Asegura que el CUR se publique en S3 con acceso para el rol.{" "}
