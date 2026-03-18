@@ -183,6 +183,25 @@ export default function AwsIntegrationPage() {
           descubrir oportunidades de optimización de costos en tu infraestructura cloud.
         </p>
 
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="p-4 rounded-2xl border border-blue-200 bg-blue-50 text-sm text-blue-900">
+            <p className="font-semibold">Permisos necesarios (Cost Explorer / CUR)</p>
+            <p className="mt-2">
+              Para calcular cobertura y uso de Reserved Instances y Savings Plans, se requieren permisos de lectura sobre
+              Cost Explorer (CE) y/o Cost & Usage Report (CUR), incluyendo acceso a datos de billing. Si no se otorgan estos permisos,
+              las secciones de RI y SP se mostrarán vacías.
+            </p>
+          </div>
+          <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50 text-sm text-amber-900">
+            <p className="font-semibold">Cómo habilitarlo (estilo CloudHealth)</p>
+            <p className="mt-2">
+              1) Crea o actualiza el rol de solo lectura para FinOpsLatam incluyendo las políticas de Cost Explorer y CUR.{" "}
+              2) Asegura que el CUR se publique en S3 con acceso para el rol.{" "}
+              3) Vuelve a validar la conexión. Sin estos pasos, los análisis de RI/SP no tendrán datos.
+            </p>
+          </div>
+        </div>
+
       </div>
 
       {/* ================= STATUS CARD ================= */}
