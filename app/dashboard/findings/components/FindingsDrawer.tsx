@@ -27,7 +27,7 @@ export default function FindingsDrawer({
         
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold">Finding Details</h2>
+          <h2 className="text-lg font-bold">Detalle del hallazgo</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-black"
@@ -44,33 +44,33 @@ export default function FindingsDrawer({
         {/* Core Info */}
         <div className="space-y-3 text-sm">
           <div>
-            <strong>Finding Type:</strong> {finding.finding_type}
+            <strong>Tipo de hallazgo:</strong> {finding.finding_type}
           </div>
           <div>
-            <strong>Resource ID:</strong> {finding.resource_id}
+            <strong>ID de recurso:</strong> {finding.resource_id}
           </div>
           <div>
-            <strong>Resource Type:</strong> {finding.resource_type}
+            <strong>Tipo de recurso:</strong> {finding.resource_type}
           </div>
           <div>
-            <strong>Estimated Savings:</strong> $
+            <strong>Ahorro estimado:</strong> $
             {finding.estimated_monthly_savings}
           </div>
           <div>
-            <strong>Status:</strong>{" "}
-            {finding.resolved ? "Resolved" : "Active"}
+            <strong>Estado:</strong>{" "}
+            {finding.resolved ? "Resuelto" : "Activo"}
           </div>
           <div>
-            <strong>Detected At:</strong> {finding.detected_at}
+            <strong>Detectado el:</strong> {finding.detected_at}
           </div>
           <div>
-            <strong>Created At:</strong> {finding.created_at}
+            <strong>Creado el:</strong> {finding.created_at}
           </div>
         </div>
 
         {/* Message */}
         <div className="mt-6">
-          <h3 className="font-semibold mb-2">Message</h3>
+          <h3 className="font-semibold mb-2">Mensaje</h3>
           <p className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl shadow-sm">
             {finding.message}
           </p>
@@ -82,7 +82,7 @@ export default function FindingsDrawer({
             onClick={() => onResolve(finding.id)}
             className="mt-6 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
           >
-            Mark as Resolved
+            Marcar como resuelto
           </button>
         )}
       </div>
