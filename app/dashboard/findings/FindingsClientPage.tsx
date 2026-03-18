@@ -40,7 +40,7 @@ export default function FindingsPage() {
 
   const [scanModal, setScanModal] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
-  const { token } = useAuth();
+  const { token, isAuthReady } = useAuth();
   const { fetchStatus } = useAuditStatus();
   const [runningAudit, setRunningAudit] = useState(false);
   const [lastScan, setLastScan] = useState<string | null>(null);
@@ -162,7 +162,10 @@ export default function FindingsPage() {
   };
 
   const handleExport = async (format: "pdf" | "csv" | "xlsx") => {
-    if (!token) return;
+    if (!isAuthReady || !token) {
+      alert("Inicia sesión para exportar.");
+      return;
+    }
     const endpoint = `/api/client/reports/${format}`;
     const res = await fetch(`${API_URL}${endpoint}`, {
       method: "GET",
@@ -452,7 +455,8 @@ function ExportCard({
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-3 rounded-xl shadow-sm font-semibold text-sm ${color} transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black/5`}
+      className={`px-4 py-3 rounded-xl shadow-sm font-semibold text-sm ${color} transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black/5 disabled:opacity-50 disabled:cursor-not-allowed`}
+      disabled={!isAuthReady || !token}
     >
       {label}
     </button>
