@@ -11,10 +11,12 @@ import {
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
 import AwsAccountSelector from "../components/AwsAccountSelector";
+import { useSnapshots } from "../hooks/useSnapshots";
 
 export default function GobernanzaPage() {
   const { data, loading } = useDashboard();
   const { user } = useAuth();
+  const { trend, latest } = useSnapshots();
 
   // =============================
   // PLAN FEATURE CHECK
@@ -95,6 +97,15 @@ export default function GobernanzaPage() {
           actual, el progreso de remediación y la salud estructural de la infraestructura,
           permitiendo priorizar decisiones estratégicas basadas en impacto real.
         </p>
+
+        <div className="flex flex-wrap gap-3 mt-4 text-sm text-slate-700">
+          <span className="px-3 py-1 rounded-full bg-white border border-indigo-200">
+            Último snapshot: {latest?.created_at || 'Sin snapshots'}
+          </span>
+          <span className="px-3 py-1 rounded-full bg-white border border-emerald-200">
+            Trend puntos: {Array.isArray(trend) ? trend.length : 0}
+          </span>
+        </div>
 
       </div>
 

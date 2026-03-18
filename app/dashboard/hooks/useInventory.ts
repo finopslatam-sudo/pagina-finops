@@ -45,6 +45,17 @@ interface InventoryResponse {
   pagination: PaginationInfo;
 }
 
+interface InventoryServices {
+  services: Record<string, number>;
+}
+
+interface InventoryHealth {
+  healthy: number;
+  warning: number;
+  waste: number;
+  unknown: number;
+}
+
 /* =====================================================
    HOOK
 ===================================================== */
@@ -55,6 +66,8 @@ export function useInventory(page: number = 1, perPage: number = 50) {
   const { selectedAccount } = useAwsAccount();
 
   const [data, setData] = useState<InventoryResponse | null>(null);
+  const [servicesMeta, setServicesMeta] = useState<InventoryServices | null>(null);
+  const [healthMeta, setHealthMeta] = useState<InventoryHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
@@ -74,18 +87,34 @@ export function useInventory(page: number = 1, perPage: number = 50) {
           endpoint += `&aws_account_id=${selectedAccount}`;
         }
 
-        const response = await apiFetch<{
+        const inventoryPromise = apiFetch<{
           status: string;
           data: InventoryResponse;
-        }>(endpoint, {
-          token,
-        });
+        }>(endpoint, { token });
 
-        if (response.status !== 'ok') {
+        const servicesPromise = apiFetch<InventoryServices>(
+          "/api/client/inventory/services",
+          { token }
+        );
+
+        const healthPromise = apiFetch<InventoryHealth>(
+          "/api/client/inventory/health",
+          { token }
+        );
+
+        const [inventoryRes, servicesRes, healthRes] = await Promise.all([
+          inventoryPromise,
+          servicesPromise,
+          healthPromise,
+        ]);
+
+        if (inventoryRes.status !== 'ok') {
           throw new Error('Inventory response not ok');
         }
 
-        setData(response.data);
+        setData(inventoryRes.data);
+        setServicesMeta(servicesRes);
+        setHealthMeta(healthRes);
         setError('');
 
       } catch (err) {
@@ -105,5 +134,5 @@ export function useInventory(page: number = 1, perPage: number = 50) {
 
   }, [isAuthReady, token, page, perPage, selectedAccount]);
 
-  return { data, loading, error };
+  return { data, servicesMeta, healthMeta, loading, error };
 }

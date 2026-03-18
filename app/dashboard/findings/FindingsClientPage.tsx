@@ -19,6 +19,7 @@ import FindingsDrawer from "./components/FindingsDrawer";
 import { Finding } from "./types";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
+import { API_URL } from "@/app/lib/api";
 
 /* =====================================================
    MAIN COMPONENT
@@ -160,6 +161,26 @@ export default function FindingsPage() {
     setSelectedFinding(null);
   };
 
+  const handleExport = async (format: "pdf" | "csv" | "xlsx") => {
+    if (!token) return;
+    const endpoint = `/api/client/reports/${format}`;
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      alert("No se pudo exportar el reporte");
+      return;
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `findings.${format}`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   const runAudit = async () => {
 
     try {
@@ -267,6 +288,26 @@ export default function FindingsPage() {
 
         )}
 
+        </div>
+        <div className="flex flex-col gap-2 ml-6">
+          <button
+            onClick={() => handleExport("pdf")}
+            className="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50"
+          >
+            Exportar PDF
+          </button>
+          <button
+            onClick={() => handleExport("csv")}
+            className="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50"
+          >
+            Exportar CSV
+          </button>
+          <button
+            onClick={() => handleExport("xlsx")}
+            className="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50"
+          >
+            Exportar XLSX
+          </button>
         </div>
         </div>
 

@@ -9,6 +9,8 @@ import FindingsTable from './findings/components/FindingsTable';
 
 import { useDashboard } from './hooks/useDashboard';
 import { useInventory } from './hooks/useInventory';
+import { useClientPlan } from '@/app/lib/hooks/useClientPlan';
+import { useSnapshots } from './hooks/useSnapshots';
 
 import MonthlyCostChart from './components/finance/MonthlyCostChart';
 
@@ -24,6 +26,8 @@ export default function ClientDashboard() {
   const dashboard = data;
   const { data: latestFindings } = useFindings({ page: 1 });
   const { data: inventoryData } = useInventory();
+  const { plan } = useClientPlan();
+  const { latest: latestSnapshot } = useSnapshots();
 
   useEffect(() => {
     if (!isAuthReady) return;
@@ -42,6 +46,11 @@ export default function ClientDashboard() {
   if (error) return <p className="text-red-500">{error}</p>;
   if (loading || !data)
     return <p className="text-gray-400">Cargando dashboard…</p>;
+
+  const planLabel = Array.isArray(plan) && plan.length > 0
+    ? plan.map((p: any) => p.name || p.code || 'Plan').join(', ')
+    : 'Plan no asignado';
+  const lastSnapshotLabel = latestSnapshot?.created_at || latestSnapshot || 'Sin escaneos';
 
   /* =====================================================
      Construcción robusta de servicios escaneados
@@ -70,6 +79,15 @@ export default function ClientDashboard() {
         <h1 className="text-4xl font-semibold text-slate-800">
           Executive Overview
         </h1>
+
+        <div className="flex flex-wrap gap-3 text-sm text-slate-700">
+          <span className="px-3 py-1 rounded-full bg-white border border-blue-200">
+            Plan: {planLabel}
+          </span>
+          <span className="px-3 py-1 rounded-full bg-white border border-emerald-200">
+            Último snapshot: {lastSnapshotLabel}
+          </span>
+        </div>
 
         <p className="text-lg text-slate-700 leading-relaxed">
           {data.executive_summary?.message}

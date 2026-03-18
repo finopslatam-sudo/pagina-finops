@@ -14,7 +14,7 @@ import AwsAccountSelector from "../components/AwsAccountSelector";
 
 export default function AssetsPage() {
 
-  const { data, loading, error } = useInventory();
+  const { data, servicesMeta, healthMeta, loading, error } = useInventory();
   const [page, setPage] = useState(1);
   const perPage = 10;
 
@@ -207,7 +207,7 @@ export default function AssetsPage() {
       </div>
 
       {/* ================= ANALYTICS GRID ================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
       {/* ===== RISK DISTRIBUTION ===== */}
       <div className="bg-white p-8 rounded-3xl border shadow-xl">
@@ -236,6 +236,28 @@ export default function AssetsPage() {
             </PieChart>
           </ResponsiveContainer>
         </div>
+      {/* ===== HEALTH OVERVIEW (api/client/inventory/health) ===== */}
+      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+        <h2 className="text-xl font-semibold mb-2">
+          Health Overview
+        </h2>
+        <p className="text-sm text-gray-500 mb-6">
+          Resumen de salud operacional desde <code>/api/client/inventory/health</code>.
+        </p>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          {healthMeta ? (
+            <>
+              <HealthBadge label="Healthy" value={healthMeta.healthy} color="emerald" />
+              <HealthBadge label="Warning" value={healthMeta.warning} color="yellow" />
+              <HealthBadge label="Waste" value={healthMeta.waste} color="red" />
+              <HealthBadge label="Unknown" value={healthMeta.unknown} color="gray" />
+            </>
+          ) : (
+            <p className="text-gray-400">Sin datos de health</p>
+          )}
+        </div>
+      </div>
+
       </div>
 
       {/* ===== SERVICE DISTRIBUTION ===== */}
@@ -244,7 +266,7 @@ export default function AssetsPage() {
           Distribución por Servicio
         </h2>
         <p className="text-sm text-gray-500 mb-6">
-          Inventario consolidado agrupado por tipo de servicio cloud.
+          Inventario consolidado agrupado por tipo de servicio cloud (API: /api/client/inventory/services).
         </p>
 
         <div className="h-72">
@@ -268,6 +290,11 @@ export default function AssetsPage() {
             </PieChart>
           </ResponsiveContainer>
         </div>
+        {servicesMeta && Object.keys(servicesMeta.services || {}).length > 0 && (
+          <p className="text-xs text-gray-500 mt-3">
+            Servicios detectados (API): {Object.keys(servicesMeta.services).length}
+          </p>
+        )}
       </div>
 
       </div>
@@ -437,6 +464,29 @@ function FilterSelect({
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+function HealthBadge({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color: 'emerald' | 'yellow' | 'red' | 'gray';
+}) {
+  const palette: Record<string, string> = {
+    emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    yellow: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    red: 'bg-red-50 text-red-700 border-red-200',
+    gray: 'bg-gray-50 text-gray-700 border-gray-200',
+  };
+  return (
+    <div className={`p-4 rounded-xl border ${palette[color]}`}>
+      <p className="text-xs uppercase opacity-70">{label}</p>
+      <p className="text-2xl font-bold">{value}</p>
     </div>
   );
 }
