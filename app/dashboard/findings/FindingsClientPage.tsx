@@ -301,9 +301,9 @@ export default function FindingsPage() {
 
       {/* ================= EXPORT ACTIONS ================= */}
       <div className="flex flex-wrap justify-end gap-3">
-        <ExportCard label="Exportar PDF" onClick={() => handleExport("pdf")} color="bg-blue-600 text-white hover:bg-blue-700" />
-        <ExportCard label="Exportar CSV" onClick={() => handleExport("csv")} color="bg-emerald-600 text-white hover:bg-emerald-700" />
-        <ExportCard label="Exportar XLSX" onClick={() => handleExport("xlsx")} color="bg-indigo-600 text-white hover:bg-indigo-700" />
+        <ExportCard label="Exportar PDF" onClick={() => handleExport("pdf")} color="bg-blue-600 text-white hover:bg-blue-700" disabled={!isAuthReady || !token} />
+        <ExportCard label="Exportar CSV" onClick={() => handleExport("csv")} color="bg-emerald-600 text-white hover:bg-emerald-700" disabled={!isAuthReady || !token} />
+        <ExportCard label="Exportar XLSX" onClick={() => handleExport("xlsx")} color="bg-indigo-600 text-white hover:bg-indigo-700" disabled={!isAuthReady || !token} />
       </div>
 
       {/* ================= FILTERS ================= */}
@@ -447,16 +447,18 @@ function ExportCard({
   label,
   onClick,
   color,
+  disabled,
 }: {
   label: string;
   onClick: () => void;
   color: string;
+  disabled?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       className={`px-4 py-3 rounded-xl shadow-sm font-semibold text-sm ${color} transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black/5 disabled:opacity-50 disabled:cursor-not-allowed`}
-      disabled={!isAuthReady || !token}
+      disabled={disabled}
     >
       {label}
     </button>
