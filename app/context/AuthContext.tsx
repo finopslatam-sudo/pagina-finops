@@ -151,6 +151,7 @@ export function AuthProvider({
 
     localStorage.removeItem("finops_token");
     localStorage.removeItem("finops_user");
+    localStorage.removeItem("selectedAwsAccount");
 
     setUser(null);
     setToken(null);
@@ -346,6 +347,7 @@ export function AuthProvider({
       "finops_user",
       JSON.stringify(data.user)
     );
+    localStorage.removeItem("selectedAwsAccount");
 
     router.replace("/dashboard");
   };

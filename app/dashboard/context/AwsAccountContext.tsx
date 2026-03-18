@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface AwsAccountContextType {
   selectedAccount: number | null;
@@ -13,37 +14,15 @@ const AwsAccountContext = createContext<AwsAccountContextType>({
 });
 
 export function AwsAccountProvider({ children }: { children: React.ReactNode }) {
-
+  const pathname = usePathname();
   const [selectedAccount, setSelectedAccountState] = useState<number | null>(null);
 
-  /* =====================================================
-     LOAD FROM LOCAL STORAGE
-  ===================================================== */
-
   useEffect(() => {
-
-    const saved = localStorage.getItem('selectedAwsAccount');
-
-    if (saved) {
-      setSelectedAccountState(Number(saved));
-    }
-
-  }, []);
-
-  /* =====================================================
-     SAVE TO LOCAL STORAGE
-  ===================================================== */
+    setSelectedAccountState(null);
+  }, [pathname]);
 
   const setSelectedAccount = (id: number | null) => {
-
     setSelectedAccountState(id);
-
-    if (id === null) {
-      localStorage.removeItem('selectedAwsAccount');
-    } else {
-      localStorage.setItem('selectedAwsAccount', String(id));
-    }
-
   };
 
   return (
