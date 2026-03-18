@@ -297,10 +297,10 @@ export default function FindingsPage() {
       )}
 
       {/* ================= EXPORT ACTIONS ================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <ExportCard label="Exportar PDF" onClick={() => handleExport("pdf")} color="bg-sky-50 border-sky-200 text-sky-700" />
-        <ExportCard label="Exportar CSV" onClick={() => handleExport("csv")} color="bg-emerald-50 border-emerald-200 text-emerald-700" />
-        <ExportCard label="Exportar XLSX" onClick={() => handleExport("xlsx")} color="bg-amber-50 border-amber-200 text-amber-700" />
+      <div className="flex flex-wrap justify-end gap-3">
+        <ExportCard label="Exportar PDF" onClick={() => handleExport("pdf")} color="bg-blue-600 text-white hover:bg-blue-700" />
+        <ExportCard label="Exportar CSV" onClick={() => handleExport("csv")} color="bg-emerald-600 text-white hover:bg-emerald-700" />
+        <ExportCard label="Exportar XLSX" onClick={() => handleExport("xlsx")} color="bg-indigo-600 text-white hover:bg-indigo-700" />
       </div>
 
       {/* ================= FILTERS ================= */}
@@ -452,7 +452,7 @@ function ExportCard({
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left p-5 rounded-2xl border shadow-sm font-semibold ${color} hover:opacity-90 transition`}
+      className={`px-4 py-3 rounded-xl shadow-sm font-semibold text-sm ${color} transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black/5`}
     >
       {label}
     </button>
