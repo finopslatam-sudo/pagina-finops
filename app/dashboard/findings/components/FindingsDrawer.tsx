@@ -30,6 +30,18 @@ export default function FindingsDrawer({
       CLOUDWATCH_NO_RETENTION: "El grupo de logs no tiene retención configurada.",
       DYNAMODB_EMPTY_TABLE: "La tabla DynamoDB no tiene elementos.",
       UNATTACHED_VOLUME: "El volumen EBS no está adjunto a ninguna instancia.",
+      EBS_GP2_TO_GP3: "Convierte el volumen de GP2 a GP3 para reducir costos.",
+      RIGHTSIZING_OPPORTUNITY: "Oportunidad de redimensionamiento para reducir costos.",
+      EC2_UNDERUTILIZED: "La instancia EC2 está subutilizada; considera bajarla de tamaño.",
+      RDS_UNDERUTILIZED: "La instancia RDS está subutilizada; considera bajarla de tamaño.",
+      LAMBDA_MEMORY_RIGHTSIZING: "Ajusta la memoria de la función Lambda para optimizar costo/rendimiento.",
+      DYNAMODB_PROVISIONED_RIGHTSIZING: "Reduce la capacidad provisionada de DynamoDB para ahorrar.",
+      CLOUDWATCH_STORAGE_RIGHTSIZING: "Optimiza el almacenamiento de logs en CloudWatch para ahorrar.",
+      S3_STORAGE_RIGHTSIZING_REVIEW: "Revisa el almacenamiento S3 para aplicar políticas de ahorro.",
+      ECS_SERVICE_RIGHTSIZING_REVIEW: "Redimensiona servicios ECS para alinearlos al uso real.",
+      EKS_NODEGROUP_RIGHTSIZING_REVIEW: "Ajusta los node groups de EKS al tamaño adecuado.",
+      NAT_IDLE_GATEWAY: "Gateway NAT inactivo; evalúa apagarlo o escalarlo.",
+      REDSHIFT_UNDERUTILIZED: "El cluster Redshift está subutilizado; considera reducir nodos o pausar.",
     };
     if (findingType && mapByType[findingType]) return mapByType[findingType];
 

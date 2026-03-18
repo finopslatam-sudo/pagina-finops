@@ -108,13 +108,12 @@ export default function OptimizationPage() {
       {/* ================= HERO ================= */}
       <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-gray-900">
-          Optimization & Commitments Strategy
+          Optimización y Estrategia de Compromisos
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
         Marco de optimización a nivel ejecutivo que consolida las oportunidades de dimensionamiento, 
-        la cobertura de los compromisos (Instancias Reservadas y Planes de Ahorro) y el impacto financiero proyectado 
-        en su entorno de nube. Esta sección permite tomar decisiones basadas en datos para mejorar la eficiencia, 
-        reducir el desperdicio estructural y maximizar el retorno a largo plazo de las inversiones en la nube.
+        la cobertura de compromisos (Instancias Reservadas y Savings Plans) y el impacto financiero proyectado 
+        en tu entorno cloud. Facilita decisiones basadas en datos para reducir desperdicio y maximizar ROI.
         </p>
       </div>
 
@@ -180,7 +179,7 @@ export default function OptimizationPage() {
                   </div>
                   <p className="text-sm text-gray-600">{r.message}</p>
                   <p className="text-sm text-emerald-600 mt-2">
-                    ${r.estimated_monthly_savings} monthly
+                    ${r.estimated_monthly_savings} ahorro mensual
                   </p>
                 </div>
               ))}
@@ -190,18 +189,18 @@ export default function OptimizationPage() {
       </SectionCard>
 
       {/* ================= RI ================= */}
-      <SectionCard title="Reserved Instances Coverage">
+      <SectionCard title="Cobertura de Reserved Instances">
         {!ri?.has_reserved_instances ? (
-          <EmptyState message="No Reserved Instances detected in the last 30 days." />
+          <EmptyState message="No se detectaron Reserved Instances en los últimos 30 días." />
         ) : (
           <CoverageDisplay percentage={ri.coverage_percentage} />
         )}
       </SectionCard>
 
       {/* ================= SP ================= */}
-      <SectionCard title="Savings Plans Coverage">
+      <SectionCard title="Cobertura de Savings Plans">
         {!sp?.has_savings_plans ? (
-          <EmptyState message="No Savings Plans active in this account." />
+          <EmptyState message="No hay Savings Plans activos en esta cuenta." />
         ) : (
           <div className="space-y-4">
             {sp.services.map((s, idx) => (
