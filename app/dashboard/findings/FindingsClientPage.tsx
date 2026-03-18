@@ -289,32 +289,19 @@ export default function FindingsPage() {
         )}
 
         </div>
-        <div className="flex flex-col gap-2 ml-6">
-          <button
-            onClick={() => handleExport("pdf")}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50"
-          >
-            Exportar PDF
-          </button>
-          <button
-            onClick={() => handleExport("csv")}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50"
-          >
-            Exportar CSV
-          </button>
-          <button
-            onClick={() => handleExport("xlsx")}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-50"
-          >
-            Exportar XLSX
-          </button>
-        </div>
         </div>
 
       {/* ================= STATS ================= */}
       {stats && (
         <FindingsStatsCards stats={stats} />
       )}
+
+      {/* ================= EXPORT ACTIONS ================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <ExportCard label="Exportar PDF" onClick={() => handleExport("pdf")} color="bg-sky-50 border-sky-200 text-sky-700" />
+        <ExportCard label="Exportar CSV" onClick={() => handleExport("csv")} color="bg-emerald-50 border-emerald-200 text-emerald-700" />
+        <ExportCard label="Exportar XLSX" onClick={() => handleExport("xlsx")} color="bg-amber-50 border-amber-200 text-amber-700" />
+      </div>
 
       {/* ================= FILTERS ================= */}
       <FindingsFilters
@@ -450,5 +437,24 @@ export default function FindingsPage() {
       />
 
     </div>
+  );
+}
+
+function ExportCard({
+  label,
+  onClick,
+  color,
+}: {
+  label: string;
+  onClick: () => void;
+  color: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full text-left p-5 rounded-2xl border shadow-sm font-semibold ${color} hover:opacity-90 transition`}
+    >
+      {label}
+    </button>
   );
 }
