@@ -21,13 +21,26 @@ export default function FindingsDrawer({
 
   if (!finding) return null;
 
-  const translateMessage = (msg?: string) => {
+  const translateMessage = (msg?: string, findingType?: string) => {
     if (!msg) return "";
+    const mapByType: Record<string, string> = {
+      STOPPED_INSTANCE: "La instancia EC2 está detenida.",
+      MISSING_TAG_OWNER: "Falta la etiqueta obligatoria: Owner.",
+      MISSING_TAG_ENVIRONMENT: "Falta la etiqueta obligatoria: Environment.",
+      CLOUDWATCH_NO_RETENTION: "El grupo de logs no tiene retención configurada.",
+      DYNAMODB_EMPTY_TABLE: "La tabla DynamoDB no tiene elementos.",
+      UNATTACHED_VOLUME: "El volumen EBS no está adjunto a ninguna instancia.",
+    };
+    if (findingType && mapByType[findingType]) return mapByType[findingType];
+
     const lower = msg.toLowerCase();
-    if (lower.includes("ec2 instance is stopped")) return "La instancia EC2 está detenida";
-    if (lower.includes("missing required tag: owner")) return "Falta la etiqueta obligatoria: Owner";
-    if (lower.includes("missing required tag: environment")) return "Falta la etiqueta obligatoria: Environment";
-    if (lower.includes("log group has unlimited retention")) return "El grupo de logs no tiene retención configurada";
+    if (lower.includes("ec2 instance is stopped")) return mapByType.STOPPED_INSTANCE;
+    if (lower.includes("missing required tag: owner")) return mapByType.MISSING_TAG_OWNER;
+    if (lower.includes("missing required tag: environment")) return mapByType.MISSING_TAG_ENVIRONMENT;
+    if (lower.includes("log group has unlimited retention")) return mapByType.CLOUDWATCH_NO_RETENTION;
+    if (lower.includes("dynamodb table has zero items")) return mapByType.DYNAMODB_EMPTY_TABLE;
+    if (lower.includes("volume not attached")) return mapByType.UNATTACHED_VOLUME;
+
     return msg;
   };
 
@@ -82,7 +95,7 @@ export default function FindingsDrawer({
         <div className="mt-6">
           <h3 className="font-semibold mb-2">Mensaje</h3>
           <p className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl shadow-sm">
-            {translateMessage(finding.message)}
+            {translateMessage(finding.message, finding.finding_type)}
           </p>
         </div>
 
