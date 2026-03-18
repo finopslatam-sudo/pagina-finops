@@ -50,7 +50,10 @@ export default function ClientDashboard() {
   const planLabel = Array.isArray(plan) && plan.length > 0
     ? plan.map((p: any) => p.name || p.code || 'Plan').join(', ')
     : 'Plan no asignado';
-  const lastSnapshotLabel = latestSnapshot?.created_at || latestSnapshot || 'Sin escaneos';
+  const lastSnapshotLabel: string =
+    typeof latestSnapshot === "string"
+      ? latestSnapshot
+      : latestSnapshot?.created_at ?? 'Sin escaneos';
 
   /* =====================================================
      Construcción robusta de servicios escaneados
