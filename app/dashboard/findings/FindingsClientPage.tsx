@@ -252,12 +252,11 @@ export default function FindingsPage() {
         <div>
 
           <h1 className="text-3xl font-semibold text-slate-800">
-            Risk & Findings
+            Findings & Optimization
           </h1>
 
           <p className="text-slate-600 mt-3">
-          Detección automática de recursos huérfanos, configuraciones ineficientes y desperdicio de infraestructura en tu entorno cloud. 
-          Identifica instancias olvidadas, volúmenes sin uso, almacenamiento innecesario y otras oportunidades de optimización que generan costos ocultos.
+          Detección y recomendaciones de optimización (rightsizing, tags, gobernanza y costos) en tu entorno cloud, incluyendo ahorro estimado y acciones sugeridas.
           </p>
 
         </div>

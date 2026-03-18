@@ -1,19 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useDashboard } from '../hooks/useDashboard';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
 import { useAwsAccount } from "../context/AwsAccountContext";
 import AwsAccountSelector from "../components/AwsAccountSelector";
-
-type RightsizingResponse = {
-  has_data: boolean;
-  total_recommendations: number;
-  total_estimated_monthly_savings: number;
-  supported_services: string[];
-  recommendations: any[];
-};
 
 type RIResponse = {
   coverage_percentage: number;
@@ -31,10 +22,8 @@ type SPResponse = {
 };
 
 export default function OptimizationPage() {
-  const { data, loading, error } = useDashboard();
   const { token, user } = useAuth();
   const { selectedAccount } = useAwsAccount();
-  const [rightsizing, setRightsizing] = useState<RightsizingResponse | null>(null);
   const [ri, setRI] = useState<RIResponse | null>(null);
   const [sp, setSP] = useState<SPResponse | null>(null);
   const [loadingFinops, setLoadingFinops] = useState(true);
@@ -55,17 +44,14 @@ export default function OptimizationPage() {
         ? `?aws_account_id=${selectedAccount}`
         : '';
       
-        const [r1, r2, r3] = await Promise.all([
-          fetch(`/api/client/finops/rightsizing${accountQuery}`, { headers }),
+        const [r2, r3] = await Promise.all([
           fetch(`/api/client/finops/ri-coverage${accountQuery}`, { headers }),
           fetch(`/api/client/finops/sp-coverage${accountQuery}`, { headers }),
         ]);
 
-        const d1 = await r1.json();
         const d2 = await r2.json();
         const d3 = await r3.json();
 
-        setRightsizing(d1);
         setRI(d2);
         setSP(d3);
       } catch (e) {
@@ -90,17 +76,9 @@ export default function OptimizationPage() {
     );
   }
 
-  if (loading || loadingFinops) {
+  if (loadingFinops) {
     return <div className="p-6 text-gray-400">Cargando optimización...</div>;
   }
-
-  if (error) {
-    return <div className="p-6 text-red-500">{error}</div>;
-  }
-
-  if (!data) return null;
-
-  const roi = data.roi_projection;
 
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-16">
@@ -108,12 +86,10 @@ export default function OptimizationPage() {
       {/* ================= HERO ================= */}
       <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-gray-900">
-          Optimización y Estrategia de Compromisos
+          Estrategia de Compromisos (RI & Savings Plans)
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
-        Marco de optimización a nivel ejecutivo que consolida las oportunidades de dimensionamiento, 
-        la cobertura de compromisos (Instancias Reservadas y Savings Plans) y el impacto financiero proyectado 
-        en tu entorno cloud. Facilita decisiones basadas en datos para reducir desperdicio y maximizar ROI.
+        Cobertura y uso de compromisos (Reserved Instances y Savings Plans) para maximizar el valor de tus workloads en la nube.
         </p>
       </div>
 
@@ -121,72 +97,6 @@ export default function OptimizationPage() {
       <div className="flex items-center gap-4 pt-2">
         <AwsAccountSelector />
       </div>
-
-      {/* ================= ROI ================= */}
-      {roi && (
-        <SectionCard title="Strategic ROI Projection">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <MetricCard
-              label="Puntuación de riesgo proyectada"
-              value={`${roi.projected_risk_score}%`}
-              variant="orange"
-            />
-
-            <MetricCard
-              label="Gobernanza proyectada"
-              value={`${roi.projected_governance}%`}
-              variant="blue"
-            />
-
-            <MetricCard
-              label="Nivel de riesgo proyectado"
-              value={roi.projected_risk_level}
-              variant="purple"
-            />
-
-            <MetricCard
-              label="Ahorro anual proyectado"
-              value={`$${roi.high_savings_opportunity_annual}`}
-              variant="green"
-            />
-          </div>
-        </SectionCard>
-      )}
-
-      {/* ================= RIGHTSIZING ================= */}
-      <SectionCard title="Rightsizing">
-        {!rightsizing?.has_data ? (
-          <EmptyState message="No se detectaron oportunidades de rightsizing para los servicios evaluados." />
-        ) : (
-          <>
-            <div className="mb-6">
-              <p className="text-sm text-gray-600">
-                Recomendaciones totales: {rightsizing.total_recommendations}
-              </p>
-              <p className="text-sm text-gray-600">
-                Ahorro mensual estimado: ${rightsizing.total_estimated_monthly_savings}
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {rightsizing.recommendations.map((r: any) => (
-                <div key={r.id} className="border rounded-2xl p-5 bg-gray-50">
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="font-semibold">{r.resource_id}</p>
-                    <span className="text-xs font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-700">
-                      {r.aws_service}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600">{r.message}</p>
-                  <p className="text-sm text-emerald-600 mt-2">
-                    ${r.estimated_monthly_savings} ahorro mensual
-                  </p>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </SectionCard>
 
       {/* ================= RI ================= */}
       <SectionCard title="Cobertura de Reserved Instances">
