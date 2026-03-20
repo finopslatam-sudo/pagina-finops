@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
-import { apiFetch } from "@/app/lib/api";
+import { apiFetch, API_URL } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 import StepGuide from "./components/StepGuide";
 import { Copy, Check } from "lucide-react";
@@ -10,6 +10,7 @@ import { Copy, Check } from "lucide-react";
 export default function AwsIntegrationPage() {
 
   const { token } = useAuth();
+  const templateDownloadUrl = `${API_URL}/api/client/aws/template`;
 
   const [loading, setLoading] = useState(false);
   const [cloudformationUrl, setCloudformationUrl] = useState<string | null>(null);
@@ -427,7 +428,7 @@ export default function AwsIntegrationPage() {
               title="Descargar Template"
               description="Descarga el archivo YAML de CloudFormation."
               button="Download YAML"
-              link="/api/client/aws/template"
+              link={templateDownloadUrl}
             />
         
           </div>
@@ -606,7 +607,7 @@ function ActionCard({
         onClick={() => {
           const downloadLink = document.createElement("a");
       
-          downloadLink.href = "https://api.finopslatam.com/api/client/aws/template";
+          downloadLink.href = link;
           downloadLink.download = "finopslatam-cloudformation.yaml";
       
           document.body.appendChild(downloadLink);
