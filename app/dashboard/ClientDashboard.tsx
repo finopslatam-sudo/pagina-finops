@@ -40,8 +40,7 @@ export default function ClientDashboard() {
   }, [isAuthReady, user, token, isStaff, router]);
 
   if (error) return <p className="text-red-500">{error}</p>;
-  if (loading || !data)
-    return <p className="text-gray-400">Cargando dashboard…</p>;
+  if (loading || !data) return <DashboardSkeleton />;
 
 
   /* =====================================================
@@ -330,6 +329,61 @@ export default function ClientDashboard() {
           onResolve={() => {}}
         />
 
+      </div>
+
+    </div>
+  );
+}
+
+/* =====================================================
+   SKELETON LOADER
+===================================================== */
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-16 animate-pulse">
+
+      {/* Executive Overview */}
+      <div className="bg-slate-100 border border-slate-200 p-12 rounded-3xl space-y-6">
+        <div className="h-9 w-64 bg-slate-200 rounded-xl" />
+        <div className="h-4 w-full max-w-2xl bg-slate-200 rounded-lg" />
+        <div className="h-4 w-3/4 bg-slate-200 rounded-lg" />
+        <div className="grid grid-cols-3 gap-6 pt-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white border border-slate-200 p-5 rounded-xl h-16" />
+          ))}
+        </div>
+      </div>
+
+      {/* Account selector */}
+      <div className="h-10 w-48 bg-slate-100 rounded-xl" />
+
+      {/* KPI rows — 3×3 */}
+      {[...Array(3)].map((_, row) => (
+        <div key={row} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, col) => (
+            <div key={col} className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+              <div className="h-3 w-40 bg-slate-200 rounded" />
+              <div className="h-8 w-32 bg-slate-200 rounded-lg" />
+            </div>
+          ))}
+        </div>
+      ))}
+
+      {/* Operational metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-3">
+            <div className="h-3 w-24 bg-slate-200 rounded" />
+            <div className="h-7 w-12 bg-slate-200 rounded" />
+          </div>
+        ))}
+      </div>
+
+      {/* Chart placeholder */}
+      <div className="bg-white border border-slate-200 p-10 rounded-3xl">
+        <div className="h-6 w-48 bg-slate-200 rounded mb-6" />
+        <div className="h-48 bg-slate-100 rounded-xl" />
       </div>
 
     </div>
