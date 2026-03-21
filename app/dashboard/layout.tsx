@@ -40,7 +40,7 @@ export default function DashboardLayout({
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <img
-                src="/logoFinopsLatam.png"
+                src="/logo2.png"
                 alt="FinOpsLatam"
                 className="h-9 w-9 rounded-lg object-contain bg-white/10 p-1"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -64,6 +64,13 @@ export default function DashboardLayout({
               >
                 <span>✉️</span>
                 <span>contacto@finopslatam.com</span>
+              </a>
+              <a
+                href="mailto:soporte@finopslatam.com"
+                className="flex items-center gap-2 hover:text-white transition-colors"
+              >
+                <span>🛠️</span>
+                <span>soporte@finopslatam.com</span>
               </a>
               <a
                 href="https://wa.me/56965090121"
@@ -95,8 +102,8 @@ export default function DashboardLayout({
                 <span>Tus datos están protegidos y cifrados</span>
               </p>
               <p className="flex items-center gap-2">
-                <span>☁️</span>
-                <span>Infraestructura en AWS (us-east-1)</span>
+                <span>🛡️</span>
+                <span>Altos estándares de seguridad y privacidad</span>
               </p>
               <p className="flex items-center gap-2">
                 <span>🔄</span>
