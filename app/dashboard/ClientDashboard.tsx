@@ -142,14 +142,10 @@ export default function ClientDashboard() {
               />
 
               <PastelCard
-                title="Ahorro Mensual"
+                title="Ahorro Mensual Acumulado"
                 value={formatUSD(data.cost.potential_savings)}
                 variant="green"
-                tooltip={
-                  dl.previous_month_start && dl.previous_month_end
-                    ? `Ahorro potencial estimado vs el mes anterior (${fmt(dl.previous_month_start)} – ${fmt(dl.previous_month_end)})`
-                    : 'Ahorro potencial estimado comparado con el mes anterior.'
-                }
+                tooltip="Corresponde a los ahorros ya aplicados en meses anteriores más los ahorros identificados en el mes actual. Incluye recursos históricos escaneados aunque ya no estén activos en el inventario."
               />
 
             </div>
