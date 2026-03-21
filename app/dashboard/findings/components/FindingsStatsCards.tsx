@@ -28,7 +28,7 @@ export default function FindingsStatsCards({ stats }: Props) {
 
       <Card
         title="Monthly Savings"
-        value={`$${stats.estimated_monthly_savings}`}
+        value={`USD $${stats.estimated_monthly_savings}`}
         color="blue"
       />
     </div>
