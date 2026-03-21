@@ -102,31 +102,123 @@ export default function ClientDashboard() {
       </div>
 
       {/* =====================================================
-         2️⃣ FINANCIAL SNAPSHOT
+         2️⃣ FINANCIAL SNAPSHOT — 9 CARDS (3 FILAS × 3)
       ===================================================== */}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {(() => {
+        const dl = data.cost.date_labels ?? {};
+        const fmt = (iso: string) => {
+          if (!iso) return iso;
+          const [y, m, d] = iso.split('-');
+          const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+          return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+        };
 
-      <PastelCard
-        title="Gasto Actual mensual"
-        value={formatUSD(data.cost.current_month_cost)}
-        variant="blue"
-      />
+        return (
+          <div className="space-y-6">
 
-      <PastelCard
-        title="Ahorro Potencial mensual"
-        value={formatUSD(data.cost.potential_savings)}
-        variant="green"
-        tooltip="El ahorro potencial solo considera hallazgos con impacto económico directo. Las recomendaciones de revisión se muestran por separado."
-      />
+            {/* FILA 1 — GASTOS MENSUALES */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-      <PastelCard
-        title="Potencial Optimización"
-        value={formatPercentage(data.cost.savings_percentage)}
-        variant="amber"
-      />
+              <PastelCard
+                title="Gasto Mes Anterior"
+                value={formatUSD(data.cost.previous_month_cost ?? data.cost.current_month_cost)}
+                variant="blue"
+                tooltip={
+                  dl.previous_month_start && dl.previous_month_end
+                    ? `Período de facturación: ${fmt(dl.previous_month_start)} al ${fmt(dl.previous_month_end)}`
+                    : 'Gasto total del mes cerrado anterior.'
+                }
+              />
 
-      </div>
+              <PastelCard
+                title="Gasto del Mes Actual"
+                value={formatUSD(data.cost.current_month_partial ?? 0)}
+                variant="sky"
+                tooltip={
+                  dl.current_month_end
+                    ? `Gastos acumulados hasta el ${fmt(dl.current_month_end)}`
+                    : 'Gastos acumulados hasta el día de hoy.'
+                }
+              />
+
+              <PastelCard
+                title="Ahorro Mensual"
+                value={formatUSD(data.cost.potential_savings)}
+                variant="green"
+                tooltip={
+                  dl.previous_month_start && dl.previous_month_end
+                    ? `Ahorro potencial estimado vs el mes anterior (${fmt(dl.previous_month_start)} – ${fmt(dl.previous_month_end)})`
+                    : 'Ahorro potencial estimado comparado con el mes anterior.'
+                }
+              />
+
+            </div>
+
+            {/* FILA 2 — GASTOS ANUALES */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+              <PastelCard
+                title="Gasto Año Anterior"
+                value={formatUSD(data.cost.previous_year_cost ?? 0)}
+                variant="indigo"
+                tooltip={
+                  dl.previous_year_start && dl.previous_year_end
+                    ? `Período: ${fmt(dl.previous_year_start)} al ${fmt(dl.previous_year_end)}`
+                    : 'Gasto total del año anterior.'
+                }
+              />
+
+              <PastelCard
+                title="Gasto Año Actual"
+                value={formatUSD(data.cost.current_year_ytd ?? 0)}
+                variant="purple"
+                tooltip={
+                  dl.current_year_start && dl.current_year_end
+                    ? `Suma de gastos del ${fmt(dl.current_year_start)} al ${fmt(dl.current_year_end)}`
+                    : 'Gastos acumulados del año en curso hasta hoy.'
+                }
+              />
+
+              <PastelCard
+                title="Ahorro Estimado Anual"
+                value={formatUSD(data.cost.annual_estimated_savings ?? 0)}
+                variant="green"
+                tooltip={
+                  dl.current_year_end
+                    ? `Proyección de ahorro anualizada al ${fmt(dl.current_year_end)}, basada en hallazgos activos.`
+                    : 'Proyección de ahorro anualizada basada en hallazgos activos.'
+                }
+              />
+
+            </div>
+
+            {/* FILA 3 — PORCENTAJES DE AHORRO */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+              <PastelCard
+                title="Porcentaje de Ahorro Mensual"
+                value={formatPercentage(data.cost.monthly_savings_percentage ?? data.cost.savings_percentage)}
+                variant="amber"
+              />
+
+              <PastelCard
+                title="Porcentaje de Ahorro Anual"
+                value={formatPercentage(data.cost.annual_savings_percentage ?? 0)}
+                variant="rose"
+              />
+
+              <PastelCard
+                title="Porcentaje de Ahorro Actual"
+                value={formatPercentage(data.cost.current_month_savings_percentage ?? 0)}
+                variant="sky"
+              />
+
+            </div>
+
+          </div>
+        );
+      })()}
 
       {/* =====================================================
          3️⃣ OPERATIONAL METRICS
@@ -262,7 +354,8 @@ function PastelCard({
     | 'amber'
     | 'rose'
     | 'indigo'
-    | 'sky';
+    | 'sky'
+    | 'purple';
   tooltip?: string;
 }) {
 
@@ -273,6 +366,7 @@ function PastelCard({
     rose: "bg-rose-50",
     indigo: "bg-indigo-50",
     sky: "bg-sky-50",
+    purple: "bg-purple-50",
   };
 
   return (

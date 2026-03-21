@@ -52,11 +52,31 @@ export interface DashboardResponse {
   };
 
   cost: {
+    // Campos originales
     current_month_cost: number;
     monthly_cost: { month: string; amount: number }[];
     service_breakdown: { service: string; amount: number }[];
     potential_savings: number;
     savings_percentage: number;
+    // Nuevos campos
+    previous_month_cost: number;
+    current_month_partial: number;
+    previous_year_cost: number;
+    current_year_ytd: number;
+    annual_estimated_savings: number;
+    monthly_savings_percentage: number;
+    annual_savings_percentage: number;
+    current_month_savings_percentage: number;
+    date_labels: {
+      previous_month_start: string;
+      previous_month_end: string;
+      current_month_start: string;
+      current_month_end: string;
+      previous_year_start: string;
+      previous_year_end: string;
+      current_year_start: string;
+      current_year_end: string;
+    };
   };
 
   roi_projection: {
