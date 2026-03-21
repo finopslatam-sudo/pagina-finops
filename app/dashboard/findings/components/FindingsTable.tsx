@@ -93,69 +93,80 @@ export default function FindingsTable({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full bg-white shadow rounded text-sm">
+    <div className="w-full">
+      <table className="w-full bg-white shadow rounded-xl text-sm table-fixed">
+        <colgroup>
+          <col className="w-[7%]" />
+          <col className="w-[10%]" />
+          <col className="w-[13%]" />
+          <col className="w-[11%]" />
+          <col className="w-[8%]" />
+          <col className="w-[7%]" />
+          <col className="w-[7%]" />
+          <col className="w-[18%]" />
+          <col className="w-[19%]" />
+        </colgroup>
         <thead>
-          <tr className="text-left border-b bg-gray-50">
-            <th className="p-3 whitespace-nowrap">Service</th>
-            <th className="p-3 whitespace-nowrap">Account</th>
-            <th className="p-3 whitespace-nowrap">Type</th>
-            <th className="p-3 whitespace-nowrap">Resource</th>
-            <th className="p-3 whitespace-nowrap">Hallazgo</th>
-            <th className="p-3 whitespace-nowrap">Region</th>
-            <th className="p-3 whitespace-nowrap">Savings</th>
-            <th className="p-3 whitespace-nowrap">Status</th>
-            <th className="p-3 whitespace-nowrap">Cómo resolverlo</th>
+          <tr className="text-left border-b bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+            <th className="px-4 py-3">Service</th>
+            <th className="px-4 py-3">Account</th>
+            <th className="px-4 py-3">Type</th>
+            <th className="px-4 py-3">Resource</th>
+            <th className="px-4 py-3">Region</th>
+            <th className="px-4 py-3">Savings</th>
+            <th className="px-4 py-3">Status</th>
+            <th className="px-4 py-3">Finding</th>
+            <th className="px-4 py-3">How to Fix</th>
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="divide-y divide-gray-100">
           {findings.map((f) => (
             <tr
               key={f.id}
-              className="border-b hover:bg-gray-50 cursor-pointer transition align-top"
+              className="hover:bg-gray-50 cursor-pointer transition align-top"
               onClick={() => onRowClick?.(f)}
             >
-              <td className="p-3 font-medium whitespace-nowrap">
+              <td className="px-4 py-3 font-medium text-gray-800 truncate">
                 {f.aws_service}
               </td>
 
-              <td className="p-3 whitespace-nowrap">
+              <td className="px-4 py-3 text-gray-600 truncate">
                 {f.aws_account_name}
               </td>
 
-              <td className="p-3 whitespace-nowrap">
+              <td className="px-4 py-3 text-gray-700 truncate" title={f.finding_type}>
                 {f.finding_type}
               </td>
 
-              <td className="p-3 text-gray-600 max-w-[160px] truncate" title={f.resource_id}>
+              <td className="px-4 py-3 text-gray-500 truncate" title={f.resource_id}>
                 {f.resource_id}
               </td>
 
-              <td className="p-3 text-gray-700 max-w-[220px]">
-                <span title={f.message} className="line-clamp-2">
-                  {f.message || "—"}
-                </span>
-              </td>
-
-              <td className="p-3 text-gray-600 whitespace-nowrap">
+              <td className="px-4 py-3 text-gray-600 truncate">
                 {f.region || "—"}
               </td>
 
-              <td className="p-3 whitespace-nowrap">
+              <td className="px-4 py-3 text-gray-800 whitespace-nowrap">
                 USD ${f.estimated_monthly_savings}
               </td>
 
-              <td className="p-3 whitespace-nowrap">
+              <td className="px-4 py-3">
                 {f.resolved ? (
                   <span className="text-green-600 font-medium">Resolved</span>
                 ) : (
-                  <span className="text-red-600 font-medium">Active</span>
+                  <span className="text-red-500 font-medium">Active</span>
                 )}
               </td>
 
-              <td className="p-3 text-gray-600 max-w-[280px]">
-                <p className="text-xs leading-relaxed">
+              <td className="px-4 py-3 text-gray-600">
+                <p className="text-xs leading-relaxed line-clamp-3" title={f.message}>
+                  {f.message || "—"}
+                </p>
+              </td>
+
+              <td className="px-4 py-3">
+                <p className="text-xs leading-relaxed text-gray-600">
                   {getResolution(f.finding_type)}
                 </p>
                 {isFinopsAdmin && !f.resolved && (
@@ -166,7 +177,7 @@ export default function FindingsTable({
                     }}
                     className="mt-2 text-xs text-blue-600 hover:underline"
                   >
-                    Marcar como resuelto
+                    Mark as resolved
                   </button>
                 )}
               </td>
