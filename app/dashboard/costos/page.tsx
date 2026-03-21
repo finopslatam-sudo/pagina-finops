@@ -1,10 +1,10 @@
 'use client';
 
 import { useDashboard } from '../hooks/useDashboard';
-import DashboardFinancialKPIs from '../components/finance/DashboardFinancialKPIs';
 import MonthlyCostChart from '../components/finance/MonthlyCostChart';
 import ServiceBreakdownChart from '../components/finance/ServiceBreakdownChart';
 import AwsAccountSelector from "../components/AwsAccountSelector";
+import { formatUSD, formatPercentage } from "@/app/lib/finopsFormat";
 
 export default function CostosPage() {
 
@@ -23,22 +23,27 @@ export default function CostosPage() {
   }
 
   const cost = data.cost;
+  const dl = cost.date_labels ?? {} as NonNullable<typeof cost.date_labels>;
+
+  const fmt = (iso: string) => {
+    if (!iso) return iso;
+    const [y, m, d] = iso.split('-');
+    const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-12">
 
       {/* ================= HERO FINANCIAL CARD ================= */}
       <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-8 shadow-sm">
-
         <h1 className="text-3xl font-bold text-gray-900">
           Costs & Financials
         </h1>
-
         <p className="text-gray-600 mt-3 max-w-3xl">
           Análisis financiero consolidado del consumo cloud, exposición proyectada
           y oportunidades estratégicas de optimización.
         </p>
-
       </div>
 
       {/* ================= ACCOUNT FILTER ================= */}
@@ -46,32 +51,101 @@ export default function CostosPage() {
         <AwsAccountSelector />
       </div>
 
-      {/* ================= KPIs PRINCIPALES ================= */}
-      <DashboardFinancialKPIs
-        currentMonthCost={cost.current_month_cost ?? 0}
-        potentialSavings={cost.potential_savings ?? 0}
-        savingsPercentage={cost.savings_percentage ?? 0}
-      />
-
-      {/* ================= KPIs ADICIONALES ================= */}
+      {/* ================= FILA 1: GASTOS MENSUALES ================= */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <MetricCard
-          title="EXPOSICIÓN MENSUAL ESTIMADA"
-          value={`$${data.executive_summary.monthly_financial_exposure ?? 0}`}
+        <KpiCard
+          title="Gasto Mes Anterior"
+          value={formatUSD(cost.previous_month_cost ?? cost.current_month_cost ?? 0)}
           variant="blue"
+          tooltip={
+            dl.previous_month_start && dl.previous_month_end
+              ? `Período de facturación: ${fmt(dl.previous_month_start)} al ${fmt(dl.previous_month_end)}`
+              : 'Gasto total del mes cerrado anterior.'
+          }
         />
 
-        <MetricCard
-          title="EXPOSICIÓN ANUAL ESTIMADA"
-          value={`$${data.executive_summary.annual_financial_exposure ?? 0}`}
-          variant="purple"
+        <KpiCard
+          title="Gasto del Mes Actual"
+          value={formatUSD(cost.current_month_partial ?? 0)}
+          variant="sky"
+          tooltip={
+            dl.current_month_end
+              ? `Gastos acumulados hasta el ${fmt(dl.current_month_end)}`
+              : 'Gastos acumulados hasta el día de hoy.'
+          }
         />
 
-        <MetricCard
-          title="OPORTUNIDAD AHORRO ANUAL (HIGH)"
-          value={`$${data.roi_projection.high_savings_opportunity_annual ?? 0}`}
+        <KpiCard
+          title="Ahorro Mensual"
+          value={formatUSD(cost.potential_savings ?? 0)}
           variant="green"
+          tooltip={
+            dl.previous_month_start && dl.previous_month_end
+              ? `Ahorro potencial estimado vs el mes anterior (${fmt(dl.previous_month_start)} – ${fmt(dl.previous_month_end)})`
+              : 'Ahorro potencial estimado comparado con el mes anterior.'
+          }
+        />
+
+      </div>
+
+      {/* ================= FILA 2: GASTOS ANUALES ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <KpiCard
+          title="Gasto Año Anterior"
+          value={formatUSD(cost.previous_year_cost ?? 0)}
+          variant="indigo"
+          tooltip={
+            dl.previous_year_start && dl.previous_year_end
+              ? `Período: ${fmt(dl.previous_year_start)} al ${fmt(dl.previous_year_end)}`
+              : 'Gasto total del año anterior.'
+          }
+        />
+
+        <KpiCard
+          title="Gasto Año Actual"
+          value={formatUSD(cost.current_year_ytd ?? 0)}
+          variant="purple"
+          tooltip={
+            dl.current_year_start && dl.current_year_end
+              ? `Suma de gastos del ${fmt(dl.current_year_start)} al ${fmt(dl.current_year_end)}`
+              : 'Gastos acumulados del año en curso hasta hoy.'
+          }
+        />
+
+        <KpiCard
+          title="Ahorro Estimado Anual"
+          value={formatUSD(cost.annual_estimated_savings ?? 0)}
+          variant="green"
+          tooltip={
+            dl.current_year_end
+              ? `Proyección de ahorro anualizada al ${fmt(dl.current_year_end)}, basada en hallazgos activos.`
+              : 'Proyección de ahorro anualizada basada en hallazgos activos.'
+          }
+        />
+
+      </div>
+
+      {/* ================= FILA 3: PORCENTAJES DE AHORRO ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <KpiCard
+          title="Porcentaje de Ahorro Mensual"
+          value={formatPercentage(cost.monthly_savings_percentage ?? cost.savings_percentage ?? 0)}
+          variant="amber"
+        />
+
+        <KpiCard
+          title="Porcentaje de Ahorro Anual"
+          value={formatPercentage(cost.annual_savings_percentage ?? 0)}
+          variant="rose"
+        />
+
+        <KpiCard
+          title="Porcentaje de Ahorro Actual"
+          value={formatPercentage(cost.current_month_savings_percentage ?? 0)}
+          variant="sky"
         />
 
       </div>
@@ -97,30 +171,53 @@ export default function CostosPage() {
 }
 
 /* =====================================================
-   COMPONENTE INTERNO KPI SIMPLE
+   KPI CARD
 ===================================================== */
 
-function MetricCard({
+function KpiCard({
   title,
   value,
-  variant = 'default',
+  variant,
+  tooltip,
 }: {
   title: string;
   value: string;
-  variant?: 'blue' | 'green' | 'purple' | 'default';
+  variant: 'blue' | 'sky' | 'green' | 'indigo' | 'purple' | 'amber' | 'rose';
+  tooltip?: string;
 }) {
 
-  const variants = {
-    blue: "bg-blue-50 border-blue-200",
-    green: "bg-green-50 border-green-200",
+  const bg: Record<string, string> = {
+    blue:   "bg-blue-50 border-blue-200",
+    sky:    "bg-sky-50 border-sky-200",
+    green:  "bg-emerald-50 border-emerald-200",
+    indigo: "bg-indigo-50 border-indigo-200",
     purple: "bg-purple-50 border-purple-200",
-    default: "bg-gray-50 border-gray-200"
+    amber:  "bg-amber-50 border-amber-200",
+    rose:   "bg-rose-50 border-rose-200",
   };
 
   return (
-    <div className={`${variants[variant]} border rounded-2xl p-6 shadow-sm`}>
-      <p className="text-sm text-gray-600">{title}</p>
-      <p className="text-2xl font-semibold mt-2 text-gray-900">{value}</p>
+    <div className={`${bg[variant]} border rounded-2xl p-6 shadow-sm`}>
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <p className="text-sm uppercase text-slate-600">{title}</p>
+
+        {tooltip ? (
+          <div className="group relative shrink-0">
+            <button
+              type="button"
+              aria-label={`Información sobre ${title}`}
+              className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 bg-white/80 text-xs font-semibold text-slate-600 shadow-sm transition hover:bg-white"
+            >
+              i
+            </button>
+            <div className="pointer-events-none absolute right-0 top-8 z-10 w-64 rounded-xl border border-slate-200 bg-white p-3 text-xs normal-case text-slate-600 opacity-0 shadow-lg transition duration-200 group-hover:opacity-100">
+              {tooltip}
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      <p className="text-3xl font-semibold text-slate-800">{value}</p>
     </div>
   );
 }
