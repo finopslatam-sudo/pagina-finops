@@ -112,23 +112,27 @@ export default function CostosPage() {
 
         <KpiCard
           title="Gasto Año Anterior"
-          value={formatUSD(cost.previous_year_cost ?? 0)}
+          value={(cost.previous_year_cost ?? 0) > 0 ? formatUSD(cost.previous_year_cost!) : 'Sin datos'}
           variant="indigo"
           tooltip={
-            dl.previous_year_start && dl.previous_year_end
-              ? `Período: ${fmt(dl.previous_year_start)} al ${fmt(dl.previous_year_end)}`
-              : 'Gasto total del año anterior.'
+            (cost.previous_year_cost ?? 0) > 0
+              ? (dl.previous_year_start && dl.previous_year_end
+                  ? `Período: ${fmt(dl.previous_year_start)} al ${fmt(dl.previous_year_end)}`
+                  : 'Gasto total del año anterior.')
+              : 'Esta cuenta no tiene historial de costos en AWS para el año anterior.'
           }
         />
 
         <KpiCard
           title="Gasto Año Actual"
-          value={formatUSD(cost.current_year_ytd ?? 0)}
+          value={(cost.current_year_ytd ?? 0) > 0 ? formatUSD(cost.current_year_ytd!) : 'Sin datos'}
           variant="purple"
           tooltip={
-            dl.current_year_start && dl.current_year_end
-              ? `Suma de gastos del ${fmt(dl.current_year_start)} al ${fmt(dl.current_year_end)}`
-              : 'Gastos acumulados del año en curso hasta hoy.'
+            (cost.current_year_ytd ?? 0) > 0
+              ? (dl.current_year_start && dl.current_year_end
+                  ? `Suma de gastos del ${fmt(dl.current_year_start)} al ${fmt(dl.current_year_end)}`
+                  : 'Gastos acumulados del año en curso hasta hoy.')
+              : 'Esta cuenta no tiene historial de costos en AWS para el año en curso.'
           }
         />
 
@@ -156,7 +160,7 @@ export default function CostosPage() {
 
         <KpiCard
           title="Porcentaje de Ahorro Anual"
-          value={formatPercentage(cost.annual_savings_percentage ?? 0)}
+          value={(cost.previous_year_cost ?? 0) > 0 ? formatPercentage(cost.annual_savings_percentage ?? 0) : 'Sin datos'}
           variant="rose"
         />
 
