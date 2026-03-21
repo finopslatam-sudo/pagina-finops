@@ -154,63 +154,42 @@ export default function ClientDashboard() {
 
             </div>
 
-            {/* FILA 2 — GASTOS ANUALES */}
+            {/* FILA 2 — FINDINGS & RIESGO */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-              <PastelCard
-                title="Gasto Año Anterior"
-                value={formatUSD(data.cost.previous_year_cost ?? 0)}
-                variant="indigo"
-                tooltip={
-                  dl.previous_year_start && dl.previous_year_end
-                    ? `Período: ${fmt(dl.previous_year_start)} al ${fmt(dl.previous_year_end)}`
-                    : 'Gasto total del año anterior.'
-                }
-              />
+              {/* Card: Findings totales */}
+              <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 shadow-sm">
+                <p className="text-sm uppercase text-slate-600 mb-3">
+                  Findings &amp; Optimization
+                </p>
+                <p className="text-3xl font-semibold text-slate-800">
+                  {data.findings.total ?? 0}
+                </p>
+                <p className="text-xs text-slate-500 mt-2">
+                  {data.findings.active ?? 0} activos · {data.findings.resolved ?? 0} resueltos
+                </p>
+              </div>
 
-              <PastelCard
-                title="Gasto Año Actual"
-                value={formatUSD(data.cost.current_year_ytd ?? 0)}
-                variant="purple"
-                tooltip={
-                  dl.current_year_start && dl.current_year_end
-                    ? `Suma de gastos del ${fmt(dl.current_year_start)} al ${fmt(dl.current_year_end)}`
-                    : 'Gastos acumulados del año en curso hasta hoy.'
-                }
-              />
+              {/* Card: Ahorro mensual de findings */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 shadow-sm">
+                <p className="text-sm uppercase text-slate-600 mb-3">
+                  Ahorro mensual de Findings
+                </p>
+                <p className="text-3xl font-semibold text-slate-800">
+                  {formatUSD(data.findings.estimated_monthly_savings ?? data.cost.potential_savings ?? 0)}
+                </p>
+                <p className="text-xs text-slate-500 mt-2">
+                  {data.findings.financial_opportunities ?? 0} oportunidades financieras detectadas
+                </p>
+              </div>
 
-              <PastelCard
-                title="Ahorro Estimado Anual"
-                value={formatUSD(data.cost.annual_estimated_savings ?? 0)}
-                variant="green"
-                tooltip={
-                  dl.current_year_end
-                    ? `Proyección de ahorro anualizada al ${fmt(dl.current_year_end)}, basada en hallazgos activos.`
-                    : 'Proyección de ahorro anualizada basada en hallazgos activos.'
-                }
-              />
-
-            </div>
-
-            {/* FILA 3 — PORCENTAJES DE AHORRO */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-              <PastelCard
-                title="Porcentaje de Ahorro Mensual"
-                value={formatPercentage(data.cost.monthly_savings_percentage ?? data.cost.savings_percentage)}
-                variant="amber"
-              />
-
-              <PastelCard
-                title="Porcentaje de Ahorro Anual"
-                value={formatPercentage(data.cost.annual_savings_percentage ?? 0)}
-                variant="rose"
-              />
-
-              <PastelCard
-                title="Porcentaje de Ahorro Actual"
-                value={formatPercentage(data.cost.current_month_savings_percentage ?? 0)}
-                variant="sky"
+              {/* Card: Distribución por riesgo */}
+              <RiskDistributionCard
+                high={data.risk.high ?? 0}
+                medium={data.risk.medium ?? 0}
+                low={data.risk.low ?? 0}
+                riskScore={data.risk.risk_score ?? 0}
+                riskLevel={data.risk.risk_level ?? '—'}
               />
 
             </div>
@@ -245,7 +224,7 @@ export default function ClientDashboard() {
 
       <PastelCard
         title="Cuentas AWS"
-        value={data.accounts}
+        value={data.total_accounts ?? data.accounts}
         variant="indigo"
       />
 
@@ -451,6 +430,73 @@ function PastelCard({
 
       <p className="text-3xl font-semibold text-slate-800">
         {value}
+      </p>
+    </div>
+  );
+}
+
+function RiskDistributionCard({
+  high,
+  medium,
+  low,
+  riskScore,
+  riskLevel,
+}: {
+  high: number;
+  medium: number;
+  low: number;
+  riskScore: number;
+  riskLevel: string;
+}) {
+  const total = high + medium + low || 1;
+  const pctHigh   = Math.round((high   / total) * 100);
+  const pctMedium = Math.round((medium / total) * 100);
+  const pctLow    = Math.round((low    / total) * 100);
+
+  const levelColor: Record<string, string> = {
+    critical: 'text-red-600',
+    high:     'text-orange-500',
+    medium:   'text-amber-500',
+    low:      'text-emerald-600',
+    minimal:  'text-emerald-600',
+  };
+  const textColor = levelColor[riskLevel?.toLowerCase()] ?? 'text-slate-700';
+
+  return (
+    <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 shadow-sm">
+      <div className="flex items-start justify-between mb-3">
+        <p className="text-sm uppercase text-slate-600">Distribución por Riesgo</p>
+        <span className={`text-xs font-semibold uppercase ${textColor}`}>
+          {riskLevel}
+        </span>
+      </div>
+
+      {/* Barra apilada */}
+      <div className="flex h-3 w-full rounded-full overflow-hidden mb-4">
+        {pctHigh   > 0 && <div style={{ width: `${pctHigh}%`   }} className="bg-red-400" />}
+        {pctMedium > 0 && <div style={{ width: `${pctMedium}%` }} className="bg-amber-400" />}
+        {pctLow    > 0 && <div style={{ width: `${pctLow}%`    }} className="bg-emerald-400" />}
+      </div>
+
+      {/* Leyenda */}
+      <div className="flex justify-between text-xs text-slate-600">
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 rounded-full bg-red-400" />
+          Alto {high}
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
+          Medio {medium}
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" />
+          Bajo {low}
+        </span>
+      </div>
+
+      <p className="text-2xl font-semibold text-slate-800 mt-3">
+        {riskScore}%
+        <span className="text-sm font-normal text-slate-500 ml-1">risk score</span>
       </p>
     </div>
   );

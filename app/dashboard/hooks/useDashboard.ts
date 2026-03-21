@@ -11,6 +11,7 @@ import { useAwsAccount } from '../context/AwsAccountContext';
 
 export interface DashboardResponse {
   accounts: number;
+  total_accounts: number;
   last_sync: string | null;
   resources_affected: number;
 
