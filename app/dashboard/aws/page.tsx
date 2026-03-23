@@ -1,195 +1,64 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { apiFetch, API_URL } from "@/app/lib/api";
-import { useAuth } from "@/app/context/AuthContext";
+import { useAwsConnection } from "./hooks/useAwsConnection";
+import ConnectionStatus from "./components/ConnectionStatus";
+import ConnectionSteps from "./components/ConnectionSteps";
+import AccountForm from "./components/AccountForm";
 import StepGuide from "./components/StepGuide";
-import { Copy, Check } from "lucide-react";
-
 
 export default function AwsIntegrationPage() {
+  const {
+    loading,
+    cloudformationUrl,
+    externalId,
+    accountId,
+    accounts,
+    accountLimit,
+    status,
+    copied,
+    showConnectionFlow,
+    stepsRef,
+    templateDownloadUrl,
+    accountLimitReached,
+    setAccountId,
+    setShowConnectionFlow,
+    setCopied,
+    handleConnectAws,
+    handleValidateConnection,
+    runAudit,
+  } = useAwsConnection();
 
-  const { token } = useAuth();
-  const templateDownloadUrl = `${API_URL}/api/client/aws/template`;
-
-  const [loading, setLoading] = useState(false);
-  const [cloudformationUrl, setCloudformationUrl] = useState<string | null>(null);
-  const [externalId, setExternalId] = useState<string | null>(null);
-  const [accountId, setAccountId] = useState("");
-  const [accounts, setAccounts] = useState<any[]>([]);
-  const [accountLimit, setAccountLimit] = useState<number>(1);
-  const [status, setStatus] = useState<"connected" | "pending" | "disconnected">("disconnected");
-  const [copied, setCopied] = useState(false);
-  const [showConnectionFlow, setShowConnectionFlow] = useState(false);
-  const stepsRef = useRef<HTMLDivElement | null>(null);
-
-  /* =====================================================
-     LOAD STATUS
-  ===================================================== */
-
-  useEffect(() => {
-    if (token) {
-      checkConnection();
-    }
-  }, [token]);
-
-  useEffect(() => {
-
-    const interval = setInterval(() => {
-      if (token) {
-        checkConnection();
-      }
-    }, 8000);
-  
-    return () => clearInterval(interval);
-  
-  }, [token]);
-
-  const checkConnection = async () => {
-
-    try {
-  
-      const res = await apiFetch<{
-        status: "connected" | "pending" | "disconnected"
-        accounts: any[]
-        accounts_limit: number
-        accounts_used: number
-      }>("/api/client/aws/status", {
-        token
-      });
-  
-      setAccounts(res.accounts || []);
-      setAccountLimit(res.accounts_limit || 1);
-  
-      // usar status del backend directamente
-      setStatus(res.status || "disconnected");
-  
-
-    } catch (err) {
-  
-      console.error(err);
-      setStatus("disconnected");
-      setAccounts([]);
-  
-    }
-  
-  };
-  /* =====================================================
-     CONNECT AWS
-  ===================================================== */
-
-  const handleConnectAws = async () => {
-
-    try {
-
-      setLoading(true);
-
-      const response = await apiFetch<{
-        cloudformation_url: string;
-        external_id: string;
-      }>("/api/client/aws/connect", {
-        method: "POST",
-        token
-      });
-
-      setCloudformationUrl(response.cloudformation_url);
-      setExternalId(response.external_id);
-      setStatus("pending");
-
-      await checkConnection();      
-
-    } catch (error) {
-
-      console.error(error);
-      alert("Error generating CloudFormation stack");
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
+  const handleAddAccount = () => {
+    if (accountLimitReached) return;
+    setShowConnectionFlow(true);
+    setTimeout(() => {
+      stepsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
   };
 
-  /* =====================================================
-     RUN AUDIT
-  ===================================================== */
-
-  const runAudit = async () => {
-
-    try {
-
-      setLoading(true);
-
-      await apiFetch("/api/client/audit/run", {
-        method: "POST",
-        token
-      });
-
-      alert("Audit started successfully");
-
-    } catch (error) {
-
-      console.error(error);
-      alert("Error running audit");
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
+  const handleCopy = () => {
+    navigator.clipboard.writeText(externalId ?? "");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
-
-  /* =====================================================
-     STATUS SEMAPHORE
-  ===================================================== */
-
-  const statusConfig = {
-    connected: {
-      label: "Cuenta conectada",
-      color: "bg-emerald-100 text-emerald-700",
-      dot: "bg-emerald-500"
-    },
-    pending: {
-      label: "Conexión pendiente",
-      color: "bg-yellow-100 text-yellow-700",
-      dot: "bg-yellow-500"
-    },
-    disconnected: {
-      label: "Cuenta no conectada",
-      color: "bg-red-100 text-red-700",
-      dot: "bg-red-500"
-    }
-  };
-
-  const current = statusConfig[status];
-  const accountLimitReached = accounts.length >= accountLimit;
 
   return (
-
     <div className="max-w-7xl mx-auto px-6 space-y-14">
 
-      {/* ================= HERO ================= */}
-
+      {/* HERO */}
       <div className="bg-gradient-to-r from-blue-50 via-white to-white border border-blue-200 rounded-3xl p-10 shadow-sm">
-
-        <h1 className="text-3xl font-bold text-gray-900">
-          AWS Integration
-        </h1>
-
+        <h1 className="text-3xl font-bold text-gray-900">AWS Integration</h1>
         <p className="text-gray-600 mt-4 max-w-4xl leading-relaxed text-lg">
           Conecta tu cuenta de AWS de forma segura mediante un rol de solo lectura.
           Esta integración permite analizar recursos, detectar riesgos FinOps y
           descubrir oportunidades de optimización de costos en tu infraestructura cloud.
         </p>
-
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div className="p-4 rounded-2xl border border-blue-200 bg-blue-50 text-sm text-blue-900">
             <p className="font-semibold">Permisos necesarios (Cost Explorer / CUR)</p>
             <p className="mt-2">
               Para calcular cobertura y uso de Reserved Instances y Savings Plans, se requieren permisos de lectura sobre
-              Cost Explorer (CE) y/o Cost & Usage Report (CUR), incluyendo acceso a datos de billing. Si no se otorgan estos permisos,
+              Cost Explorer (CE) y/o Cost &amp; Usage Report (CUR), incluyendo acceso a datos de billing. Si no se otorgan estos permisos,
               las secciones de RI y SP se mostrarán vacías.
             </p>
           </div>
@@ -202,437 +71,39 @@ export default function AwsIntegrationPage() {
             </p>
           </div>
         </div>
-
       </div>
 
-      {/* ================= STATUS CARD ================= */}
+      {/* STATUS + ACCOUNTS TABLE */}
+      <ConnectionStatus
+        status={status}
+        accounts={accounts}
+        accountLimit={accountLimit}
+        accountLimitReached={accountLimitReached}
+        loading={loading}
+        onRunAudit={runAudit}
+        onAddAccount={handleAddAccount}
+      />
 
-      <div className={`p-6 rounded-2xl border ${current.color}`}>
-
-        <div className="flex items-center gap-3">
-
-          <div className={`w-3 h-3 rounded-full ${current.dot}`} />
-
-          <h3 className="text-lg font-semibold">
-            {status === "pending"
-              ? "Conexión en progreso"
-              : `${accounts.length} cuenta(s) AWS conectadas`}
-          </h3>
-
-        </div>
-
-        <div className="text-sm mt-2 opacity-80">
-
-          {accounts.length > 0 &&
-            `FinOpsLatam tiene acceso a ${accounts.length} cuenta(s) AWS para auditoría y análisis FinOps.`
-          }
-
-          {status === "pending" &&
-            "Completa el despliegue de CloudFormation para finalizar la conexión."}
-
-          {status === "disconnected" &&
-            "No existe una cuenta AWS conectada a tu organización."}
-
-          </div>
-
-          {status === "connected" && (
-
-          <div className="mt-4">
-
-          <button
-            onClick={runAudit}
-            disabled={loading}
-            className={`px-4 py-2 rounded-lg text-white
-            ${loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-emerald-600 hover:bg-emerald-700"}
-            `}
-          >
-            {loading ? "Running audit..." : "Run Audit Scan"}
-          </button>
-
-          </div>
-
-          )}
-
-
-      </div>
-
-      <div className="bg-white border rounded-2xl p-6 shadow-sm">
-
-        <div className="flex justify-between items-center mb-4">
-
-        <div className="flex items-center gap-3">
-
-          <h3 className="text-lg font-semibold">
-            Cuentas AWS conectadas
-          </h3>
-
-          <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-            {accounts.length} / {accountLimit}
-          </span>
-
-          </div>
-          {accountLimitReached && (
-
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between mb-4">
-
-            <div className="text-sm text-amber-800">
-
-              <p className="font-semibold">
-                ⚠️ Has alcanzado el límite de cuentas AWS de tu plan.
-              </p>
-
-              <p>
-                Actualiza tu suscripción para agregar más usuarios y cuentas AWS. 
-              </p>
-
-            </div>
-
-            <button
-              onClick={() => window.location.href="/dashboard/ClientAdministration"}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-            >
-              Upgrade Plan
-            </button>
-
-          </div>
-
-          )}
-
-          <button
-          disabled={accountLimitReached}
-          onClick={() => {
-
-            if(accountLimitReached){
-              return;
-            }
-
-            setShowConnectionFlow(true);
-
-            setTimeout(() => {
-              stepsRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-              });
-            }, 200);
-
-          }}
-          className={`px-4 py-2 rounded-lg text-white
-          ${accountLimitReached
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"}
-          `}
-          >
-          + Add AWS Account
-          </button>
-
-        </div>
-
-        {accounts.length === 0 ? (
-
-          <p className="text-gray-500 text-sm">
-            No hay cuentas AWS conectadas todavía.
-          </p>
-
-        ) : (
-
-          <div className="overflow-x-auto">
-
-            <table className="w-full text-sm">
-
-              <thead className="border-b">
-
-                <tr className="text-left text-gray-600">
-                  <th className="py-2">Account ID</th>
-                  <th className="py-2">Nombre</th>
-                  <th className="py-2">Estado</th>
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                {accounts.map((acc) => (
-
-                  <tr key={acc.id} className="border-b">
-
-                    <td className="py-2 font-mono">
-                      {acc.account_id}
-                    </td>
-
-                    <td className="py-2">
-                      {acc.account_name}
-                    </td>
-
-                    <td className="py-2">
-                      <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs">
-                        Conectada
-                      </span>
-                    </td>
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        )}
-
-        </div>
-
-      {/* ================= INTEGRATION STEPS ================= */}
+      {/* CONNECTION FLOW */}
       {showConnectionFlow && (
-
         <div className="space-y-10">
-        
-          <div
-            ref={stepsRef}
-            className="bg-white p-8 rounded-3xl border shadow-xl space-y-6"
-          >
-        
-            <h2 className="text-xl font-semibold">
-              Pasos para conectar tu cuenta AWS
-            </h2>
-        
-            <ol className="space-y-4 text-gray-600 list-decimal ml-6">
-        
-              <li>Genera el stack de CloudFormation con nuevo EXTERNAL ID.</li>
-              <li>Descargar el archivo YAML.</li>
-              <li>Has click en el hipervinculo "Open AWS CloudFormation".</li>
-              <li>Copia el contenido numeral de "External ID" lo necesitaras mas adelante.</li>
-              <li>Luego sigue los pasos de las imagenes.</li>
-        
-            </ol>
-        
-          </div>
-        
-        
-          {/* ================= ACTIONS ================= */}
-        
-          <div className="grid md:grid-cols-2 gap-6">
-        
-            <ActionCard
-              title="Conectar AWS"
-              description="Generar stack CloudFormation para integrar tu cuenta."
-              button="Create External ID"
-              onClick={handleConnectAws}
-              loading={loading}
-            />
-        
-            <ActionCard
-              title="Descargar Template"
-              description="Descarga el archivo YAML de CloudFormation."
-              button="Download YAML"
-              link={templateDownloadUrl}
-            />
-        
-          </div>
-        
-        
-          {/* ================= CLOUD FORMATION LINK ================= */}
-        
-          {cloudformationUrl && (
-        
-            <div className="bg-blue-50 border border-blue-200 p-6 rounded-2xl">
-        
-              <h3 className="font-semibold text-blue-900">
-                CloudFormation Stack
-              </h3>
-        
-              <p className="text-sm mt-2 text-blue-700">
-                Abre el siguiente enlace para desplegar el stack en tu cuenta AWS.
-              </p>
-        
-              <a
-                /*href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create" */
-
-                href={cloudformationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline block mt-3"
-              >
-                Link AWS CloudFormation
-              </a>
-        
-        
-              {externalId && (
-        
-                <div className="mt-5">
-        
-                  <div className="border-t border-blue-200 my-4"></div>
-        
-                  <p className="text-xs font-semibold text-blue-900 tracking-wide">
-                    EXTERNAL ID:
-                  </p>
-        
-                  <div className="flex items-center gap-3 mt-2">
-
-                  <p className="text-lg font-mono font-semibold text-blue-700 break-all">
-                    {externalId}
-                  </p>
-
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(externalId ?? "");
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className="text-gray-500 hover:text-blue-600 transition"
-                  >
-                    {copied ? <Check size={18} /> : <Copy size={18} />}
-                  </button>
-
-                  </div>
-
-                  {/* AWS ACCOUNT ID INPUT */}
-
-                  <div className="mt-6">
-
-                  <p className="text-xs font-semibold text-blue-900 tracking-wide">
-                    AWS ACCOUNT ID
-                  </p>
-
-                  <input
-                    type="text"
-                    placeholder="123456789012"
-                    value={accountId}
-                    onChange={(e) => setAccountId(e.target.value)}
-                    className="border rounded px-3 py-2 w-72 mt-2"
-                  />
-
-                  </div>
-      
-        
-                </div>
-        
-              )}
-        
-            </div>
-        
-          )}
-        
-          <div className="flex justify-end mt-4">
-        
-            <button
-            onClick={async () => {
-
-              try {
-
-                if (!accountId || !externalId) {
-                  alert("Debes ingresar el AWS Account ID");
-                  return;
-                }
-                
-                if (!/^\d{12}$/.test(accountId)) {
-                  alert("AWS Account ID debe tener 12 dígitos");
-                  return;
-                }
-
-                await apiFetch("/api/client/aws/validate", {
-                  method: "POST",
-                  token,
-                  body: {
-                    account_id: accountId,
-                    external_id: externalId
-                  }
-                });
-
-                await checkConnection();
-
-                setShowConnectionFlow(false);
-
-              } catch (err) {
-
-                console.error(err);
-                alert("Error validating AWS connection");
-
-              }
-
-            }}
-            className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
-            >
-            Probar conexión
-            </button>
-        
-          </div>
-        
-        
-          {/* ================= STEP GUIDE ================= */}
-        
+          <ConnectionSteps stepsRef={stepsRef} />
+          <AccountForm
+            cloudformationUrl={cloudformationUrl}
+            externalId={externalId}
+            accountId={accountId}
+            copied={copied}
+            loading={loading}
+            templateDownloadUrl={templateDownloadUrl}
+            onAccountIdChange={setAccountId}
+            onCopy={handleCopy}
+            onConnectAws={handleConnectAws}
+            onValidate={handleValidateConnection}
+          />
           <StepGuide />
-        
         </div>
-        
-        )}
-        
-        </div>
-        
-        );
-        
-        }
-
-/* =====================================================
-   ACTION CARD
-===================================================== */
-
-function ActionCard({
-  title,
-  description,
-  button,
-  onClick,
-  loading,
-  link
-}: any) {
-
-  return (
-
-    <div className="bg-white border rounded-2xl p-6 shadow-sm space-y-4">
-
-      <h3 className="font-semibold text-lg">
-        {title}
-      </h3>
-
-      <p className="text-sm text-gray-600">
-        {description}
-      </p>
-
-      {link ? (
-
-        <button
-        onClick={() => {
-          const downloadLink = document.createElement("a");
-      
-          downloadLink.href = link;
-          downloadLink.download = "finopslatam-cloudformation.yaml";
-      
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-          document.body.removeChild(downloadLink);
-        }}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        {button}
-      </button>
-
-      ) : (
-
-        <button
-          onClick={onClick}
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {loading ? "Processing..." : button}
-        </button>
-
       )}
 
     </div>
-
   );
-
 }
