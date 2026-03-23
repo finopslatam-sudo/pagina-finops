@@ -127,10 +127,10 @@ const REPORTS: ReportDef[] = [
       'Inventario por región geográfica',
     ],
     formats: ['csv', 'xlsx'],
-    endpoint: null,
+    endpoint: '/api/client/reports/inventory',
     color: 'bg-amber-50 border-amber-200',
     headerColor: 'bg-amber-600',
-    available: false,
+    available: true,
   },
 ];
 
