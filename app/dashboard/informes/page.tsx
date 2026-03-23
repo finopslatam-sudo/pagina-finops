@@ -201,7 +201,7 @@ export default function InformesPage() {
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-3xl">📑</span>
+              <span className="text-3xl"></span>
             </div>
             <h1 className="text-3xl font-bold text-slate-800">Informes Ejecutivos</h1>
             <p className="text-slate-500 mt-3 max-w-3xl leading-relaxed">
