@@ -181,7 +181,7 @@ export default function AlertasPage() {
     <div className="max-w-7xl mx-auto px-6 space-y-10">
 
       {/* ── HERO ── */}
-      <div className="bg-gradient-to-r from-amber-50 via-rose-50 to-sky-50 rounded-3xl p-10 shadow-md text-slate-900 border border-white/60">
+      <div className="bg-sky-50 border-2 border-sky-200 rounded-3xl p-10 shadow-md text-slate-900">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
             <h1 className="text-3xl font-bold">Políticas & Alertas</h1>
@@ -309,12 +309,11 @@ export default function AlertasPage() {
         <p className="text-sm text-slate-500 mb-6">
           Configura los destinos donde se enviarán las alertas cuando se dispare una política.
         </p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[
-            { icon: '📧', label: 'Email', desc: 'Notificación directa por correo' },
-            { icon: '💬', label: 'Slack', desc: 'Alertas en canales de Slack' },
-            { icon: '🪝', label: 'Webhook', desc: 'Integración con sistemas propios' },
-            { icon: '📱', label: 'WhatsApp', desc: 'Alertas críticas por WhatsApp' },
+            { icon: '📧', label: 'Email', desc: 'Notificación directa por correo', status: null },
+            { icon: '💬', label: 'Slack', desc: 'Alertas en canales de Slack', status: 'Próximamente' },
+            { icon: '👥', label: 'Teams', desc: 'Alertas en Microsoft Teams', status: 'Próximamente' },
           ].map(ch => (
             <div
               key={ch.label}
@@ -324,7 +323,9 @@ export default function AlertasPage() {
               <span className="text-3xl">{ch.icon}</span>
               <span className="font-semibold text-slate-700 text-sm">{ch.label}</span>
               <span className="text-xs text-slate-400">{ch.desc}</span>
-              <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">Próximamente</span>
+              {ch.status && (
+                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{ch.status}</span>
+              )}
             </div>
           ))}
         </div>
