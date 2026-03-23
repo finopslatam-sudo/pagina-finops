@@ -181,17 +181,11 @@ export default function AlertasPage() {
     <div className="max-w-7xl mx-auto px-6 space-y-10">
 
       {/* ── HERO ── */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-10 shadow-lg text-white">
+      <div className="bg-gradient-to-r from-amber-50 via-rose-50 to-sky-50 rounded-3xl p-10 shadow-md text-slate-900 border border-white/60">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-3xl">🔔</span>
-              <span className="text-xs font-semibold uppercase tracking-widest text-slate-400 bg-slate-700 px-3 py-1 rounded-full">
-                Plan Enterprise
-              </span>
-            </div>
             <h1 className="text-3xl font-bold">Políticas & Alertas</h1>
-            <p className="text-slate-300 mt-3 max-w-3xl leading-relaxed">
+            <p className="text-slate-700 mt-3 max-w-3xl leading-relaxed">
               Define reglas de presupuesto, alertas de consumo, detección de anomalías y políticas de gobernanza
               para mantener control total sobre el gasto cloud de tu organización. Comparable a las capacidades
               de CloudHealth y AWS Budgets, pero integrado en tu plataforma FinOps.
@@ -200,7 +194,7 @@ export default function AlertasPage() {
           <div className="flex flex-col items-end gap-3">
             <button
               onClick={() => setShowComingSoon(true)}
-              className="px-5 py-2.5 bg-white text-slate-900 font-semibold rounded-xl hover:bg-slate-100 transition text-sm"
+              className="px-5 py-2.5 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition text-sm shadow"
             >
               + Nueva Política
             </button>
@@ -216,9 +210,9 @@ export default function AlertasPage() {
             { label: 'Alertas disparadas hoy',  value: '0', icon: '⚡' },
             { label: 'Canales de notificación', value: '0', icon: '📨' },
           ].map(s => (
-            <div key={s.label} className="bg-white/10 rounded-2xl p-4">
-              <div className="text-2xl font-bold">{s.icon} {s.value}</div>
-              <div className="text-xs text-slate-400 mt-1">{s.label}</div>
+            <div key={s.label} className="bg-white/80 border border-white/70 rounded-2xl p-4 shadow-sm">
+              <div className="text-2xl font-bold text-slate-800">{s.icon} {s.value}</div>
+              <div className="text-xs text-slate-600 mt-1">{s.label}</div>
             </div>
           ))}
         </div>
