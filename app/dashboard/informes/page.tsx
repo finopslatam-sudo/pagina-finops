@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { useAwsAccounts } from '@/app/dashboard/hooks/useAwsAccounts';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
@@ -136,33 +137,42 @@ const REPORTS: ReportDef[] = [
 /* ─── formato labels ─────────────────────────────────────── */
 
 const FORMAT_CONFIG: Record<ExportFormat, { label: string; color: string; icon: string }> = {
-  pdf:  { label: 'PDF',  color: 'bg-blue-600 hover:bg-blue-700 text-white',    icon: '📄' },
+  pdf:  { label: 'PDF',  color: 'bg-blue-600 hover:bg-blue-700 text-white',       icon: '📄' },
   csv:  { label: 'CSV',  color: 'bg-emerald-600 hover:bg-emerald-700 text-white', icon: '📊' },
-  xlsx: { label: 'XLSX', color: 'bg-indigo-600 hover:bg-indigo-700 text-white',  icon: '📋' },
+  xlsx: { label: 'XLSX', color: 'bg-indigo-600 hover:bg-indigo-700 text-white',   icon: '📋' },
 };
 
 /* ─── page ──────────────────────────────────────────────── */
 
 export default function InformesPage() {
   const { token, isAuthReady } = useAuth();
-  const [loading, setLoading] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const { accounts, loading: loadingAccounts } = useAwsAccounts();
 
+  /* estado de carga/error global */
+  const [loadingKey, setLoadingKey]   = useState<string | null>(null);
+  const [error,      setError]        = useState<string | null>(null);
+  const [success,    setSuccess]      = useState<string | null>(null);
+
+  /* cuenta seleccionada por informe: { [reportId]: accountId | null } */
+  const [selectedAccounts, setSelectedAccounts] = useState<Record<string, number | null>>({});
+
+  const setAccount = (reportId: string, value: number | null) =>
+    setSelectedAccounts(prev => ({ ...prev, [reportId]: value }));
+
+  /* descarga */
   const handleExport = async (report: ReportDef, format: ExportFormat) => {
-    if (!isAuthReady || !token) {
-      setError('Inicia sesión para exportar informes.');
-      return;
-    }
+    if (!isAuthReady || !token) { setError('Inicia sesión para exportar informes.'); return; }
     if (!report.endpoint) return;
 
     const key = `${report.id}-${format}`;
-    setLoading(key);
+    setLoadingKey(key);
     setError(null);
     setSuccess(null);
 
     try {
-      const res = await fetch(`${API_URL}${report.endpoint}/${format}`, {
+      const accountId = selectedAccounts[report.id] ?? null;
+      const qs = accountId ? `?account_id=${accountId}` : '';
+      const res = await fetch(`${API_URL}${report.endpoint}/${format}${qs}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -179,7 +189,7 @@ export default function InformesPage() {
     } catch {
       setError('No se pudo generar el informe. Intenta nuevamente.');
     } finally {
-      setLoading(null);
+      setLoadingKey(null);
     }
   };
 
@@ -214,9 +224,9 @@ export default function InformesPage() {
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: 'Formatos disponibles', value: 'PDF · CSV · XLSX', icon: '📄' },
-            { label: 'Generación',            value: 'Tiempo real',       icon: '⚡' },
-            { label: 'Datos actualizados',    value: 'Cada 24 horas',     icon: '🔄' },
-            { label: 'Idioma',                value: 'Español',            icon: '🌎' },
+            { label: 'Generación',            value: 'Tiempo real',      icon: '⚡' },
+            { label: 'Datos actualizados',    value: 'Cada 24 horas',    icon: '🔄' },
+            { label: 'Idioma',                value: 'Español',           icon: '🌎' },
           ].map(s => (
             <div key={s.label} className="bg-white/10 rounded-2xl p-4">
               <div className="text-lg font-bold">{s.icon} {s.value}</div>
@@ -242,86 +252,135 @@ export default function InformesPage() {
 
       {/* ── GRID DE INFORMES ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {REPORTS.map(report => (
-          <div
-            key={report.id}
-            className={`border rounded-3xl overflow-hidden shadow-sm ${report.available ? '' : 'opacity-75'}`}
-          >
-            {/* header de tarjeta */}
-            <div className={`${report.headerColor} px-6 py-4 flex items-center justify-between`}>
-              <div className="flex items-center gap-3 text-white">
-                <span className="text-2xl">{report.icon}</span>
-                <div>
-                  <h2 className="font-bold text-base">{report.title}</h2>
-                  <p className="text-xs text-white/70">{report.subtitle}</p>
+        {REPORTS.map(report => {
+          const currentAccount = selectedAccounts[report.id] ?? null;
+          const selectedAccountName = accounts.find(a => a.id === currentAccount)?.account_name;
+
+          return (
+            <div
+              key={report.id}
+              className={`border rounded-3xl overflow-hidden shadow-sm ${report.available ? '' : 'opacity-75'}`}
+            >
+              {/* ── header ── */}
+              <div className={`${report.headerColor} px-6 py-4 flex items-center justify-between`}>
+                <div className="flex items-center gap-3 text-white">
+                  <span className="text-2xl">{report.icon}</span>
+                  <div>
+                    <h2 className="font-bold text-base">{report.title}</h2>
+                    <p className="text-xs text-white/70">{report.subtitle}</p>
+                  </div>
                 </div>
-              </div>
-              {report.available ? (
-                <span className="text-xs bg-white/20 text-white px-2.5 py-1 rounded-full font-medium">
-                  Disponible
-                </span>
-              ) : (
-                <span className="text-xs bg-black/20 text-white/80 px-2.5 py-1 rounded-full font-medium">
-                  Próximamente
-                </span>
-              )}
-            </div>
-
-            {/* cuerpo */}
-            <div className={`${report.color} border-t-0 p-6 space-y-5`}>
-              <p className="text-sm text-slate-600 leading-relaxed">{report.description}</p>
-
-              {/* qué incluye */}
-              <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Contenido del informe</p>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                  {report.includes.map((item, i) => (
-                    <li key={i} className="text-xs text-slate-500 flex items-start gap-1.5">
-                      <span className="text-slate-400 mt-0.5 shrink-0">✓</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* botones de descarga */}
-              <div className="pt-2 border-t border-white/60">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Formatos de descarga</p>
-                <div className="flex flex-wrap gap-2">
-                  {report.formats.map(fmt => {
-                    const cfg = FORMAT_CONFIG[fmt];
-                    const key = `${report.id}-${fmt}`;
-                    const isLoading = loading === key;
-                    return (
-                      <button
-                        key={fmt}
-                        onClick={() => report.available && handleExport(report, fmt)}
-                        disabled={!report.available || isLoading}
-                        className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition ${
-                          report.available
-                            ? cfg.color
-                            : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                        } ${isLoading ? 'opacity-60 cursor-wait' : ''}`}
-                      >
-                        {isLoading ? (
-                          <span className="animate-spin">⏳</span>
-                        ) : (
-                          <span>{cfg.icon}</span>
-                        )}
-                        {isLoading ? 'Generando...' : `Descargar ${cfg.label}`}
-                      </button>
-                    );
-                  })}
-                </div>
-                {!report.available && (
-                  <p className="text-xs text-slate-400 mt-2">
-                    Este informe estará disponible en la próxima versión de la plataforma.
-                  </p>
+                {report.available ? (
+                  <span className="text-xs bg-white/20 text-white px-2.5 py-1 rounded-full font-medium">
+                    Disponible
+                  </span>
+                ) : (
+                  <span className="text-xs bg-black/20 text-white/80 px-2.5 py-1 rounded-full font-medium">
+                    Próximamente
+                  </span>
                 )}
               </div>
+
+              {/* ── cuerpo ── */}
+              <div className={`${report.color} border-t-0 p-6 space-y-5`}>
+
+                <p className="text-sm text-slate-600 leading-relaxed">{report.description}</p>
+
+                {/* ── SELECTOR DE CUENTA AWS ── */}
+                <div className="bg-white/70 border border-slate-200 rounded-2xl p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">☁️</span>
+                    <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                      Cuenta AWS
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Selecciona para qué cuenta deseas generar este informe.
+                  </p>
+                  {loadingAccounts ? (
+                    <div className="h-9 bg-slate-100 rounded-xl animate-pulse" />
+                  ) : (
+                    <select
+                      value={currentAccount ?? ''}
+                      onChange={e => setAccount(report.id, e.target.value === '' ? null : Number(e.target.value))}
+                      disabled={!report.available}
+                      className={`w-full border rounded-xl px-3 py-2 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ${
+                        !report.available ? 'opacity-50 cursor-not-allowed' : 'hover:border-slate-400'
+                      }`}
+                    >
+                      <option value="">🌐 Todas las cuentas</option>
+                      {accounts.map(a => (
+                        <option key={a.id} value={a.id}>
+                          {a.account_name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {currentAccount && (
+                    <p className="text-xs text-blue-600 font-medium">
+                      ✓ Informe filtrado para: <span className="font-semibold">{selectedAccountName}</span>
+                    </p>
+                  )}
+                  {!currentAccount && (
+                    <p className="text-xs text-slate-400">
+                      El informe incluirá datos consolidados de todas las cuentas conectadas.
+                    </p>
+                  )}
+                </div>
+
+                {/* ── contenido del informe ── */}
+                <div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                    Contenido del informe
+                  </p>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    {report.includes.map((item, i) => (
+                      <li key={i} className="text-xs text-slate-500 flex items-start gap-1.5">
+                        <span className="text-slate-400 mt-0.5 shrink-0">✓</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* ── botones de descarga ── */}
+                <div className="pt-2 border-t border-white/60">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                    Formatos de descarga
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {report.formats.map(fmt => {
+                      const cfg = FORMAT_CONFIG[fmt];
+                      const key = `${report.id}-${fmt}`;
+                      const isLoading = loadingKey === key;
+                      return (
+                        <button
+                          key={fmt}
+                          onClick={() => report.available && handleExport(report, fmt)}
+                          disabled={!report.available || isLoading}
+                          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition ${
+                            report.available
+                              ? cfg.color
+                              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                          } ${isLoading ? 'opacity-60 cursor-wait' : ''}`}
+                        >
+                          {isLoading ? <span className="animate-spin">⏳</span> : <span>{cfg.icon}</span>}
+                          {isLoading ? 'Generando...' : `Descargar ${cfg.label}`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {!report.available && (
+                    <p className="text-xs text-slate-400 mt-2">
+                      Este informe estará disponible en la próxima versión de la plataforma.
+                    </p>
+                  )}
+                </div>
+
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* ── NOTA LEGAL ── */}
