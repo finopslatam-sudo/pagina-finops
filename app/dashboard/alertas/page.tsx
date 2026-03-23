@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
+import { useAwsAccounts } from '@/app/dashboard/hooks/useAwsAccounts';
 import PolicyModal from './policyModal';
 import { POLICIES, STATUS_CONFIG, CATEGORIES, PolicyCard } from './policies';
 
@@ -19,6 +20,7 @@ type HistoryEntry = {
 
 export default function AlertasPage() {
   const { user } = useAuth();
+  const { accounts: awsAccounts, loading: loadingAccounts } = useAwsAccounts();
   const [activeCategory, setActiveCategory] = useState('Todas');
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<PolicyCard | undefined>();
@@ -261,6 +263,11 @@ export default function AlertasPage() {
           threshold: payload.threshold,
           thresholdType: payload.thresholdType,
         })}
+        accounts={awsAccounts.map(acc => ({
+          id: acc.account_id ?? String(acc.id),
+          label: acc.account_name || acc.account_id || `Cuenta ${acc.id}`,
+        }))}
+        loadingAccounts={loadingAccounts}
       />
 
     </div>

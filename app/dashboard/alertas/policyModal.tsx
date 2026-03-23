@@ -16,11 +16,13 @@ interface Props {
     period?: string;
   }) => void;
   policy?: PolicyCard;
+  accounts: { id: string; label: string }[];
+  loadingAccounts?: boolean;
 }
 
 type Channel = "email" | "slack" | "teams";
 
-export default function PolicyModal({ open, onClose, onSave, policy }: Props) {
+export default function PolicyModal({ open, onClose, onSave, policy, accounts, loadingAccounts = false }: Props) {
   const [channel, setChannel] = useState<Channel>("email");
   const [email, setEmail] = useState("");
   const [accountScope, setAccountScope] = useState<"all" | "one">("all");
@@ -28,10 +30,9 @@ export default function PolicyModal({ open, onClose, onSave, policy }: Props) {
   const [thresholdType, setThresholdType] = useState<"usd" | "pct">("pct");
   const [thresholdValue, setThresholdValue] = useState("");
   const [windowSize, setWindowSize] = useState<"daily" | "weekly" | "monthly" | "annual">("monthly");
-  const accounts = [
+  const accountOptions = [
     { id: "all", label: "Todas las cuentas" },
-    { id: "acc-001", label: "Cuenta 001" },
-    { id: "acc-002", label: "Cuenta 002" },
+    ...accounts,
   ];
 
   useEffect(() => {
@@ -46,10 +47,21 @@ export default function PolicyModal({ open, onClose, onSave, policy }: Props) {
     }
   }, [open]);
 
+  useEffect(() => {
+    if (open && accountScope === "one" && accountOptions.length > 1) {
+      const first = accountOptions.find(a => a.id !== "all");
+      setAccountId(first?.id || "");
+    }
+  }, [open, accountScope, accountOptions]);
+
   const changeScope = (scope: "all" | "one") => {
     setAccountScope(scope);
-    if (scope === "one") setAccountId(accounts.find(a => a.id !== "all")?.id || "acc-001");
-    else setAccountId("all");
+    if (scope === "one") {
+      const first = accountOptions.find(a => a.id !== "all");
+      setAccountId(first?.id || "");
+    } else {
+      setAccountId("all");
+    }
   };
 
   if (!open || !policy) return null;
@@ -76,12 +88,16 @@ export default function PolicyModal({ open, onClose, onSave, policy }: Props) {
           <select
             value={accountId}
             onChange={e => setAccountId(e.target.value)}
+            disabled={loadingAccounts || accountOptions.filter(a => a.id !== "all").length === 0}
             className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
           >
-            {accounts.filter(a => a.id !== "all").map(acc => (
+            {accountOptions.filter(a => a.id !== "all").map(acc => (
               <option key={acc.id} value={acc.id}>{acc.label}</option>
             ))}
           </select>
+        )}
+        {accountScope === "one" && !loadingAccounts && accountOptions.filter(a => a.id !== "all").length === 0 && (
+          <p className="text-xs text-amber-600">No hay cuentas disponibles. Conecta una cuenta AWS primero.</p>
         )}
       </div>
 
@@ -138,7 +154,7 @@ export default function PolicyModal({ open, onClose, onSave, policy }: Props) {
             onChange={e => setAccountId(e.target.value)}
             className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
           >
-            {accounts.filter(a => a.id !== "all").map(acc => (
+            {accountOptions.filter(a => a.id !== "all").map(acc => (
               <option key={acc.id} value={acc.id}>{acc.label}</option>
             ))}
           </select>
@@ -258,7 +274,7 @@ export default function PolicyModal({ open, onClose, onSave, policy }: Props) {
               if (!policy) return;
               const accountLabel = accountScope === "all"
                 ? "Todas las cuentas"
-                : accounts.find(a => a.id === accountId)?.label || "Cuenta seleccionada";
+                : accountOptions.find(a => a.id === accountId)?.label || "Cuenta seleccionada";
               const thresholdLabel = thresholdValue || "-";
               onSave({
                 policyId: policy.id,
