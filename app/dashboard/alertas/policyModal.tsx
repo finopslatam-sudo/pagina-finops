@@ -1,15 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { PolicyCard } from "./policies";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  policy?: {
-    title: string;
-    category: string;
-    description: string;
-  };
+  policy?: PolicyCard;
 }
 
 type Channel = "email" | "slack" | "teams";
