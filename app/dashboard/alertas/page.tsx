@@ -6,6 +6,15 @@ import { hasFeature } from '@/app/lib/hasFeature';
 import PolicyModal from './policyModal';
 import { POLICIES, STATUS_CONFIG, CATEGORIES, PolicyCard } from './policies';
 
+type HistoryEntry = {
+  id: string;
+  title: string;
+  account: string;
+  channel: string;
+  threshold: string;
+  thresholdType: string;
+};
+
 /* ─── page ──────────────────────────────────────────────── */
 
 export default function AlertasPage() {
@@ -14,6 +23,17 @@ export default function AlertasPage() {
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<PolicyCard | undefined>();
   const [showModal, setShowModal] = useState(false);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+
+  const handleClose = () => {
+    setShowModal(false);
+    setSelectedPolicy(undefined);
+  };
+
+  const handleSave = (data: HistoryEntry) => {
+    setHistory(prev => [data, ...prev].slice(0, 10));
+    handleClose();
+  };
 
   /* plan check */
   if (!hasFeature(user?.plan_code, 'alertas')) {
@@ -67,7 +87,7 @@ export default function AlertasPage() {
         {/* Stats row */}
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: 'Políticas configuradas', value: '0', icon: '📋' },
+            { label: 'Políticas configuradas', value: String(history.length), icon: '📋' },
             { label: 'Alertas activas',         value: '0', icon: '🔔' },
             { label: 'Alertas disparadas hoy',  value: '0', icon: '⚡' },
             { label: 'Canales de notificación', value: '0', icon: '📨' },
@@ -193,10 +213,54 @@ export default function AlertasPage() {
         </div>
       </div>
 
+      {/* ── HISTORIAL ── */}
+      <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-slate-800">Historial de políticas creadas</h2>
+            <p className="text-sm text-slate-500">Las últimas configuraciones guardadas en esta sesión.</p>
+          </div>
+          <span className="text-xs text-slate-500">{history.length} en total</span>
+        </div>
+        {history.length === 0 ? (
+          <p className="text-sm text-slate-500">Aún no has guardado ninguna política. Configura una para verla aquí.</p>
+        ) : (
+          <div className="space-y-3">
+            {history.map(item => (
+              <div
+                key={item.id}
+                className="border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">{item.title}</p>
+                  <p className="text-xs text-slate-500">{item.account}</p>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-slate-600">
+                  <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">
+                    {item.channel === 'email' ? 'Correo' : item.channel === 'slack' ? 'Slack' : 'Teams'}
+                  </span>
+                  <span className="font-semibold text-slate-800">
+                    {item.threshold} {item.thresholdType}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <PolicyModal
         open={showModal}
         policy={selectedPolicy}
-        onClose={() => setShowModal(false)}
+        onClose={handleClose}
+        onSave={(payload) => handleSave({
+          id: `${Date.now()}`,
+          title: payload.title,
+          account: payload.account,
+          channel: payload.channel,
+          threshold: payload.threshold,
+          thresholdType: payload.thresholdType,
+        })}
       />
 
     </div>
