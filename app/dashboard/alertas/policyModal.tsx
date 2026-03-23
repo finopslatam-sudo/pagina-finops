@@ -25,7 +25,6 @@ type Channel = "email" | "slack" | "teams";
 export default function PolicyModal({ open, onClose, onSave, policy, accounts, loadingAccounts = false }: Props) {
   const [channel, setChannel] = useState<Channel>("email");
   const [email, setEmail] = useState("");
-  const [accountScope, setAccountScope] = useState<"all" | "one">("all");
   const [accountId, setAccountId] = useState("all");
   const [thresholdType, setThresholdType] = useState<"usd" | "pct">("pct");
   const [thresholdValue, setThresholdValue] = useState("");
@@ -39,7 +38,6 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
     if (open) {
       setChannel("email");
       setEmail("");
-      setAccountScope("all");
       setAccountId("all");
       setThresholdType("pct");
       setThresholdValue("");
@@ -48,21 +46,11 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
   }, [open]);
 
   useEffect(() => {
-    if (open && accountScope === "one" && accountOptions.length > 1) {
+    if (open && accountOptions.length > 1) {
       const first = accountOptions.find(a => a.id !== "all");
-      setAccountId(first?.id || "");
+      setAccountId(first?.id || "all");
     }
-  }, [open, accountScope, accountOptions]);
-
-  const changeScope = (scope: "all" | "one") => {
-    setAccountScope(scope);
-    if (scope === "one") {
-      const first = accountOptions.find(a => a.id !== "all");
-      setAccountId(first?.id || "");
-    } else {
-      setAccountId("all");
-    }
-  };
+  }, [open, accountOptions]);
 
   if (!open || !policy) return null;
 
@@ -72,31 +60,17 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
     <div className="space-y-4">
       <div className="space-y-2">
         <p className="text-sm font-semibold text-slate-800">Cuenta</p>
-        <div className="grid grid-cols-2 gap-3">
-          {[{ id: "all", label: "Todas las cuentas" }, { id: "one", label: "Filtrar por cuenta" }].map(opt => (
-            <button
-              key={opt.id}
-              onClick={() => changeScope(opt.id as "all" | "one")}
-              className={`border rounded-xl px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-sky-300
-                ${accountScope === opt.id ? "border-sky-500 bg-sky-50 text-sky-800" : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"}`}
-            >
-              {opt.label}
-            </button>
+        <select
+          value={accountId}
+          onChange={e => setAccountId(e.target.value)}
+          disabled={loadingAccounts}
+          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
+        >
+          {accountOptions.map(acc => (
+            <option key={acc.id} value={acc.id}>{acc.label}</option>
           ))}
-        </div>
-        {accountScope === "one" && (
-          <select
-            value={accountId}
-            onChange={e => setAccountId(e.target.value)}
-            disabled={loadingAccounts || accountOptions.filter(a => a.id !== "all").length === 0}
-            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
-          >
-            {accountOptions.filter(a => a.id !== "all").map(acc => (
-              <option key={acc.id} value={acc.id}>{acc.label}</option>
-            ))}
-          </select>
-        )}
-        {accountScope === "one" && !loadingAccounts && accountOptions.filter(a => a.id !== "all").length === 0 && (
+        </select>
+        {!loadingAccounts && accountOptions.length === 1 && (
           <p className="text-xs text-amber-600">No hay cuentas disponibles. Conecta una cuenta AWS primero.</p>
         )}
       </div>
@@ -136,28 +110,18 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
     <div className="space-y-4">
       <div className="space-y-2">
         <p className="text-sm font-semibold text-slate-800">Cuenta</p>
-        <div className="grid grid-cols-2 gap-3">
-          {[{ id: "all", label: "Todas las cuentas" }, { id: "one", label: "Filtrar por cuenta" }].map(opt => (
-            <button
-              key={opt.id}
-              onClick={() => changeScope(opt.id as "all" | "one")}
-              className={`border rounded-xl px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-sky-300
-                ${accountScope === opt.id ? "border-sky-500 bg-sky-50 text-sky-800" : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"}`}
-            >
-              {opt.label}
-            </button>
+        <select
+          value={accountId}
+          onChange={e => setAccountId(e.target.value)}
+          disabled={loadingAccounts}
+          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
+        >
+          {accountOptions.map(acc => (
+            <option key={acc.id} value={acc.id}>{acc.label}</option>
           ))}
-        </div>
-        {accountScope === "one" && (
-          <select
-            value={accountId}
-            onChange={e => setAccountId(e.target.value)}
-            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
-          >
-            {accountOptions.filter(a => a.id !== "all").map(acc => (
-              <option key={acc.id} value={acc.id}>{acc.label}</option>
-            ))}
-          </select>
+        </select>
+        {!loadingAccounts && accountOptions.length === 1 && (
+          <p className="text-xs text-amber-600">No hay cuentas disponibles. Conecta una cuenta AWS primero.</p>
         )}
       </div>
 
@@ -272,7 +236,7 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
           <button
             onClick={() => {
               if (!policy) return;
-              const accountLabel = accountScope === "all"
+              const accountLabel = accountId === "all"
                 ? "Todas las cuentas"
                 : accountOptions.find(a => a.id === accountId)?.label || "Cuenta seleccionada";
               const thresholdLabel = thresholdValue || "-";
