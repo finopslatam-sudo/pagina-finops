@@ -7,6 +7,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
+import { hasFeature } from '@/app/lib/hasFeature';
 
 /* =====================================================
    COMPONENT
@@ -14,7 +15,7 @@ import { useAuth } from '@/app/context/AuthContext';
 
 export default function UserMenu() {
 
-  const { user, logout, isStaff, isFoundation } = useAuth();
+  const { user, logout, isStaff, isFoundation, isEnterprise } = useAuth();
 
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -175,6 +176,32 @@ export default function UserMenu() {
                 </Link>
               )}
 
+
+                {/* =========================
+                  INFORMES — TODOS LOS PLANES
+                ========================== */}
+
+                <Link
+                  href="/dashboard/informes"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  📑 Informes Ejecutivos
+                </Link>
+
+                {/* =========================
+                  POLÍTICAS & ALERTAS — SOLO ENTERPRISE
+                ========================== */}
+
+                {isEnterprise && (
+                  <Link
+                    href="/dashboard/alertas"
+                    className="block px-4 py-3 hover:bg-blue-50"
+                    onClick={() => setOpen(false)}
+                  >
+                    🔔 Políticas & Alertas
+                  </Link>
+                )}
 
                 {/* =========================
                   AWS INTEGRATION
