@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
 import NotificationBell from '@/app/components/NotificationBell';
+import { useT } from '@/app/lib/useT';
 
 /* =====================================================
    COMPONENT
@@ -17,6 +18,7 @@ import NotificationBell from '@/app/components/NotificationBell';
 export default function UserMenu() {
 
   const { user, logout, isStaff, isFoundation } = useAuth();
+  const t = useT();
 
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -65,7 +67,7 @@ export default function UserMenu() {
             }}
             className="border-2 border-blue-500 text-blue-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition"
           >
-            Mi cuenta
+            {t.menu.myAccount}
           </button>
 
         {open && (
@@ -84,7 +86,7 @@ export default function UserMenu() {
               className="block px-4 py-3 hover:bg-blue-50"
               onClick={() => setOpen(false)}
             >
-              📊 Dashboard
+              {t.menu.dashboard}
             </Link>
 
 
@@ -100,7 +102,7 @@ export default function UserMenu() {
                 className="block px-4 py-3 hover:bg-blue-50 border-t"
                 onClick={() => setOpen(false)}
               >
-                👥 Panel de Usuarios
+                {t.menu.usersPanel}
               </Link>
 
               <Link
@@ -108,7 +110,7 @@ export default function UserMenu() {
                 className="block px-4 py-3 hover:bg-blue-50"
                 onClick={() => setOpen(false)}
               >
-                🏢 Panel de Clientes
+                {t.menu.clientsPanel}
               </Link>
 
               {/* =========================
@@ -120,7 +122,7 @@ export default function UserMenu() {
                 className="block px-4 py-3 hover:bg-blue-50"
                 onClick={() => setOpen(false)}
               >
-                📈 Aprobaciones de Upgrade
+                {t.menu.upgradeApprovals}
               </Link>
 
               <Link
@@ -128,7 +130,7 @@ export default function UserMenu() {
                 className="block px-4 py-3 hover:bg-blue-50"
                 onClick={() => setOpen(false)}
               >
-                🎫 Tickets de Soporte
+                {t.menu.supportTickets}
               </Link>
 
             </>
@@ -148,7 +150,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50 border-t"
                   onClick={() => setOpen(false)}
                 >
-                  🔎 Findings & Optimization
+                  {t.menu.findings}
                 </Link>
 
                 <Link
@@ -156,7 +158,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  📦 Risk & Assets
+                  {t.menu.assets}
                 </Link>
 
                 <Link
@@ -164,7 +166,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  💰 Cost & Financials
+                  {t.menu.costs}
                 </Link>
 
                 {!isFoundation && (
@@ -174,7 +176,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  🚀 RI & Savings Plans
+                  {t.menu.savings}
                 </Link>
                 )}
 
@@ -185,7 +187,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  🏛 Governance
+                  {t.menu.governance}
                 </Link>
               )}
 
@@ -199,7 +201,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  📑 Informes Ejecutivos
+                  {t.menu.reports}
                 </Link>
 
                 {/* =========================
@@ -212,7 +214,7 @@ export default function UserMenu() {
                     className="block px-4 py-3 hover:bg-blue-50"
                     onClick={() => setOpen(false)}
                   >
-                    🔔 Políticas & Alertas
+                    {t.menu.alerts}
                   </Link>
                 )}
 
@@ -228,7 +230,7 @@ export default function UserMenu() {
                     className="block px-4 py-3 hover:bg-blue-50"
                     onClick={() => setOpen(false)}
                   >
-                    ☁️ AWS Integration
+                    {t.menu.aws}
                   </Link>
 
                 )}
@@ -246,7 +248,7 @@ export default function UserMenu() {
                     className="block px-4 py-3 hover:bg-blue-50"
                     onClick={() => setOpen(false)}
                   >
-                    ⚙️ Organization Settings
+                    {t.menu.orgSettings}
                   </Link>
 
                 )}
@@ -260,7 +262,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  🎫 Soporte FinopsLatam
+                  {t.menu.support}
                 </Link>
 
 
@@ -273,7 +275,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50 border-t"
                   onClick={() => setOpen(false)}
                 >
-                  👤 Account
+                  {t.menu.account}
                 </Link>
 
               </>
@@ -289,7 +291,7 @@ export default function UserMenu() {
               onClick={handleLogout}
               className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 border-t"
             >
-              🚪 Logout
+              {t.menu.logout}
             </button>
 
           </div>
