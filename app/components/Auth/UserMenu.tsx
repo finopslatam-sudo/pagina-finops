@@ -123,6 +123,14 @@ export default function UserMenu() {
                 📈 Aprobaciones de Upgrade
               </Link>
 
+              <Link
+                href="/dashboard/admin/soporte"
+                className="block px-4 py-3 hover:bg-blue-50"
+                onClick={() => setOpen(false)}
+              >
+                🎫 Tickets de Soporte
+              </Link>
+
             </>
             )}
 
@@ -192,6 +200,18 @@ export default function UserMenu() {
                   onClick={() => setOpen(false)}
                 >
                   📑 Informes Ejecutivos
+                </Link>
+
+                {/* =========================
+                  SOPORTE — TODOS LOS PLANES
+                ========================== */}
+
+                <Link
+                  href="/dashboard/soporte"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  🎫 Soporte
                 </Link>
 
                 {/* =========================
