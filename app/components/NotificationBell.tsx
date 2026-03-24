@@ -22,7 +22,8 @@ function timeAgo(iso: string): string {
 }
 
 export default function NotificationBell() {
-  const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
+  const { notifications, unreadCount, markRead, markAllRead, clearRead } = useNotifications();
+  const hasRead = notifications.some(n => n.is_read);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -84,7 +85,7 @@ export default function NotificationBell() {
           </div>
 
           {/* lista */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
+          <div className="max-h-72 overflow-y-auto divide-y divide-slate-50">
             {notifications.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-8">Sin notificaciones</p>
             ) : (
@@ -110,6 +111,18 @@ export default function NotificationBell() {
               ))
             )}
           </div>
+
+          {/* footer — limpiar leídas */}
+          {hasRead && (
+            <div className="px-4 py-2 border-t border-slate-100 flex justify-end">
+              <button
+                onClick={clearRead}
+                className="text-xs text-slate-400 hover:text-red-500 transition font-medium"
+              >
+                Limpiar historial
+              </button>
+            </div>
+          )}
 
         </div>
       )}

@@ -60,6 +60,15 @@ export function useNotifications() {
     setUnreadCount(0);
   }, [token]);
 
+  const clearRead = useCallback(async () => {
+    if (!token) return;
+    await fetch(`${API_URL}/api/notifications`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setNotifications(prev => prev.filter(n => !n.is_read));
+  }, [token]);
+
   // Carga inicial + polling cada 60 s
   useEffect(() => {
     fetchNotifications();
@@ -67,5 +76,5 @@ export function useNotifications() {
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
-  return { notifications, unreadCount, loading, markRead, markAllRead, refetch: fetchNotifications };
+  return { notifications, unreadCount, loading, markRead, markAllRead, clearRead, refetch: fetchNotifications };
 }

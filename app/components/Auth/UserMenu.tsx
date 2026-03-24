@@ -203,18 +203,6 @@ export default function UserMenu() {
                 </Link>
 
                 {/* =========================
-                  SOPORTE — TODOS LOS PLANES
-                ========================== */}
-
-                <Link
-                  href="/dashboard/soporte"
-                  className="block px-4 py-3 hover:bg-blue-50"
-                  onClick={() => setOpen(false)}
-                >
-                  🎫 Soporte
-                </Link>
-
-                {/* =========================
                   POLÍTICAS & ALERTAS — SOLO ENTERPRISE
                 ========================== */}
 
@@ -262,6 +250,18 @@ export default function UserMenu() {
                   </Link>
 
                 )}
+
+                {/* =========================
+                  SOPORTE — TODOS LOS PLANES
+                ========================== */}
+
+                <Link
+                  href="/dashboard/soporte"
+                  className="block px-4 py-3 hover:bg-blue-50"
+                  onClick={() => setOpen(false)}
+                >
+                  🎫 Soporte FinopsLatam
+                </Link>
 
 
                 {/* =========================
