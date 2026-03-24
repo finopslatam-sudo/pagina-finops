@@ -55,6 +55,8 @@ export default function SubscriptionCard({
                   <Feature text="Cost & Financials" />
                   <Feature text="RI & Savings Plans" />
                   <Feature text="Informes Ejecutivos" />
+                  <Feature text="AWS Integration" />
+                  <Feature text="Organization Settings" />
                   <Feature text="1 cuenta AWS conectada" />
                   <Feature text="Hasta 3 usuarios" />
                 </>
@@ -67,6 +69,8 @@ export default function SubscriptionCard({
                   <Feature text="RI & Savings Plans" />
                   <Feature text="Governance" />
                   <Feature text="Informes Ejecutivos" />
+                  <Feature text="AWS Integration" />
+                  <Feature text="Organization Settings" />
                   <Feature text="Hasta 5 cuentas AWS" />
                   <Feature text="Hasta 9 usuarios" />
                 </>
@@ -80,6 +84,8 @@ export default function SubscriptionCard({
                   <Feature text="Governance" />
                   <Feature text="Informes Ejecutivos" />
                   <Feature text="Políticas & Alertas" />
+                  <Feature text="AWS Integration" />
+                  <Feature text="Organization Settings" />
                   <Feature text="Hasta 20 cuentas AWS" />
                   <Feature text="Hasta 12 usuarios" />
                 </>
@@ -128,6 +134,8 @@ export default function SubscriptionCard({
                   <li>✔ RI & Savings Plans</li>
                   <li>✔ Governance</li>
                   <li>✔ Informes Ejecutivos</li>
+                  <li>✔ AWS Integration</li>
+                  <li>✔ Organization Settings</li>
                   <li>✔ Hasta 5 cuentas AWS</li>
                   <li>✔ Hasta 9 usuarios</li>
                 </ul>
@@ -152,6 +160,8 @@ export default function SubscriptionCard({
                   <li>✔ Governance</li>
                   <li>✔ Informes Ejecutivos</li>
                   <li>✔ Políticas & Alertas</li>
+                  <li>✔ AWS Integration</li>
+                  <li>✔ Organization Settings</li>
                   <li>✔ Hasta 20 cuentas AWS</li>
                   <li>✔ Hasta 12 usuarios</li>
                 </ul>
