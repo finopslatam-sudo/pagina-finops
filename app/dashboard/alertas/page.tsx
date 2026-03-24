@@ -108,10 +108,9 @@ export default function AlertasPage() {
     return (
       <div className="max-w-7xl mx-auto px-6 py-16 flex flex-col items-center justify-center gap-6 text-center">
         <div className="text-6xl">🔒</div>
-        <h2 className="text-2xl font-bold text-slate-800">Módulo exclusivo Plan Enterprise</h2>
+        <h2 className="text-2xl font-bold text-slate-800">Módulo no disponible en tu plan actual</h2>
         <p className="text-slate-500 max-w-md leading-relaxed">
-          Las Políticas & Alertas avanzadas de presupuesto, consumo y gobernanza están disponibles únicamente en el plan
-          <span className="font-semibold text-slate-700"> FinOps Enterprise</span>.
+          Las Políticas & Alertas avanzadas de presupuesto, consumo y gobernanza no están habilitadas para tu suscripción actual.
         </p>
         <a
           href="/dashboard/ClientAdministration"

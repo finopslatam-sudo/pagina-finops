@@ -15,7 +15,7 @@ import { hasFeature } from '@/app/lib/hasFeature';
 
 export default function UserMenu() {
 
-  const { user, logout, isStaff, isFoundation, isEnterprise } = useAuth();
+  const { user, logout, isStaff, isFoundation } = useAuth();
 
   const [open, setOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -193,7 +193,7 @@ export default function UserMenu() {
                   POLÍTICAS & ALERTAS — SOLO ENTERPRISE
                 ========================== */}
 
-                {isEnterprise && (
+                {hasFeature(user?.plan_code, 'alertas') && (
                   <Link
                     href="/dashboard/alertas"
                     className="block px-4 py-3 hover:bg-blue-50"
