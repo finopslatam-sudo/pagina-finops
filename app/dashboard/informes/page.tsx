@@ -197,12 +197,9 @@ export default function InformesPage() {
     <div className="max-w-7xl mx-auto px-6 space-y-10">
 
       {/* ── HERO ── */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-slate-100 border border-indigo-100 rounded-3xl p-10 shadow-sm">
+      <div className="bg-gradient-to-br from-violet-50 via-pink-50 to-sky-50 border border-purple-100 rounded-3xl p-10 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-3xl"></span>
-            </div>
             <h1 className="text-3xl font-bold text-slate-800">Informes Ejecutivos</h1>
             <p className="text-slate-500 mt-3 max-w-3xl leading-relaxed">
               Genera y descarga informes formales de tu entorno cloud: hallazgos, costos, riesgos e inventario.
@@ -225,7 +222,7 @@ export default function InformesPage() {
             { label: 'Datos actualizados',    value: 'Cada 24 horas',    icon: '🔄' },
             { label: 'Idioma',                value: 'Español',           icon: '🌎' },
           ].map(s => (
-            <div key={s.label} className="bg-white/80 border border-indigo-100 rounded-2xl p-4">
+            <div key={s.label} className="bg-white/70 border border-purple-100 rounded-2xl p-4">
               <div className="text-lg font-bold text-slate-700">{s.icon} {s.value}</div>
               <div className="text-xs text-slate-400 mt-1">{s.label}</div>
             </div>

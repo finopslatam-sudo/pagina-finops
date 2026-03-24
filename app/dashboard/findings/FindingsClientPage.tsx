@@ -19,7 +19,7 @@ import FindingsDrawer from "./components/FindingsDrawer";
 import { Finding } from "./types";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
-import { API_URL } from "@/app/lib/api";
+import Link from "next/link";
 
 type LastScanResponse = {
   last_scan?: string | null;
@@ -165,29 +165,6 @@ export default function FindingsPage() {
     setSelectedFinding(null);
   };
 
-  const handleExport = async (format: "pdf" | "csv" | "xlsx") => {
-    if (!isAuthReady || !token) {
-      alert("Inicia sesión para exportar.");
-      return;
-    }
-    const endpoint = `/api/client/reports/${format}`;
-    const res = await fetch(`${API_URL}${endpoint}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) {
-      alert("No se pudo exportar el reporte");
-      return;
-    }
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `findings.${format}`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
   const runAudit = async () => {
 
     try {
@@ -302,11 +279,18 @@ export default function FindingsPage() {
         <FindingsStatsCards stats={stats} />
       )}
 
-      {/* ================= EXPORT ACTIONS ================= */}
-      <div className="flex flex-wrap justify-end gap-3">
-        <ExportCard label="Exportar PDF" onClick={() => handleExport("pdf")} color="bg-blue-600 text-white hover:bg-blue-700" disabled={!isAuthReady || !token} />
-        <ExportCard label="Exportar CSV" onClick={() => handleExport("csv")} color="bg-emerald-600 text-white hover:bg-emerald-700" disabled={!isAuthReady || !token} />
-        <ExportCard label="Exportar XLSX" onClick={() => handleExport("xlsx")} color="bg-indigo-600 text-white hover:bg-indigo-700" disabled={!isAuthReady || !token} />
+      {/* ================= EXPORT REDIRECT ================= */}
+      <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4">
+        <span className="text-xl">📄</span>
+        <p className="text-sm text-slate-600">
+          ¿Necesitas exportar un reporte?{' '}
+          <Link
+            href="/dashboard/informes"
+            className="text-blue-600 font-semibold hover:text-blue-800 underline underline-offset-2 transition"
+          >
+            Ir a Informes Ejecutivos →
+          </Link>
+        </p>
       </div>
 
       {/* ================= FILTERS ================= */}
@@ -446,24 +430,3 @@ export default function FindingsPage() {
   );
 }
 
-function ExportCard({
-  label,
-  onClick,
-  color,
-  disabled,
-}: {
-  label: string;
-  onClick: () => void;
-  color: string;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-4 py-3 rounded-xl shadow-sm font-semibold text-sm ${color} transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black/5 disabled:opacity-50 disabled:cursor-not-allowed`}
-      disabled={disabled}
-    >
-      {label}
-    </button>
-  );
-}
