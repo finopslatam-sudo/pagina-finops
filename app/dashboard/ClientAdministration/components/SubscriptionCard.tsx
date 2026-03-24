@@ -50,31 +50,35 @@ export default function SubscriptionCard({
             <div className="space-y-2 text-sm">
               {subscription.plan_code === "FINOPS_FOUNDATION" && (
                 <>
-                  <Feature text="Hallazgos & Findings AWS" />
-                  <Feature text="Inventario de assets AWS" />
-                  <Feature text="Análisis de costos AWS" />
+                  <Feature text="Findings & Optimization" />
+                  <Feature text="Risk & Assets" />
+                  <Feature text="Cost & Financials" />
+                  <Feature text="RI & Savings Plans" />
+                  <Feature text="Informes Ejecutivos" />
                   <Feature text="1 cuenta AWS conectada" />
                   <Feature text="Hasta 3 usuarios" />
                 </>
               )}
               {subscription.plan_code === "FINOPS_PROFESSIONAL" && (
                 <>
-                  <Feature text="Hallazgos & Findings AWS" />
-                  <Feature text="Inventario de assets AWS" />
-                  <Feature text="Análisis de costos AWS" />
-                  <Feature text="Gobernanza & Compliance" />
-                  <Feature text="Optimización de recursos" />
+                  <Feature text="Findings & Optimization" />
+                  <Feature text="Risk & Assets" />
+                  <Feature text="Cost & Financials" />
+                  <Feature text="RI & Savings Plans" />
+                  <Feature text="Governance" />
+                  <Feature text="Informes Ejecutivos" />
                   <Feature text="Hasta 5 cuentas AWS" />
                   <Feature text="Hasta 9 usuarios" />
                 </>
               )}
               {subscription.plan_code === "FINOPS_ENTERPRISE" && (
                 <>
-                  <Feature text="Hallazgos & Findings AWS" />
-                  <Feature text="Inventario de assets AWS" />
-                  <Feature text="Análisis de costos AWS" />
-                  <Feature text="Gobernanza & Compliance" />
-                  <Feature text="Optimización de recursos" />
+                  <Feature text="Findings & Optimization" />
+                  <Feature text="Risk & Assets" />
+                  <Feature text="Cost & Financials" />
+                  <Feature text="RI & Savings Plans" />
+                  <Feature text="Governance" />
+                  <Feature text="Informes Ejecutivos" />
                   <Feature text="Políticas & Alertas" />
                   <Feature text="Hasta 20 cuentas AWS" />
                   <Feature text="Hasta 12 usuarios" />
@@ -118,11 +122,12 @@ export default function SubscriptionCard({
               <div className="border rounded-xl p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-blue-700">FinOps Professional</h3>
                 <ul className="text-sm space-y-1 text-gray-600">
-                  <li>✔ Hallazgos & Findings AWS</li>
-                  <li>✔ Inventario de assets AWS</li>
-                  <li>✔ Análisis de costos AWS</li>
-                  <li>✔ Gobernanza & Compliance</li>
-                  <li>✔ Optimización de recursos</li>
+                  <li>✔ Findings & Optimization</li>
+                  <li>✔ Risk & Assets</li>
+                  <li>✔ Cost & Financials</li>
+                  <li>✔ RI & Savings Plans</li>
+                  <li>✔ Governance</li>
+                  <li>✔ Informes Ejecutivos</li>
                   <li>✔ Hasta 5 cuentas AWS</li>
                   <li>✔ Hasta 9 usuarios</li>
                 </ul>
@@ -140,11 +145,12 @@ export default function SubscriptionCard({
               <div className="border rounded-xl p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-purple-700">FinOps Enterprise</h3>
                 <ul className="text-sm space-y-1 text-gray-600">
-                  <li>✔ Hallazgos & Findings AWS</li>
-                  <li>✔ Inventario de assets AWS</li>
-                  <li>✔ Análisis de costos AWS</li>
-                  <li>✔ Gobernanza & Compliance</li>
-                  <li>✔ Optimización de recursos</li>
+                  <li>✔ Findings & Optimization</li>
+                  <li>✔ Risk & Assets</li>
+                  <li>✔ Cost & Financials</li>
+                  <li>✔ RI & Savings Plans</li>
+                  <li>✔ Governance</li>
+                  <li>✔ Informes Ejecutivos</li>
                   <li>✔ Políticas & Alertas</li>
                   <li>✔ Hasta 20 cuentas AWS</li>
                   <li>✔ Hasta 12 usuarios</li>
