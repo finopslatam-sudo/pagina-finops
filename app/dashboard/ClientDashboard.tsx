@@ -8,13 +8,12 @@ import { useFindings } from './findings/hooks/useFindings';
 import FindingsTable from './findings/components/FindingsTable';
 
 import { useDashboard } from './hooks/useDashboard';
-import { useInventory } from './hooks/useInventory';
 
 import MonthlyCostChart from './components/finance/MonthlyCostChart';
 
 import AwsAccountSelector from "@/app/dashboard/components/AwsAccountSelector";
 
-import { formatUSD, formatPercentage } from "@/app/lib/finopsFormat";
+import { formatUSD } from "@/app/lib/finopsFormat";
 
 export default function ClientDashboard() {
   const router = useRouter();
@@ -22,8 +21,7 @@ export default function ClientDashboard() {
 
   const { data, loading, error } = useDashboard();
   const dashboard = data;
-  const { data: latestFindings } = useFindings({ page: 1 });
-  const { data: inventoryData } = useInventory();
+  const { data: latestFindings } = useFindings({ page: 1, perPage: 5 });
 
   useEffect(() => {
     if (!isAuthReady) return;
@@ -42,21 +40,7 @@ export default function ClientDashboard() {
   if (error) return <p className="text-red-500">{error}</p>;
   if (loading || !data) return <DashboardSkeleton />;
 
-
-  /* =====================================================
-     Construcción robusta de servicios escaneados
-  ===================================================== */
-
-  const servicesMap: Record<string, number> = {};
-
-  if (inventoryData?.summary) {
-    Object.assign(servicesMap, inventoryData.summary);
-  } else if (inventoryData?.resources) {
-    inventoryData.resources.forEach((r: any) => {
-      servicesMap[r.resource_type] =
-        (servicesMap[r.resource_type] || 0) + 1;
-    });
-  }
+  type ScannedService = DashboardResponse["services_scanned"][number];
 
   return (
     <div className="space-y-16">
@@ -249,8 +233,8 @@ export default function ClientDashboard() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {dashboard.services_scanned
-              .sort((a: any, b: any) => b.total_resources - a.total_resources)
-              .map((service: any) => (
+              .sort((a: ScannedService, b: ScannedService) => b.total_resources - a.total_resources)
+              .map((service: ScannedService) => (
                 <div
                   key={service.service}
                   onClick={() =>

@@ -8,12 +8,17 @@ import { Finding, FindingsResponse } from "../types";
 
 interface UseFindingsParams {
   page?: number;
+  perPage?: number;
   severity?: string;
   status?: string;
   search?: string;
   service?: string;
   account?: number | "";
   region?: string;
+}
+
+interface ApiErrorLike {
+  status?: number;
 }
 
 export function useFindings(params: UseFindingsParams) {
@@ -44,6 +49,7 @@ export function useFindings(params: UseFindingsParams) {
 
       const query = new URLSearchParams({
         page: String(params.page ?? 1),
+        per_page: String(params.perPage ?? 20),
         ...(params.severity ? { severity: params.severity } : {}),
         ...(params.status ? { status: params.status } : {}),
         ...(params.search ? { search: params.search } : {}),
@@ -65,13 +71,15 @@ export function useFindings(params: UseFindingsParams) {
       setTotal(typeof json?.total === "number" ? json.total : 0);
       setPages(typeof json?.pages === "number" ? json.pages : 1);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
 
       console.error("FINDINGS FETCH ERROR:", err);
 
-      if (err?.status === 401) {
+      const apiError = err as ApiErrorLike;
+
+      if (apiError?.status === 401) {
         setError("Unauthorized request");
-      } else if (err?.status === 403) {
+      } else if (apiError?.status === 403) {
         setError("Forbidden access");
       } else {
         setError("Failed to load findings");
@@ -89,6 +97,7 @@ export function useFindings(params: UseFindingsParams) {
 
   }, [
     params.page,
+    params.perPage,
     params.severity,
     params.status,
     params.search,
