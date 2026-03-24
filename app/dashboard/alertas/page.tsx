@@ -373,67 +373,66 @@ export default function AlertasPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Historial de políticas creadas</h2>
-            <p className="text-sm text-slate-500">Revisa destino, cuenta, umbral y administra cada política creada.</p>
+            <p className="text-sm text-slate-500">Vista tabular para revisar y administrar políticas sin que la sección crezca demasiado.</p>
           </div>
           <span className="text-xs text-slate-500">{history.length} en total</span>
         </div>
         {history.length === 0 ? (
           <p className="text-sm text-slate-500">Aún no has guardado ninguna política.</p>
         ) : (
-          <div className="space-y-3">
-            {history.map(item => (
-              <div key={item.dbId || `${item.policyId}-${item.createdAt || item.title}`} className="border border-slate-200 rounded-2xl p-5 space-y-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-base font-semibold text-slate-800">{item.title}</p>
-                    <p className="text-sm text-slate-500">{item.account}</p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">{CHANNEL_LABELS[item.channel]}</span>
-                    <span className="text-base font-semibold text-slate-800">{item.threshold} {item.thresholdType}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Cuenta</p>
-                    <p className="mt-1 font-medium text-slate-800">{item.account}</p>
-                  </div>
-                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Canal</p>
-                    <p className="mt-1 font-medium text-slate-800">{CHANNEL_LABELS[item.channel]}</p>
-                  </div>
-                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Destino</p>
-                    <p className="mt-1 font-medium text-slate-800 break-all">{item.destination}</p>
-                  </div>
-                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Periodicidad</p>
-                    <p className="mt-1 font-medium text-slate-800">{item.period ? PERIOD_LABELS[item.period] || item.period : 'No definida'}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-xs text-slate-500">
-                    {item.createdAt ? `Creada: ${new Date(item.createdAt).toLocaleString('es-CL')}` : 'Política persistida en la base de datos'}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item)}
-                      className="px-3 py-2 rounded-xl border border-rose-200 text-rose-700 text-sm font-medium hover:bg-rose-50"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto rounded-2xl border border-slate-200">
+            <table className="min-w-[1100px] w-full border-collapse">
+              <thead className="bg-slate-50">
+                <tr className="text-left">
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Política</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Cuenta</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Canal</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Destino</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Periodicidad</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Umbral</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Creada</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map(item => (
+                  <tr key={item.dbId || `${item.policyId}-${item.createdAt || item.title}`} className="border-t border-slate-200 align-top hover:bg-slate-50/70">
+                    <td className="px-4 py-4">
+                      <p className="font-semibold text-slate-800">{item.title}</p>
+                      <p className="mt-1 text-xs text-slate-500">{item.policyId}</p>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{item.account}</td>
+                    <td className="px-4 py-4">
+                      <span className="inline-flex px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">
+                        {CHANNEL_LABELS[item.channel]}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-slate-700 break-all">{item.destination}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{item.period ? PERIOD_LABELS[item.period] || item.period : 'No definida'}</td>
+                    <td className="px-4 py-4 text-sm font-semibold text-slate-800">{item.threshold} {item.thresholdType}</td>
+                    <td className="px-4 py-4 text-sm text-slate-500">
+                      {item.createdAt ? new Date(item.createdAt).toLocaleString('es-CL') : 'Persistida'}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item)}
+                          className="px-3 py-2 rounded-xl border border-rose-200 text-rose-700 text-sm font-medium hover:bg-rose-50"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
