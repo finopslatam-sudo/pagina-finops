@@ -22,6 +22,7 @@ interface ReportDef {
   color: string;
   headerColor: string;
   available: boolean;
+  allowedPlans: ('foundation' | 'professional' | 'enterprise')[];
 }
 
 /* ─── definición de informes ─────────────────────────────── */
@@ -47,6 +48,7 @@ const REPORTS: ReportDef[] = [
     color: 'bg-blue-50 border-blue-200',
     headerColor: 'bg-blue-600',
     available: true,
+    allowedPlans: ['foundation', 'professional', 'enterprise'],
   },
   {
     id: 'executive',
@@ -68,6 +70,7 @@ const REPORTS: ReportDef[] = [
     color: 'bg-indigo-50 border-indigo-200',
     headerColor: 'bg-indigo-600',
     available: true,
+    allowedPlans: ['professional', 'enterprise'],
   },
   {
     id: 'costs',
@@ -89,6 +92,7 @@ const REPORTS: ReportDef[] = [
     color: 'bg-emerald-50 border-emerald-200',
     headerColor: 'bg-emerald-600',
     available: true,
+    allowedPlans: ['professional', 'enterprise'],
   },
   {
     id: 'risk',
@@ -110,6 +114,7 @@ const REPORTS: ReportDef[] = [
     color: 'bg-rose-50 border-rose-200',
     headerColor: 'bg-rose-600',
     available: true,
+    allowedPlans: ['professional', 'enterprise'],
   },
   {
     id: 'assets',
@@ -131,6 +136,7 @@ const REPORTS: ReportDef[] = [
     color: 'bg-amber-50 border-amber-200',
     headerColor: 'bg-amber-600',
     available: true,
+    allowedPlans: ['professional', 'enterprise'],
   },
 ];
 
@@ -145,8 +151,13 @@ const FORMAT_CONFIG: Record<ExportFormat, { label: string; color: string; icon: 
 /* ─── page ──────────────────────────────────────────────── */
 
 export default function InformesPage() {
-  const { token, isAuthReady } = useAuth();
+  const { token, isAuthReady, isFoundation, isProfessional, isEnterprise } = useAuth();
   const { accounts, loading: loadingAccounts } = useAwsAccounts();
+
+  const currentPlan = isFoundation ? 'foundation' : isProfessional ? 'professional' : isEnterprise ? 'enterprise' : null;
+  const visibleReports = currentPlan
+    ? REPORTS.filter(r => r.allowedPlans.includes(currentPlan))
+    : REPORTS;
 
   /* estado de carga/error global */
   const [loadingKey, setLoadingKey]   = useState<string | null>(null);
@@ -208,7 +219,7 @@ export default function InformesPage() {
           </div>
           <div className="flex flex-col items-end justify-center">
             <div className="text-right">
-              <div className="text-2xl font-bold text-slate-800">{REPORTS.filter(r => r.available).length}/{REPORTS.length}</div>
+              <div className="text-2xl font-bold text-slate-800">{visibleReports.filter(r => r.available).length}/{visibleReports.length}</div>
               <div className="text-xs text-slate-400">informes disponibles</div>
             </div>
           </div>
@@ -246,7 +257,7 @@ export default function InformesPage() {
 
       {/* ── GRID DE INFORMES ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {REPORTS.map(report => {
+        {visibleReports.map(report => {
           const currentAccount = selectedAccounts[report.id] ?? null;
           const selectedAccountName = accounts.find(a => a.id === currentAccount)?.account_name;
 
