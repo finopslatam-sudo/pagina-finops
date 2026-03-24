@@ -120,7 +120,6 @@ export default function AlertasPage() {
   const { user, token } = useAuth();
   const { accounts: awsAccounts, loading: loadingAccounts } = useAwsAccounts();
   const [activeCategory, setActiveCategory] = useState('Todas');
-  const [showComingSoon, setShowComingSoon] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<PolicyCard | undefined>();
   const [editingEntry, setEditingEntry] = useState<HistoryEntry | undefined>();
   const [showModal, setShowModal] = useState(false);
@@ -270,12 +269,7 @@ export default function AlertasPage() {
               Define reglas de presupuesto, alertas de consumo, detección de anomalías y políticas de gobernanza para mantener control total sobre el gasto cloud de tu organización.
             </p>
           </div>
-          <div className="flex flex-col items-end gap-3">
-            <button onClick={() => setShowComingSoon(true)} className="px-5 py-2.5 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition text-sm shadow">
-              + Nueva Política
-            </button>
-            <span className="text-xs text-slate-500">9 tipos de políticas disponibles</span>
-          </div>
+          <span className="text-xs text-slate-500">9 tipos de políticas disponibles</span>
         </div>
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
@@ -291,17 +285,6 @@ export default function AlertasPage() {
           ))}
         </div>
       </div>
-
-      {showComingSoon && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-4">
-          <span className="text-2xl">🚧</span>
-          <div className="flex-1">
-            <p className="font-semibold text-amber-800">Configuración de políticas en desarrollo</p>
-            <p className="text-sm text-amber-700 mt-1">El módulo de creación y gestión de alertas estará disponible en la próxima versión de la plataforma.</p>
-          </div>
-          <button onClick={() => setShowComingSoon(false)} className="text-amber-600 hover:text-amber-800 font-bold text-lg">×</button>
-        </div>
-      )}
 
       <div className="flex flex-wrap gap-2">
         {CATEGORIES.map(cat => (
@@ -359,7 +342,7 @@ export default function AlertasPage() {
             { icon: '💬', label: 'Slack', desc: 'Alertas en canales de Slack', status: 'Próximamente' },
             { icon: '👥', label: 'Teams', desc: 'Alertas en Microsoft Teams', status: 'Próximamente' },
           ].map(ch => (
-            <div key={ch.label} className="border border-dashed border-slate-300 rounded-2xl p-5 flex flex-col items-center text-center gap-2 hover:border-slate-500 hover:bg-slate-50 transition cursor-pointer" onClick={() => setShowComingSoon(true)}>
+            <div key={ch.label} className="border border-dashed border-slate-300 rounded-2xl p-5 flex flex-col items-center text-center gap-2">
               <span className="text-3xl">{ch.icon}</span>
               <span className="font-semibold text-slate-700 text-sm">{ch.label}</span>
               <span className="text-xs text-slate-400">{ch.desc}</span>
