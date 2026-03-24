@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
+import NotificationBell from '@/app/components/NotificationBell';
 
 /* =====================================================
    COMPONENT
@@ -49,19 +50,23 @@ export default function UserMenu() {
 
     <>
 
-      <div className="relative">
+      <div className="flex items-center gap-2">
 
-        <button
-          onClick={(e) => {
+        <NotificationBell />
 
-            e.stopPropagation();
-            setOpen(!open);
+        <div className="relative">
 
-          }}
-          className="border-2 border-blue-500 text-blue-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition"
-        >
-          Mi cuenta
-        </button>
+          <button
+            onClick={(e) => {
+
+              e.stopPropagation();
+              setOpen(!open);
+
+            }}
+            className="border-2 border-blue-500 text-blue-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition"
+          >
+            Mi cuenta
+          </button>
 
         {open && (
 
@@ -271,7 +276,9 @@ export default function UserMenu() {
 
         )}
 
-      </div>
+        </div>  {/* fin .relative (dropdown Mi cuenta) */}
+
+      </div>  {/* fin .flex (campana + Mi cuenta) */}
 
 
       {/* =========================
