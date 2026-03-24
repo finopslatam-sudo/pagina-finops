@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 
+interface FindingServiceSummaryItem {
+  service: string;
+}
+
+interface FindingServiceSummaryResponse {
+  data: FindingServiceSummaryItem[];
+}
+
 export function useFindingServices() {
   const { token, isAuthReady } = useAuth();
 
@@ -14,12 +22,15 @@ export function useFindingServices() {
 
     const fetchServices = async () => {
       try {
-        const res = await apiFetch<any>(
+        const res = await apiFetch<FindingServiceSummaryResponse>(
           "/api/client/findings/summary-by-service",
-          { token }
+          {
+            token,
+            cacheTtlMs: 2 * 60 * 1000,
+          }
         );
 
-        const names = res.data.map((s: any) => s.service);
+        const names = res.data.map((s) => s.service);
 
         setServices(names);
       } catch (err) {

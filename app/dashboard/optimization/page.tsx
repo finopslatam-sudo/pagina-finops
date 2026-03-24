@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
+import { apiFetch } from '@/app/lib/api';
 import { useAwsAccount } from '../context/AwsAccountContext';
 import { useDashboard } from '../hooks/useDashboard';
 import AwsAccountSelector from '../components/AwsAccountSelector';
@@ -49,22 +50,29 @@ export default function OptimizationPage() {
 
   const [ri,             setRI]             = useState<RIResponse | null>(null);
   const [sp,             setSP]             = useState<SPResponse | null>(null);
-  const [loadingFinops,  setLoadingFinops]  = useState(true);
+  const requestKey = token ? String(selectedAccount ?? "all") : "no-token";
+  const [loadedKey, setLoadedKey] = useState<string>("no-token");
+  const loadingFinops = !!token && loadedKey !== requestKey;
 
   useEffect(() => {
-    if (!token) { setLoadingFinops(false); return; }
+    if (!token) return;
 
     const accountQuery = selectedAccount ? `?aws_account_id=${selectedAccount}` : '';
 
     Promise.all([
-      fetch(`/api/client/finops/ri-coverage${accountQuery}`, { headers: { Authorization: `Bearer ${token}` } }),
-      fetch(`/api/client/finops/sp-coverage${accountQuery}`, { headers: { Authorization: `Bearer ${token}` } }),
+      apiFetch<RIResponse>(`/api/client/finops/ri-coverage${accountQuery}`, {
+        token,
+        cacheTtlMs: 60 * 1000,
+      }),
+      apiFetch<SPResponse>(`/api/client/finops/sp-coverage${accountQuery}`, {
+        token,
+        cacheTtlMs: 60 * 1000,
+      }),
     ])
-      .then(([r2, r3]) => Promise.all([r2.json(), r3.json()]))
       .then(([d2, d3]) => { setRI(d2); setSP(d3); })
       .catch(e => console.error('FinOps API error', e))
-      .finally(() => setLoadingFinops(false));
-  }, [token, selectedAccount]);
+      .finally(() => setLoadedKey(requestKey));
+  }, [token, selectedAccount, requestKey]);
 
   /* ── plan check ── */
   if (!hasFeature(user?.plan_code, 'optimization')) {

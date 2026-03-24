@@ -13,7 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { AUTH_LOGOUT_EVENT, apiFetch } from "@/app/lib/api";
+import { AUTH_LOGOUT_EVENT, apiFetch, clearApiCache } from "@/app/lib/api";
 
 /* =====================================================
    TYPES
@@ -152,6 +152,7 @@ export function AuthProvider({
     localStorage.removeItem("finops_token");
     localStorage.removeItem("finops_user");
     localStorage.removeItem("selectedAwsAccount");
+    clearApiCache();
 
     setUser(null);
     setToken(null);

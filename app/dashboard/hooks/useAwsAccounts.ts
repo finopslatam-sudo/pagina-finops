@@ -12,7 +12,7 @@ interface AwsAccount {
 
 export function useAwsAccounts() {
 
-  const { token } = useAuth();
+  const { token, isAuthReady } = useAuth();
 
   const [accounts, setAccounts] = useState<AwsAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,13 +21,19 @@ export function useAwsAccounts() {
 
     const loadAccounts = async () => {
 
-      if (!token) return;
+      if (!isAuthReady || !token) {
+        setLoading(false);
+        return;
+      }
 
       try {
 
         const res = await apiFetch<{ accounts: AwsAccount[] }>(
           "/api/client/aws/accounts",
-          { token }
+          {
+            token,
+            cacheTtlMs: 5 * 60 * 1000,
+          }
         );
 
         setAccounts(res.accounts || []);
@@ -46,7 +52,7 @@ export function useAwsAccounts() {
 
     loadAccounts();
 
-  }, [token]);
+  }, [isAuthReady, token]);
 
   return { accounts, loading };
 

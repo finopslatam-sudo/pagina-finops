@@ -90,16 +90,25 @@ export function useInventory(page: number = 1, perPage: number = 50) {
         const inventoryPromise = apiFetch<{
           status: string;
           data: InventoryResponse;
-        }>(endpoint, { token });
+        }>(endpoint, {
+          token,
+          cacheTtlMs: 20 * 1000,
+        });
 
         const servicesPromise = apiFetch<InventoryServices>(
           "/api/client/inventory/services",
-          { token }
+          {
+            token,
+            cacheTtlMs: 60 * 1000,
+          }
         );
 
         const healthPromise = apiFetch<InventoryHealth>(
           "/api/client/inventory/health",
-          { token }
+          {
+            token,
+            cacheTtlMs: 60 * 1000,
+          }
         );
 
         const [inventoryRes, servicesRes, healthRes] = await Promise.all([

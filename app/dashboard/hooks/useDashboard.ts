@@ -88,10 +88,10 @@ export interface DashboardResponse {
     high_savings_opportunity_annual: number;
   };
 
-  priority_services: any[];
-  trend: any;
-  remediation: any;
-  risk_by_service: any;
+  priority_services: Record<string, unknown>[];
+  trend: unknown;
+  remediation: unknown;
+  risk_by_service: unknown;
 
   services_scanned: {
     service: string;
@@ -128,13 +128,16 @@ export function useDashboard() {
 
         const response = await apiFetch<DashboardResponse>(
           endpoint,
-          { token }
+          {
+            token,
+            cacheTtlMs: 60 * 1000,
+          }
         );
 
         setData(response);
         setError('');
 
-      } catch (err: any) {
+      } catch (err: unknown) {
 
         console.error('DASHBOARD ERROR:', err);
         setError('No se pudo cargar el dashboard.');

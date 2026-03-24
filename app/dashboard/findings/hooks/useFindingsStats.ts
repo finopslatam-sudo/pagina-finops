@@ -51,7 +51,10 @@ export function useFindingsStats(params: UseFindingsStatsParams = {}) {
 
       const json = await apiFetch<{ data: FindingsStats }>(
         endpoint,
-        { token }
+        {
+          token,
+          cacheTtlMs: 20 * 1000,
+        }
       );
 
       setStats(json.data);

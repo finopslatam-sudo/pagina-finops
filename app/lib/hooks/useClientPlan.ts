@@ -4,7 +4,11 @@ import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "../api";
 import { useAuth } from "@/app/context/AuthContext";
 
-type PlanResponse = any; // backend devuelve array vacío o plan; tipar cuando se amplíe
+type PlanResponse = unknown; // backend devuelve array vacío o plan; tipar cuando se amplíe
+
+interface ApiErrorLike {
+  message?: string;
+}
 
 export function useClientPlan() {
   const { token, isAuthReady } = useAuth();
@@ -19,10 +23,12 @@ export function useClientPlan() {
     try {
       const data = await apiFetch<PlanResponse>("/api/client/plan", {
         token,
+        cacheTtlMs: 5 * 60 * 1000,
       });
       setPlan(data);
-    } catch (err: any) {
-      setError(err?.message || "No se pudo cargar el plan");
+    } catch (err: unknown) {
+      const apiError = err as ApiErrorLike;
+      setError(apiError?.message || "No se pudo cargar el plan");
       setPlan(null);
     } finally {
       setLoading(false);
