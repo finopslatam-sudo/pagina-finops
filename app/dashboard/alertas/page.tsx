@@ -19,6 +19,25 @@ type HistoryEntry = {
   aws_account_id?: string;
 };
 
+type AlertPolicyApiItem = {
+  id?: number | string;
+  policy_id?: string;
+  title: string;
+  channel: string;
+  threshold?: number | null;
+  threshold_type?: string | null;
+  period?: string;
+  email?: string;
+  aws_account_id?: number | string | null;
+  account?: {
+    account_name?: string;
+    account_id?: string;
+  } | null;
+  account_name?: string | null;
+  aws_account_name?: string | null;
+  aws_account_number?: string | null;
+};
+
 export default function AlertasPage() {
   const { user, token } = useAuth();
   const { accounts: awsAccounts, loading: loadingAccounts } = useAwsAccounts();
@@ -32,11 +51,16 @@ export default function AlertasPage() {
     const load = async () => {
       if (!token) return;
       try {
-        const res = await apiFetch<{ data: any[] }>('/api/client/alert-policies/', { token });
+        const res = await apiFetch<{ data: AlertPolicyApiItem[] }>('/api/client/alert-policies/', { token });
         const mapped: HistoryEntry[] = (res.data || []).map(item => ({
           id: item.policy_id || String(item.id),
           title: item.title,
-          account: item.account?.account_name || item.account?.account_id || 'Todas las cuentas',
+          account: item.account?.account_name
+            || item.account_name
+            || item.aws_account_name
+            || item.account?.account_id
+            || item.aws_account_number
+            || 'Todas las cuentas',
           channel: item.channel,
           threshold: item.threshold != null ? String(item.threshold) : '-',
           thresholdType: item.threshold_type || '',
@@ -239,6 +263,7 @@ export default function AlertasPage() {
       </div>
 
       <PolicyModal
+        key={`${selectedPolicy?.id ?? 'policy-modal'}-${showModal ? 'open' : 'closed'}`}
         open={showModal}
         policy={selectedPolicy}
         onClose={handleClose}
@@ -253,10 +278,12 @@ export default function AlertasPage() {
           email: payload.email,
           aws_account_id: payload.aws_account_id,
         })}
-        accounts={awsAccounts.map(acc => ({ id: acc.account_id ?? String(acc.id), label: acc.account_name || acc.account_id || `Cuenta ${acc.id}` }))}
+        accounts={awsAccounts.map(acc => ({
+          id: String(acc.id),
+          label: acc.account_name || acc.account_id || `Cuenta ${acc.id}`,
+        }))}
         loadingAccounts={loadingAccounts}
       />
     </div>
   );
 }
-

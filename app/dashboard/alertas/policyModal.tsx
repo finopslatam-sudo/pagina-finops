@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { PolicyCard } from "./policies";
 
 interface Props {
@@ -27,43 +27,28 @@ type Channel = "email" | "slack" | "teams";
 export default function PolicyModal({ open, onClose, onSave, policy, accounts, loadingAccounts = false }: Props) {
   const [channel, setChannel] = useState<Channel>("email");
   const [email, setEmail] = useState("");
-  const [accountId, setAccountId] = useState("all");
+  const [accountId, setAccountId] = useState("");
   const [thresholdType, setThresholdType] = useState<"usd" | "pct">("pct");
   const [thresholdValue, setThresholdValue] = useState("");
   const [windowSize, setWindowSize] = useState<"daily" | "weekly" | "monthly" | "annual">("monthly");
-  const accountOptions = [
-    { id: "all", label: "Todas las cuentas" },
-    ...accounts,
-  ];
-
-  useEffect(() => {
-    if (open) {
-      setChannel("email");
-      setEmail("");
-      setAccountId("all");
-      setThresholdType("pct");
-      setThresholdValue("");
-      setWindowSize("monthly");
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (open && accountOptions.length > 1) {
-      const first = accountOptions.find(a => a.id !== "all");
-      setAccountId(first?.id || "all");
-    }
-  }, [open, accountOptions]);
+  const accountOptions = useMemo(
+    () => [{ id: "all", label: "Todas las cuentas" }, ...accounts],
+    [accounts]
+  );
 
   if (!open || !policy) return null;
 
   const disabled = (ch: Channel) => ch !== "email";
+  const resolvedAccountId = accountOptions.some(a => a.id === accountId)
+    ? accountId
+    : accountOptions.find(a => a.id !== "all")?.id || "all";
 
   const renderBudgetFields = (period: "monthly" | "annual") => (
     <div className="space-y-4">
       <div className="space-y-2">
         <p className="text-sm font-semibold text-slate-800">Cuenta</p>
         <select
-          value={accountId}
+          value={resolvedAccountId}
           onChange={e => setAccountId(e.target.value)}
           disabled={loadingAccounts}
           className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
@@ -113,7 +98,7 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
       <div className="space-y-2">
         <p className="text-sm font-semibold text-slate-800">Cuenta</p>
         <select
-          value={accountId}
+          value={resolvedAccountId}
           onChange={e => setAccountId(e.target.value)}
           disabled={loadingAccounts}
           className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
@@ -163,7 +148,7 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
     if (policy.id === "anomaly-spike") return renderAnomalyFields();
     return (
       <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        Configuración detallada próximamente para "{policy.title}".
+        Configuración detallada próximamente para &quot;{policy.title}&quot;.
       </div>
     );
   };
@@ -238,9 +223,9 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
           <button
             onClick={() => {
               if (!policy) return;
-              const accountLabel = accountId === "all"
+              const accountLabel = resolvedAccountId === "all"
                 ? "Todas las cuentas"
-                : accountOptions.find(a => a.id === accountId)?.label || "Cuenta seleccionada";
+                : accountOptions.find(a => a.id === resolvedAccountId)?.label || "Cuenta seleccionada";
               const thresholdLabel = thresholdValue || "-";
               onSave({
                 policyId: policy.id,
@@ -251,7 +236,7 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
                 thresholdType: thresholdType === "usd" ? "USD" : "%",
                 period: windowSize,
                 email: email || undefined,
-                aws_account_id: accountId === "all" ? undefined : accountId,
+                aws_account_id: resolvedAccountId === "all" ? undefined : resolvedAccountId,
               });
               onClose();
             }}
