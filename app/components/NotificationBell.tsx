@@ -4,9 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useNotifications, AppNotification } from '@/app/dashboard/hooks/useNotifications';
 
 const TYPE_ICON: Record<string, string> = {
-  plan_upgrade_requested: '📈',
-  plan_upgrade_approved:  '✅',
-  plan_upgrade_rejected:  '❌',
+  plan_upgrade_requested:    '📈',
+  plan_upgrade_approved:     '✅',
+  plan_upgrade_rejected:     '❌',
+  support_ticket_created:    '🎫',
+  support_ticket_reply:      '💬',
+  support_ticket_client_reply: '💬',
+  support_ticket_status:     '🔄',
 };
 
 function timeAgo(iso: string): string {
