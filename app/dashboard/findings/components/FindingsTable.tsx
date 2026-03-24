@@ -93,8 +93,8 @@ export default function FindingsTable({
   }
 
   return (
-    <div className="w-full">
-      <table className="w-full bg-white shadow rounded-xl text-sm table-fixed">
+    <div className="w-full overflow-x-auto">
+      <table className="w-full min-w-[800px] bg-white shadow rounded-xl text-sm table-fixed">
         <colgroup>
           <col className="w-[7%]" />
           <col className="w-[10%]" />

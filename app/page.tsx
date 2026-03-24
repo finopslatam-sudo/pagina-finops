@@ -63,16 +63,16 @@ export default function Home() {
           <div className="absolute bottom-40 right-56 w-6 h-36 bg-white rounded-t"></div>
         </div>
 
-        <div className="relative text-center max-w-4xl mx-auto px-6">
-          <h1 className="text-5xl font-bold mb-6">
+        <div className="relative text-center max-w-4xl mx-auto px-4 sm:px-6">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
             Optimización de Costos en la Nube
           </h1>
-          <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+          <p className="text-base sm:text-xl text-blue-100 mb-8 leading-relaxed">
             Ayudamos a empresas a controlar, visualizar y optimizar sus costos en AWS
             aplicando mejores prácticas FinOps y análisis estratégico basado en datos.
           </p>
 
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <a
               href="https://wa.me/56965090121?text=Hola,%20quiero%20información%20sobre%20FinOpsLatam"
               target="_blank"
@@ -91,7 +91,7 @@ export default function Home() {
       </section>
 
       {/* DASHBOARD SECTION - Métricas y gráficos */}
-      <section className="px-6 py-16 bg-white">
+      <section className="px-4 lg:px-6 py-10 lg:py-16 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
@@ -157,7 +157,7 @@ export default function Home() {
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">PERSPECTIVAS</h3>
                 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-white rounded-xl border border-gray-200">
                     <p className="text-2xl font-bold text-gray-900">10</p>
                     <p className="text-sm text-gray-500 mt-1">Otras propuestas</p>
@@ -233,13 +233,13 @@ export default function Home() {
       ===================================================== */}
       <section
         id="servicios"
-        className="px-6 py-24 bg-gray-50"
+        className="px-4 lg:px-6 py-16 lg:py-24 bg-gray-50"
       >
         <div className="max-w-6xl mx-auto">
 
           {/* TÍTULO */}
-          <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold mb-4 text-gray-900">
+          <div className="text-center mb-10 lg:mb-16">
+            <h3 className="text-2xl lg:text-4xl font-bold mb-4 text-gray-900">
               Servicios FinOps
             </h3>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -364,9 +364,9 @@ export default function Home() {
       </section>
 
       {/* SOBRE MI */}
-      <section id="sobre-mi" className="px-6 py-20 bg-gray-50">
+      <section id="sobre-mi" className="px-4 lg:px-6 py-14 lg:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-4xl font-bold mb-8 text-gray-900 text-center">Quiénes somos</h3>
+          <h3 className="text-2xl lg:text-4xl font-bold mb-8 text-gray-900 text-center">Quiénes somos</h3>
           <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
             <p className="text-gray-600 leading-relaxed text-lg">
               En <span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent font-semibold">FinOpsLatam</span> combinamos experiencia en FinOps, DevOps y DataOps para ayudarte a controlar tus gastos en la nube. Nuestra misión es reducir costos de manera sostenible, sin comprometer la eficiencia de tus servicios.
@@ -390,9 +390,9 @@ export default function Home() {
       </section>
 
       {/* CONTACTO */}
-      <section id="contacto" className="px-6 py-20 text-center bg-white">
+      <section id="contacto" className="px-4 lg:px-6 py-14 lg:py-20 text-center bg-white">
         <div className="max-w-2xl mx-auto">
-          <h3 className="text-4xl font-bold mb-6 text-gray-900">Contacto</h3>
+          <h3 className="text-2xl lg:text-4xl font-bold mb-6 text-gray-900">Contacto</h3>
           <p className="text-gray-600 mb-8 text-lg">
             ¿Listo para optimizar tus costos en la nube? Contáctanos hoy mismo.
           </p>

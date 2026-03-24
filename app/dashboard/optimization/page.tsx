@@ -82,7 +82,7 @@ export default function OptimizationPage() {
   /* ── skeleton loader ── */
   if (loadingFinops) {
     return (
-      <div className="max-w-7xl mx-auto px-6 space-y-10 animate-pulse">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-10 animate-pulse">
         <div className="bg-slate-100 border border-slate-200 rounded-3xl p-8 space-y-4">
           <div className="h-8 w-96 bg-slate-200 rounded-xl" />
           <div className="h-4 w-full max-w-xl bg-slate-200 rounded-lg" />
@@ -112,11 +112,11 @@ export default function OptimizationPage() {
   const savings  = dash?.findings?.estimated_monthly_savings ?? 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-10">
 
       {/* ── HERO ── */}
-      <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-900">
+      <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-200 rounded-3xl p-5 lg:p-8 shadow-sm">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
           Estrategia de Compromisos (RI & Savings Plans)
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">

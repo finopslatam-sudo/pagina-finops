@@ -209,18 +209,18 @@ export default function Servicios() {
     <main className="min-h-screen bg-white text-gray-900">
 
       {/* HERO */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 text-center px-6">
-        <h1 className="text-5xl font-bold mb-6">
+      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-14 lg:py-20 text-center px-4 lg:px-6">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
           Planes FinOps para cada etapa de crecimiento
         </h1>
-        <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+        <p className="text-base sm:text-xl text-blue-100 max-w-3xl mx-auto">
           Gobierno financiero cloud, optimización continua y decisiones
           estratégicas basadas en datos e inteligencia artificial.
         </p>
       </section>
 
       {/* PLANES */}
-      <section className="px-6 py-20 bg-gray-50">
+      <section className="px-4 lg:px-6 py-14 lg:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
 
         <Plan

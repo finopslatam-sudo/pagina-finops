@@ -37,7 +37,7 @@ export default function SubscriptionCard({
   return (
     <>
       {/* Plan card */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+      <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl space-y-6">
         <h2 className="text-xl font-semibold">Plan de suscripción</h2>
 
         {subscription ? (
@@ -109,7 +109,7 @@ export default function SubscriptionCard({
       {/* Upgrade selection modal */}
       {showUpgradeModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-[520px] max-h-[80vh] overflow-y-auto p-8 space-y-6">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto p-6 lg:p-8 space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Upgrade Plan</h2>
               <button
@@ -187,7 +187,7 @@ export default function SubscriptionCard({
       {/* Upgrade success modal */}
       {upgradeSuccess && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-[420px] p-8 text-center space-y-6">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-8 text-center space-y-6">
             <div className="text-5xl">✅</div>
             <h2 className="text-xl font-semibold">Upgrade solicitado con éxito</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
@@ -210,7 +210,7 @@ export default function SubscriptionCard({
       {/* Processing modal */}
       {showProcessingModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-[360px] p-8 text-center space-y-6">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 text-center space-y-6">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <h2 className="text-lg font-semibold">Procesando upgrade...</h2>
             <p className="text-gray-500 text-sm">

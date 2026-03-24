@@ -43,12 +43,12 @@ export default function AwsIntegrationPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-14">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-10 lg:space-y-14">
 
       {/* HERO */}
-      <div className="bg-gradient-to-r from-blue-50 via-white to-white border border-blue-200 rounded-3xl p-10 shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-900">AWS Integration</h1>
-        <p className="text-gray-600 mt-4 max-w-4xl leading-relaxed text-lg">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-white border border-blue-200 rounded-3xl p-6 lg:p-10 shadow-sm">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">AWS Integration</h1>
+        <p className="text-gray-600 mt-4 max-w-4xl leading-relaxed text-base lg:text-lg">
           Conecta tu cuenta de AWS de forma segura mediante un rol de solo lectura.
           Esta integración permite analizar recursos, detectar riesgos FinOps y
           descubrir oportunidades de optimización de costos en tu infraestructura cloud.

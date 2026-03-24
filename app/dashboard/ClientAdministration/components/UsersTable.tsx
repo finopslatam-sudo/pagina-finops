@@ -38,9 +38,9 @@ export default function UsersTable({
   onOpenUpgradeModal,
 }: Props) {
   return (
-    <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+    <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-semibold">Usuarios de la organización</h2>
           <span className="text-xs bg-gray-100 px-2 py-1 rounded">

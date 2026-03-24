@@ -30,7 +30,7 @@ export default function UserFormModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-xl w-[480px] p-8 space-y-6">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">

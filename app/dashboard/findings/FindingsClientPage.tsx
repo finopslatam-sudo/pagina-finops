@@ -224,15 +224,15 @@ export default function FindingsPage() {
   ===================================================== */
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-14">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-14">
 
       {/* ================= HEADER ================= */}
 
-      <div className="bg-slate-100 border border-blue-300 p-8 rounded-3xl shadow-sm flex justify-between items-center">
+      <div className="bg-slate-100 border border-blue-300 p-5 sm:p-8 rounded-3xl shadow-sm flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
 
         <div>
 
-          <h1 className="text-3xl font-semibold text-slate-800">
+          <h1 className="text-2xl lg:text-3xl font-semibold text-slate-800">
             Findings & Optimization
           </h1>
 
@@ -242,7 +242,7 @@ export default function FindingsPage() {
 
         </div>
 
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
 
         <button
           onClick={runAudit}
@@ -313,7 +313,7 @@ export default function FindingsPage() {
       )}
 
       {/* ================= TABLE ================= */}
-      <div className="bg-white border border-blue-300 p-10 rounded-3xl shadow-sm">
+      <div className="bg-white border border-blue-300 p-4 sm:p-8 lg:p-10 rounded-3xl shadow-sm">
 
         {loading ? (
           <div className="text-center py-16 text-slate-500">
@@ -366,7 +366,7 @@ export default function FindingsPage() {
 
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-        <div className="bg-white rounded-2xl shadow-xl w-[420px] p-8 text-center space-y-6">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-8 text-center space-y-6">
 
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
 
@@ -391,7 +391,7 @@ export default function FindingsPage() {
 
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-        <div className="bg-white rounded-2xl shadow-xl w-[420px] p-8 text-center space-y-6">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-8 text-center space-y-6">
 
           <div className="text-5xl">
             ✅

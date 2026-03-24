@@ -101,8 +101,8 @@ function ClientsTableSection({
   onEdit,
 }: SectionProps) {
   return (
-    <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-      <table className="w-full text-sm">
+    <div className="bg-white border rounded-xl shadow-sm overflow-x-auto">
+      <table className="w-full min-w-[640px] text-sm">
         <thead className="bg-gray-50 text-left">
           <tr>
             <th className="p-4">Empresa</th>

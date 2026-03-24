@@ -55,11 +55,11 @@ export default function CostosPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-12">
 
       {/* ================= HERO FINANCIAL CARD ================= */}
-      <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-8 shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-900">
+      <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-5 lg:p-8 shadow-sm">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
           Costs & Financials
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
@@ -173,7 +173,7 @@ export default function CostosPage() {
       </div>
 
       {/* ================= TENDENCIA MENSUAL ================= */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+      <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl">
         <h2 className="text-xl font-semibold mb-6">
           Tendencia mensual
         </h2>
@@ -181,7 +181,7 @@ export default function CostosPage() {
       </div>
 
       {/* ================= DISTRIBUCIÓN POR SERVICIO ================= */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+      <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl">
         <h2 className="text-xl font-semibold mb-6">
           Distribución por servicio
         </h2>

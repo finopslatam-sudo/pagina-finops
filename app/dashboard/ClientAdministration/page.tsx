@@ -66,19 +66,19 @@ export default function ClientAdministrationPage() {
   const viewers = users.filter((u) => u.client_role === "viewer").length;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-14">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-10 lg:space-y-14">
 
       {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-50 via-white to-white border border-blue-200 rounded-3xl p-10 shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-900">Administración de Organización</h1>
-        <p className="text-gray-600 mt-4 max-w-4xl leading-relaxed text-lg">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-white border border-blue-200 rounded-3xl p-6 lg:p-10 shadow-sm">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Administración de Organización</h1>
+        <p className="text-gray-600 mt-4 max-w-4xl leading-relaxed text-base lg:text-lg">
           Gestiona la configuración de tu organización, el plan de suscripción, las cuentas AWS
           conectadas y los usuarios que tienen acceso a la plataforma FinOpsLatam.
         </p>
       </div>
 
       {/* KPI grid */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
         <KpiCard title="Usuarios"    value={users.length}  bg="bg-blue-50"    text="text-blue-600"    />
         <KpiCard title="Owners"      value={owners}        bg="bg-purple-50"  text="text-purple-600"  />
         <KpiCard title="FinOps Admin" value={admins}       bg="bg-indigo-50"  text="text-indigo-600"  />
@@ -135,7 +135,7 @@ export default function ClientAdministrationPage() {
       {/* User action success modal */}
       {successMessage && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-[380px] p-8 text-center space-y-6">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 text-center space-y-6">
             <div className="text-4xl">🎉</div>
             <h2 className="text-lg font-semibold">{successMessage}</h2>
             <button

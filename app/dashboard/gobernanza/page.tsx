@@ -73,7 +73,7 @@ export default function GobernanzaPage() {
   /* skeleton */
   if (loading || !data) {
     return (
-      <div className="max-w-7xl mx-auto px-6 space-y-10 animate-pulse">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-10 animate-pulse">
         <div className="bg-slate-100 border border-slate-200 rounded-3xl p-10 space-y-4">
           <div className="h-8 w-72 bg-slate-200 rounded-xl" />
           <div className="h-4 w-full max-w-2xl bg-slate-200 rounded-lg" />
@@ -125,13 +125,13 @@ export default function GobernanzaPage() {
   const priorityServices: any[] = Array.isArray(data.priority_services) ? data.priority_services : [];
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-10">
 
       {/* ── HERO ── */}
-      <div className="bg-gradient-to-r from-indigo-50 via-white to-white border border-indigo-200 rounded-3xl p-10 shadow-sm">
+      <div className="bg-gradient-to-r from-indigo-50 via-white to-white border border-indigo-200 rounded-3xl p-6 lg:p-10 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold text-gray-900">Gobernanza & Compliance</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Gobernanza & Compliance</h1>
             <p className="text-gray-600 mt-3 max-w-3xl leading-relaxed">
               {exec.message || 'Evaluación integral del nivel de riesgo, madurez operativa y cumplimiento de buenas prácticas en tu entorno cloud.'}
             </p>
@@ -214,7 +214,7 @@ export default function GobernanzaPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
         {/* Gauge de compliance */}
-        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+        <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl space-y-6">
           <div>
             <h2 className="text-xl font-semibold text-slate-800">Nivel de Compliance</h2>
             <p className="text-sm text-slate-500 mt-1">Recursos que cumplen las buenas prácticas de AWS sobre el total escaneado.</p>
@@ -241,7 +241,7 @@ export default function GobernanzaPage() {
         </div>
 
         {/* Donut severidad */}
-        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+        <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl space-y-6">
           <div>
             <h2 className="text-xl font-semibold text-slate-800">Distribución por Severidad</h2>
             <p className="text-sm text-slate-500 mt-1">Findings activos clasificados por nivel de criticidad.</p>
@@ -294,7 +294,7 @@ export default function GobernanzaPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
         {/* Progreso de resolución */}
-        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+        <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl space-y-6">
           <div>
             <h2 className="text-xl font-semibold text-slate-800">Progreso de Remediación</h2>
             <p className="text-sm text-slate-500 mt-1">Avance en la resolución de findings identificados.</p>
@@ -329,7 +329,7 @@ export default function GobernanzaPage() {
         </div>
 
         {/* Executive Summary */}
-        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+        <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl space-y-6">
           <div>
             <h2 className="text-xl font-semibold text-slate-800">Resumen Ejecutivo</h2>
             <p className="text-sm text-slate-500 mt-1">Diagnóstico estratégico generado automáticamente.</p>
@@ -374,7 +374,7 @@ export default function GobernanzaPage() {
       </div>
 
       {/* ── ROI PROJECTION ── */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-3xl p-8 shadow-sm">
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-3xl p-5 lg:p-8 shadow-sm">
         <h2 className="text-xl font-semibold text-slate-800 mb-2">Proyección de Mejora (ROI)</h2>
         <p className="text-sm text-slate-500 mb-8">
           Estimación del estado del entorno si se resuelven todos los findings activos de alta severidad.
@@ -413,7 +413,7 @@ export default function GobernanzaPage() {
 
       {/* ── PRIORITY SERVICES ── */}
       {priorityServices.length > 0 && (
-        <div className="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+        <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl space-y-6">
           <div>
             <h2 className="text-xl font-semibold text-slate-800">Servicios Prioritarios</h2>
             <p className="text-sm text-slate-500 mt-1">Servicios con mayor concentración de riesgo que requieren atención inmediata.</p>

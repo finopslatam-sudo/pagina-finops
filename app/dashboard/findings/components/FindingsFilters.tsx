@@ -38,7 +38,7 @@ export default function FindingsFilters({
   const regions = availableRegions || [];
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm mb-6 grid grid-cols-1 md:grid-cols-6 gap-4">
+    <div className="bg-white p-6 rounded-2xl shadow-sm mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
 
       {/* Service */}
       <select

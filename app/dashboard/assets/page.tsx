@@ -186,11 +186,11 @@ export default function AssetsPage() {
   /* ================= RENDER ================= */
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-12">
 
       {/* ================= HERO CARD ================= */}
-      <div className="bg-gradient-to-r from-blue-50 to-white border border-blue-200 rounded-3xl p-8 shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-900">
+      <div className="bg-gradient-to-r from-blue-50 to-white border border-blue-200 rounded-3xl p-5 lg:p-8 shadow-sm">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
           Assets & Overview
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
@@ -210,7 +210,7 @@ export default function AssetsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
       {/* ===== RISK DISTRIBUTION ===== */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+      <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl">
         <h2 className="text-xl font-semibold mb-2">
           Distribución de Riesgo
         </h2>
@@ -239,7 +239,7 @@ export default function AssetsPage() {
       </div>
 
       {/* ===== SERVICE DISTRIBUTION ===== */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+      <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl">
         <h2 className="text-xl font-semibold mb-2">
           Distribución por Servicio
         </h2>
@@ -338,7 +338,7 @@ export default function AssetsPage() {
             </div>
 
       {/* ================= TABLE ================= */}
-      <div className="bg-white p-8 rounded-3xl border shadow-xl">
+      <div className="bg-white p-5 lg:p-8 rounded-3xl border shadow-xl">
         <h2 className="text-xl font-semibold mb-6">
           Recursos detectados
         </h2>

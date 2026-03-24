@@ -58,7 +58,7 @@ export default function FindingsDrawer({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-end z-50">
-      <div className="w-[400px] bg-white h-full shadow-xl p-6 overflow-y-auto">
+      <div className="w-full sm:w-[400px] bg-white h-full shadow-xl p-6 overflow-y-auto">
         
         {/* Header */}
         <div className="flex justify-between items-center mb-4">

@@ -265,11 +265,11 @@ export default function AlertasPage() {
   const configuredChannels = new Set(history.map(item => item.channel)).size;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 space-y-10">
-      <div className="bg-sky-50 border-2 border-sky-200 rounded-3xl p-10 shadow-md text-slate-900">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-10">
+      <div className="bg-sky-50 border-2 border-sky-200 rounded-3xl p-6 lg:p-10 shadow-md text-slate-900">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold">Políticas & Alertas</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold">Políticas & Alertas</h1>
             <p className="text-slate-700 mt-3 max-w-3xl leading-relaxed">
               Define reglas de presupuesto, alertas de consumo, detección de anomalías y políticas de gobernanza para mantener control total sobre el gasto cloud de tu organización.
             </p>
@@ -338,7 +338,7 @@ export default function AlertasPage() {
         })}
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-3xl p-8">
+      <div className="bg-white border border-slate-200 rounded-3xl p-5 lg:p-8">
         <h2 className="text-lg font-bold text-slate-800 mb-1">Canales de Notificación</h2>
         <p className="text-sm text-slate-500 mb-6">Configura los destinos donde se enviarán las alertas cuando se dispare una política.</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -357,7 +357,7 @@ export default function AlertasPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-4">
+      <div className="bg-white border border-slate-200 rounded-3xl p-5 lg:p-8 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Historial de políticas creadas</h2>

@@ -29,12 +29,12 @@ export default function ClientsPage() {
     useState(false);
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+    <section className="max-w-7xl mx-auto px-4 lg:px-6 py-6 space-y-6">
 
       {/* =========================
           HEADER
       ========================== */}
-      <header className="flex justify-between items-center">
+      <header className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
         <div>
           <h1 className="text-2xl font-semibold">
             Panel de Clientes
