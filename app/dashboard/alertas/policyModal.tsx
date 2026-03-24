@@ -7,10 +7,12 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSave: (data: {
+    dbId?: string;
     policyId: string;
     title: string;
     account: string;
     channel: string;
+    destination: string;
     threshold: string;
     thresholdType: string;
     period?: string;
@@ -18,19 +20,46 @@ interface Props {
     aws_account_id?: string;
   }) => void;
   policy?: PolicyCard;
+  initialValues?: {
+    dbId?: string;
+    channel?: string;
+    email?: string;
+    threshold?: string;
+    thresholdType?: string;
+    period?: string;
+    aws_account_id?: string;
+  };
   accounts: { id: string; label: string }[];
   loadingAccounts?: boolean;
 }
 
 type Channel = "email" | "slack" | "teams";
 
-export default function PolicyModal({ open, onClose, onSave, policy, accounts, loadingAccounts = false }: Props) {
-  const [channel, setChannel] = useState<Channel>("email");
-  const [email, setEmail] = useState("");
-  const [accountId, setAccountId] = useState("");
-  const [thresholdType, setThresholdType] = useState<"usd" | "pct">("pct");
-  const [thresholdValue, setThresholdValue] = useState("");
-  const [windowSize, setWindowSize] = useState<"daily" | "weekly" | "monthly" | "annual">("monthly");
+export default function PolicyModal({
+  open,
+  onClose,
+  onSave,
+  policy,
+  initialValues,
+  accounts,
+  loadingAccounts = false,
+}: Props) {
+  const initialChannel = initialValues?.channel === "slack" || initialValues?.channel === "teams"
+    ? initialValues.channel
+    : "email";
+  const initialThresholdType = initialValues?.thresholdType === "USD" ? "usd" : "pct";
+  const initialPeriod = initialValues?.period === "daily" || initialValues?.period === "weekly"
+    ? initialValues.period
+    : policy?.id === "budget-annual"
+      ? "annual"
+      : "monthly";
+
+  const [channel, setChannel] = useState<Channel>(initialChannel);
+  const [email, setEmail] = useState(initialValues?.email || "");
+  const [accountId, setAccountId] = useState(initialValues?.aws_account_id || "all");
+  const [thresholdType, setThresholdType] = useState<"usd" | "pct">(initialThresholdType);
+  const [thresholdValue, setThresholdValue] = useState(initialValues?.threshold || "");
+  const [windowSize, setWindowSize] = useState<"daily" | "weekly" | "monthly" | "annual">(initialPeriod);
   const accountOptions = useMemo(
     () => [{ id: "all", label: "Todas las cuentas" }, ...accounts],
     [accounts]
@@ -41,7 +70,7 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
   const disabled = (ch: Channel) => ch !== "email";
   const resolvedAccountId = accountOptions.some(a => a.id === accountId)
     ? accountId
-    : accountOptions.find(a => a.id !== "all")?.id || "all";
+    : "all";
 
   const renderBudgetFields = (period: "monthly" | "annual") => (
     <div className="space-y-4">
@@ -226,15 +255,26 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
               const accountLabel = resolvedAccountId === "all"
                 ? "Todas las cuentas"
                 : accountOptions.find(a => a.id === resolvedAccountId)?.label || "Cuenta seleccionada";
+              const destination = channel === "email"
+                ? (email || "Sin correo configurado")
+                : channel === "slack"
+                  ? "Grupo o canal de Slack"
+                  : "Grupo o canal de Teams";
               const thresholdLabel = thresholdValue || "-";
               onSave({
+                dbId: initialValues?.dbId,
                 policyId: policy.id,
                 title: policy.title,
                 account: accountLabel,
                 channel,
+                destination,
                 threshold: thresholdLabel,
                 thresholdType: thresholdType === "usd" ? "USD" : "%",
-                period: windowSize,
+                period: policy.id === "budget-monthly"
+                  ? "monthly"
+                  : policy.id === "budget-annual"
+                    ? "annual"
+                    : windowSize,
                 email: email || undefined,
                 aws_account_id: resolvedAccountId === "all" ? undefined : resolvedAccountId,
               });

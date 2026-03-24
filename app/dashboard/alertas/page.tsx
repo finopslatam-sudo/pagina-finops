@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
@@ -7,16 +8,21 @@ import { useAwsAccounts } from '@/app/dashboard/hooks/useAwsAccounts';
 import PolicyModal from './policyModal';
 import { POLICIES, STATUS_CONFIG, CATEGORIES, PolicyCard } from './policies';
 
+type ChannelType = 'email' | 'slack' | 'teams';
+
 type HistoryEntry = {
-  id: string;
+  dbId?: string;
+  policyId: string;
   title: string;
   account: string;
-  channel: string;
+  channel: ChannelType;
+  destination: string;
   threshold: string;
   thresholdType: string;
   period?: string;
   email?: string;
   aws_account_id?: string;
+  createdAt?: string;
 };
 
 type AlertPolicyApiItem = {
@@ -29,6 +35,7 @@ type AlertPolicyApiItem = {
   period?: string;
   email?: string;
   aws_account_id?: number | string | null;
+  created_at?: string | null;
   account?: {
     account_name?: string;
     account_id?: string;
@@ -38,12 +45,84 @@ type AlertPolicyApiItem = {
   aws_account_number?: string | null;
 };
 
+type AlertPoliciesResponse = {
+  data?: AlertPolicyApiItem[];
+  policies?: AlertPolicyApiItem[];
+};
+
+type AlertPolicyMutationResponse = {
+  data?: AlertPolicyApiItem;
+  policy?: AlertPolicyApiItem;
+};
+
+const CHANNEL_LABELS: Record<ChannelType, string> = {
+  email: 'Correo',
+  slack: 'Slack',
+  teams: 'Teams',
+};
+
+const PERIOD_LABELS: Record<string, string> = {
+  daily: 'Diaria',
+  weekly: 'Semanal',
+  monthly: 'Mensual',
+  annual: 'Anual',
+};
+
+function getDestination(channel: string, email?: string | null) {
+  if (channel === 'email') return email || 'Sin correo configurado';
+  if (channel === 'slack') return 'Grupo o canal de Slack';
+  return 'Grupo o canal de Teams';
+}
+
+function toHistoryEntry(item: AlertPolicyApiItem): HistoryEntry {
+  const channel = (item.channel === 'slack' || item.channel === 'teams' ? item.channel : 'email') as ChannelType;
+
+  return {
+    dbId: item.id != null ? String(item.id) : undefined,
+    policyId: item.policy_id || String(item.id || ''),
+    title: item.title,
+    account: item.account?.account_name
+      || item.account_name
+      || item.aws_account_name
+      || item.account?.account_id
+      || item.aws_account_number
+      || 'Todas las cuentas',
+    channel,
+    destination: getDestination(channel, item.email),
+    threshold: item.threshold != null ? String(item.threshold) : '-',
+    thresholdType: item.threshold_type || '',
+    period: item.period,
+    email: item.email,
+    aws_account_id: item.aws_account_id ? String(item.aws_account_id) : undefined,
+    createdAt: item.created_at || undefined,
+  };
+}
+
+function getPolicyDefinition(policyId: string, title: string): PolicyCard {
+  const existing = POLICIES.find(policy => policy.id === policyId);
+  if (existing) return existing;
+
+  return {
+    id: policyId,
+    category: 'Configurada',
+    icon: '🔔',
+    title,
+    description: 'Edita la configuración de esta política creada anteriormente.',
+    examples: [],
+    status: 'active',
+    color: 'bg-slate-50',
+    borderColor: 'border-slate-200',
+    badgeColor: 'bg-slate-100 text-slate-700',
+  };
+}
+
 export default function AlertasPage() {
   const { user, token } = useAuth();
   const { accounts: awsAccounts, loading: loadingAccounts } = useAwsAccounts();
   const [activeCategory, setActiveCategory] = useState('Todas');
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<PolicyCard | undefined>();
+  const [editingEntry, setEditingEntry] = useState<HistoryEntry | undefined>();
   const [showModal, setShowModal] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
 
@@ -51,24 +130,9 @@ export default function AlertasPage() {
     const load = async () => {
       if (!token) return;
       try {
-        const res = await apiFetch<{ data: AlertPolicyApiItem[] }>('/api/client/alert-policies/', { token });
-        const mapped: HistoryEntry[] = (res.data || []).map(item => ({
-          id: item.policy_id || String(item.id),
-          title: item.title,
-          account: item.account?.account_name
-            || item.account_name
-            || item.aws_account_name
-            || item.account?.account_id
-            || item.aws_account_number
-            || 'Todas las cuentas',
-          channel: item.channel,
-          threshold: item.threshold != null ? String(item.threshold) : '-',
-          thresholdType: item.threshold_type || '',
-          period: item.period,
-          email: item.email,
-          aws_account_id: item.aws_account_id ? String(item.aws_account_id) : undefined,
-        }));
-        setHistory(mapped);
+        const res = await apiFetch<AlertPoliciesResponse>('/api/client/alert-policies/', { token });
+        const items = res.data || res.policies || [];
+        setHistory(items.map(toHistoryEntry));
       } catch (err) {
         console.error('No se pudo cargar el historial de políticas', err);
       }
@@ -79,26 +143,97 @@ export default function AlertasPage() {
   const handleClose = () => {
     setShowModal(false);
     setSelectedPolicy(undefined);
+    setEditingEntry(undefined);
   };
 
-  const handleSave = async (data: HistoryEntry & { aws_account_id?: string }) => {
-    setHistory(prev => [data, ...prev].slice(0, 10));
-    handleClose();
+  const handleEdit = (entry: HistoryEntry) => {
+    setEditingEntry(entry);
+    setSelectedPolicy(getPolicyDefinition(entry.policyId, entry.title));
+    setShowModal(true);
+  };
+
+  const handleDelete = async (entry: HistoryEntry) => {
+    if (!token) return;
+    if (!window.confirm(`¿Deseas eliminar la política "${entry.title}"?`)) return;
+
+    const previous = history;
+    setHistory(prev => prev.filter(item => item.dbId !== entry.dbId));
+
+    if (!entry.dbId) return;
+
     try {
-      await apiFetch('/api/client/alert-policies/', {
-        method: 'POST',
+      await apiFetch(`/api/client/alert-policies/${entry.dbId}`, {
+        method: 'DELETE',
         token,
-        body: {
-          policy_id: data.id,
-          title: data.title,
-          channel: data.channel,
-          email: data.email,
-          threshold: data.threshold,
-          threshold_type: data.thresholdType,
-          period: data.period,
-          aws_account_id: data.aws_account_id,
-        },
       });
+    } catch (err) {
+      console.error('No se pudo eliminar la política', err);
+      setHistory(previous);
+    }
+  };
+
+  const handleSave = async (data: {
+    dbId?: string;
+    policyId: string;
+    title: string;
+    account: string;
+    channel: string;
+    destination: string;
+    threshold: string;
+    thresholdType: string;
+    period?: string;
+    email?: string;
+    aws_account_id?: string;
+  }) => {
+    if (!token) return;
+
+    try {
+      const res = await apiFetch<AlertPolicyMutationResponse>(
+        data.dbId ? `/api/client/alert-policies/${data.dbId}` : '/api/client/alert-policies/',
+        {
+          method: data.dbId ? 'PUT' : 'POST',
+          token,
+          body: {
+            policy_id: data.policyId,
+            title: data.title,
+            channel: data.channel,
+            email: data.email,
+            threshold: data.threshold,
+            threshold_type: data.thresholdType,
+            period: data.period,
+            aws_account_id: data.aws_account_id,
+          },
+        }
+      );
+
+      const savedItem = res.data || res.policy;
+      const nextEntry = savedItem
+        ? toHistoryEntry(savedItem)
+        : {
+            dbId: data.dbId,
+            policyId: data.policyId,
+            title: data.title,
+            account: data.account,
+            channel: (data.channel === 'slack' || data.channel === 'teams' ? data.channel : 'email') as ChannelType,
+            destination: data.destination,
+            threshold: data.threshold,
+            thresholdType: data.thresholdType,
+            period: data.period,
+            email: data.email,
+            aws_account_id: data.aws_account_id,
+          };
+
+      setHistory(prev => {
+        if (nextEntry.dbId) {
+          const exists = prev.some(item => item.dbId === nextEntry.dbId);
+          if (exists) {
+            return prev.map(item => (item.dbId === nextEntry.dbId ? nextEntry : item));
+          }
+        }
+        return [nextEntry, ...prev].slice(0, 20);
+      });
+
+      handleClose();
     } catch (err) {
       console.error('No se pudo persistir la política', err);
     }
@@ -123,6 +258,7 @@ export default function AlertasPage() {
   }
 
   const filtered = activeCategory === 'Todas' ? POLICIES : POLICIES.filter(p => p.category === activeCategory);
+  const configuredChannels = new Set(history.map(item => item.channel)).size;
 
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-10">
@@ -144,9 +280,9 @@ export default function AlertasPage() {
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: 'Políticas configuradas', value: String(history.length), icon: '📋' },
-            { label: 'Alertas activas', value: '0', icon: '🔔' },
+            { label: 'Alertas activas', value: String(history.length), icon: '🔔' },
             { label: 'Alertas disparadas hoy', value: '0', icon: '⚡' },
-            { label: 'Canales de notificación', value: '0', icon: '📨' },
+            { label: 'Canales de notificación', value: String(configuredChannels), icon: '📨' },
           ].map(s => (
             <div key={s.label} className="bg-white/80 border border-white/70 rounded-2xl p-4 shadow-sm">
               <div className="text-2xl font-bold text-slate-800">{s.icon} {s.value}</div>
@@ -206,7 +342,7 @@ export default function AlertasPage() {
                   ))}
                 </ul>
               </div>
-              <button onClick={() => { setSelectedPolicy(policy); setShowModal(true); }} className="mt-2 w-full py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 hover:border-slate-400 transition">
+              <button onClick={() => { setSelectedPolicy(policy); setEditingEntry(undefined); setShowModal(true); }} className="mt-2 w-full py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 hover:border-slate-400 transition">
                 Configurar política
               </button>
             </div>
@@ -237,7 +373,7 @@ export default function AlertasPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Historial de políticas creadas</h2>
-            <p className="text-sm text-slate-500">Las últimas configuraciones guardadas.</p>
+            <p className="text-sm text-slate-500">Revisa destino, cuenta, umbral y administra cada política creada.</p>
           </div>
           <span className="text-xs text-slate-500">{history.length} en total</span>
         </div>
@@ -246,14 +382,55 @@ export default function AlertasPage() {
         ) : (
           <div className="space-y-3">
             {history.map(item => (
-              <div key={item.id} className="border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">{item.title}</p>
-                  <p className="text-xs text-slate-500">{item.account}</p>
+              <div key={item.dbId || `${item.policyId}-${item.createdAt || item.title}`} className="border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-base font-semibold text-slate-800">{item.title}</p>
+                    <p className="text-sm text-slate-500">{item.account}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">{CHANNEL_LABELS[item.channel]}</span>
+                    <span className="text-base font-semibold text-slate-800">{item.threshold} {item.thresholdType}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-slate-600">
-                  <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">{item.channel === 'email' ? 'Correo' : item.channel === 'slack' ? 'Slack' : 'Teams'}</span>
-                  <span className="font-semibold text-slate-800">{item.threshold} {item.thresholdType}</span>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Cuenta</p>
+                    <p className="mt-1 font-medium text-slate-800">{item.account}</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Canal</p>
+                    <p className="mt-1 font-medium text-slate-800">{CHANNEL_LABELS[item.channel]}</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Destino</p>
+                    <p className="mt-1 font-medium text-slate-800 break-all">{item.destination}</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Periodicidad</p>
+                    <p className="mt-1 font-medium text-slate-800">{item.period ? PERIOD_LABELS[item.period] || item.period : 'No definida'}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs text-slate-500">
+                    {item.createdAt ? `Creada: ${new Date(item.createdAt).toLocaleString('es-CL')}` : 'Política persistida en la base de datos'}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item)}
+                      className="px-3 py-2 rounded-xl border border-rose-200 text-rose-700 text-sm font-medium hover:bg-rose-50"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -262,21 +439,20 @@ export default function AlertasPage() {
       </div>
 
       <PolicyModal
-        key={`${selectedPolicy?.id ?? 'policy-modal'}-${showModal ? 'open' : 'closed'}`}
+        key={`${editingEntry?.dbId ?? selectedPolicy?.id ?? 'policy-modal'}-${showModal ? 'open' : 'closed'}`}
         open={showModal}
         policy={selectedPolicy}
+        initialValues={editingEntry ? {
+          dbId: editingEntry.dbId,
+          channel: editingEntry.channel,
+          email: editingEntry.email,
+          threshold: editingEntry.threshold,
+          thresholdType: editingEntry.thresholdType,
+          period: editingEntry.period,
+          aws_account_id: editingEntry.aws_account_id,
+        } : undefined}
         onClose={handleClose}
-        onSave={(payload) => handleSave({
-          id: payload.policyId,
-          title: payload.title,
-          account: payload.account,
-          channel: payload.channel,
-          threshold: payload.threshold,
-          thresholdType: payload.thresholdType,
-          period: payload.period,
-          email: payload.email,
-          aws_account_id: payload.aws_account_id,
-        })}
+        onSave={handleSave}
         accounts={awsAccounts.map(acc => ({
           id: String(acc.id),
           label: acc.account_name || acc.account_id || `Cuenta ${acc.id}`,
