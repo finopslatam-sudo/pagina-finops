@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { PolicyCard } from "./policies";
+import { renderPolicyFields } from "./policyFields";
 
 interface Props {
   open: boolean;
@@ -35,6 +36,15 @@ interface Props {
 
 type Channel = "email" | "slack" | "teams";
 
+// Fixed periods per policy type — others use windowSize state
+const FIXED_PERIODS: Record<string, string> = {
+  "budget-monthly": "monthly",
+  "budget-annual":  "annual",
+  "service-cost":   "monthly",
+  "forecast":       "monthly",
+  "off-hours":      "daily",
+};
+
 export default function PolicyModal({
   open,
   onClose,
@@ -44,22 +54,28 @@ export default function PolicyModal({
   accounts,
   loadingAccounts = false,
 }: Props) {
-  const initialChannel = initialValues?.channel === "slack" || initialValues?.channel === "teams"
-    ? initialValues.channel
-    : "email";
-  const initialThresholdType = initialValues?.thresholdType === "USD" ? "usd" : "pct";
-  const initialPeriod = initialValues?.period === "daily" || initialValues?.period === "weekly"
-    ? initialValues.period
-    : policy?.id === "budget-annual"
-      ? "annual"
-      : "monthly";
+  const initialChannel =
+    initialValues?.channel === "slack" || initialValues?.channel === "teams"
+      ? initialValues.channel
+      : "email";
+  const initialThresholdType = initialValues?.thresholdType === "%" ? "pct" : "usd";
+  const initialPeriod =
+    initialValues?.period === "daily" ||
+    initialValues?.period === "weekly" ||
+    initialValues?.period === "monthly" ||
+    initialValues?.period === "annual"
+      ? initialValues.period
+      : "daily";
 
   const [channel, setChannel] = useState<Channel>(initialChannel);
   const [email, setEmail] = useState(initialValues?.email || "");
   const [accountId, setAccountId] = useState(initialValues?.aws_account_id || "all");
   const [thresholdType, setThresholdType] = useState<"usd" | "pct">(initialThresholdType);
   const [thresholdValue, setThresholdValue] = useState(initialValues?.threshold || "");
-  const [windowSize, setWindowSize] = useState<"daily" | "weekly" | "monthly" | "annual">(initialPeriod);
+  const [windowSize, setWindowSize] = useState<"daily" | "weekly" | "monthly" | "annual">(
+    initialPeriod
+  );
+
   const accountOptions = useMemo(
     () => [{ id: "all", label: "Todas las cuentas" }, ...accounts],
     [accounts]
@@ -67,124 +83,46 @@ export default function PolicyModal({
 
   if (!open || !policy) return null;
 
-  const disabled = (ch: Channel) => ch !== "email";
-  const resolvedAccountId = accountOptions.some(a => a.id === accountId)
+  const resolvedAccountId = accountOptions.some((a) => a.id === accountId)
     ? accountId
     : "all";
 
-  const renderBudgetFields = (period: "monthly" | "annual") => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <p className="text-sm font-semibold text-slate-800">Cuenta</p>
-        <select
-          value={resolvedAccountId}
-          onChange={e => setAccountId(e.target.value)}
-          disabled={loadingAccounts}
-          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
-        >
-          {accountOptions.map(acc => (
-            <option key={acc.id} value={acc.id}>{acc.label}</option>
-          ))}
-        </select>
-        {!loadingAccounts && accountOptions.length === 1 && (
-          <p className="text-xs text-amber-600">No hay cuentas disponibles. Conecta una cuenta AWS primero.</p>
-        )}
-      </div>
+  const handleSave = () => {
+    if (!policy) return;
+    const accountLabel =
+      resolvedAccountId === "all"
+        ? "Todas las cuentas"
+        : accountOptions.find((a) => a.id === resolvedAccountId)?.label ||
+          "Cuenta seleccionada";
+    const destination =
+      channel === "email"
+        ? email || "Sin correo configurado"
+        : channel === "slack"
+        ? "Grupo o canal de Slack"
+        : "Grupo o canal de Teams";
 
-      <div className="space-y-2">
-        <p className="text-sm font-semibold text-slate-800">Umbral de alerta ({period === "monthly" ? "mensual" : "anual"})</p>
-        <div className="grid grid-cols-2 gap-3">
-          {[{ id: "usd", label: "USD" }, { id: "pct", label: "% del presupuesto" }].map(opt => (
-            <button
-              key={opt.id}
-              onClick={() => setThresholdType(opt.id as "usd" | "pct")}
-              className={`border rounded-xl px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-sky-300
-                ${thresholdType === opt.id ? "border-sky-500 bg-sky-50 text-sky-800" : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"}`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        <input
-          type="number"
-          min={0}
-          value={thresholdValue}
-          onChange={e => setThresholdValue(e.target.value)}
-          placeholder={thresholdType === "usd" ? "Ej: 500" : "Ej: 80"}
-          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
-        />
-        <p className="text-xs text-slate-500">
-          {thresholdType === "usd"
-            ? "Se disparará cuando el gasto supere este monto en USD."
-            : "Se disparará al superar este % del presupuesto definido."}
-        </p>
-      </div>
-    </div>
-  );
+    const period = FIXED_PERIODS[policy.id] ?? windowSize;
 
-  const renderAnomalyFields = () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <p className="text-sm font-semibold text-slate-800">Cuenta</p>
-        <select
-          value={resolvedAccountId}
-          onChange={e => setAccountId(e.target.value)}
-          disabled={loadingAccounts}
-          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 bg-white"
-        >
-          {accountOptions.map(acc => (
-            <option key={acc.id} value={acc.id}>{acc.label}</option>
-          ))}
-        </select>
-        {!loadingAccounts && accountOptions.length === 1 && (
-          <p className="text-xs text-amber-600">No hay cuentas disponibles. Conecta una cuenta AWS primero.</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-sm font-semibold text-slate-800">Variación anómala</p>
-        <div className="grid grid-cols-2 gap-3">
-          {[{ id: "daily", label: "Diaria" }, { id: "weekly", label: "Semanal" }].map(opt => (
-            <button
-              key={opt.id}
-              onClick={() => setWindowSize(opt.id as "daily" | "weekly" | "monthly" | "annual")}
-              className={`border rounded-xl px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-sky-300
-                ${windowSize === opt.id ? "border-sky-500 bg-sky-50 text-sky-800" : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"}`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        <input
-          type="number"
-          min={0}
-          value={thresholdValue}
-          onChange={e => setThresholdValue(e.target.value)}
-          placeholder="Ej: 30 (% sobre promedio)"
-          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
-        />
-        <p className="text-xs text-slate-500">
-          Se disparará si el gasto {windowSize === "daily" ? "diario" : "semanal"} supera este porcentaje sobre el promedio histórico.
-        </p>
-      </div>
-    </div>
-  );
-
-  const renderFields = () => {
-    if (!policy) return null;
-    if (policy.id === "budget-monthly") return renderBudgetFields("monthly");
-    if (policy.id === "budget-annual") return renderBudgetFields("annual");
-    if (policy.id === "anomaly-spike") return renderAnomalyFields();
-    return (
-      <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        Configuración detallada próximamente para &quot;{policy.title}&quot;.
-      </div>
-    );
+    onSave({
+      dbId: initialValues?.dbId,
+      policyId: policy.id,
+      title: policy.title,
+      account: accountLabel,
+      channel,
+      destination,
+      threshold: thresholdValue || "-",
+      thresholdType: thresholdType === "usd" ? "USD" : "%",
+      period,
+      email: email || undefined,
+      aws_account_id: resolvedAccountId === "all" ? undefined : resolvedAccountId,
+    });
+    onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-xl rounded-2xl bg-white shadow-2xl p-6 space-y-4 max-h-[80vh] overflow-y-auto flex flex-col">
+        {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs uppercase tracking-wide text-slate-500">Configurar política</p>
@@ -200,11 +138,12 @@ export default function PolicyModal({
           </button>
         </div>
 
+        {/* Channel selector */}
         <div className="space-y-2">
           <p className="text-sm font-semibold text-slate-800">Notificar vía</p>
           <div className="grid grid-cols-3 gap-3">
-            {["email", "slack", "teams"].map((ch) => {
-              const isDisabled = disabled(ch as Channel) && ch !== "email";
+            {(["email", "slack", "teams"] as Channel[]).map((ch) => {
+              const isDisabled = ch !== "email";
               const labels: Record<Channel, string> = {
                 email: "Correo",
                 slack: "Slack (Próximamente)",
@@ -214,18 +153,21 @@ export default function PolicyModal({
                 <button
                   key={ch}
                   disabled={isDisabled}
-                  onClick={() => setChannel(ch as Channel)}
+                  onClick={() => setChannel(ch)}
                   className={`border rounded-xl px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-sky-300
-                    ${channel === ch ? "border-sky-500 bg-sky-50 text-sky-800" : "border-slate-200 bg-white text-slate-700"}
+                    ${channel === ch
+                      ? "border-sky-500 bg-sky-50 text-sky-800"
+                      : "border-slate-200 bg-white text-slate-700"}
                     ${isDisabled ? "opacity-60 cursor-not-allowed" : "hover:border-slate-400"}`}
                 >
-                  {labels[ch as Channel]}
+                  {labels[ch]}
                 </button>
               );
             })}
           </div>
         </div>
 
+        {/* Email input */}
         {channel === "email" && (
           <div className="space-y-2">
             <p className="text-sm font-semibold text-slate-800">Correo de notificación</p>
@@ -236,12 +178,28 @@ export default function PolicyModal({
               placeholder="ej: alertas@empresa.com"
               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
             />
-            <p className="text-xs text-slate-500">Recibirás un correo cuando la alerta se dispare con el estado y detalles.</p>
+            <p className="text-xs text-slate-500">
+              Recibirás un correo cuando la alerta se dispare con el estado y detalles.
+            </p>
           </div>
         )}
 
-        {renderFields()}
+        {/* Policy-specific fields */}
+        {renderPolicyFields({
+          policy,
+          accountOptions,
+          resolvedAccountId,
+          setAccountId,
+          loadingAccounts,
+          thresholdType,
+          setThresholdType,
+          thresholdValue,
+          setThresholdValue,
+          windowSize,
+          setWindowSize,
+        })}
 
+        {/* Actions */}
         <div className="flex items-center justify-end gap-3 pt-2">
           <button
             onClick={onClose}
@@ -250,36 +208,7 @@ export default function PolicyModal({
             Cancelar
           </button>
           <button
-            onClick={() => {
-              if (!policy) return;
-              const accountLabel = resolvedAccountId === "all"
-                ? "Todas las cuentas"
-                : accountOptions.find(a => a.id === resolvedAccountId)?.label || "Cuenta seleccionada";
-              const destination = channel === "email"
-                ? (email || "Sin correo configurado")
-                : channel === "slack"
-                  ? "Grupo o canal de Slack"
-                  : "Grupo o canal de Teams";
-              const thresholdLabel = thresholdValue || "-";
-              onSave({
-                dbId: initialValues?.dbId,
-                policyId: policy.id,
-                title: policy.title,
-                account: accountLabel,
-                channel,
-                destination,
-                threshold: thresholdLabel,
-                thresholdType: thresholdType === "usd" ? "USD" : "%",
-                period: policy.id === "budget-monthly"
-                  ? "monthly"
-                  : policy.id === "budget-annual"
-                    ? "annual"
-                    : windowSize,
-                email: email || undefined,
-                aws_account_id: resolvedAccountId === "all" ? undefined : resolvedAccountId,
-              });
-              onClose();
-            }}
+            onClick={handleSave}
             className="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
           >
             Guardar
