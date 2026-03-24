@@ -74,7 +74,7 @@ export default function PublicNavbar() {
             {/* =========================
                LOGO
             ========================== */}
-            <Link href="/" className="flex items-center">
+            <Link href={user ? '/dashboard' : '/'} className="flex items-center">
               <img
                 src="/logo2.png"
                 alt="FinOpsLatam"
