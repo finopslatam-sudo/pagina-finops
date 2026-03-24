@@ -4,11 +4,25 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 
+interface UpgradeRequestItem {
+  id: number;
+  client_id: number;
+  company_name?: string | null;
+  email?: string | null;
+  current_plan?: string | null;
+  requested_plan: string;
+  created_at: string;
+}
+
+interface UpgradeRequestsResponse {
+  data: UpgradeRequestItem[];
+}
+
 export default function AdminUpgradesPage() {
 
   const { token } = useAuth();
 
-  const [requests, setRequests] = useState<any[]>([]);
+  const [requests, setRequests] = useState<UpgradeRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<number | null>(null);
 
@@ -24,7 +38,7 @@ export default function AdminUpgradesPage() {
 
     try {
 
-      const res = await apiFetch("/api/admin/upgrades", { token });
+      const res = await apiFetch<UpgradeRequestsResponse>("/api/admin/upgrades", { token });
 
       setRequests(res?.data ?? []);
 

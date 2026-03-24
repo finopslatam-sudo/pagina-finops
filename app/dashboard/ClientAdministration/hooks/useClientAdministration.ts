@@ -5,6 +5,27 @@ import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 import { ClientInfo, ClientUser, Subscription, UserForm } from "../types";
 
+interface SubscriptionResponse {
+  data: Subscription;
+}
+
+interface ClientUsersResponse {
+  data: ClientUser[];
+}
+
+interface AwsStatusResponse {
+  accounts_used: number;
+  accounts_limit: number;
+}
+
+interface UpgradeResponse {
+  data?: {
+    status?: string;
+    requested_plan?: string;
+    message?: string;
+  };
+}
+
 export function useClientAdministration() {
   const { token } = useAuth();
 
@@ -46,10 +67,10 @@ export function useClientAdministration() {
   const loadData = async () => {
     try {
       const [clientRes, subRes, usersRes, awsRes] = await Promise.all([
-        apiFetch("/api/client", { token }),
-        apiFetch("/api/client/subscription", { token }),
-        apiFetch("/api/client/users", { token }),
-        apiFetch("/api/client/aws/status", { token }),
+        apiFetch<ClientInfo>("/api/client", { token }),
+        apiFetch<SubscriptionResponse>("/api/client/subscription", { token }),
+        apiFetch<ClientUsersResponse>("/api/client/users", { token }),
+        apiFetch<AwsStatusResponse>("/api/client/aws/status", { token }),
       ]);
 
       setClient(clientRes);
@@ -79,7 +100,7 @@ export function useClientAdministration() {
       setShowUpgradeModal(false);
       setShowProcessingModal(true);
 
-      const res = await apiFetch("/api/client/subscription/upgrade", {
+      const res = await apiFetch<UpgradeResponse>("/api/client/subscription/upgrade", {
         method: "POST",
         token,
         body: { plan_code: planCode },

@@ -21,6 +21,10 @@ import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 import { API_URL } from "@/app/lib/api";
 
+type LastScanResponse = {
+  last_scan?: string | null;
+};
+
 /* =====================================================
    MAIN COMPONENT
 ===================================================== */
@@ -104,7 +108,7 @@ export default function FindingsPage() {
   
       try {
   
-        const res = await apiFetch("/api/client/dashboard/last-scan", {
+        const res = await apiFetch<LastScanResponse>("/api/client/dashboard/last-scan", {
           token
         });
   

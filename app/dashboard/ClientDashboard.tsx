@@ -7,7 +7,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useFindings } from './findings/hooks/useFindings';
 import FindingsTable from './findings/components/FindingsTable';
 
-import { useDashboard } from './hooks/useDashboard';
+import { useDashboard, type DashboardResponse } from './hooks/useDashboard';
 
 import MonthlyCostChart from './components/finance/MonthlyCostChart';
 
