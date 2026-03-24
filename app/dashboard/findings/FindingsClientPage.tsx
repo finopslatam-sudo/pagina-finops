@@ -282,11 +282,11 @@ export default function FindingsPage() {
       {/* ================= EXPORT REDIRECT ================= */}
       <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4">
         <span className="text-xl">📄</span>
-        <p className="text-sm text-slate-600">
+        <p className="text-base font-bold text-slate-700">
           ¿Necesitas exportar un reporte?{' '}
           <Link
             href="/dashboard/informes"
-            className="text-blue-600 font-semibold hover:text-blue-800 underline underline-offset-2 transition"
+            className="text-blue-600 font-bold hover:text-blue-800 underline underline-offset-2 transition"
           >
             Ir a Informes Ejecutivos →
           </Link>
