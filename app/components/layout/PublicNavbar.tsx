@@ -5,6 +5,10 @@
    Navbar global público y de sesión
 ===================================================== */
 
+/* =====================================================
+   IMPORTS
+===================================================== */
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -13,37 +17,53 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/app/context/AuthContext';
 import LoginModal from '@/app/components/Auth/LoginModal';
 import UserMenu from '@/app/components/Auth/UserMenu';
-import LanguageSwitcher from '@/app/components/LanguageSwitcher';
-import { useT } from '@/app/lib/useT';
 
 /* =====================================================
    COMPONENT
 ===================================================== */
 
+/**
+ * PublicNavbar
+ *
+ * Responsabilidad:
+ * - Navegación pública (desktop / mobile)
+ * - Menú usuario autenticado
+ * - Animación UX enterprise
+ * - Cierre automático al cambiar ruta
+ *
+ * NO:
+ * - Lógica de permisos
+ * - Lógica de negocio
+ */
 export default function PublicNavbar() {
   const { user } = useAuth();
   const pathname = usePathname();
-  const t = useT();
 
   /* =========================
      UI STATE
   ========================== */
 
-  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen]       = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen]       = useState(false);
+  const [isLoginDropdownOpen, setIsLoginDropdownOpen] =
+    useState(false);
 
-  /* =========================
+  const [isLoginModalOpen, setIsLoginModalOpen] =
+    useState(false);
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] =
+    useState(false);
+
+  /* =====================================================
      EFFECTS
-  ========================== */
+     - Cerrar menú mobile al cambiar ruta
+  ===================================================== */
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  /* =========================
+  /* =====================================================
      RENDER
-  ========================== */
+  ===================================================== */
 
   return (
     <>
@@ -51,7 +71,9 @@ export default function PublicNavbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
 
-            {/* LOGO */}
+            {/* =========================
+               LOGO
+            ========================== */}
             <Link href={user ? '/dashboard' : '/'} className="flex items-center">
               <img
                 src="/logo2.png"
@@ -60,29 +82,32 @@ export default function PublicNavbar() {
               />
             </Link>
 
-            {/* MENÚ DESKTOP */}
+            {/* =========================
+               MENÚ DESKTOP
+            ========================== */}
             {!user && (
               <nav className="hidden md:flex items-center space-x-8 mx-auto">
-                <Link href="/"              className="nav-link">{t.nav.home}</Link>
-                <Link href="/servicios"     className="nav-link">{t.nav.services}</Link>
-                <Link href="/quienes-somos" className="nav-link">{t.nav.about}</Link>
-                <Link href="/blog"          className="nav-link">{t.nav.blog}</Link>
-                <Link href="/contacto"      className="nav-link">{t.nav.contact}</Link>
+                <Link href="/" className="nav-link">Inicio</Link>
+                <Link href="/servicios" className="nav-link">Servicios</Link>
+                <Link href="/quienes-somos" className="nav-link">Quiénes Somos</Link>
+                <Link href="/blog" className="nav-link">Blog</Link>
+                <Link href="/contacto" className="nav-link">Contacto</Link>
               </nav>
             )}
 
-            {/* ACCIONES */}
-            <div className="flex items-center gap-3 relative">
-
-              {/* ---------- IDIOMA ---------- */}
-              <LanguageSwitcher />
+            {/* =========================
+               ACCIONES
+            ========================== */}
+            <div className="flex items-center gap-4 relative">
 
               {/* ---------- HAMBURGUESA MOBILE ---------- */}
               {!user && (
                 <button
-                  onClick={() => setIsMobileMenuOpen((v) => !v)}
+                  onClick={() =>
+                    setIsMobileMenuOpen((v) => !v)
+                  }
                   className="md:hidden text-gray-700 text-2xl"
-                  aria-label={t.nav.openMenu}
+                  aria-label="Abrir menú"
                 >
                   ☰
                 </button>
@@ -92,10 +117,12 @@ export default function PublicNavbar() {
               {!user && (
                 <div className="hidden md:block relative">
                   <button
-                    onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
+                    onClick={() =>
+                      setIsLoginDropdownOpen(!isLoginDropdownOpen)
+                    }
                     className="border-2 border-blue-500 text-blue-500 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition"
                   >
-                    {t.nav.login}
+                    Login
                   </button>
 
                   {isLoginDropdownOpen && (
@@ -107,7 +134,7 @@ export default function PublicNavbar() {
                         }}
                         className="px-4 py-3 w-full text-left hover:bg-blue-50"
                       >
-                        {t.nav.partnerPortal}
+                        Portal de Socios
                       </button>
                     </div>
                   )}
@@ -116,12 +143,13 @@ export default function PublicNavbar() {
 
               {/* ---------- USER MENU ---------- */}
               {user && <UserMenu />}
-
             </div>
           </div>
         </div>
 
-        {/* MENÚ MOBILE ANIMADO */}
+        {/* =========================
+           MENÚ MOBILE ANIMADO
+        ========================== */}
         <AnimatePresence>
           {!user && isMobileMenuOpen && (
             <motion.nav
@@ -131,24 +159,36 @@ export default function PublicNavbar() {
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="md:hidden border-t bg-white px-6 py-6 space-y-4"
             >
-              <Link href="/"              className="block font-medium text-gray-700">{t.nav.home}</Link>
-              <Link href="/servicios"     className="block font-medium text-gray-700">{t.nav.services}</Link>
-              <Link href="/quienes-somos" className="block font-medium text-gray-700">{t.nav.about}</Link>
-              <Link href="/blog"          className="block font-medium text-gray-700">{t.nav.blog}</Link>
-              <Link href="/contacto"      className="block font-medium text-gray-700">{t.nav.contact}</Link>
+              <Link href="/" className="block font-medium text-gray-700">
+                Inicio
+              </Link>
+              <Link href="/servicios" className="block font-medium text-gray-700">
+                Servicios
+              </Link>
+              <Link href="/quienes-somos" className="block font-medium text-gray-700">
+                Quiénes Somos
+              </Link>
+              <Link href="/blog" className="block font-medium text-gray-700">
+                Blog
+              </Link>
+              <Link href="/contacto" className="block font-medium text-gray-700">
+                Contacto
+              </Link>
 
               <button
                 onClick={() => setIsLoginModalOpen(true)}
                 className="mt-4 w-full border border-blue-500 text-blue-500 py-2 rounded-lg font-semibold"
               >
-                {t.nav.partnerPortal}
+                Portal de Socios
               </button>
             </motion.nav>
           )}
         </AnimatePresence>
       </header>
 
-      {/* LOGIN MODAL */}
+      {/* =========================
+         LOGIN MODAL
+      ========================== */}
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

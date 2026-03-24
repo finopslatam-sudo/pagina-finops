@@ -2,14 +2,12 @@
 
 import SessionExpiredModal from "@/app/components/Auth/SessionExpiredModal";
 import { AwsAccountProvider } from "./context/AwsAccountContext";
-import { useT } from "@/app/lib/useT";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const t = useT();
 
   return (
 
@@ -50,14 +48,15 @@ export default function DashboardLayout({
               <span className="text-white font-semibold text-sm">FinOpsLatam</span>
             </div>
             <p className="text-xs leading-relaxed text-slate-500 max-w-xs">
-              {t.footer.description}
+              Plataforma de optimización financiera para AWS. Monitoreo continuo,
+              detección de hallazgos y reducción de costos en la nube.
             </p>
-            <p className="text-xs text-slate-600">{t.footer.version}</p>
+            <p className="text-xs text-slate-600">Versión 1.0 · Plataforma FinOps</p>
           </div>
 
           {/* Col 2 — Soporte */}
           <div className="space-y-3">
-            <p className="text-white text-sm font-semibold">{t.footer.supportTitle}</p>
+            <p className="text-white text-sm font-semibold">Soporte</p>
             <div className="space-y-2 text-xs">
               <a
                 href="mailto:contacto@finopslatam.com"
@@ -96,19 +95,19 @@ export default function DashboardLayout({
 
           {/* Col 3 — Legal */}
           <div className="space-y-3">
-            <p className="text-white text-sm font-semibold">{t.footer.legal}</p>
+            <p className="text-white text-sm font-semibold">Legal & Plataforma</p>
             <div className="space-y-2 text-xs">
               <p className="flex items-center gap-2">
                 <span>🔒</span>
-                <span>{t.footer.dataProtected}</span>
+                <span>Tus datos están protegidos y cifrados</span>
               </p>
               <p className="flex items-center gap-2">
                 <span>🛡️</span>
-                <span>{t.footer.highSecurity}</span>
+                <span>Altos estándares de seguridad y privacidad</span>
               </p>
               <p className="flex items-center gap-2">
                 <span>🔄</span>
-                <span>{t.footer.autoScan}</span>
+                <span>Escaneos automáticos cada 24 horas</span>
               </p>
             </div>
           </div>
@@ -118,9 +117,9 @@ export default function DashboardLayout({
         {/* Barra inferior */}
         <div className="border-t border-slate-800">
           <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-600">
-            <span>© {new Date().getFullYear()} FinOpsLatam — {t.footer.rights}</span>
+            <span>© {new Date().getFullYear()} FinOpsLatam — Todos los derechos reservados</span>
             <span className="hidden sm:block">·</span>
-            <span>{t.footer.tagline}</span>
+            <span>Plataforma FinOps para AWS · Chile</span>
           </div>
         </div>
 
