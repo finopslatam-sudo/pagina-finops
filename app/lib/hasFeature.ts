@@ -8,9 +8,9 @@ export function hasFeature(
   // Informes disponible para todos los planes
   if (feature === "informes") return true;
 
-  // Alertas & Políticas: Professional + Enterprise únicamente
+  // Alertas & Políticas: solo Enterprise
   if (feature === "alertas") {
-    return planCode === "FINOPS_PROFESSIONAL" || planCode === "FINOPS_ENTERPRISE";
+    return planCode === "FINOPS_ENTERPRISE";
   }
 
   // Gobernanza y Optimización: Professional + Enterprise
