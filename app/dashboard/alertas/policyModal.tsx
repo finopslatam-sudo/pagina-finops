@@ -14,6 +14,8 @@ interface Props {
     threshold: string;
     thresholdType: string;
     period?: string;
+    email?: string;
+    aws_account_id?: string;
   }) => void;
   policy?: PolicyCard;
   accounts: { id: string; label: string }[];
@@ -248,6 +250,8 @@ export default function PolicyModal({ open, onClose, onSave, policy, accounts, l
                 threshold: thresholdLabel,
                 thresholdType: thresholdType === "usd" ? "USD" : "%",
                 period: windowSize,
+                email: email || undefined,
+                aws_account_id: accountId === "all" ? undefined : accountId,
               });
               onClose();
             }}
