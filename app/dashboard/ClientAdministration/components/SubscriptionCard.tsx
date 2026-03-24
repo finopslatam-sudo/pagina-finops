@@ -48,19 +48,48 @@ export default function SubscriptionCard({
             </div>
 
             <div className="space-y-2 text-sm">
-              <Feature text="Cost Optimization Insights" />
-              <Feature text="Governance & Compliance" />
-              <Feature text="FinOps Risk Analysis" />
-              <Feature text="Multi-account AWS Support" />
-              <Feature text="Panel avanzado de métricas" />
+              {subscription.plan_code === "FINOPS_FOUNDATION" && (
+                <>
+                  <Feature text="Hallazgos & Findings AWS" />
+                  <Feature text="Inventario de assets AWS" />
+                  <Feature text="Análisis de costos AWS" />
+                  <Feature text="1 cuenta AWS conectada" />
+                  <Feature text="Hasta 3 usuarios" />
+                </>
+              )}
+              {subscription.plan_code === "FINOPS_PROFESSIONAL" && (
+                <>
+                  <Feature text="Hallazgos & Findings AWS" />
+                  <Feature text="Inventario de assets AWS" />
+                  <Feature text="Análisis de costos AWS" />
+                  <Feature text="Gobernanza & Compliance" />
+                  <Feature text="Optimización de recursos" />
+                  <Feature text="Hasta 5 cuentas AWS" />
+                  <Feature text="Hasta 9 usuarios" />
+                </>
+              )}
+              {subscription.plan_code === "FINOPS_ENTERPRISE" && (
+                <>
+                  <Feature text="Hallazgos & Findings AWS" />
+                  <Feature text="Inventario de assets AWS" />
+                  <Feature text="Análisis de costos AWS" />
+                  <Feature text="Gobernanza & Compliance" />
+                  <Feature text="Optimización de recursos" />
+                  <Feature text="Políticas & Alertas" />
+                  <Feature text="Hasta 20 cuentas AWS" />
+                  <Feature text="Hasta 12 usuarios" />
+                </>
+              )}
             </div>
 
-            <button
-              onClick={onOpenUpgradeModal}
-              className="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition shadow-lg"
-            >
-              🚀 Upgrade Plan
-            </button>
+            {subscription.plan_code !== "FINOPS_ENTERPRISE" && (
+              <button
+                onClick={onOpenUpgradeModal}
+                className="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition shadow-lg"
+              >
+                🚀 Upgrade Plan
+              </button>
+            )}
           </>
         ) : (
           <p className="text-gray-400">No hay plan activo</p>
@@ -89,17 +118,20 @@ export default function SubscriptionCard({
               <div className="border rounded-xl p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-blue-700">FinOps Professional</h3>
                 <ul className="text-sm space-y-1 text-gray-600">
-                  <li>✔ Governance & Compliance</li>
-                  <li>✔ Optimization insights</li>
-                  <li>✔ Advanced dashboards</li>
-                  <li>✔ Multi-account support</li>
+                  <li>✔ Hallazgos & Findings AWS</li>
+                  <li>✔ Inventario de assets AWS</li>
+                  <li>✔ Análisis de costos AWS</li>
+                  <li>✔ Gobernanza & Compliance</li>
+                  <li>✔ Optimización de recursos</li>
+                  <li>✔ Hasta 5 cuentas AWS</li>
+                  <li>✔ Hasta 9 usuarios</li>
                 </ul>
                 <button
                   disabled={upgrading}
                   onClick={() => onUpgradePlan("FINOPS_PROFESSIONAL")}
                   className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {upgrading ? "Procesando..." : "Upgrade"}
+                  {upgrading ? "Procesando..." : "Upgrade a Professional"}
                 </button>
               </div>
             )}
@@ -108,17 +140,21 @@ export default function SubscriptionCard({
               <div className="border rounded-xl p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-purple-700">FinOps Enterprise</h3>
                 <ul className="text-sm space-y-1 text-gray-600">
-                  <li>✔ Todo lo incluido en Professional</li>
-                  <li>✔ Escaneo completo FinOps</li>
-                  <li>✔ Reporting avanzado</li>
-                  <li>✔ Máximo nivel de optimización</li>
+                  <li>✔ Hallazgos & Findings AWS</li>
+                  <li>✔ Inventario de assets AWS</li>
+                  <li>✔ Análisis de costos AWS</li>
+                  <li>✔ Gobernanza & Compliance</li>
+                  <li>✔ Optimización de recursos</li>
+                  <li>✔ Políticas & Alertas</li>
+                  <li>✔ Hasta 20 cuentas AWS</li>
+                  <li>✔ Hasta 12 usuarios</li>
                 </ul>
                 <button
                   disabled={upgrading}
                   onClick={() => onUpgradePlan("FINOPS_ENTERPRISE")}
-                  className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+                  className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50"
                 >
-                  Upgrade
+                  {upgrading ? "Procesando..." : "Upgrade a Enterprise"}
                 </button>
               </div>
             )}
