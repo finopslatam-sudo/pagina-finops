@@ -139,6 +139,11 @@ export default function AlertasPage() {
     load();
   }, [token]);
 
+  /* ── plan check (después de todos los hooks) ── */
+  if (!hasFeature(user?.plan_code, 'alertas')) {
+    return <div className="p-6 text-red-500">Este módulo requiere plan Enterprise</div>;
+  }
+
   const handleClose = () => {
     setShowModal(false);
     setSelectedPolicy(undefined);
