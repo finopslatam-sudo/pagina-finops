@@ -2,12 +2,15 @@
 
 import SessionExpiredModal from "@/app/components/Auth/SessionExpiredModal";
 import { AwsAccountProvider } from "./context/AwsAccountContext";
+import FinopsIAChat from "./components/FinopsIA/FinopsIAChat";
+import { useFinopsIA } from "./hooks/useFinopsIA";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const ia = useFinopsIA();
 
   return (
 
@@ -28,6 +31,34 @@ export default function DashboardLayout({
       {/* ================= SESSION MODAL ================= */}
 
       <SessionExpiredModal />
+
+      {/* ================= FINOPS.IA FLOTANTE ================= */}
+
+      {ia.isOpen && (
+        <FinopsIAChat
+          messages={ia.messages}
+          isLoading={ia.isLoading}
+          error={ia.error}
+          onSend={ia.sendMessage}
+          onClose={ia.closeChat}
+          onClear={ia.clearChat}
+        />
+      )}
+
+      {/* Botón flotante */}
+      <button
+        onClick={ia.isOpen ? ia.closeChat : ia.openChat}
+        title="Finops.ia — Arquitecto AWS"
+        className="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
+      >
+        {ia.isOpen ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <span className="font-bold text-sm tracking-tight">IA</span>
+        )}
+      </button>
 
       {/* ================= FOOTER PLATAFORMA ================= */}
 
