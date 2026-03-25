@@ -199,7 +199,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  📑 Informes Ejecutivos
+                  📑 Executive Reports
                 </Link>
 
                 {/* =========================
@@ -212,7 +212,7 @@ export default function UserMenu() {
                     className="block px-4 py-3 hover:bg-blue-50"
                     onClick={() => setOpen(false)}
                   >
-                    🔔 Políticas & Alertas
+                    🔔 Policies & Alerts
                   </Link>
                 )}
 
@@ -260,7 +260,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  🎫 Soporte FinopsLatam
+                  🎫 FinOps Support
                 </Link>
 
 
