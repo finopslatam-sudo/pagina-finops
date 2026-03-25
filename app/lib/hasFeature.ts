@@ -1,6 +1,6 @@
 export function hasFeature(
   planCode: string | null | undefined,
-  feature: "gobernanza" | "optimization" | "alertas" | "informes"
+  feature: "gobernanza" | "optimization" | "alertas" | "informes" | "calculadora"
 ): boolean {
 
   if (!planCode) return false;
@@ -10,6 +10,11 @@ export function hasFeature(
 
   // Alertas & Políticas: solo Enterprise
   if (feature === "alertas") {
+    return planCode === "FINOPS_ENTERPRISE";
+  }
+
+  // Calculadora de Proyectos: solo Enterprise
+  if (feature === "calculadora") {
     return planCode === "FINOPS_ENTERPRISE";
   }
 

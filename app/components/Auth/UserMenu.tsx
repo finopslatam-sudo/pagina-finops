@@ -216,6 +216,16 @@ export default function UserMenu() {
                   </Link>
                 )}
 
+                {hasFeature(user?.plan_code, 'calculadora') && (
+                  <Link
+                    href="/dashboard/calculadora"
+                    className="block px-4 py-3 hover:bg-blue-50"
+                    onClick={() => setOpen(false)}
+                  >
+                    🧮 Project Calculator
+                  </Link>
+                )}
+
                 {/* =========================
                   AWS INTEGRATION
                   SOLO OWNER
