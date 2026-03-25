@@ -29,8 +29,16 @@ export function useFinopsIA() {
         { method: 'POST', token, body: { messages: [], is_new_conversation: true } }
       );
       setMessages([{ role: 'assistant', content: data.response }]);
-    } catch {
-      setError('No se pudo conectar con Finops.ia. Intenta nuevamente.');
+    } catch (err: unknown) {
+      console.error('[Finops.ia] openChat error:', err);
+      const status = (err as { status?: number })?.status;
+      if (status === 503) {
+        setError('El servicio de IA no está configurado en el servidor. Contacta al administrador.');
+      } else if (status === 403) {
+        setError('Sin permisos para usar Finops.ia.');
+      } else {
+        setError(`Error al conectar (${status ?? 'red'}). Revisa que el servidor esté activo.`);
+      }
     } finally {
       setIsLoading(false);
     }

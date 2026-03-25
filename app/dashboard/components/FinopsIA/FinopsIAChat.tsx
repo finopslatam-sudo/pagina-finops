@@ -64,7 +64,7 @@ export default function FinopsIAChat({ messages, isLoading, error, onSend, onClo
       <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-600 shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold text-white">
-            IA
+            Bot
           </div>
           <div>
             <p className="text-white font-semibold text-sm leading-none">Finops.ia</p>
