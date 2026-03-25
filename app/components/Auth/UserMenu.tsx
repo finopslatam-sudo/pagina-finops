@@ -260,7 +260,7 @@ export default function UserMenu() {
                   className="block px-4 py-3 hover:bg-blue-50"
                   onClick={() => setOpen(false)}
                 >
-                  🎫 FinOps Support
+                  🎫 FinOpsLatam Support
                 </Link>
 
 
