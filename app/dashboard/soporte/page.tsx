@@ -75,10 +75,10 @@ export default function SoportePage() {
       {/* ─── KPI ROW ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total',       val: tickets.length,                                         color: 'text-gray-700' },
-          { label: 'Abiertos',    val: tickets.filter(t => t.status === 'open').length,         color: 'text-blue-600' },
-          { label: 'En proceso',  val: tickets.filter(t => t.status === 'in_progress').length,  color: 'text-amber-600' },
-          { label: 'Resueltos',   val: tickets.filter(t => t.status === 'resolved').length,     color: 'text-green-600' },
+          { label: 'Total',      val: tickets.length,                                         color: 'text-gray-700' },
+          { label: 'Abiertos',   val: tickets.filter(t => t.status === 'open').length,         color: 'text-blue-600' },
+          { label: 'En proceso', val: tickets.filter(t => t.status === 'in_progress').length,  color: 'text-amber-600' },
+          { label: 'Resueltos',  val: tickets.filter(t => t.status === 'resolved').length,     color: 'text-green-600' },
         ].map(kpi => (
           <div key={kpi.label} className="bg-white border rounded-xl p-4 shadow-sm text-center">
             <p className={`text-2xl font-bold ${kpi.color}`}>{kpi.val}</p>

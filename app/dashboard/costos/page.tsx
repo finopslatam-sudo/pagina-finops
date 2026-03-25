@@ -60,7 +60,7 @@ export default function CostosPage() {
       {/* ================= HERO FINANCIAL CARD ================= */}
       <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-3xl p-5 lg:p-8 shadow-sm">
         <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-          Costs & Financials
+          Costos & Finanzas
         </h1>
         <p className="text-gray-600 mt-3 max-w-3xl">
           Análisis financiero consolidado del consumo cloud, exposición proyectada

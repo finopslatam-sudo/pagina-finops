@@ -120,7 +120,7 @@ const REPORTS: ReportDef[] = [
     id: 'assets',
     icon: '📦',
     title: 'Inventario de Recursos',
-    subtitle: 'Inventario cloud completo',
+    subtitle: 'Inventario completo cloud',
     description:
       'Inventario detallado de todos los recursos activos en tus cuentas AWS: instancias, bases de datos, almacenamiento, funciones serverless y más, con estado y costo asociado.',
     includes: [
@@ -228,10 +228,10 @@ export default function InformesPage() {
         {/* stat row */}
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: 'Formatos disponibles', value: 'PDF · CSV · XLSX', icon: '📄' },
-            { label: 'Generación',            value: 'Tiempo real',      icon: '⚡' },
-            { label: 'Datos actualizados',    value: 'Cada 24 horas',    icon: '🔄' },
-            { label: 'Idioma',                value: 'Español',           icon: '🌎' },
+            { label: 'Formatos disponibles', value: 'PDF · CSV · XLSX',  icon: '📄' },
+            { label: 'Generación',          value: 'Tiempo real',       icon: '⚡' },
+            { label: 'Datos actualizados',  value: 'Cada 24 horas',     icon: '🔄' },
+            { label: 'Idioma',              value: 'Español',           icon: '🌎' },
           ].map(s => (
             <div key={s.label} className="bg-white/70 border border-purple-100 rounded-2xl p-4">
               <div className="text-lg font-bold text-slate-700">{s.icon} {s.value}</div>

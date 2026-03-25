@@ -271,7 +271,7 @@ export default function AlertasPage() {
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl lg:text-3xl font-bold">Políticas & Alertas</h1>
             <p className="text-slate-700 mt-3 max-w-3xl leading-relaxed">
-              Define reglas de presupuesto, alertas de consumo, detección de anomalías y políticas de gobernanza para mantener control total sobre el gasto cloud de tu organización.
+              Define reglas de presupuesto, alertas de consumo, detección de anomalías y políticas de gobernanza para mantener el control total del gasto cloud de tu organización.
             </p>
           </div>
           <span className="text-xs text-slate-500">9 tipos de políticas disponibles</span>
@@ -340,7 +340,7 @@ export default function AlertasPage() {
 
       <div className="bg-white border border-slate-200 rounded-3xl p-5 lg:p-8">
         <h2 className="text-lg font-bold text-slate-800 mb-1">Canales de Notificación</h2>
-        <p className="text-sm text-slate-500 mb-6">Configura los destinos donde se enviarán las alertas cuando se dispare una política.</p>
+        <p className="text-sm text-slate-500 mb-6">Configura los destinos donde se enviarán las alertas cuando se active una política.</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[
             { icon: '📧', label: 'Email', desc: 'Notificación directa por correo', status: null },
@@ -361,7 +361,7 @@ export default function AlertasPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Historial de políticas creadas</h2>
-            <p className="text-sm text-slate-500">Vista tabular para revisar y administrar políticas sin que la sección crezca demasiado.</p>
+            <p className="text-sm text-slate-500">Vista tabular para revisar y gestionar las políticas.</p>
           </div>
           <span className="text-xs text-slate-500">{history.length} en total</span>
         </div>
