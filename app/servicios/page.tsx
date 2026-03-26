@@ -308,8 +308,11 @@ export default function Servicios() {
 
 
         </div>
+
         {/* TABLA COMPARATIVA */}
-        <PlanComparisonTable />
+        <div className="max-w-7xl mx-auto mt-16">
+          <PlanComparisonTable />
+        </div>
       </section>
 
 

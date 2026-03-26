@@ -1,5 +1,8 @@
 'use client';
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 import { useAwsConnection } from "./hooks/useAwsConnection";
 import ConnectionStatus from "./components/ConnectionStatus";
 import ConnectionSteps from "./components/ConnectionSteps";
@@ -7,6 +10,16 @@ import AccountForm from "./components/AccountForm";
 import StepGuide from "./components/StepGuide";
 
 export default function AwsIntegrationPage() {
+  const { isOwner, isAuthReady } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthReady && !isOwner) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthReady, isOwner, router]);
+
+  if (!isAuthReady || !isOwner) return null;
   const {
     loading,
     cloudformationUrl,

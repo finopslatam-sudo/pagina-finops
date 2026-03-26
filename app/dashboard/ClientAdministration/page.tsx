@@ -1,5 +1,8 @@
 'use client';
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 import { useClientAdministration } from "./hooks/useClientAdministration";
 import CompanyInfoCard from "./components/CompanyInfoCard";
 import SubscriptionCard from "./components/SubscriptionCard";
@@ -24,6 +27,15 @@ function KpiCard({ title, value, bg, text }: KpiCardProps) {
 }
 
 export default function ClientAdministrationPage() {
+  const { isOwner, isAuthReady } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthReady && !isOwner) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthReady, isOwner, router]);
+
   const {
     client,
     subscription,
@@ -64,6 +76,8 @@ export default function ClientAdministrationPage() {
   const owners = users.filter((u) => u.client_role === "owner").length;
   const admins = users.filter((u) => u.client_role === "finops_admin").length;
   const viewers = users.filter((u) => u.client_role === "viewer").length;
+
+  if (!isAuthReady || !isOwner) return null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-10 lg:space-y-14">
