@@ -227,7 +227,7 @@ export default function Servicios() {
           title="FinOps Foundation"
           description="Visibilidad y control financiero cloud."
           features={[
-            "Integración con AWS (1 cuenta)",
+            "Integración con AWS   (1 cuenta)",
             "Dashboard de costos y cuentas",
             "Findings básicos de optimización",
             "Inventario de recursos y análisis de riesgo",
@@ -247,11 +247,16 @@ export default function Servicios() {
           description="Optimización activa y decisiones basadas en datos."
           features={[
             "Todo Foundation",
-            "Rightsizing EC2 y RDS",
+            "Hasta 5 cuentas AWS",
+            "Hasta 9 usuarios",
+            "Optimización avanzada (Findings & Rightsizing)",
             "Análisis de Savings Plans y Reserved Instances",
+            "Reportes detallados: Cost, Risk y Resource",
             "Proyección financiera (ROI & Savings)",
-            "Forecast y seguimiento presupuestario",
-            "Reunión estratégica quincenal",
+            "Forecast y control presupuestario",
+            "Governance FinOps",
+            "Planes de ahorro (RI & Savings Plans)",
+            "Soporte prioritario",
           ]}
           bg="bg-gradient-to-br from-blue-50 to-blue-100"
           border="border-2 border-blue-600"
@@ -265,11 +270,15 @@ export default function Servicios() {
           description="Gobierno completo y automatización avanzada."
           features={[
             "Todo Professional",
-            "Multi-account visibility",
-            "Roadmap estratégico FinOps",
-            "Modelo operativo FinOps (definición inicial)",
-            "Sesión ejecutiva mensual",
-            "Acompañamiento en implementación de compromisos",
+            "Hasta 10 cuentas AWS",
+            "Hasta 12 usuarios",
+            "Policies y alertas automáticas",
+            "Gobernanza avanzada multi-account",
+            "Reportes ejecutivos automatizados",
+            "Project Calculator (proyección de costos)",
+            "Asistente FinOps integrado",
+            "Modelo operativo FinOps",
+            "Acompañamiento estratégico continuo",
           ]}
           bg="bg-gradient-to-br from-purple-50 to-purple-100"
           border="border border-purple-300"
