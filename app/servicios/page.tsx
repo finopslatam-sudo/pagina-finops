@@ -308,10 +308,11 @@ export default function Servicios() {
 
 
         </div>
+        {/* TABLA COMPARATIVA */}
+        <PlanComparisonTable />
       </section>
-      
-      {/* TABLA COMPARATIVA */}
-      <PlanComparisonTable />
+
+
 
       {selectedPlan && (
         <ContractModal
