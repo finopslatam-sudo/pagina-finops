@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { API_URL } from "@/app/lib/api";
+import PlanComparisonTable from '@/app/components/PlanComparisonTable';
 
 /* =========================
    COMPONENTE PLAN
@@ -305,8 +306,11 @@ export default function Servicios() {
           onClick={() => setSelectedPlan("Consultoría FinOps Estratégica")}
         />
 
+
         </div>
       </section>
+      {/* TABLA COMPARATIVA */}
+      <PlanComparisonTable />
 
       {selectedPlan && (
         <ContractModal
