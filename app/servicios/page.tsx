@@ -214,8 +214,8 @@ export default function Servicios() {
           Planes FinOps para cada etapa de crecimiento
         </h1>
         <p className="text-base sm:text-xl text-blue-100 max-w-3xl mx-auto">
-          Gobierno financiero cloud, optimización continua y decisiones
-          estratégicas basadas en datos e inteligencia artificial.
+          Gobernanza financiera en la nube, optimización continua de recursos y decisiones estratégicas 
+          basadas en análisis de costos.
         </p>
       </section>
 
@@ -227,12 +227,14 @@ export default function Servicios() {
           title="FinOps Foundation"
           description="Visibilidad y control financiero cloud."
           features={[
-            "Diagnóstico inicial del entorno AWS",
-            "Dashboard ejecutivo de costos y riesgo",
-            "Inventario completo de recursos cloud",
-            "Costos por servicio y análisis mensual",
-            "Risk & Governance Score",
-            "Reporte ejecutivo mensual",
+            "Integración con AWS (1 cuenta)",
+            "Dashboard de costos y cuentas",
+            "Findings básicos de optimización",
+            "Inventario de recursos y análisis de riesgo",
+            "Costos y financieros (visión general)",
+            "Exportación de reportes (PDF, CSV, XLSX)",
+            "Hasta 3 usuarios",
+            "Soporte estándar",
           ]}
           bg="bg-gradient-to-br from-slate-200 via-slate-100 to-white"
           border="border border-slate-300"
@@ -279,7 +281,7 @@ export default function Servicios() {
           title="Consultoría FinOps Estratégica"
           description="Diagnóstico, implementación y acompañamiento especializado en optimización cloud."
           features={[
-            "Auditoría FinOps completa",
+            "Consultoria FinOps completa",
             "Identificación de desperdicio y quick wins",
             "Diseño de estrategia de ahorro",
             "Implementación de políticas FinOps",
