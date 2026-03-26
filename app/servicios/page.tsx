@@ -227,9 +227,9 @@ export default function Servicios() {
           title="FinOps Foundation"
           description="Visibilidad y control financiero cloud."
           features={[
-            "Integración con AWS   (1 cuenta)",
-            "Dashboard de costos y cuentas",
-            "Findings básicos de optimización",
+            "Integración con AWS (1 cuenta)",
+            "Dashboard de costos, cuentas y servicios",
+            "Hallazgos y recomendaciones de ahorro",
             "Inventario de recursos y análisis de riesgo",
             "Costos y financieros (visión general)",
             "Exportación de reportes (PDF, CSV, XLSX)",

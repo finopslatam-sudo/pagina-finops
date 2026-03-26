@@ -26,12 +26,14 @@ export default function ServicesSection() {
             <h4 className="text-2xl font-bold mb-2 text-gray-900">FinOps Foundation</h4>
             <p className="text-gray-500 mb-6 text-sm">Visibilidad y control financiero cloud.</p>
             <ul className="space-y-2 text-gray-700 mb-10 text-sm">
-              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Dashboard ejecutivo de costos y riesgo</li>
-              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Inventario completo de recursos AWS</li>
+              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Integración con AWS (1 cuenta)</li>
+              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Dashboard de costos, cuentas y servicios</li>
               <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Hallazgos y recomendaciones de ahorro</li>
-              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Risk &amp; Governance Score</li>
-              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Reportes ejecutivos PDF / CSV / XLSX</li>
-              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Bot asistente FinOps</li>
+              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Inventario de recursos y análisis de riesgo</li>
+              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Costos y financieros (visión general)</li>
+              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Exportación de reportes (PDF, CSV, XLSX)</li>
+              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Hasta 3 usuarios</li>
+              <li className="flex items-start gap-2"><span className="text-green-500 font-bold mt-0.5">✔</span> Soporte estándar</li>
             </ul>
             <div className="mt-auto">
               <div className="bg-gray-800 text-white text-center font-semibold py-3 rounded-xl group-hover:bg-gray-900 transition">
@@ -50,11 +52,16 @@ export default function ServicesSection() {
             <p className="text-gray-500 mb-6 text-sm">Optimización activa y decisiones basadas en datos.</p>
             <ul className="space-y-2 text-gray-700 mb-10 text-sm">
               <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Todo lo incluido en Foundation</li>
-              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Rightsizing EC2, RDS y Lambda</li>
-              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Análisis Savings Plans y Reserved Instances</li>
-              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Proyección financiera (ROI &amp; Savings)</li>
-              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Forecast y seguimiento presupuestario</li>
-              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Reunión estratégica quincenal</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Hasta 5 cuentas AWS</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Hasta 9 usuarios</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Optimización avanzada (Findings & Rightsizing)</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Análisis de Savings Plans y Reserved Instances</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Reportes detallados: Cost, Risk y Resource</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Proyección financiera (ROI & Savings)</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Forecast y control presupuestario</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Governance FinOps</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Planes de ahorro (RI & Savings Plans)</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">✔</span> Soporte prioritario</li>
             </ul>
             <div className="mt-auto">
               <div className="bg-blue-600 text-white text-center font-semibold py-3 rounded-xl group-hover:bg-blue-700 transition">
@@ -72,11 +79,15 @@ export default function ServicesSection() {
             <p className="text-gray-500 mb-6 text-sm">Gobierno completo y automatización avanzada.</p>
             <ul className="space-y-2 text-gray-700 mb-10 text-sm">
               <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Todo lo incluido en Professional</li>
-              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Multi-account visibility</li>
-              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Roadmap estratégico FinOps</li>
-              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Modelo operativo FinOps (definición inicial)</li>
-              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Sesión ejecutiva mensual C-Level</li>
-              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Acompañamiento en compromisos cloud</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Hasta 10 cuentas AWS</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Hasta 12 usuarios</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Policies y alertas automáticas</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Gobernanza avanzada multi-account"</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Reportes ejecutivos automatizados</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Project Calculator (proyección de costos)</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> MAsistente FinOps integrado</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Modelo operativo FinOps</li>
+              <li className="flex items-start gap-2"><span className="text-purple-500 font-bold mt-0.5">✔</span> Acompañamiento estratégico continuo</li>
             </ul>
             <div className="mt-auto">
               <div className="bg-purple-600 text-white text-center font-semibold py-3 rounded-xl group-hover:bg-purple-700 transition">
