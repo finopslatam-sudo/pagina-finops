@@ -288,14 +288,16 @@ export default function Servicios() {
 
         <Plan
           title="Consultoría FinOps Estratégica"
-          description="Diagnóstico, implementación y acompañamiento especializado en optimización cloud."
+          description="Diagnóstico, implementación y acompañamiento especializado en optimización en la nube."
           features={[
-            "Consultoria FinOps completa",
+            "Assessment FinOps completo",
             "Identificación de desperdicio y quick wins",
             "Diseño de estrategia de ahorro",
+            "Baseline de costos y definición de KPIs FinOps",
             "Implementación de políticas FinOps",
             "Definición de gobernanza cloud",
             "Presentación ejecutiva a dirección",
+            "Introducción a la cultura FinOps en la organización",
           ]}
           bg="bg-gradient-to-br from-emerald-50 to-emerald-100"
           border="border border-emerald-300"
