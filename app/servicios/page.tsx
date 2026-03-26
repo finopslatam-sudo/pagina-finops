@@ -306,11 +306,12 @@ export default function Servicios() {
           onClick={() => setSelectedPlan("Consultoría FinOps Estratégica")}
         />
 
-
-        </div>
-      </section>
       {/* TABLA COMPARATIVA */}
       <PlanComparisonTable />
+      
+        </div>
+      </section>
+
 
       {selectedPlan && (
         <ContractModal
