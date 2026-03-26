@@ -4,6 +4,7 @@ import SessionExpiredModal from "@/app/components/Auth/SessionExpiredModal";
 import { AwsAccountProvider } from "./context/AwsAccountContext";
 import FinopsIAChat from "./components/FinopsIA/FinopsIAChat";
 import { useFinopsIA } from "./hooks/useFinopsIA";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function DashboardLayout({
   children,
@@ -11,6 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const ia = useFinopsIA();
+  const { isEnterprise } = useAuth();
 
   return (
 
@@ -32,33 +34,36 @@ export default function DashboardLayout({
 
       <SessionExpiredModal />
 
-      {/* ================= FINOPS.IA FLOTANTE ================= */}
+      {/* ================= FINOPS.IA FLOTANTE (solo Enterprise) ================= */}
 
-      {ia.isOpen && (
-        <FinopsIAChat
-          messages={ia.messages}
-          isLoading={ia.isLoading}
-          error={ia.error}
-          onSend={ia.sendMessage}
-          onClose={ia.closeChat}
-          onClear={ia.clearChat}
-        />
+      {isEnterprise && (
+        <>
+          {ia.isOpen && (
+            <FinopsIAChat
+              messages={ia.messages}
+              isLoading={ia.isLoading}
+              error={ia.error}
+              onSend={ia.sendMessage}
+              onClose={ia.closeChat}
+              onClear={ia.clearChat}
+            />
+          )}
+
+          <button
+            onClick={ia.isOpen ? ia.closeChat : ia.openChat}
+            title="Bot — Asistente FinOps"
+            className="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
+          >
+            {ia.isOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <span className="font-bold text-xs tracking-tight">Bot</span>
+            )}
+          </button>
+        </>
       )}
-
-      {/* Botón flotante */}
-      <button
-        onClick={ia.isOpen ? ia.closeChat : ia.openChat}
-        title="Bot — Asistente FinOps"
-        className="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
-      >
-        {ia.isOpen ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <span className="font-bold text-xs tracking-tight">Bot</span>
-        )}
-      </button>
 
       {/* ================= FOOTER PLATAFORMA ================= */}
 
