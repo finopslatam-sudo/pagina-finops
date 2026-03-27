@@ -29,6 +29,12 @@ type SPResponse = {
 
 /* ─── helpers ─────────────────────────────────────────────── */
 
+function coverageColor(pct: number): { label: string; color: string } {
+  if (pct >= 70) return { label: 'Cobertura óptima',  color: 'text-emerald-600' };
+  if (pct >= 40) return { label: 'Cobertura parcial', color: 'text-amber-600' };
+  return               { label: 'Cobertura baja',    color: 'text-red-600' };
+}
+
 function overallStatus(ri: RIResponse | null, sp: SPResponse | null): { label: string; color: string } {
   const riPct  = ri?.has_reserved_instances  ? ri.coverage_percentage  : 0;
   const spPct  = sp?.has_savings_plans       ? (sp.services[0]?.coverage_percentage ?? 0) : 0;
