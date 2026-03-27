@@ -118,7 +118,7 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
         return;
       }
 
-      // Redirigir a Stripe Checkout
+      // Redirigir a PayPal para aprobar la suscripción
       window.location.href = data.checkout_url;
     } catch {
       setError('No se pudo conectar con el servidor. Intenta nuevamente.');
@@ -131,7 +131,7 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Completa tus datos</h2>
         <p className="text-gray-500 text-sm mt-1">
-          Serás redirigido a Stripe para completar el pago de forma segura.
+          Serás redirigido a PayPal para completar el pago de forma segura.
         </p>
       </div>
 
@@ -228,7 +228,7 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
           </>
         ) : (
           <>
-            🔒 Pagar con Stripe — {plan.priceDiscount} {plan.period}
+            🔒 Pagar con PayPal — {plan.priceDiscount} {plan.period}
           </>
         )}
       </button>
@@ -236,7 +236,7 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
       <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
         <span>🔐 Pago 100% seguro</span>
         <span>•</span>
-        <span>Powered by Stripe</span>
+        <span>Powered by PayPal</span>
         <span>•</span>
         <span>Cancela cuando quieras</span>
       </div>
