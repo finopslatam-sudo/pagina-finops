@@ -2,7 +2,8 @@ export type PlanSlug = 'foundation' | 'professional' | 'enterprise' | 'consultor
 
 export interface PlanInfo {
   name: string;
-  price: string;
+  priceOriginal: string;  // precio sin descuento (tachado)
+  priceDiscount: string;  // precio con 20% de descuento
   period: string;
   description: string;
   badge?: string;
@@ -15,7 +16,8 @@ export interface PlanInfo {
 export const PLANS: Record<PlanSlug, PlanInfo> = {
   foundation: {
     name: 'FinOps Foundation',
-    price: '$299',
+    priceOriginal: '$950',
+    priceDiscount: '$760',
     period: 'USD/mes',
     description: 'Visibilidad y control financiero cloud.',
     accentColor: 'text-slate-700',
@@ -33,7 +35,8 @@ export const PLANS: Record<PlanSlug, PlanInfo> = {
   },
   professional: {
     name: 'FinOps Professional',
-    price: '$799',
+    priceOriginal: '$1.750',
+    priceDiscount: '$1.400',
     period: 'USD/mes',
     description: 'Optimización activa y decisiones basadas en datos.',
     badge: 'Más elegido',
@@ -52,7 +55,8 @@ export const PLANS: Record<PlanSlug, PlanInfo> = {
   },
   enterprise: {
     name: 'FinOps Enterprise',
-    price: '$1.499',
+    priceOriginal: '$2.550',
+    priceDiscount: '$2.040',
     period: 'USD/mes',
     description: 'Gobierno completo y automatización avanzada.',
     accentColor: 'text-purple-700',
@@ -70,8 +74,9 @@ export const PLANS: Record<PlanSlug, PlanInfo> = {
   },
   consultoria: {
     name: 'Consultoría FinOps Estratégica',
-    price: 'A convenir',
-    period: '',
+    priceOriginal: '$2.550',
+    priceDiscount: '$2.040',
+    period: 'USD',
     description: 'Diagnóstico, implementación y acompañamiento especializado.',
     accentColor: 'text-emerald-700',
     borderColor: 'border-emerald-300',

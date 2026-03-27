@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PublicFooter from '@/app/components/layout/PublicFooter';
+import PlanComparisonTable from '@/app/components/PlanComparisonTable';
 import { PLANS, type PlanSlug } from './constants';
 import { API_URL } from '@/app/lib/api';
 
@@ -16,26 +17,37 @@ function PlanSummary({ slug }: { slug: PlanSlug }) {
   return (
     <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 lg:p-8 flex flex-col gap-6">
 
-      {/* Header plan */}
       <div>
         <span className="inline-block bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full mb-3">
           🎉 20% DCTO aplicado
         </span>
-        <h2 className={`text-2xl font-bold ${plan.accentColor}`}>{plan.name}</h2>
+        {plan.badge && (
+          <span className="ml-2 inline-block bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+            {plan.badge}
+          </span>
+        )}
+        <h2 className={`text-2xl font-bold mt-2 ${plan.accentColor}`}>{plan.name}</h2>
         <p className="text-gray-500 mt-1 text-sm">{plan.description}</p>
       </div>
 
-      {/* Precio */}
+      {/* Precio con tachado */}
       <div className={`border-t border-b ${plan.borderColor} py-4`}>
         <p className="text-sm text-gray-500 mb-1">Total a pagar hoy</p>
-        <p className={`text-4xl font-extrabold ${plan.accentColor}`}>
-          {plan.price}
-          {plan.period && (
-            <span className="text-base font-normal text-gray-400 ml-1">{plan.period}</span>
-          )}
-        </p>
-        {plan.period && (
-          <p className="text-xs text-gray-400 mt-1">Se renueva automáticamente cada mes. Cancela cuando quieras.</p>
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <p className={`text-4xl font-extrabold ${plan.accentColor}`}>
+            {plan.priceDiscount}
+            {plan.period && (
+              <span className="text-base font-normal text-gray-400 ml-1">{plan.period}</span>
+            )}
+          </p>
+          <p className="text-lg text-gray-400 line-through">
+            {plan.priceOriginal} {plan.period}
+          </p>
+        </div>
+        {plan.period === 'USD/mes' && (
+          <p className="text-xs text-gray-400 mt-1">
+            Se renueva automáticamente cada mes. Cancela cuando quieras.
+          </p>
         )}
       </div>
 
@@ -73,7 +85,6 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
     pais: '',
   });
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -86,58 +97,41 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
     setError('');
 
     try {
-      const res = await fetch(`${API_URL}/api/contact`, {
+      const res = await fetch(`${API_URL}/api/payments/create-checkout-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          plan_code: slug,
+          email: form.email,
           nombre: form.nombre,
           empresa: form.empresa,
-          email: form.email,
-          telefono: form.telefono,
           pais: form.pais,
-          servicio: plan.name,
-          mensaje: `Solicitud de contratación: ${plan.name}`,
+          telefono: form.telefono,
         }),
       });
 
-      if (!res.ok) throw new Error('Error al enviar');
-      setSuccess(true);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Error al iniciar el pago. Intenta nuevamente.');
+        setLoading(false);
+        return;
+      }
+
+      // Redirigir a Stripe Checkout
+      window.location.href = data.checkout_url;
     } catch {
-      setError('Hubo un problema al enviar la solicitud. Intenta nuevamente.');
-    } finally {
+      setError('No se pudo conectar con el servidor. Intenta nuevamente.');
       setLoading(false);
     }
   };
-
-  if (success) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center py-16 gap-6">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl">
-          ✅
-        </div>
-        <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">¡Solicitud enviada!</h3>
-          <p className="text-gray-500 max-w-sm">
-            Recibimos tu solicitud para contratar <strong>{plan.name}</strong>.
-            Un especialista FinOps se pondrá en contacto en las próximas 24 horas hábiles.
-          </p>
-        </div>
-        <Link
-          href="/"
-          className="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition"
-        >
-          Volver al inicio
-        </Link>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Completa tus datos</h2>
         <p className="text-gray-500 text-sm mt-1">
-          Un especialista FinOps confirmará tu suscripción en menos de 24 horas hábiles.
+          Serás redirigido a Stripe para completar el pago de forma segura.
         </p>
       </div>
 
@@ -217,19 +211,38 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
       </div>
 
       {error && (
-        <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2">{error}</p>
+        <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+          {error}
+        </p>
       )}
 
       <button
         type="submit"
         disabled={loading}
-        className={`w-full ${plan.badgeBg} hover:opacity-90 text-white font-bold py-3.5 rounded-xl transition text-base mt-2`}
+        className={`w-full ${plan.badgeBg} hover:opacity-90 text-white font-bold py-3.5 rounded-xl transition text-base mt-2 flex items-center justify-center gap-2`}
       >
-        {loading ? 'Enviando solicitud...' : `Contratar ${plan.name}`}
+        {loading ? (
+          <>
+            <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+            Redirigiendo a pago seguro...
+          </>
+        ) : (
+          <>
+            🔒 Pagar con Stripe — {plan.priceDiscount} {plan.period}
+          </>
+        )}
       </button>
 
+      <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+        <span>🔐 Pago 100% seguro</span>
+        <span>•</span>
+        <span>Powered by Stripe</span>
+        <span>•</span>
+        <span>Cancela cuando quieras</span>
+      </div>
+
       <p className="text-xs text-gray-400 text-center">
-        Al enviar, aceptas nuestros{' '}
+        Al continuar aceptas nuestros{' '}
         <Link href="/terminos" className="underline hover:text-gray-600">términos de servicio</Link>
         {' '}y{' '}
         <Link href="/privacidad" className="underline hover:text-gray-600">política de privacidad</Link>.
@@ -250,7 +263,7 @@ function PagoContent() {
 
   if (!PLANS[slug]) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-4">
         <p className="text-gray-500 text-lg">Plan no encontrado.</p>
         <button
           onClick={() => router.push('/servicios')}
@@ -263,35 +276,51 @@ function PagoContent() {
   }
 
   return (
-    <section className="min-h-screen bg-white py-10 lg:py-16 px-4 lg:px-6">
-      <div className="max-w-5xl mx-auto">
+    <>
+      <section className="min-h-screen bg-white py-10 lg:py-16 px-4 lg:px-6">
+        <div className="max-w-5xl mx-auto">
 
-        {/* Breadcrumb */}
-        <nav className="text-sm text-gray-400 mb-8 flex items-center gap-2">
-          <Link href="/servicios" className="hover:text-gray-600 transition">Planes</Link>
-          <span>›</span>
-          <span className="text-gray-700 font-medium">Contratar {PLANS[slug].name}</span>
-        </nav>
+          {/* Breadcrumb */}
+          <nav className="text-sm text-gray-400 mb-8 flex items-center gap-2">
+            <Link href="/servicios" className="hover:text-gray-600 transition">Planes</Link>
+            <span>›</span>
+            <span className="text-gray-700 font-medium">Contratar {PLANS[slug].name}</span>
+          </nav>
 
-        {/* Layout dos columnas */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-          <PlanSummary slug={slug} />
-          <CheckoutForm slug={slug} />
+          {/* Layout dos columnas */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            <PlanSummary slug={slug} />
+            <CheckoutForm slug={slug} />
+          </div>
+
         </div>
+      </section>
 
-      </div>
-    </section>
+      {/* Tabla comparativa de planes */}
+      <section className="bg-gray-50 py-14 lg:py-20 px-4 lg:px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 text-center mb-10">
+            Comparativa de planes
+          </h2>
+          <PlanComparisonTable />
+        </div>
+      </section>
+    </>
   );
 }
 
 /* =====================================================
-   PAGE EXPORT — envuelve en Suspense (requerido por Next.js)
+   PAGE EXPORT
 ===================================================== */
 
 export default function PagoPage() {
   return (
     <>
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Cargando...</div>}>
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center text-gray-400">
+          Cargando...
+        </div>
+      }>
         <PagoContent />
       </Suspense>
       <PublicFooter />
