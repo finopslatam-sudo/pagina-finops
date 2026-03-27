@@ -16,6 +16,7 @@ import PrivateRoute from '@/app/components/Auth/PrivateRoute';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiFetch } from '@/app/lib/api';
 import { PasswordFields } from '@/app/components/Auth/PasswordFields';
+import { ProfileInput, EditableField } from './components/ProfileFields';
 
 /* =====================================================
    COMPONENT
@@ -205,12 +206,12 @@ export default function PerfilPage() {
                 Datos del perfil
               </h3>
 
-              <Input
+              <ProfileInput
                 label="Correo"
                 value={form.email}
               />
 
-              <Input
+              <ProfileInput
                 label="Rol"
                 value={user?.global_role || user?.client_role || '—'}
               />
@@ -280,68 +281,3 @@ export default function PerfilPage() {
   );
 }
 
-/* =====================================================
-   UI HELPERS (LOCAL)
-===================================================== */
-
-function Input({
-  label,
-  value,
-}: {
-  label: string;
-  value?: string | null;
-}) {
-  return (
-    <div className="space-y-1">
-      <label className="text-sm text-gray-600">
-        {label}
-      </label>
-      <input
-        value={value || ''}
-        disabled
-        className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-      />
-    </div>
-  );
-}
-
-function EditableField({
-  label,
-  value,
-  editable,
-  onEdit,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  editable: boolean;
-  onEdit: () => void;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm text-gray-600">
-        {label}
-      </label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={!editable}
-        className={`w-full px-4 py-3 border rounded-xl ${
-          editable
-            ? 'bg-white'
-            : 'bg-gray-100 cursor-not-allowed'
-        }`}
-      />
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={onEdit}
-          className="text-blue-600 text-sm font-medium"
-        >
-          {editable ? 'Cancelar' : 'Editar'}
-        </button>
-      </div>
-    </div>
-  );
-}

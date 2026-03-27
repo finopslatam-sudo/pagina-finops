@@ -1,4 +1,4 @@
-'use client';
+import PublicFooter from '@/app/components/layout/PublicFooter';
 
 export default function QuienesSomos() {
   return (
@@ -295,74 +295,7 @@ export default function QuienesSomos() {
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
-        <div className="flex justify-center gap-4 sm:gap-6 pb-6">
-          <a 
-            href="https://wa.me/56965090121"
-            target="_blank" 
-            className="hover:text-blue-400 transition text-xl sm:text-2xl"
-          >
-            💬
-          </a>
-          <a 
-            href="mailto:contacto@finopslatam.com" 
-            className="hover:text-blue-400 transition text-xl sm:text-2xl"
-          >
-            📧
-          </a>
-          <a 
-            href="https://www.linkedin.com/company/finopslatam" 
-            target="_blank" 
-            className="hover:text-blue-400 transition text-xl sm:text-2xl"
-          >
-            💼
-          </a>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 text-center md:text-left">
-            <div className="flex flex-col items-center md:items-start">
-              <a href="/">
-                <img 
-                  src="/logo2.png" 
-                  alt="FinOpsLatam Logo" 
-                  className="h-10 sm:h-12 w-auto mb-3 sm:mb-4"
-                />
-              </a>
-              <p className="text-xs sm:text-sm text-gray-500 leading-relaxed max-w-xs">
-                Expertos en Optimización de Costos en la Nube, 
-                automatización FinOps y control financiero para AWS.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-white text-sm font-semibold mb-3 sm:mb-4">Navegación</h3>
-              <ul className="space-y-1 sm:space-y-2">
-                <li><a href="/" className="hover:text-blue-400 transition-colors text-sm">Inicio</a></li>
-                <li><a href="/servicios" className="hover:text-blue-400 transition-colors text-sm">Servicios</a></li>
-                <li><a href="/quienes somos" className="hover:text-blue-400 transition-colors text-sm">Quiénes somos</a></li>
-                <li><a href="/blog" className="hover:text-blue-400 transition-colors text-sm">Blog</a></li>
-                <li><a href="/contacto" className="hover:text-blue-400 transition-colors text-sm">Contacto</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-white text-sm font-semibold mb-3 sm:mb-4">Contacto</h3>
-              <ul className="space-y-1 sm:space-y-2">
-                <li className="text-sm">Email: <a href="mailto:contacto@finopslatam.com" className="hover:text-blue-400 transition-colors">contacto@finopslatam.com</a></li>
-                <li className="text-sm">WhatsApp: <a href="https://wa.me/56965090121" className="hover:text-blue-400 transition-colors">+56 9 65090121</a></li>
-                <li className="text-sm">LinkedIn: <a href="https://www.linkedin.com/company/finopslatam" className="hover:text-blue-400 transition-colors">FinOpsLatam</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center text-xs sm:text-sm text-gray-600 py-4 sm:py-6 border-t border-gray-800">
-          © {new Date().getFullYear()} FinOpsLatam — Todos los derechos reservados
-        </div>
-      </footer>
+      <PublicFooter />
     </main>
   );
 }

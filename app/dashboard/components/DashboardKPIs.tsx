@@ -3,6 +3,11 @@
 import { formatUSD } from '@/app/lib/finopsFormat';
 import type { DashboardResponse } from '../hooks/useDashboard';
 
+/* =====================================================
+   DASHBOARD KPI CARDS
+   Financial Snapshot + Operational Metrics
+===================================================== */
+
 interface Props {
   data: DashboardResponse;
 }
@@ -17,14 +22,6 @@ export default function DashboardKPIs({ data }: Props) {
     return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
   };
 
-  // Delta gasto actual vs mes anterior
-  const prev = data.cost.previous_month_cost ?? 0;
-  const curr = data.cost.current_month_partial ?? 0;
-  const costDelta = prev > 0 ? ((curr - prev) / prev) * 100 : null;
-
-  // Porcentaje de ahorro mensual
-  const savingsPct = data.cost.monthly_savings_percentage ?? null;
-
   return (
     <div className="space-y-6">
 
@@ -35,62 +32,43 @@ export default function DashboardKPIs({ data }: Props) {
           value={formatUSD(data.cost.previous_month_cost ?? data.cost.current_month_cost)}
           variant="blue"
           tooltip={dl.previous_month_start && dl.previous_month_end
-            ? `Período: ${fmt(dl.previous_month_start)} al ${fmt(dl.previous_month_end)}`
+            ? `Período de facturación: ${fmt(dl.previous_month_start)} al ${fmt(dl.previous_month_end)}`
             : 'Gasto total del mes cerrado anterior.'}
         />
         <PastelCard
           title="Gasto del Mes Actual"
-          value={formatUSD(curr)}
+          value={formatUSD(data.cost.current_month_partial ?? 0)}
           variant="sky"
-          delta={costDelta}
-          deltaPositiveIsGood={false}
           tooltip={dl.current_month_end
-            ? `Acumulado hasta el ${fmt(dl.current_month_end)}`
-            : 'Gastos acumulados hasta hoy.'}
+            ? `Gastos acumulados hasta el ${fmt(dl.current_month_end)}`
+            : 'Gastos acumulados hasta el día de hoy.'}
         />
         <PastelCard
           title="Ahorro Mensual Acumulado"
           value={formatUSD(data.cost.potential_savings)}
           variant="green"
-          delta={savingsPct}
-          deltaPositiveIsGood={true}
-          tooltip="Ahorros ya aplicados más oportunidades identificadas en el mes actual."
+          tooltip="Corresponde a los ahorros ya aplicados en meses anteriores más los ahorros identificados en el mes actual."
         />
       </div>
 
       {/* FILA 2 — FINDINGS & RIESGO */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        {/* Findings */}
-        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 shadow-sm space-y-3">
-          <p className="text-sm uppercase text-slate-600">Findings &amp; Optimization</p>
+        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 shadow-sm">
+          <p className="text-sm uppercase text-slate-600 mb-3">Findings &amp; Optimization</p>
           <p className="text-3xl font-semibold text-slate-800">{data.findings.total ?? 0}</p>
-          <div className="flex gap-3 text-xs font-medium">
-            <span className="text-red-500">{data.findings.high ?? 0} alto</span>
-            <span className="text-amber-500">{data.findings.medium ?? 0} medio</span>
-            <span className="text-slate-400">{data.findings.low ?? 0} bajo</span>
-          </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 mt-2">
             {data.findings.active ?? 0} activos · {data.findings.resolved ?? 0} resueltos
           </p>
         </div>
-
-        {/* Ahorro de findings */}
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 shadow-sm space-y-3">
-          <p className="text-sm uppercase text-slate-600">Ahorro mensual de Findings</p>
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 shadow-sm">
+          <p className="text-sm uppercase text-slate-600 mb-3">Ahorro mensual de Findings</p>
           <p className="text-3xl font-semibold text-slate-800">
             {formatUSD(data.findings.estimated_monthly_savings ?? data.cost.potential_savings ?? 0)}
           </p>
-          <p className="text-xs text-slate-500">
-            {data.findings.financial_opportunities ?? 0} oportunidades financieras
+          <p className="text-xs text-slate-500 mt-2">
+            {data.findings.financial_opportunities ?? 0} oportunidades financieras detectadas
           </p>
-          {data.roi_projection?.high_savings_opportunity_annual > 0 && (
-            <p className="text-xs text-emerald-700 font-medium">
-              Potencial anual: {formatUSD(data.roi_projection.high_savings_opportunity_annual)}
-            </p>
-          )}
         </div>
-
         <RiskDistributionCard
           high={data.risk.high ?? 0}
           medium={data.risk.medium ?? 0}
@@ -102,39 +80,30 @@ export default function DashboardKPIs({ data }: Props) {
 
       {/* FILA 3 — OPERATIONAL METRICS */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6">
-        <PastelCard title="Oportunidades de ahorro"   value={data.findings.financial_opportunities ?? 0} variant="green" />
-        <PastelCard title="Revisiones recomendadas"   value={data.findings.review_recommendations ?? 0} variant="amber" />
-        <PastelCard title="Recomendaciones Activas"   value={data.findings.active}                       variant="rose" />
-        <PastelCard title="Cuentas AWS"               value={data.total_accounts ?? data.accounts}       variant="indigo" />
-        <PastelCard title="Recursos Afectados"        value={data.resources_affected}                    variant="sky" />
+        <PastelCard title="Oportunidades de ahorro" value={data.findings.financial_opportunities ?? 0} variant="green" />
+        <PastelCard title="Revisiones recomendadas" value={data.findings.review_recommendations ?? 0} variant="amber" />
+        <PastelCard title="Recomendaciones Activas" value={data.findings.active} variant="rose" />
+        <PastelCard title="Cuentas AWS" value={data.total_accounts ?? data.accounts} variant="indigo" />
+        <PastelCard title="Recursos Afectados" value={data.resources_affected} variant="sky" />
       </div>
     </div>
   );
 }
 
-/* ─────────── Sub-components ─────────── */
+/* ---- Sub-components ---- */
 
 function PastelCard({
-  title, value, variant, tooltip, delta, deltaPositiveIsGood,
+  title, value, variant, tooltip,
 }: {
   title: string;
   value: string | number;
   variant: 'blue'|'green'|'amber'|'rose'|'indigo'|'sky'|'purple';
   tooltip?: string;
-  delta?: number | null;
-  deltaPositiveIsGood?: boolean;
 }) {
   const styles = {
     blue: 'bg-blue-50', green: 'bg-emerald-50', amber: 'bg-amber-50',
     rose: 'bg-rose-50', indigo: 'bg-indigo-50', sky: 'bg-sky-50', purple: 'bg-purple-50',
   };
-
-  const deltaColor = delta == null
-    ? ''
-    : (delta >= 0) === deltaPositiveIsGood
-      ? 'text-emerald-600'
-      : 'text-rose-500';
-
   return (
     <div className={`p-8 rounded-2xl border border-blue-300 shadow-sm ${styles[variant]}`}>
       <div className="mb-2 flex items-start justify-between gap-3">
@@ -152,11 +121,6 @@ function PastelCard({
         )}
       </div>
       <p className="text-3xl font-semibold text-slate-800">{value}</p>
-      {delta != null && (
-        <p className={`text-xs font-medium mt-2 tabular-nums ${deltaColor}`}>
-          {delta >= 0 ? '↑' : '↓'} {Math.abs(delta).toFixed(1)}% vs mes anterior
-        </p>
-      )}
     </div>
   );
 }

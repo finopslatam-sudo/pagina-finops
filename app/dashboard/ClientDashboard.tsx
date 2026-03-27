@@ -60,8 +60,8 @@ export default function ClientDashboard() {
           {/* 3. KPIs (Financial Snapshot + Operational Metrics) */}
           <DashboardKPIs data={data} />
 
-          {/* 4. SERVICIOS PRIORITARIOS */}
-          <PriorityServices services={data.priority_services} router={router} />
+          {/* 4. SERVICIOS ESCANEADOS */}
+          <ServicesScanned data={data} router={router} />
 
           {/* 5. TENDENCIA DE COSTOS */}
           <div className="bg-white border border-blue-200 p-8 lg:p-10 rounded-3xl shadow-sm">
@@ -90,71 +90,34 @@ export default function ClientDashboard() {
 }
 
 /* =====================================================
-   PRIORITY SERVICES — servicios ordenados por riesgo
+   SERVICIOS SCANNED — sección inline pequeña
 ===================================================== */
 
-interface PriorityService {
-  service: string;
-  risk_score: number;
-  risk_level: string;
-  high: number;
-  medium: number;
-  low: number;
-}
-
-const RISK_CARD: Record<string, string> = {
-  CRITICAL: 'bg-red-50 border-red-200',
-  HIGH:     'bg-orange-50 border-orange-200',
-  MODERATE: 'bg-amber-50 border-amber-200',
-  LOW:      'bg-emerald-50 border-emerald-200',
-};
-
-const RISK_BADGE: Record<string, string> = {
-  CRITICAL: 'text-red-600 bg-red-100',
-  HIGH:     'text-orange-600 bg-orange-100',
-  MODERATE: 'text-amber-600 bg-amber-100',
-  LOW:      'text-emerald-600 bg-emerald-100',
-};
-
-function PriorityServices({
-  services,
+function ServicesScanned({
+  data,
   router,
 }: {
-  services: Record<string, unknown>[];
+  data: NonNullable<ReturnType<typeof useDashboard>['data']>;
   router: ReturnType<typeof useRouter>;
 }) {
-  if (!services?.length) return null;
-
-  const list = services.slice(0, 6) as unknown as PriorityService[];
+  if (!data.services_scanned?.length) return null;
 
   return (
     <div className="bg-white border border-blue-200 p-8 lg:p-10 rounded-3xl shadow-sm space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-2xl font-semibold text-slate-800">Servicios Prioritarios</h2>
-        <p className="text-sm text-slate-500">Ordenados por nivel de riesgo</p>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {list.map((s) => (
-          <div
-            key={s.service}
-            onClick={() => router.push(`/dashboard/findings?service=${s.service}`)}
-            className={`border p-5 rounded-2xl hover:shadow-md transition cursor-pointer ${RISK_CARD[s.risk_level] ?? 'bg-sky-50 border-sky-200'}`}
-          >
-            <div className="flex items-start justify-between mb-3 gap-2">
-              <p className="text-sm font-semibold text-slate-800 leading-tight">{s.service}</p>
-              <span className={`text-xs font-semibold uppercase px-2 py-0.5 rounded-full shrink-0 ${RISK_BADGE[s.risk_level] ?? 'text-sky-600 bg-sky-100'}`}>
-                {s.risk_level}
-              </span>
+      <h2 className="text-2xl font-semibold text-slate-800">Servicios Escaneados</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {[...data.services_scanned]
+          .sort((a, b) => b.total_resources - a.total_resources)
+          .map((s) => (
+            <div
+              key={s.service}
+              onClick={() => router.push(`/dashboard/findings?service=${s.service}`)}
+              className="bg-sky-50 border border-sky-200 p-6 rounded-2xl hover:bg-sky-100 transition cursor-pointer"
+            >
+              <p className="text-sm uppercase text-sky-700">{s.service}</p>
+              <p className="text-2xl font-semibold text-sky-900 mt-2">{s.total_resources}</p>
             </div>
-            <p className="text-2xl font-bold text-slate-800 tabular-nums">{s.risk_score}%</p>
-            <p className="text-xs text-slate-500 mt-0.5">risk score</p>
-            <div className="flex flex-wrap gap-3 mt-3 text-xs font-medium">
-              {s.high   > 0 && <span className="text-red-500">{s.high} alto</span>}
-              {s.medium > 0 && <span className="text-amber-500">{s.medium} medio</span>}
-              {s.low    > 0 && <span className="text-slate-400">{s.low} bajo</span>}
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

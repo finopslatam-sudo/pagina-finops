@@ -2,392 +2,71 @@
 
 import { useState } from "react";
 import { API_URL } from "@/app/lib/api";
+import PublicFooter from "@/app/components/layout/PublicFooter";
+import ContactInfo  from "./components/ContactInfo";
+import ContactForm  from "./components/ContactForm";
+import ProcessSteps from "./components/ProcessSteps";
+import ContactFAQ   from "./components/ContactFAQ";
 
-export default function QuienesSomos() {
-  const [form, setForm] = useState({
-    nombre: "",
-    empresa: "",
-    email: "",
-    telefono: "",
-    servicio: "",
-    mensaje: "",
-  });
-  
+type FormState = {
+  nombre: string; empresa: string; email: string;
+  telefono: string; servicio: string; mensaje: string;
+};
+
+const EMPTY_FORM: FormState = { nombre: '', empresa: '', email: '', telefono: '', servicio: '', mensaje: '' };
+
+export default function ContactoPage() {
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    const res = await fetch(
-      `${API_URL}/api/contact`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      }
-    );
-  
-    const data = await res.json();
-  
-    if (!res.ok) {
-      alert(data.error || "Error al enviar la solicitud");
-      return;
-    }
-  
-    alert("Solicitud enviada correctamente");
-    setForm({
-      nombre: "",
-      empresa: "",
-      email: "",
-      telefono: "",
-      servicio: "",
-      mensaje: "",
+    const res = await fetch(`${API_URL}/api/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
     });
-  };  
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || 'Error al enviar la solicitud'); return; }
+    alert('Solicitud enviada correctamente');
+    setForm(EMPTY_FORM);
+  };
+
   return (
     <main className="min-h-screen bg-white text-gray-900">
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-16 sm:py-20">
-        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-black/20" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">Contáctanos</h1>
           <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            ¿Listo para optimizar tus costos en la nube? Hablemos sobre cómo podemos 
+            ¿Listo para optimizar tus costos en la nube? Hablemos sobre cómo podemos
             ayudarte a transformar la gestión financiera de tu infraestructura cloud.
           </p>
         </div>
       </section>
 
-      {/* Información de Contacto y Formulario */}
+      {/* Info + Form */}
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
-            
-            {/* Información de Contacto */}
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Hablemos de Tu Proyecto</h2>
-              <p className="text-gray-600 text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed">
-                Estamos aquí para ayudarte a optimizar tus costos en la nube. 
-                Agenda una consultoría gratuita y descubre cómo podemos reducir 
-                tus gastos cloud mientras mejoramos el rendimiento.
-              </p>
-
-              <div className="space-y-4 sm:space-y-6">
-                {/* WhatsApp */}
-                <div className="flex items-start space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-green-600 text-lg sm:text-xl">💬</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">WhatsApp</h4>
-                    <p className="text-gray-600 mb-1 sm:mb-2 text-sm sm:text-base">Respuesta inmediata</p>
-                    <a 
-                      href="https://wa.me/56965090121"
-                      target="_blank"
-                      className="text-blue-600 hover:text-blue-700 font-semibold text-sm sm:text-base"
-                    >
-                      +56 9 65090121
-                    </a>
-                  </div>
-                </div>
-
-                {/* Email*/}
-                <div className="flex items-start space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-blue-600 text-lg sm:text-xl">📧</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">Email</h4>
-                    <p className="text-gray-600 mb-1 sm:mb-2 text-sm sm:text-base">Respuesta en 24 horas</p>
-                    <a 
-                      href="mailto:contacto@finopslatam.com"
-                      className="text-blue-600 hover:text-blue-700 font-semibold text-sm sm:text-base"
-                    >
-                      contacto@finopslatam.com
-                    </a>
-                  </div>
-                </div>
-
-                {/* LinkedIn */}
-                <div className="flex items-start space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-blue-600 text-lg sm:text-xl">💼</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">LinkedIn</h4>
-                    <p className="text-gray-600 mb-1 sm:mb-2 text-sm sm:text-base">Conecta con nosotros</p>
-                    <a 
-                      href="https://www.linkedin.com/company/finopslatam" 
-                      target="_blank"
-                      className="text-blue-600 hover:text-blue-700 font-semibold text-sm sm:text-base"
-                    >
-                      FinOpsLatam
-                    </a>
-                  </div>
-                </div>
-
-                {/* Horario */}
-                <div className="flex items-start space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-purple-600 text-lg sm:text-xl">🕒</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">Horario de Atención</h4>
-                    <p className="text-gray-600 text-sm sm:text-base">Lunes a Viernes: 9:00 - 18:00 hrs</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Llamadas a acción rápidas */}
-              <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl border border-blue-100">
-                <h4 className="font-semibold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">¿Necesitas una respuesta inmediata?</h4>
-                <a
-                  href="https://wa.me/56965090121?text=Hola,%20quiero%20información%20sobre%20FinOpsLatam"
-                  target="_blank"
-                  className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-colors text-sm sm:text-base"
-                >
-                  <span className="mr-2">💬</span>
-                  Chatear por WhatsApp
-                </a>
-              </div>
-            </div>
-
-            {/* Formulario de Contacto */}
-            <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-gray-200">
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Solicita tu Consultoría Gratuita</h3>
-              
-              <form
-                onSubmit={handleSubmit}
-                className="space-y-4 sm:space-y-6"
-              >
-                <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nombre *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={form.nombre}
-                      onChange={(e) =>
-                        setForm({ ...form, nombre: e.target.value })
-                      }
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg"
-                      placeholder="Tu nombre completo"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Empresa *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={form.empresa}
-                      onChange={(e) =>
-                        setForm({ ...form, empresa: e.target.value })
-                      }
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Nombre de tu empresa"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={form.email}
-                      onChange={(e) =>
-                        setForm({ ...form, email: e.target.value })
-                      }
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="tu@email.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Teléfono
-                    </label>
-                    <input
-                      type="tel"
-                      value={form.telefono}
-                      onChange={(e) =>
-                        setForm({ ...form, telefono: e.target.value })
-                      }
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="+56 9 1234 5678"
-                    />
-
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Servicio de Interés *
-                  </label>
-                  <select
-                    required
-                    value={form.servicio}
-                    onChange={(e) =>
-                      setForm({ ...form, servicio: e.target.value })
-                    }
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Selecciona un servicio</option>
-                    <option value="auditoria">FinOps Foundation</option>
-                    <option value="dashboards">FinOps Professional</option>
-                    <option value="gobernanza">FinOps Enterprise</option>
-                    </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Mensaje *
-                  </label>
-                  <textarea
-                    required
-                    rows={4}
-                    value={form.mensaje}
-                    onChange={(e) =>
-                      setForm({ ...form, mensaje: e.target.value })
-                    }
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Cuéntanos sobre tu proyecto y necesidades específicas..."
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 sm:py-4 rounded-lg transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
-                >
-                  Enviar Solicitud
-                </button>
-              </form>
-            </div>
-
+            <ContactInfo />
+            <ContactForm form={form} setForm={setForm} onSubmit={handleSubmit} />
           </div>
         </div>
       </section>
 
-      {/* Proceso de Contacto */}
-      <section className="py-16 sm:py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Nuestro Proceso de Contacto</h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-              Así es como trabajamos contigo desde el primer contacto hasta la implementación
-            </p>
-          </div>
+      <ProcessSteps />
+      <ContactFAQ />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            
-            {/* Paso 1 */}
-            <div className="text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <span className="text-white text-xl sm:text-2xl">1</span>
-              </div>
-              <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Consulta Inicial</h4>
-              <p className="text-gray-600 text-xs sm:text-sm">
-                Analizamos tus necesidades y objetivos específicos en una reunión de 30 minutos.
-              </p>
-            </div>
-
-            {/* Paso 2 */}
-            <div className="text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <span className="text-white text-xl sm:text-2xl">2</span>
-              </div>
-              <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Análisis Preliminar</h4>
-              <p className="text-gray-600 text-xs sm:text-sm">
-                Realizamos un diagnóstico gratuito de tus costos cloud actuales.
-              </p>
-            </div>
-
-            {/* Paso 3 */}
-            <div className="text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <span className="text-white text-xl sm:text-2xl">3</span>
-              </div>
-              <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Propuesta Personalizada</h4>
-              <p className="text-gray-600 text-xs sm:text-sm">
-                Creamos un plan de acción específico con estimación de ahorros.
-              </p>
-            </div>
-
-            {/* Paso 4 */}
-            <div className="text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <span className="text-white text-xl sm:text-2xl">4</span>
-              </div>
-              <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Implementación</h4>
-              <p className="text-gray-600 text-xs sm:text-sm">
-                Ejecutamos las optimizaciones y establecemos monitoreo continuo.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Preguntas Frecuentes */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Preguntas Frecuentes</h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-              Resolvemos tus dudas más comunes sobre nuestros servicios
-            </p>
-          </div>
-
-          <div className="space-y-4 sm:space-y-6">
-            <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-              <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                ¿Cuánto tiempo toma ver resultados después de implementar FinOps?
-              </h4>
-              <p className="text-gray-600 text-sm sm:text-base">
-                La mayoría de nuestros clientes ven reducciones significativas en sus costos cloud 
-                durante los primeros 30-60 días. Las optimizaciones iniciales suelen generar ahorros 
-                inmediatos, mientras que las estrategias a largo plazo se implementan en los primeros 3 meses.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-              <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                ¿Qué información necesitan para realizar la auditoría inicial?
-              </h4>
-              <p className="text-gray-600 text-sm sm:text-base">
-                Solo necesitamos acceso de solo lectura a tus reportes de costos de AWS (CUR) 
-                y métricas básicas de uso. No requerimos acceso a tu infraestructura ni datos sensibles. 
-                Todo el proceso se realiza bajo estrictos protocolos de seguridad y confidencialidad.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-              <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                ¿Con que tipo de empresas Trabajan?
-              </h4>
-              <p className="text-gray-600 text-sm sm:text-base">
-                Trabajamos desde startups y pymes. Nuestras soluciones 
-                son escalables y nos adaptamos a las necesidades específicas de cada cliente. 
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Llamado Final a la Acción */}
+      {/* CTA */}
       <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">¿Listo para Comenzar?</h2>
           <p className="text-lg sm:text-xl text-blue-100 mb-6 sm:mb-8 max-w-2xl mx-auto">
-            Agenda tu consultoría gratuita hoy mismo y descubre cómo podemos ayudarte 
+            Agenda tu consultoría gratuita hoy mismo y descubre cómo podemos ayudarte
             a reducir tus costos cloud mientras mejoramos el rendimiento.
           </p>
-          
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <a
               href="https://wa.me/56965090121?text=Hola,%20quiero%20agendar%20una%20consultoría%20gratuita%20de%20FinOps"
@@ -406,73 +85,7 @@ export default function QuienesSomos() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
-        <div className="flex justify-center gap-4 sm:gap-6 pb-6">
-          <a 
-            href="https://wa.me/56965090121"
-            target="_blank" 
-            className="hover:text-blue-400 transition text-xl sm:text-2xl"
-          >
-            💬
-          </a>
-          <a 
-            href="mailto:contacto@finopslatam.com" 
-            className="hover:text-blue-400 transition text-xl sm:text-2xl"
-          >
-            📧
-          </a>
-          <a 
-            href="https://www.linkedin.com/company/finopslatam" 
-            target="_blank" 
-            className="hover:text-blue-400 transition text-xl sm:text-2xl"
-          >
-            💼
-          </a>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 text-center md:text-left">
-            <div className="flex flex-col items-center md:items-start">
-              <a href="/">
-                <img 
-                  src="/logo2.png" 
-                  alt="FinOpsLatam Logo" 
-                  className="h-10 sm:h-12 w-auto mb-3 sm:mb-4"
-                />
-              </a>
-              <p className="text-xs sm:text-sm text-gray-500 leading-relaxed max-w-xs">
-                Expertos en Optimización de Costos en la Nube, 
-                automatización FinOps y control financiero para AWS.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-white text-sm font-semibold mb-3 sm:mb-4">Navegación</h3>
-              <ul className="space-y-1 sm:space-y-2">
-                <li><a href="/" className="hover:text-blue-400 transition-colors text-sm">Inicio</a></li>
-                <li><a href="/servicios" className="hover:text-blue-400 transition-colors text-sm">Servicios</a></li>
-                <li><a href="/quienes-somos" className="hover:text-blue-400 transition-colors text-sm">Quiénes somos</a></li>
-                <li><a href="/blog" className="hover:text-blue-400 transition-colors text-sm">Blog</a></li>
-                <li><a href="/contacto" className="hover:text-blue-400 transition-colors text-sm">Contacto</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-white text-sm font-semibold mb-3 sm:mb-4">Contacto</h3>
-              <ul className="space-y-1 sm:space-y-2">
-                <li className="text-sm">Email: <a href="mailto:contacto@finopslatam.com" className="hover:text-blue-400 transition-colors">contacto@finopslatam.com</a></li>
-                <li className="text-sm">WhatsApp: <a href="https://wa.me/56965090121" className="hover:text-blue-400 transition-colors">+56 9 65090121</a></li>
-                <li className="text-sm">LinkedIn: <a href="https://www.linkedin.com/company/finopslatam" className="hover:text-blue-400 transition-colors">FinOpsLatam</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center text-xs sm:text-sm text-gray-600 py-4 sm:py-6 border-t border-gray-800">
-          © {new Date().getFullYear()} FinOpsLatam — Todos los derechos reservados
-        </div>
-      </footer>
+      <PublicFooter />
     </main>
   );
 }
