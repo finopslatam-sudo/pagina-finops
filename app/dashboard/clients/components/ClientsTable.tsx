@@ -108,6 +108,7 @@ function ClientsTableSection({
             <th className="p-4">Empresa</th>
             <th className="p-4">Email</th>
             <th className="p-4">Contacto</th>
+            <th className="p-4">País</th>
             <th className="p-4">Plan</th>
             <th className="p-4">Estado</th>
             <th className="p-4 text-right">Acciones</th>
@@ -127,6 +128,10 @@ function ClientsTableSection({
 
               <td className="p-4">
                 {client.contact_name ?? '—'}
+              </td>
+
+              <td className="p-4">
+                {client.pais ?? '—'}
               </td>
 
               <td className="p-4">
