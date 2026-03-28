@@ -3,10 +3,15 @@
 import { Suspense, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import PublicFooter from '@/app/components/layout/PublicFooter';
 import PlanComparisonTable from '@/app/components/PlanComparisonTable';
+import StripeCardForm from './components/StripeCardForm';
 import { PLANS, type PlanSlug } from './constants';
 import { API_URL } from '@/app/lib/api';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 /* =====================================================
    PLAN SUMMARY — lado izquierdo
@@ -16,7 +21,6 @@ function PlanSummary({ slug }: { slug: PlanSlug }) {
   const plan = PLANS[slug];
   return (
     <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 lg:p-8 flex flex-col gap-6">
-
       <div>
         <span className="inline-block bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full mb-3">
           🎉 20% DCTO aplicado
@@ -30,7 +34,6 @@ function PlanSummary({ slug }: { slug: PlanSlug }) {
         <p className="text-gray-500 mt-1 text-sm">{plan.description}</p>
       </div>
 
-      {/* Precio con tachado */}
       <div className={`border-t border-b ${plan.borderColor} py-4`}>
         <p className="text-sm text-gray-500 mb-1">Total a pagar hoy</p>
         <div className="flex items-baseline gap-3 flex-wrap">
@@ -40,9 +43,7 @@ function PlanSummary({ slug }: { slug: PlanSlug }) {
               <span className="text-base font-normal text-gray-400 ml-1">{plan.period}</span>
             )}
           </p>
-          <p className="text-lg text-gray-400 line-through">
-            {plan.priceOriginal} {plan.period}
-          </p>
+          <p className="text-lg text-gray-400 line-through">{plan.priceOriginal} {plan.period}</p>
         </div>
         {plan.period === 'USD/mes' && (
           <p className="text-xs text-gray-400 mt-1">
@@ -51,7 +52,6 @@ function PlanSummary({ slug }: { slug: PlanSlug }) {
         )}
       </div>
 
-      {/* Features */}
       <ul className="space-y-2">
         {plan.features.map((f) => (
           <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
@@ -61,10 +61,7 @@ function PlanSummary({ slug }: { slug: PlanSlug }) {
         ))}
       </ul>
 
-      <Link
-        href="/servicios"
-        className="text-sm text-gray-400 hover:text-gray-600 transition underline text-center"
-      >
+      <Link href="/servicios" className="text-sm text-gray-400 hover:text-gray-600 transition underline text-center">
         ← Ver todos los planes
       </Link>
     </div>
@@ -72,172 +69,122 @@ function PlanSummary({ slug }: { slug: PlanSlug }) {
 }
 
 /* =====================================================
-   CHECKOUT FORM — lado derecho
+   CHECKOUT FORM — lado derecho (2 pasos)
 ===================================================== */
 
 function CheckoutForm({ slug }: { slug: PlanSlug }) {
   const plan = PLANS[slug];
-  const [form, setForm] = useState({
-    nombre: '',
-    empresa: '',
-    email: '',
-    telefono: '',
-    pais: '',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [step, setStep]               = useState<'contact' | 'payment'>('contact');
+  const [clientSecret, setClientSecret] = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState('');
+  const [form, setForm] = useState({ nombre: '', empresa: '', email: '', telefono: '', pais: '' });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
-      const res = await fetch(`${API_URL}/api/payments/create-checkout-session`, {
+      const res  = await fetch(`${API_URL}/api/payments/create-subscription`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan_code: slug,
-          email: form.email,
-          nombre: form.nombre,
-          empresa: form.empresa,
-          pais: form.pais,
-          telefono: form.telefono,
-        }),
+        body: JSON.stringify({ plan_code: slug, ...form }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Error al iniciar el pago. Intenta nuevamente.');
-        setLoading(false);
-        return;
-      }
-
-      // Redirigir a PayPal para aprobar la suscripción
-      window.location.href = data.checkout_url;
+      if (!res.ok) { setError(data.error || 'Error al iniciar el pago.'); setLoading(false); return; }
+      setClientSecret(data.client_secret);
+      setStep('payment');
     } catch {
       setError('No se pudo conectar con el servidor. Intenta nuevamente.');
-      setLoading(false);
     }
+    setLoading(false);
   };
 
+  const returnUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/pago/success?plan=${slug}`
+    : `https://www.finopslatam.com/pago/success?plan=${slug}`;
+
+  if (step === 'payment' && clientSecret) {
+    return (
+      <Elements stripe={stripePromise} options={{ clientSecret, locale: 'es' }}>
+        <StripeCardForm
+          planName={plan.name}
+          priceDiscount={plan.priceDiscount}
+          period={plan.period || ''}
+          badgeBg={plan.badgeBg}
+          returnUrl={returnUrl}
+          onBack={() => setStep('contact')}
+        />
+      </Elements>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleContactSubmit} className="flex flex-col gap-5">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Completa tus datos</h2>
-        <p className="text-gray-500 text-sm mt-1">
-          Serás redirigido a PayPal para completar el pago de forma segura.
-        </p>
+        <p className="text-gray-500 text-sm mt-1">Ingresa tu información para continuar al pago con tarjeta.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">Nombre completo *</label>
-          <input
-            required
-            name="nombre"
-            value={form.nombre}
-            onChange={handleChange}
+          <input required name="nombre" value={form.nombre} onChange={handleChange}
             placeholder="Juan Pérez"
-            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">Empresa *</label>
-          <input
-            required
-            name="empresa"
-            value={form.empresa}
-            onChange={handleChange}
+          <input required name="empresa" value={form.empresa} onChange={handleChange}
             placeholder="Acme Corp"
-            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
       </div>
 
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-gray-700">Email corporativo *</label>
-        <input
-          required
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
+        <input required type="email" name="email" value={form.email} onChange={handleChange}
           placeholder="juan@empresa.com"
-          className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+          className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">Teléfono</label>
-          <input
-            name="telefono"
-            value={form.telefono}
-            onChange={handleChange}
+          <input name="telefono" value={form.telefono} onChange={handleChange}
             placeholder="+56 9 1234 5678"
-            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">País *</label>
-          <select
-            required
-            name="pais"
-            value={form.pais}
-            onChange={handleChange}
-            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          >
+          <select required name="pais" value={form.pais} onChange={handleChange}
+            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
             <option value="">Selecciona tu país</option>
-            <option>México</option>
-            <option>Chile</option>
-            <option>Colombia</option>
-            <option>Argentina</option>
-            <option>Perú</option>
-            <option>Brasil</option>
-            <option>Ecuador</option>
-            <option>Uruguay</option>
-            <option>Bolivia</option>
-            <option>Paraguay</option>
-            <option>Venezuela</option>
-            <option>Otro</option>
+            <option>México</option><option>Chile</option><option>Colombia</option>
+            <option>Argentina</option><option>Perú</option><option>Brasil</option>
+            <option>Ecuador</option><option>Uruguay</option><option>Bolivia</option>
+            <option>Paraguay</option><option>Venezuela</option><option>Otro</option>
           </select>
         </div>
       </div>
 
       {error && (
-        <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-          {error}
-        </p>
+        <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2">{error}</p>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className={`w-full ${plan.badgeBg} hover:opacity-90 text-white font-bold py-3.5 rounded-xl transition text-base mt-2 flex items-center justify-center gap-2`}
-      >
+      <button type="submit" disabled={loading}
+        className={`w-full ${plan.badgeBg} hover:opacity-90 text-white font-bold py-3.5 rounded-xl transition text-base mt-2 flex items-center justify-center gap-2`}>
         {loading ? (
-          <>
-            <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-            Redirigiendo a pago seguro...
-          </>
-        ) : (
-          <>
-            🔒 Pagar con PayPal — {plan.priceDiscount} {plan.period}
-          </>
-        )}
+          <><span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />Procesando...</>
+        ) : <>Continuar al pago con tarjeta →</>}
       </button>
 
       <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
-        <span>🔐 Pago 100% seguro</span>
-        <span>•</span>
-        <span>Powered by PayPal</span>
-        <span>•</span>
+        <span>🔐 Pago 100% seguro</span><span>•</span>
+        <span>Powered by Stripe</span><span>•</span>
         <span>Cancela cuando quieras</span>
       </div>
 
@@ -256,19 +203,17 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
 ===================================================== */
 
 function PagoContent() {
-  const params = useSearchParams();
-  const router = useRouter();
+  const params  = useSearchParams();
+  const router  = useRouter();
   const rawSlug = params.get('plan') ?? '';
-  const slug = rawSlug as PlanSlug;
+  const slug    = rawSlug as PlanSlug;
 
   if (!PLANS[slug]) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-4">
         <p className="text-gray-500 text-lg">Plan no encontrado.</p>
-        <button
-          onClick={() => router.push('/servicios')}
-          className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition"
-        >
+        <button onClick={() => router.push('/servicios')}
+          className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition">
           Ver planes disponibles
         </button>
       </div>
@@ -279,24 +224,18 @@ function PagoContent() {
     <>
       <section className="min-h-screen bg-white py-10 lg:py-16 px-4 lg:px-6">
         <div className="max-w-5xl mx-auto">
-
-          {/* Breadcrumb */}
           <nav className="text-sm text-gray-400 mb-8 flex items-center gap-2">
             <Link href="/servicios" className="hover:text-gray-600 transition">Planes</Link>
             <span>›</span>
             <span className="text-gray-700 font-medium">Contratar {PLANS[slug].name}</span>
           </nav>
-
-          {/* Layout dos columnas */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             <PlanSummary slug={slug} />
             <CheckoutForm slug={slug} />
           </div>
-
         </div>
       </section>
 
-      {/* Tabla comparativa de planes */}
       <section className="bg-gray-50 py-14 lg:py-20 px-4 lg:px-6">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 text-center mb-10">
