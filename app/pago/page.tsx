@@ -3,15 +3,10 @@
 import { Suspense, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
 import PublicFooter from '@/app/components/layout/PublicFooter';
 import PlanComparisonTable from '@/app/components/PlanComparisonTable';
-import StripeCardForm from './components/StripeCardForm';
 import { PLANS, type PlanSlug } from './constants';
 import { API_URL } from '@/app/lib/api';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 /* =====================================================
    PLAN SUMMARY — lado izquierdo
@@ -69,21 +64,19 @@ function PlanSummary({ slug }: { slug: PlanSlug }) {
 }
 
 /* =====================================================
-   CHECKOUT FORM — lado derecho (2 pasos)
+   CHECKOUT FORM
 ===================================================== */
 
 function CheckoutForm({ slug }: { slug: PlanSlug }) {
   const plan = PLANS[slug];
-  const [step, setStep]               = useState<'contact' | 'payment'>('contact');
-  const [clientSecret, setClientSecret] = useState('');
-  const [loading, setLoading]         = useState(false);
-  const [error, setError]             = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
   const [form, setForm] = useState({ nombre: '', empresa: '', email: '', telefono: '', pais: '' });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -95,38 +88,18 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Error al iniciar el pago.'); setLoading(false); return; }
-      setClientSecret(data.client_secret);
-      setStep('payment');
+      window.location.href = data.checkout_url;
     } catch {
       setError('No se pudo conectar con el servidor. Intenta nuevamente.');
     }
     setLoading(false);
   };
 
-  const returnUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/pago/success?plan=${slug}`
-    : `https://www.finopslatam.com/pago/success?plan=${slug}`;
-
-  if (step === 'payment' && clientSecret) {
-    return (
-      <Elements stripe={stripePromise} options={{ clientSecret, locale: 'es' }}>
-        <StripeCardForm
-          planName={plan.name}
-          priceDiscount={plan.priceDiscount}
-          period={plan.period || ''}
-          badgeBg={plan.badgeBg}
-          returnUrl={returnUrl}
-          onBack={() => setStep('contact')}
-        />
-      </Elements>
-    );
-  }
-
   return (
-    <form onSubmit={handleContactSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Completa tus datos</h2>
-        <p className="text-gray-500 text-sm mt-1">Ingresa tu información para continuar al pago con tarjeta.</p>
+        <p className="text-gray-500 text-sm mt-1">Ingresa tu información para continuar al pago con PayPal.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -178,13 +151,13 @@ function CheckoutForm({ slug }: { slug: PlanSlug }) {
       <button type="submit" disabled={loading}
         className={`w-full ${plan.badgeBg} hover:opacity-90 text-white font-bold py-3.5 rounded-xl transition text-base mt-2 flex items-center justify-center gap-2`}>
         {loading ? (
-          <><span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />Procesando...</>
-        ) : <>Continuar al pago con tarjeta →</>}
+          <><span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />Redirigiendo a PayPal...</>
+        ) : <>Continuar al pago →</>}
       </button>
 
       <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
         <span>🔐 Pago 100% seguro</span><span>•</span>
-        <span>Powered by Stripe</span><span>•</span>
+        <span>Powered by PayPal</span><span>•</span>
         <span>Cancela cuando quieras</span>
       </div>
 
