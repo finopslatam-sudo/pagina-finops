@@ -65,10 +65,8 @@ export default function PerfilPage() {
   });
 
   // ── Company info (solo usuarios comerciales) ──
-  const [companyPais, setCompanyPais]   = useState('');
-  const [editPais, setEditPais]         = useState(false);
-  const [savingPais, setSavingPais]     = useState(false);
-  const [successPais, setSuccessPais]   = useState('');
+  const [companyPais, setCompanyPais] = useState('');
+  const [editPais, setEditPais]       = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -110,29 +108,6 @@ export default function PerfilPage() {
   });
 
   /* ================================
-     UPDATE COMPANY PAIS
-  ================================= */
-
-  const handlePaisSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSavingPais(true);
-    setSuccessPais('');
-    try {
-      await apiFetch('/api/client/info', {
-        method: 'PATCH',
-        token,
-        body: { pais: companyPais },
-      });
-      setSuccessPais('País actualizado correctamente');
-      setEditPais(false);
-    } catch (err: any) {
-      setError(err.message || 'Error al actualizar el país');
-    } finally {
-      setSavingPais(false);
-    }
-  };
-
-  /* ================================
      UPDATE PROFILE
   ================================= */
 
@@ -159,10 +134,17 @@ export default function PerfilPage() {
         contact_name: form.contact_name,
       });
 
-      setSuccessProfile(
-        'Perfil actualizado correctamente'
-      );
+      if (user?.client_id) {
+        await apiFetch('/api/client/info', {
+          method: 'PATCH',
+          token,
+          body: { pais: companyPais },
+        });
+      }
+
+      setSuccessProfile('Perfil actualizado correctamente');
       setEditContact(false);
+      setEditPais(false);
     } catch (err: any) {
       setError(err.message || 'Error inesperado');
     } finally {
@@ -239,59 +221,6 @@ export default function PerfilPage() {
             </div>
           )}
 
-          {/* ================= EMPRESA (solo usuarios comerciales) ================= */}
-          {user?.client_id && (
-            <div className="mb-8 p-6 border rounded-xl bg-gray-50 space-y-4">
-              <h3 className="text-base font-semibold text-gray-800">Información de la empresa</h3>
-
-              {successPais && (
-                <div className="p-3 text-sm text-green-700 bg-green-100 rounded">
-                  {successPais}
-                </div>
-              )}
-
-              <form onSubmit={handlePaisSubmit} className="space-y-3">
-                <div className="space-y-1">
-                  <label className="text-sm text-gray-600">País de la empresa</label>
-                  {editPais ? (
-                    <select
-                      value={companyPais}
-                      onChange={e => setCompanyPais(e.target.value)}
-                      className="w-full px-4 py-2 border rounded-lg bg-white"
-                    >
-                      <option value="">Selecciona un país</option>
-                      {PAISES.map(p => <option key={p}>{p}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      value={companyPais || '—'}
-                      disabled
-                      className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-                    />
-                  )}
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => { setEditPais(!editPais); setSuccessPais(''); }}
-                      className="text-blue-600 text-sm font-medium"
-                    >
-                      {editPais ? 'Cancelar' : 'Editar'}
-                    </button>
-                  </div>
-                </div>
-
-                {editPais && (
-                  <button
-                    type="submit"
-                    disabled={savingPais}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm"
-                  >
-                    {savingPais ? 'Guardando…' : 'Guardar país'}
-                  </button>
-                )}
-              </form>
-            </div>
-          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
@@ -330,6 +259,37 @@ export default function PerfilPage() {
                     }))
                   }
                 />
+
+                {user?.client_id && (
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">País</label>
+                    {editPais ? (
+                      <select
+                        value={companyPais}
+                        onChange={e => setCompanyPais(e.target.value)}
+                        className="w-full px-4 py-2 border rounded-lg bg-white"
+                      >
+                        <option value="">Selecciona un país</option>
+                        {PAISES.map(p => <option key={p}>{p}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        value={companyPais || '—'}
+                        disabled
+                        className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                      />
+                    )}
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setEditPais(!editPais)}
+                        className="text-blue-600 text-sm font-medium"
+                      >
+                        {editPais ? 'Cancelar' : 'Editar'}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 <button
                   type="submit"
