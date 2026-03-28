@@ -32,25 +32,33 @@ function PaymentMethodSelector({
         <button
           type="button"
           onClick={() => onChange('paypal')}
-          className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition text-sm font-semibold
+          className={`flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-xl border-2 transition
             ${selected === 'paypal'
-              ? 'border-blue-500 bg-blue-50 text-blue-700'
-              : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-200 bg-white hover:border-gray-300'}`}
         >
           <img src="/icons/paypal.png" alt="PayPal" className="h-10 w-auto" />
+          <span className="text-xs text-gray-500">Tarjeta o cuenta PayPal</span>
         </button>
 
         <button
           type="button"
           onClick={() => onChange('mercadopago')}
-          className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition text-sm font-semibold
+          className={`flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-xl border-2 transition
             ${selected === 'mercadopago'
-              ? 'border-blue-500 bg-blue-50 text-blue-700'
-              : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-200 bg-white hover:border-gray-300'}`}
         >
           <img src="/icons/mercadopago.png" alt="Mercado Pago" className="h-10 w-auto" />
+          <span className="text-xs text-gray-500">Tarjeta o efectivo</span>
         </button>
       </div>
+
+      {selected === 'paypal' && (
+        <p className="mt-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+          No necesitas cuenta PayPal. Al continuar podrás pagar con tu tarjeta de crédito o débito como invitado.
+        </p>
+      )}
     </div>
   );
 }
