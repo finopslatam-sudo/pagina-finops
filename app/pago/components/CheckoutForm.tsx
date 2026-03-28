@@ -38,7 +38,6 @@ function PaymentMethodSelector({
               : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
         >
           <img src="/icons/paypal.png" alt="PayPal" className="h-6 w-auto" />
-          PayPal
         </button>
 
         <button
@@ -50,7 +49,6 @@ function PaymentMethodSelector({
               : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
         >
           <img src="/icons/mercadopago.png" alt="Mercado Pago" className="h-7 w-auto" />
-          Mercado Pago
         </button>
       </div>
     </div>
