@@ -50,6 +50,7 @@ Thumbs.db
 .AppleDouble
 .LSOverride
 Icon?
+!public/icons/
 ._*
 
 # Linux system files
