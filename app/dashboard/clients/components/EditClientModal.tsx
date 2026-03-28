@@ -17,6 +17,7 @@ interface Props {
     email: string;
     contact_name?: string;
     phone?: string;
+    pais?: string;
     is_active: boolean;
     plan_id: number;
   }) => Promise<void>;
@@ -41,6 +42,7 @@ export default function EditClientModal({
   const [email, setEmail] = useState(client.email);
   const [contactName, setContactName] = useState(client.contact_name ?? '');
   const [phone, setPhone] = useState(client.phone ?? '');
+  const [pais, setPais] = useState(client.pais ?? '');
   const [isActive, setIsActive] = useState(client.is_active);
 
   const [planId, setPlanId] = useState(
@@ -77,6 +79,7 @@ export default function EditClientModal({
         email,
         contact_name: contactName || undefined,
         phone: phone || undefined,
+        pais: pais || undefined,
         is_active: isActive,
         plan_id: planId,
       });
@@ -161,6 +164,18 @@ export default function EditClientModal({
           className="w-full border rounded px-3 py-2"
           placeholder="Teléfono"
         />
+
+        <select
+          value={pais}
+          onChange={e => setPais(e.target.value)}
+          className="w-full border rounded px-3 py-2 bg-white"
+        >
+          <option value="">País (opcional)</option>
+          <option>México</option><option>Chile</option><option>Colombia</option>
+          <option>Argentina</option><option>Perú</option><option>Brasil</option>
+          <option>Ecuador</option><option>Uruguay</option><option>Bolivia</option>
+          <option>Paraguay</option><option>Venezuela</option><option>Otro</option>
+        </select>
 
         <select
           value={planId}

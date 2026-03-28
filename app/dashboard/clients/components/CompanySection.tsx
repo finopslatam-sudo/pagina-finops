@@ -5,13 +5,14 @@ interface Props {
   email:       string; setEmail:       (v: string) => void;
   contactName: string; setContactName: (v: string) => void;
   phone:       string; setPhone:       (v: string) => void;
+  pais:        string; setPais:        (v: string) => void;
   planId:      number; setPlanId:      (v: number) => void;
 }
 
 export default function CompanySection({
   companyName, setCompanyName, email, setEmail,
   contactName, setContactName, phone, setPhone,
-  planId, setPlanId,
+  pais, setPais, planId, setPlanId,
 }: Props) {
   return (
     <>
@@ -45,11 +46,22 @@ export default function CompanySection({
         onChange={e => setContactName(e.target.value)}
       />
       <input
-        className="w-full px-4 py-2 border rounded-lg mb-4"
+        className="w-full px-4 py-2 border rounded-lg mb-3"
         placeholder="Teléfono"
         value={phone}
         onChange={e => setPhone(e.target.value)}
       />
+      <select
+        className="w-full px-4 py-2 border rounded-lg mb-4 bg-white"
+        value={pais}
+        onChange={e => setPais(e.target.value)}
+      >
+        <option value="">País (opcional)</option>
+        <option>México</option><option>Chile</option><option>Colombia</option>
+        <option>Argentina</option><option>Perú</option><option>Brasil</option>
+        <option>Ecuador</option><option>Uruguay</option><option>Bolivia</option>
+        <option>Paraguay</option><option>Venezuela</option><option>Otro</option>
+      </select>
     </>
   );
 }

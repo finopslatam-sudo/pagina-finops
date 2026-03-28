@@ -10,6 +10,7 @@ export function useCreateClientForm() {
   const [email, setEmail]             = useState('');
   const [contactName, setContactName] = useState('');
   const [phone, setPhone]             = useState('');
+  const [pais, setPais]               = useState('');
   const [isActive, setIsActive]       = useState(true);
   const [planId, setPlanId]           = useState<number>(PLANS[0].id);
 
@@ -36,7 +37,7 @@ export function useCreateClientForm() {
   const [error, setError]     = useState<string | null>(null);
 
   const reset = () => {
-    setCompanyName(''); setEmail(''); setContactName(''); setPhone('');
+    setCompanyName(''); setEmail(''); setContactName(''); setPhone(''); setPais('');
     setIsActive(true);  setPlanId(PLANS[0].id);
     setOwnerEmail('');  setOwnerName(''); setOwnerPassword(''); setOwnerPasswordConfirm('');
     setShowOwnerPass(false); setShowOwnerPass2(false);
@@ -76,6 +77,7 @@ export function useCreateClientForm() {
       email,
       contact_name: contactName || undefined,
       phone: phone || undefined,
+      pais: pais || undefined,
       is_active: isActive,
       plan_id: planId,
       owner: { email: ownerEmail, contact_name: ownerName, password: ownerPassword, password_confirm: ownerPasswordConfirm },
@@ -92,7 +94,7 @@ export function useCreateClientForm() {
   return {
     /* client */
     companyName, setCompanyName, email, setEmail, contactName, setContactName,
-    phone, setPhone, isActive, setIsActive, planId, setPlanId,
+    phone, setPhone, pais, setPais, isActive, setIsActive, planId, setPlanId,
     /* owner */
     ownerEmail, setOwnerEmail, ownerName, setOwnerName,
     ownerPassword, setOwnerPassword, ownerPasswordConfirm, setOwnerPasswordConfirm,

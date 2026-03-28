@@ -37,7 +37,7 @@ function PaymentMethodSelector({
               ? 'border-blue-500 bg-blue-50 text-blue-700'
               : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
         >
-          <img src="/icons/paypal.svg" alt="PayPal" className="h-5 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          <img src="/icons/paypal.svg" alt="PayPal" className="h-6 w-auto" />
           PayPal
         </button>
 
@@ -49,7 +49,7 @@ function PaymentMethodSelector({
               ? 'border-blue-500 bg-blue-50 text-blue-700'
               : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
         >
-          <img src="/icons/mercadopago.svg" alt="Mercado Pago" className="h-5 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          <img src="/icons/mercadopago.svg" alt="Mercado Pago" className="h-7 w-auto" />
           Mercado Pago
         </button>
       </div>

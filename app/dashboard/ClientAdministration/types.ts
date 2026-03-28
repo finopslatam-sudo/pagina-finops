@@ -3,6 +3,7 @@ export interface ClientInfo {
   email: string;
   contact_name: string;
   phone: string;
+  pais?: string | null;
 }
 
 export interface Subscription {

@@ -23,6 +23,7 @@ export default function CompanyInfoCard({ client }: Props) {
       <Info label="Email" value={client?.email || "—"} />
       <Info label="Contacto" value={client?.contact_name || "—"} />
       <Info label="Teléfono" value={client?.phone || "—"} />
+      <Info label="País" value={client?.pais || "—"} />
     </div>
   );
 }

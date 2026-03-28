@@ -22,6 +22,7 @@ export interface AdminClient {
   email: string;
   contact_name: string | null;
   phone: string | null;
+  pais: string | null;
   is_active: boolean;
   plan: string | null;
   created_at: string;
@@ -37,6 +38,7 @@ export type CreateClientPayload = {
   email: string;
   contact_name?: string;
   phone?: string;
+  pais?: string;
   is_active: boolean;
   plan_id: number;
 
