@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { API_URL } from '@/app/lib/api';
 
 type Status = 'loading' | 'success' | 'rejected' | 'error';
 
-export default function PatpassReturnPage() {
+function PatpassReturnContent() {
   const searchParams = useSearchParams();
   const router       = useRouter();
   const [status, setStatus]     = useState<Status>('loading');
@@ -113,5 +113,17 @@ export default function PatpassReturnPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function PatpassReturnPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full" />
+      </div>
+    }>
+      <PatpassReturnContent />
+    </Suspense>
   );
 }
