@@ -13,9 +13,10 @@ interface FormState {
   email: string;
   telefono: string;
   pais: string;
+  rut: string;
 }
 
-const INITIAL_FORM: FormState = { nombre: '', empresa: '', email: '', telefono: '', pais: '' };
+const INITIAL_FORM: FormState = { nombre: '', empresa: '', email: '', telefono: '', pais: '', rut: '' };
 
 /* ─── Selector de método de pago ─── */
 function PaymentMethodSelector({
@@ -200,6 +201,21 @@ export default function CheckoutForm({ slug }: { slug: PlanSlug }) {
           </select>
         </div>
       </div>
+
+      {method === 'webpay' && (
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">RUT *</label>
+          <input
+            required={method === 'webpay'}
+            name="rut"
+            value={form.rut}
+            onChange={handleChange}
+            placeholder="12.345.678-9"
+            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p className="text-xs text-gray-400">RUT del titular de la tarjeta (requerido por Transbank)</p>
+        </div>
+      )}
 
       {error && (
         <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2">
