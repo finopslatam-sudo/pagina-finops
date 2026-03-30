@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { API_URL } from '@/app/lib/api';
 import { PLANS, type PlanSlug } from '../constants';
 
-type PaymentMethod = 'paypal' | 'mercadopago';
+type PaymentMethod = 'paypal' | 'mercadopago' | 'webpay';
 
 interface FormState {
   nombre: string;
@@ -28,35 +28,52 @@ function PaymentMethodSelector({
   return (
     <div>
       <p className="text-sm font-medium text-gray-700 mb-2">Método de pago</p>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <button
           type="button"
           onClick={() => onChange('paypal')}
-          className={`flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-xl border-2 transition
+          className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl border-2 transition
             ${selected === 'paypal'
               ? 'border-blue-500 bg-blue-50'
               : 'border-gray-200 bg-white hover:border-gray-300'}`}
         >
           <img src="/icons/paypal.png" alt="PayPal" className="h-10 w-auto" />
-          <span className="text-xs text-gray-500">Tarjeta o cuenta PayPal</span>
+          <span className="text-xs text-gray-500">PayPal</span>
         </button>
 
         <button
           type="button"
           onClick={() => onChange('mercadopago')}
-          className={`flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-xl border-2 transition
+          className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl border-2 transition
             ${selected === 'mercadopago'
               ? 'border-blue-500 bg-blue-50'
               : 'border-gray-200 bg-white hover:border-gray-300'}`}
         >
           <img src="/icons/mercadopago.png" alt="Mercado Pago" className="h-10 w-auto" />
-          <span className="text-xs text-gray-500">Tarjeta o efectivo</span>
+          <span className="text-xs text-gray-500">Mercado Pago</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onChange('webpay')}
+          className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl border-2 transition
+            ${selected === 'webpay'
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-200 bg-white hover:border-gray-300'}`}
+        >
+          <img src="/icons/webpay.png" alt="Webpay" className="h-10 w-auto" />
+          <span className="text-xs text-gray-500">Webpay</span>
         </button>
       </div>
 
       {selected === 'paypal' && (
         <p className="mt-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
           No necesitas cuenta PayPal. Al continuar podrás pagar con tu tarjeta de crédito o débito como invitado.
+        </p>
+      )}
+      {selected === 'webpay' && (
+        <p className="mt-2 text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+          Paga con tarjeta de crédito o débito chilena. Serás redirigido a Webpay para autorizar el débito automático mensual.
         </p>
       )}
     </div>
@@ -80,10 +97,14 @@ export default function CheckoutForm({ slug }: { slug: PlanSlug }) {
     setError('');
 
     try {
-      const endpoint =
-        method === 'mercadopago'
-          ? `${API_URL}/api/payments/mercadopago/subscription`
-          : `${API_URL}/api/payments/create-subscription`;
+      let endpoint: string;
+      if (method === 'mercadopago') {
+        endpoint = `${API_URL}/api/payments/mercadopago/subscription`;
+      } else if (method === 'webpay') {
+        endpoint = `${API_URL}/api/patpass/create-inscription`;
+      } else {
+        endpoint = `${API_URL}/api/payments/create-subscription`;
+      }
 
       const res  = await fetch(endpoint, {
         method: 'POST',
@@ -98,9 +119,12 @@ export default function CheckoutForm({ slug }: { slug: PlanSlug }) {
         return;
       }
 
-      // PayPal devuelve checkout_url; Mercado Pago devuelve init_point
-      const redirectUrl = data.checkout_url || data.init_point;
+      // PayPal: checkout_url | MercadoPago: init_point | Webpay: redirect_url
+      const redirectUrl = data.checkout_url || data.init_point || data.redirect_url;
       if (redirectUrl) {
+        if (method === 'webpay' && data.buy_order) {
+          localStorage.setItem('patpass_buy_order', data.buy_order);
+        }
         window.location.href = redirectUrl;
       } else {
         setError('No se recibió URL de pago. Intenta nuevamente.');
@@ -112,7 +136,7 @@ export default function CheckoutForm({ slug }: { slug: PlanSlug }) {
     }
   };
 
-  const methodLabel = method === 'mercadopago' ? 'Mercado Pago' : 'PayPal';
+  const methodLabel = method === 'mercadopago' ? 'Mercado Pago' : method === 'webpay' ? 'Webpay' : 'PayPal';
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
