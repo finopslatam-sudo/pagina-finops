@@ -1,15 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PlanCard from './components/PlanCard';
+import ContractModal from './components/ContractModal';
 import PlanComparisonTable from '@/app/components/PlanComparisonTable';
 import PublicFooter from '@/app/components/layout/PublicFooter';
 import { PLAN_SLUGS } from '@/app/pago/constants';
 
 export default function Servicios() {
   const router = useRouter();
+  const [showConsultoriaModal, setShowConsultoriaModal] = useState(false);
 
   const handleSelectPlan = (planTitle: string) => {
+    if (planTitle === 'Consultoría FinOps Estratégica') {
+      setShowConsultoriaModal(true);
+      return;
+    }
     const slug = PLAN_SLUGS[planTitle];
     if (slug) router.push(`/pago?plan=${slug}`);
   };
@@ -126,6 +133,13 @@ export default function Servicios() {
 
 
       <PublicFooter />
+
+      {showConsultoriaModal && (
+        <ContractModal
+          plan="Consultoría FinOps Estratégica"
+          onClose={() => setShowConsultoriaModal(false)}
+        />
+      )}
     </main>
   );
 }
