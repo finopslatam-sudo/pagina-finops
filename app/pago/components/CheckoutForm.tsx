@@ -67,11 +67,6 @@ function PaymentMethodSelector({
         </button>
       </div>
 
-      {selected === 'paypal' && (
-        <p className="mt-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-          No necesitas cuenta PayPal. Al continuar podrás pagar con tu tarjeta de crédito o débito como invitado.
-        </p>
-      )}
       {selected === 'webpay' && (
         <p className="mt-2 text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
           Paga con tarjeta de crédito o débito chilena. Serás redirigido a Webpay para autorizar el débito automático mensual.
