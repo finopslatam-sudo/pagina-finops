@@ -89,6 +89,8 @@ export default function PublicNavbar() {
               <nav className="hidden md:flex items-center space-x-8 mx-auto">
                 <Link href="/" className="nav-link">Inicio</Link>
                 <Link href="/servicios" className="nav-link">Servicios</Link>
+                <Link href="/finops-chile" className="nav-link">FinOps Chile</Link>
+                <Link href="/finops-latinoamerica" className="nav-link">FinOps LATAM</Link>
                 <Link href="/quienes-somos" className="nav-link">Quiénes Somos</Link>
                 <Link href="/blog" className="nav-link">Blog</Link>
                 <Link href="/contacto" className="nav-link">Contacto</Link>
@@ -164,6 +166,12 @@ export default function PublicNavbar() {
               </Link>
               <Link href="/servicios" className="block font-medium text-gray-700">
                 Servicios
+              </Link>
+              <Link href="/finops-chile" className="block font-medium text-gray-700">
+                FinOps Chile
+              </Link>
+              <Link href="/finops-latinoamerica" className="block font-medium text-gray-700">
+                FinOps LATAM
               </Link>
               <Link href="/quienes-somos" className="block font-medium text-gray-700">
                 Quiénes Somos

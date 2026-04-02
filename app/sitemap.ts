@@ -3,7 +3,15 @@ import type { MetadataRoute } from 'next';
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://www.finopslatam.com';
 
-const PUBLIC_ROUTES = ['/', '/servicios', '/quienes-somos', '/contacto', '/blog'];
+const PUBLIC_ROUTES = [
+  '/',
+  '/servicios',
+  '/quienes-somos',
+  '/contacto',
+  '/blog',
+  '/finops-chile',
+  '/finops-latinoamerica',
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
