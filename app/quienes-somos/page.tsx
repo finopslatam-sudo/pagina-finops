@@ -1,4 +1,33 @@
+import type { Metadata } from 'next';
 import PublicFooter from '@/app/components/layout/PublicFooter';
+
+export const metadata: Metadata = {
+  title: 'Quiénes Somos | FinOps Chile y LATAM',
+  description:
+    'Conoce al equipo de FinOpsLatam: especialistas en optimización de costos AWS, FinOps y gobierno cloud para empresas de Chile y Latinoamérica.',
+  keywords: [
+    'equipo FinOps Chile',
+    'consultores FinOps LATAM',
+    'optimización costos AWS',
+    'gobierno cloud',
+  ],
+  alternates: {
+    canonical: '/quienes-somos',
+  },
+  openGraph: {
+    title: 'Quiénes Somos | FinOps Chile y LATAM',
+    description:
+      'Especialistas en FinOps, cloud y data para reducir costos AWS en Chile y Latinoamérica.',
+    url: '/quienes-somos',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Quiénes Somos | FinOps Chile y LATAM',
+    description:
+      'Especialistas en FinOps, cloud y data para reducir costos AWS en Chile y Latinoamérica.',
+  },
+};
 
 export default function QuienesSomos() {
   return (
