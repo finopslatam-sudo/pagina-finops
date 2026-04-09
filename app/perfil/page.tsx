@@ -2,60 +2,62 @@
 
 export const dynamic = "force-dynamic";
 
-/* =====================================================
-   PERFIL — FINOPSLATAM
-   Gestión de datos personales y seguridad
-===================================================== */
-
-/* =====================================================
-   IMPORTS
-===================================================== */
-
 import { useEffect, useState } from 'react';
 import PrivateRoute from '@/app/components/Auth/PrivateRoute';
 import { useAuth } from '@/app/context/AuthContext';
-import { apiFetch } from '@/app/lib/api';
 import { PasswordFields } from '@/app/components/Auth/PasswordFields';
-import { ProfileInput, EditableField } from './components/ProfileFields';
+import { apiFetch } from '@/app/lib/api';
+import { EditableField, ProfileInput } from './components/ProfileFields';
 
 const PAISES = [
-  'México','Chile','Colombia','Argentina','Perú','Brasil',
-  'Ecuador','Uruguay','Bolivia','Paraguay','Venezuela','Otro',
+  'México', 'Chile', 'Colombia', 'Argentina', 'Perú', 'Brasil',
+  'Ecuador', 'Uruguay', 'Bolivia', 'Paraguay', 'Venezuela', 'Otro',
 ];
 
-/* =====================================================
-   COMPONENT
-===================================================== */
+type MfaPolicy =
+  | 'disabled'
+  | 'optional'
+  | 'required'
+  | 'required_for_admins';
 
-/**
- * PerfilPage
- *
- * Página protegida de perfil del usuario.
- *
- * Responsabilidades:
- * - Mostrar datos del usuario autenticado
- * - Permitir actualización de contacto
- * - Permitir cambio de contraseña
- *
- * Seguridad:
- * - Protegida por <PrivateRoute />
- * - JWT requerido
- * - force_password_change respetado
- *
- * Importante:
- * - No gestiona autenticación
- * - No gestiona permisos
- * - Backend valida todo
- */
+interface MfaStatus {
+  policy: MfaPolicy;
+  enabled: boolean;
+  required_now: boolean;
+  can_disable: boolean;
+  has_recovery_codes: boolean;
+  confirmed_at?: string | null;
+  last_used_at?: string | null;
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
+}
+
+const POLICY_LABELS: Record<MfaPolicy, string> = {
+  disabled: 'Desactivado',
+  optional: 'Opcional por usuario',
+  required: 'Obligatorio para todos',
+  required_for_admins: 'Obligatorio para owners y admins',
+};
+
 export default function PerfilPage() {
   const { user, token, updateUser, logout } = useAuth();
-  /* ================================
-     STATE
-  ================================= */
 
   const [editContact, setEditContact] = useState(false);
+  const [editPais, setEditPais] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState('');
+  const [companyPais, setCompanyPais] = useState('');
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
+  const [loadingMfa, setLoadingMfa] = useState(false);
+
+  const [successProfile, setSuccessProfile] = useState('');
+  const [error, setError] = useState('');
 
   const [form, setForm] = useState({
     email: '',
@@ -64,9 +66,11 @@ export default function PerfilPage() {
     confirmPassword: '',
   });
 
-  // ── Company info (solo usuarios comerciales) ──
-  const [companyPais, setCompanyPais] = useState('');
-  const [editPais, setEditPais]       = useState(false);
+  const [mfaStatus, setMfaStatus] = useState<MfaStatus | null>(null);
+  const [mfaSetup, setMfaSetup] = useState<{ secret: string; otpauth_url: string } | null>(null);
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaCurrentPassword, setMfaCurrentPassword] = useState('');
+  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -77,43 +81,35 @@ export default function PerfilPage() {
       contact_name: user.contact_name || '',
     }));
 
-    // Cargar pais de empresa para usuarios comerciales
+    if (token) {
+      apiFetch<{ mfa: MfaStatus }>('/api/me/security', { token })
+        .then((res) => setMfaStatus(res.mfa))
+        .catch(() => {});
+    }
+
     if (user.client_id && token) {
       apiFetch<{ pais?: string | null }>('/api/client', { token })
-        .then(res => setCompanyPais(res.pais || ''))
+        .then((res) => setCompanyPais(res.pais || ''))
         .catch(() => {});
     }
   }, [user, token]);
-  
-
-  const [loadingProfile, setLoadingProfile] = useState(false);
-  const [loadingPassword, setLoadingPassword] = useState(false);
-
-  const [successProfile, setSuccessProfile] = useState('');
-  const [error, setError] = useState('');
-  
-  /* ================================
-     PASSWORD VALIDATION UI
-  ================================= */
 
   const { allValid, component: passwordUI } = PasswordFields({
     currentPassword,
     setCurrentPassword,
     password: form.password,
-    setPassword: (v: string) =>
-      setForm((p) => ({ ...p, password: v })),
+    setPassword: (v: string) => setForm((p) => ({ ...p, password: v })),
     confirm: form.confirmPassword,
-    setConfirm: (v: string) =>
-      setForm((p) => ({ ...p, confirmPassword: v })),
+    setConfirm: (v: string) => setForm((p) => ({ ...p, confirmPassword: v })),
   });
 
-  /* ================================
-     UPDATE PROFILE
-  ================================= */
+  const refreshMfaStatus = async () => {
+    if (!token) return;
+    const res = await apiFetch<{ mfa: MfaStatus }>('/api/me/security', { token });
+    setMfaStatus(res.mfa);
+  };
 
-  const handleProfileSubmit = async (
-    e: React.FormEvent
-  ) => {
+  const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessProfile('');
@@ -145,27 +141,19 @@ export default function PerfilPage() {
       setSuccessProfile('Perfil actualizado correctamente');
       setEditContact(false);
       setEditPais(false);
-    } catch (err: any) {
-      setError(err.message || 'Error inesperado');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Error inesperado'));
     } finally {
       setLoadingProfile(false);
     }
   };
 
-  /* ================================
-     CHANGE PASSWORD
-  ================================= */
-
-  const handlePasswordSubmit = async (
-    e: React.FormEvent
-  ) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (!allValid) {
-      setError(
-        'La contraseña no cumple los requisitos'
-      );
+      setError('La contraseña no cumple los requisitos');
       return;
     }
 
@@ -178,37 +166,108 @@ export default function PerfilPage() {
         body: {
           current_password: currentPassword,
           new_password: form.password,
-          
         },
       });
 
-      alert(
-        'Contraseña cambiada con éxito. Debes iniciar sesión nuevamente.'
-      );
-
-      // 🔒 Logout forzado por seguridad
+      alert('Contraseña cambiada con éxito. Debes iniciar sesión nuevamente.');
       logout();
-    } catch (err: any) {
-      setError(err.message || 'Error inesperado');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Error inesperado'));
     } finally {
       setLoadingPassword(false);
     }
   };
 
-  /* ================================
-     RENDER
-  ================================= */
+  const handleStartMfaSetup = async () => {
+    if (!token) return;
+    setError('');
+    setLoadingMfa(true);
+
+    try {
+      const res = await apiFetch<{ secret: string; otpauth_url: string }>('/api/me/mfa/setup', {
+        method: 'POST',
+        token,
+      });
+      setMfaSetup(res);
+      setRecoveryCodes([]);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'No se pudo iniciar la configuración MFA'));
+    } finally {
+      setLoadingMfa(false);
+    }
+  };
+
+  const handleConfirmMfa = async () => {
+    if (!token || !mfaCode.trim()) return;
+    setError('');
+    setLoadingMfa(true);
+
+    try {
+      const res = await apiFetch<{ mfa: MfaStatus; recovery_codes: string[] }>('/api/me/mfa/confirm', {
+        method: 'POST',
+        token,
+        body: { code: mfaCode.trim() },
+      });
+      setMfaSetup(null);
+      setMfaCode('');
+      setRecoveryCodes(res.recovery_codes || []);
+      setMfaStatus(res.mfa);
+      updateUser({ mfa_enabled: true, mfa_required_now: res.mfa.required_now });
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'No se pudo confirmar MFA'));
+    } finally {
+      setLoadingMfa(false);
+    }
+  };
+
+  const handleDisableMfa = async () => {
+    if (!token || !mfaCurrentPassword.trim()) return;
+    setError('');
+    setLoadingMfa(true);
+
+    try {
+      const res = await apiFetch<{ mfa: MfaStatus }>('/api/me/mfa/disable', {
+        method: 'POST',
+        token,
+        body: { current_password: mfaCurrentPassword },
+      });
+      setMfaCurrentPassword('');
+      setMfaSetup(null);
+      setRecoveryCodes([]);
+      setMfaStatus(res.mfa);
+      updateUser({ mfa_enabled: false, mfa_required_now: res.mfa.required_now });
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'No se pudo desactivar MFA'));
+    } finally {
+      setLoadingMfa(false);
+    }
+  };
+
+  const handleRegenerateRecoveryCodes = async () => {
+    if (!token) return;
+    setError('');
+    setLoadingMfa(true);
+
+    try {
+      const res = await apiFetch<{ recovery_codes: string[] }>('/api/me/mfa/recovery-codes', {
+        method: 'POST',
+        token,
+      });
+      setRecoveryCodes(res.recovery_codes || []);
+      await refreshMfaStatus();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'No se pudieron regenerar los recovery codes'));
+    } finally {
+      setLoadingMfa(false);
+    }
+  };
 
   return (
     <PrivateRoute>
       <main className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="bg-white w-full max-w-5xl mx-auto rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-semibold mb-8">Mi Perfil</h2>
 
-          <h2 className="text-2xl font-semibold mb-8">
-            Mi Perfil
-          </h2>
-
-          {/* MESSAGES */}
           {error && (
             <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded">
               {error}
@@ -221,37 +280,22 @@ export default function PerfilPage() {
             </div>
           )}
 
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-
-            {/* ================= DATOS ================= */}
             <div className="space-y-10">
-              <h3 className="text-lg font-semibold">
-                Datos del perfil
-              </h3>
+              <h3 className="text-lg font-semibold">Datos del perfil</h3>
 
-              <ProfileInput
-                label="Correo"
-                value={form.email}
-              />
-
+              <ProfileInput label="Correo" value={form.email} />
               <ProfileInput
                 label="Rol"
                 value={user?.global_role || user?.client_role || '—'}
               />
 
-              {/* EDITABLE */}
-              <form
-                onSubmit={handleProfileSubmit}
-                className="space-y-6"
-              >
+              <form onSubmit={handleProfileSubmit} className="space-y-6">
                 <EditableField
                   label="Nombre de contacto"
                   value={form.contact_name}
                   editable={editContact}
-                  onEdit={() =>
-                    setEditContact(!editContact)
-                  }
+                  onEdit={() => setEditContact(!editContact)}
                   onChange={(v) =>
                     setForm((p) => ({
                       ...p,
@@ -266,11 +310,11 @@ export default function PerfilPage() {
                     {editPais ? (
                       <select
                         value={companyPais}
-                        onChange={e => setCompanyPais(e.target.value)}
+                        onChange={(e) => setCompanyPais(e.target.value)}
                         className="w-full px-4 py-2 border rounded-lg bg-white"
                       >
                         <option value="">Selecciona un país</option>
-                        {PAISES.map(p => <option key={p}>{p}</option>)}
+                        {PAISES.map((p) => <option key={p}>{p}</option>)}
                       </select>
                     ) : (
                       <input
@@ -296,43 +340,152 @@ export default function PerfilPage() {
                   disabled={loadingProfile}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
                 >
-                  {loadingProfile
-                    ? 'Guardando…'
-                    : 'Guardar perfil'}
+                  {loadingProfile ? 'Guardando…' : 'Guardar perfil'}
                 </button>
               </form>
             </div>
 
-            {/* ================= SEGURIDAD ================= */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">
-                Seguridad
-              </h3>
+            <div className="space-y-10">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Seguridad</h3>
+                <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                  {passwordUI}
 
-              <form
-                onSubmit={handlePasswordSubmit}
-                className="space-y-4"
-              >
-                {passwordUI}
+                  <button
+                    type="submit"
+                    disabled={loadingPassword || !allValid}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+                  >
+                    {loadingPassword ? 'Cambiando…' : 'Cambiar contraseña'}
+                  </button>
+                </form>
+              </div>
 
-                <button
-                  type="submit"
-                  disabled={
-                    loadingPassword || !allValid
-                  }
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
-                >
-                  {loadingPassword
-                    ? 'Cambiando…'
-                    : 'Cambiar contraseña'}
-                </button>
-              </form>
+              <div className="rounded-2xl border border-gray-200 p-6 space-y-5">
+                <div>
+                  <h4 className="text-base font-semibold text-gray-900">
+                    Autenticación multifactor
+                  </h4>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Tu organización puede dejar MFA opcional u obligatorio. Si está permitido, puedes activarlo aquí.
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-blue-50 px-4 py-4 text-sm text-blue-900 space-y-1">
+                  <p><strong>Política:</strong> {mfaStatus ? POLICY_LABELS[mfaStatus.policy] : 'Cargando...'}</p>
+                  <p><strong>Estado:</strong> {mfaStatus?.enabled ? 'Activado' : 'Desactivado'}</p>
+                  {mfaStatus?.confirmed_at && (
+                    <p><strong>Activado el:</strong> {new Date(mfaStatus.confirmed_at).toLocaleString()}</p>
+                  )}
+                  {mfaStatus?.last_used_at && (
+                    <p><strong>Último uso:</strong> {new Date(mfaStatus.last_used_at).toLocaleString()}</p>
+                  )}
+                </div>
+
+                {!mfaStatus?.enabled && (
+                  <button
+                    type="button"
+                    onClick={handleStartMfaSetup}
+                    disabled={loadingMfa}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg disabled:opacity-50"
+                  >
+                    {loadingMfa ? 'Preparando MFA…' : 'Activar multifactor'}
+                  </button>
+                )}
+
+                {mfaSetup && (
+                  <div className="space-y-4 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                    <p className="text-sm text-indigo-900">
+                      Configura tu app autenticadora con este secreto y luego ingresa el código de 6 dígitos.
+                    </p>
+                    <div className="font-mono text-sm break-all text-indigo-950">
+                      {mfaSetup.secret}
+                    </div>
+                    <a
+                      href={mfaSetup.otpauth_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-indigo-700 underline"
+                    >
+                      Abrir configuración en la app autenticadora
+                    </a>
+                    <div className="flex gap-3">
+                      <input
+                        value={mfaCode}
+                        onChange={(e) => setMfaCode(e.target.value)}
+                        placeholder="Código de 6 dígitos"
+                        className="flex-1 px-4 py-2 border rounded-lg bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleConfirmMfa}
+                        disabled={loadingMfa}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+                      >
+                        Confirmar
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {mfaStatus?.enabled && (
+                  <div className="space-y-4">
+                    <button
+                      type="button"
+                      onClick={handleRegenerateRecoveryCodes}
+                      disabled={loadingMfa}
+                      className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg disabled:opacity-50"
+                    >
+                      Regenerar recovery codes
+                    </button>
+
+                    {mfaStatus.can_disable && (
+                      <div className="space-y-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                        <p className="text-sm text-amber-900">
+                          Para desactivar MFA, confirma tu contraseña actual.
+                        </p>
+                        <input
+                          type="password"
+                          value={mfaCurrentPassword}
+                          onChange={(e) => setMfaCurrentPassword(e.target.value)}
+                          placeholder="Contraseña actual"
+                          className="w-full px-4 py-2 border rounded-lg bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleDisableMfa}
+                          disabled={loadingMfa}
+                          className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg disabled:opacity-50"
+                        >
+                          Desactivar multifactor
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {recoveryCodes.length > 0 && (
+                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                    <p className="text-sm font-medium text-emerald-900 mb-3">
+                      Guarda estos recovery codes en un lugar seguro.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {recoveryCodes.map((code) => (
+                        <div
+                          key={code}
+                          className="font-mono text-sm bg-white border rounded-lg px-3 py-2"
+                        >
+                          {code}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-
           </div>
         </div>
       </main>
     </PrivateRoute>
   );
 }
-

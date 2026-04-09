@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { useClientAdministration } from "./hooks/useClientAdministration";
 import CompanyInfoCard from "./components/CompanyInfoCard";
+import SecurityPolicyCard from "./components/SecurityPolicyCard";
 import SubscriptionCard from "./components/SubscriptionCard";
 import UsersTable from "./components/UsersTable";
 import UserFormModal from "./components/UserFormModal";
@@ -42,6 +43,7 @@ export default function ClientAdministrationPage() {
     users,
     awsAccounts,
     awsAccountsLimit,
+    savingSecurity,
     userLimit,
     userLimitReached,
     // upgrade
@@ -56,6 +58,7 @@ export default function ClientAdministrationPage() {
     openEditUser,
     deleteUser,
     activateUser,
+    updateMfaPolicy,
     // user modal
     showUserModal,
     editingUser,
@@ -101,8 +104,14 @@ export default function ClientAdministrationPage() {
       </div>
 
       {/* Organization + Plan */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <CompanyInfoCard client={client} />
+
+        <SecurityPolicyCard
+          client={client}
+          saving={savingSecurity}
+          onChangePolicy={updateMfaPolicy}
+        />
 
         <SubscriptionCard
           subscription={subscription}

@@ -34,8 +34,28 @@ export interface User {
   contact_name?: string | null;
 
   plan_code?: string | null;
+  mfa_enabled?: boolean;
+  mfa_policy?: "disabled" | "optional" | "required" | "required_for_admins";
+  mfa_required_now?: boolean;
+  mfa_confirmed_at?: string | null;
+  mfa_last_used_at?: string | null;
+  mfa_has_recovery_codes?: boolean;
 }
 
+export interface AuthSuccessResponse {
+  access_token: string;
+  user: User;
+  recovery_codes?: string[];
+}
+
+export interface AuthChallengeResponse {
+  user: User;
+  challenge_token: string;
+  methods?: string[];
+  message?: string;
+  mfa_required?: boolean;
+  mfa_enrollment_required?: boolean;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -64,7 +84,8 @@ interface AuthContextType {
   sessionWarningVisible: boolean;
   sessionCountdown: number;
 
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthSuccessResponse | AuthChallengeResponse>;
+  completeAuth: (payload: AuthSuccessResponse) => void;
   logout: (reason?: "expired") => void;
   staySignedIn: () => void;
   updateUser: (partial: Partial<User>) => void;
@@ -160,6 +181,17 @@ export function AuthProvider({
     setSessionCountdown(SESSION_WARNING_SECONDS);
 
     router.replace("/");
+  };
+
+  const completeAuth = (payload: AuthSuccessResponse) => {
+    isLoggingOutRef.current = false;
+
+    setToken(payload.access_token);
+    setUser(payload.user);
+
+    localStorage.setItem("finops_token", payload.access_token);
+    localStorage.setItem("finops_user", JSON.stringify(payload.user));
+    localStorage.removeItem("selectedAwsAccount");
   };
 
   /* =========================
@@ -326,31 +358,14 @@ export function AuthProvider({
     email: string,
     password: string
   ) => {
-    isLoggingOutRef.current = false;
-
-    const data = await apiFetch<{
-      access_token: string;
-      user: User;
-    }>("/api/auth/login", {
+    const data = await apiFetch<AuthSuccessResponse | AuthChallengeResponse>("/api/auth/login", {
       method: "POST",
       body: { email, password },
     });
-
-    setToken(data.access_token);
-    setUser(data.user);
-
-    localStorage.setItem(
-      "finops_token",
-      data.access_token
-    );
-
-    localStorage.setItem(
-      "finops_user",
-      JSON.stringify(data.user)
-    );
-    localStorage.removeItem("selectedAwsAccount");
-
-    router.replace("/dashboard");
+    if ("access_token" in data) {
+      completeAuth(data);
+    }
+    return data;
   };
 
   /* =========================
@@ -426,6 +441,7 @@ export function AuthProvider({
         sessionWarningVisible,
         sessionCountdown,
         login,
+        completeAuth,
         logout,
         staySignedIn,
         updateUser,

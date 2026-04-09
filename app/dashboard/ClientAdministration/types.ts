@@ -4,6 +4,8 @@ export interface ClientInfo {
   contact_name: string;
   phone: string;
   pais?: string | null;
+  mfa_policy?: "disabled" | "optional" | "required" | "required_for_admins";
+  mfa_updated_at?: string | null;
 }
 
 export interface Subscription {
@@ -17,6 +19,8 @@ export interface ClientUser {
   email: string;
   client_role: "owner" | "finops_admin" | "viewer";
   is_active: boolean;
+  mfa_enabled?: boolean;
+  mfa_confirmed_at?: string | null;
 }
 
 export interface UserForm {

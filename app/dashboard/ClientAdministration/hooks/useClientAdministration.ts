@@ -18,6 +18,13 @@ interface AwsStatusResponse {
   accounts_limit: number;
 }
 
+interface ClientSecurityResponse {
+  data: {
+    mfa_policy: "disabled" | "optional" | "required" | "required_for_admins";
+    mfa_updated_at?: string | null;
+  };
+}
+
 interface UpgradeResponse {
   data?: {
     status?: string;
@@ -29,12 +36,20 @@ interface UpgradeResponse {
 export function useClientAdministration() {
   const { token } = useAuth();
 
+  const getErrorMessage = (error: unknown, fallback: string) => {
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+    return fallback;
+  };
+
   const [loading, setLoading] = useState(true);
   const [client, setClient] = useState<ClientInfo | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [users, setUsers] = useState<ClientUser[]>([]);
   const [awsAccounts, setAwsAccounts] = useState<number>(0);
   const [awsAccountsLimit, setAwsAccountsLimit] = useState<number>(0);
+  const [savingSecurity, setSavingSecurity] = useState(false);
 
   // Upgrade modal state
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -66,19 +81,24 @@ export function useClientAdministration() {
 
   const loadData = async () => {
     try {
-      const [clientRes, subRes, usersRes, awsRes] = await Promise.all([
+      const [clientRes, subRes, usersRes, awsRes, securityRes] = await Promise.all([
         apiFetch<ClientInfo>("/api/client", { token }),
         apiFetch<SubscriptionResponse>("/api/client/subscription", { token }),
         apiFetch<ClientUsersResponse>("/api/client/users", { token }),
         apiFetch<AwsStatusResponse>("/api/client/aws/status", { token }),
+        apiFetch<ClientSecurityResponse>("/api/client/security", { token }),
       ]);
 
-      setClient(clientRes);
+      setClient({
+        ...clientRes,
+        mfa_policy: securityRes.data.mfa_policy,
+        mfa_updated_at: securityRes.data.mfa_updated_at || null,
+      });
       setSubscription(subRes.data);
       setUsers(usersRes.data || []);
       setAwsAccounts(awsRes.accounts_used || 0);
       setAwsAccountsLimit(awsRes.accounts_limit || 0);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error al cargar los datos de administración del cliente:", err);
     } finally {
       setLoading(false);
@@ -114,10 +134,10 @@ export function useClientAdministration() {
       setShowProcessingModal(false);
       setUpgradeSuccess(true);
       await loadData();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setShowProcessingModal(false);
-      const message = err?.message || err?.response?.data?.error;
+      const message = getErrorMessage(err, "No se pudo actualizar el plan");
 
       if (message === "Upgrade request already pending") {
         alert(
@@ -188,8 +208,8 @@ export function useClientAdministration() {
       setSuccessMessage("Usuario creado con éxito");
       setUserForm({ name: "", email: "", role: "viewer", password: "", confirmPassword: "" });
       await loadData();
-    } catch (err: any) {
-      alert(err?.message || "No se pudo crear el usuario");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "No se pudo crear el usuario"));
     }
   };
 
@@ -221,8 +241,8 @@ export function useClientAdministration() {
           : "Cambios guardados con éxito"
       );
       await loadData();
-    } catch (err: any) {
-      alert(err?.message || "No se pudo actualizar el usuario");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "No se pudo actualizar el usuario"));
     } finally {
       setSavingUser(false);
     }
@@ -234,8 +254,8 @@ export function useClientAdministration() {
       await apiFetch(`/api/client/users/${userId}`, { method: "DELETE", token });
       setSuccessMessage("Usuario eliminado con éxito");
       await loadData();
-    } catch (err: any) {
-      alert(err?.message || "No se pudo eliminar el usuario");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "No se pudo eliminar el usuario"));
     }
   };
 
@@ -244,8 +264,32 @@ export function useClientAdministration() {
       await apiFetch(`/api/client/users/${userId}/activate`, { method: "PATCH", token });
       setSuccessMessage("Usuario reactivado con éxito");
       await loadData();
-    } catch (err: any) {
-      alert(err?.message || "No se pudo activar el usuario");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "No se pudo activar el usuario"));
+    }
+  };
+
+  const updateMfaPolicy = async (
+    policy: "disabled" | "optional" | "required" | "required_for_admins"
+  ) => {
+    try {
+      setSavingSecurity(true);
+      const res = await apiFetch<ClientSecurityResponse>("/api/client/security", {
+        method: "PATCH",
+        token,
+        body: { mfa_policy: policy },
+      });
+
+      setClient((prev) => prev ? {
+        ...prev,
+        mfa_policy: res.data.mfa_policy,
+        mfa_updated_at: res.data.mfa_updated_at || null,
+      } : prev);
+      setSuccessMessage("Política MFA actualizada con éxito");
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, "No se pudo actualizar la política MFA"));
+    } finally {
+      setSavingSecurity(false);
     }
   };
 
@@ -257,6 +301,7 @@ export function useClientAdministration() {
     users,
     awsAccounts,
     awsAccountsLimit,
+    savingSecurity,
     userLimit,
     userLimitReached,
     // upgrade
@@ -271,6 +316,7 @@ export function useClientAdministration() {
     openEditUser,
     deleteUser,
     activateUser,
+    updateMfaPolicy,
     // user modal
     showUserModal,
     editingUser,
