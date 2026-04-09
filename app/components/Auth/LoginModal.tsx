@@ -402,7 +402,7 @@ export default function LoginModal({ isOpen, onClose }: Props) {
           />
         ) : (
           <LoginForm
-            onLogin={handleLogin}
+            onSubmit={handleLogin}
             error={error}
             loading={loading}
             onForgot={() => {
