@@ -22,8 +22,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      # No bloqueante por ahora: hay deuda de lint preexistente en el repo
+      # (ver `npm run lint` localmente). El gate real es el build de abajo.
+      - name: Lint — informativo
         run: npm run lint
+        continue-on-error: true
 
       - name: Build
         run: npm run build

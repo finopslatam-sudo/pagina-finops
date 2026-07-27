@@ -45,7 +45,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
       {/* HERO SECTION */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 overflow-hidden">
+      <section className="relative flex items-center min-h-[85vh] sm:min-h-[90vh] bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white overflow-hidden">
         <video
           autoPlay
           muted
@@ -74,7 +74,7 @@ export default function Home() {
           <div className="absolute bottom-40 right-56 w-6 h-36 bg-white rounded-t"></div>
         </div>
 
-        <div className="relative text-center max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="relative text-center max-w-4xl mx-auto px-4 sm:px-6 py-20">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
             Optimización de Costos en la Nube
           </h1>

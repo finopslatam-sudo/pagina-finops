@@ -86,3 +86,5 @@ Desktop.ini
 .env.*.bak       # backups de variables de entorno
 coverage/        # reports de testing
 *.tmp            # archivos temporales
+.vercel
+.env*
