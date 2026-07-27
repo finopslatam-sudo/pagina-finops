@@ -45,8 +45,17 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
       {/* HERO SECTION */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20">
-        <div className="absolute inset-0 bg-black/20"></div>
+      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/videos/hero.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/50"></div>
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-1/4 left-1/4 w-48 h-32 bg-white rounded-lg transform rotate-6"></div>
           <div className="absolute top-1/3 right-1/4 w-56 h-40 bg-white rounded-lg transform -rotate-3"></div>
