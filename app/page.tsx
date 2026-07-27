@@ -45,7 +45,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
       {/* HERO SECTION */}
-      <section className="relative flex items-center min-h-[85vh] sm:min-h-[90vh] bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white overflow-hidden">
+      <section className="relative flex flex-col justify-end min-h-screen bg-gray-900 text-white overflow-hidden">
         <video
           autoPlay
           muted
@@ -55,30 +55,12 @@ export default function Home() {
         >
           <source src="/videos/hero.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-1/4 left-1/4 w-48 h-32 bg-white rounded-lg transform rotate-6"></div>
-          <div className="absolute top-1/3 right-1/4 w-56 h-40 bg-white rounded-lg transform -rotate-3"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-64 h-36 bg-white rounded-lg transform rotate-12"></div>
-          <div className="absolute bottom-1/3 right-1/3 w-52 h-28 bg-white rounded-lg transform -rotate-6"></div>
-          
-          {/* Líneas de gráficos */}
-          <div className="absolute top-40 left-20 w-64 h-1 bg-white transform rotate-12"></div>
-          <div className="absolute top-44 left-24 w-56 h-1 bg-white transform rotate-12"></div>
-          <div className="absolute top-52 left-28 w-48 h-1 bg-white transform rotate-12"></div>
-          
-          {/* Barras de gráfico */}
-          <div className="absolute bottom-40 right-20 w-6 h-24 bg-white rounded-t"></div>
-          <div className="absolute bottom-40 right-32 w-6 h-32 bg-white rounded-t"></div>
-          <div className="absolute bottom-40 right-44 w-6 h-28 bg-white rounded-t"></div>
-          <div className="absolute bottom-40 right-56 w-6 h-36 bg-white rounded-t"></div>
-        </div>
 
-        <div className="relative text-center max-w-4xl mx-auto px-4 sm:px-6 py-20">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+        <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 pb-14 sm:pb-20">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 [text-shadow:0_2px_12px_rgba(0,0,0,0.85)]">
             Optimización de Costos en la Nube
           </h1>
-          <p className="text-base sm:text-xl text-blue-100 mb-8 leading-relaxed">
+          <p className="text-base sm:text-xl mb-8 leading-relaxed [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">
             Ayudamos a empresas a controlar, visualizar y optimizar sus costos en AWS
             aplicando mejores prácticas FinOps y análisis estratégico basado en datos.
           </p>
@@ -93,7 +75,7 @@ export default function Home() {
             </a>
             <a
               href="/servicios"
-              className="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-lg transition-colors text-sm sm:text-base"
+              className="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-lg transition-colors text-sm sm:text-base shadow-lg"
             >
               Conocer Servicios
             </a>
