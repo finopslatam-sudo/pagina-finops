@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/app/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 
-interface AwsAccount {
+export interface AwsAccount {
   id: number;
   account_id: string;
   account_name: string;

@@ -1,6 +1,7 @@
 'use client';
 
 import SessionExpiredModal from "@/app/components/Auth/SessionExpiredModal";
+import PrivateRoute from "@/app/components/Auth/PrivateRoute";
 import { AwsAccountProvider } from "./context/AwsAccountContext";
 import FinopsIAChat from "./components/FinopsIA/FinopsIAChat";
 import { useFinopsIA } from "./hooks/useFinopsIA";
@@ -16,6 +17,7 @@ export default function DashboardLayout({
 
   return (
 
+    <PrivateRoute>
     <AwsAccountProvider>
 
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8 space-y-8">
@@ -162,6 +164,7 @@ export default function DashboardLayout({
       </footer>
 
     </AwsAccountProvider>
+    </PrivateRoute>
 
   );
 

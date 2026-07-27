@@ -170,8 +170,6 @@ export function AuthProvider({
       clearInterval(countdownTimer.current);
     }
 
-    localStorage.removeItem("finops_token");
-    localStorage.removeItem("finops_user");
     localStorage.removeItem("selectedAwsAccount");
     clearApiCache();
 
@@ -189,8 +187,6 @@ export function AuthProvider({
     setToken(payload.access_token);
     setUser(payload.user);
 
-    localStorage.setItem("finops_token", payload.access_token);
-    localStorage.setItem("finops_user", JSON.stringify(payload.user));
     localStorage.removeItem("selectedAwsAccount");
   };
 
@@ -261,36 +257,10 @@ export function AuthProvider({
   ========================== */
 
   useEffect(() => {
-    const rehydrate = async () => {
-      try {
-        const savedToken = localStorage.getItem("finops_token");
-
-        if (!savedToken) {
-          setIsAuthReady(true);
-          return;
-        }
-
-        setToken(savedToken);
-
-        const freshUser = await apiFetch<User>("/api/me", {
-          token: savedToken,
-        });
-
-        setUser(freshUser);
-
-        localStorage.setItem(
-          "finops_user",
-          JSON.stringify(freshUser)
-        );
-      } catch (err) {
-        console.warn("[REHYDRATE_FAILED]", err);
-        logout();
-      } finally {
-        setIsAuthReady(true);
-      }
-    };
-
-    rehydrate();
+    // El token vive solo en memoria (nunca en localStorage), así que no
+    // hay sesión que rehidratar tras un refresh de página: el usuario
+    // debe volver a autenticarse.
+    setIsAuthReady(true);
   }, []);
 
   useEffect(() => {
@@ -375,13 +345,7 @@ export function AuthProvider({
   const updateUser = (partial: Partial<User>) => {
     setUser((prev) => {
       if (!prev) return prev;
-
-      const merged = { ...prev, ...partial };
-      localStorage.setItem(
-        "finops_user",
-        JSON.stringify(merged)
-      );
-      return merged;
+      return { ...prev, ...partial };
     });
   };
 
@@ -400,11 +364,6 @@ export function AuthProvider({
       });
 
       setUser(freshUser);
-
-      localStorage.setItem(
-        "finops_user",
-        JSON.stringify(freshUser)
-      );
 
     } catch (err) {
 
