@@ -38,6 +38,7 @@ import UserMenu from '@/app/components/Auth/UserMenu';
 export default function PublicNavbar() {
   const { user } = useAuth();
   const pathname = usePathname();
+  const isHomeHero = pathname === '/' && !user;
 
   /* =========================
      UI STATE
@@ -67,7 +68,13 @@ export default function PublicNavbar() {
 
   return (
     <>
-      <header className="relative z-50 bg-white border-b border-gray-200">
+      <header
+        className={
+          isHomeHero
+            ? 'absolute top-0 left-0 right-0 z-50 bg-transparent'
+            : 'relative z-50 bg-white border-b border-gray-200'
+        }
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
 
@@ -86,7 +93,11 @@ export default function PublicNavbar() {
                MENÚ DESKTOP
             ========================== */}
             {!user && (
-              <nav className="hidden md:flex items-center space-x-8 mx-auto">
+              <nav
+                className={`hidden md:flex items-center space-x-8 mx-auto ${
+                  isHomeHero ? 'text-white [&_a:hover]:text-blue-200' : 'text-gray-700 [&_a:hover]:text-blue-600'
+                }`}
+              >
                 <Link href="/" className="nav-link">Inicio</Link>
                 <Link href="/servicios" className="nav-link">Servicios</Link>
                 <Link href="/finops-chile" className="nav-link">FinOps Chile</Link>
@@ -108,7 +119,7 @@ export default function PublicNavbar() {
                   onClick={() =>
                     setIsMobileMenuOpen((v) => !v)
                   }
-                  className="md:hidden text-gray-700 text-2xl"
+                  className={`md:hidden text-2xl ${isHomeHero ? 'text-white' : 'text-gray-700'}`}
                   aria-label="Abrir menú"
                 >
                   ☰
@@ -122,7 +133,11 @@ export default function PublicNavbar() {
                     onClick={() =>
                       setIsLoginDropdownOpen(!isLoginDropdownOpen)
                     }
-                    className="border-2 border-blue-500 text-blue-500 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition"
+                    className={
+                      isHomeHero
+                        ? 'border-2 border-white text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition'
+                        : 'border-2 border-blue-500 text-blue-500 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition'
+                    }
                   >
                     Login
                   </button>
