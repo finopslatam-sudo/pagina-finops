@@ -2,6 +2,7 @@
 
 import { AdminUser } from '../hooks/useAdminUsers';
 import { useAuth } from '@/app/context/AuthContext';
+import { UserTable, UserTableColumn, UserTableAction } from '@/app/components/shared/UserManagement';
 
 interface Props {
   users: AdminUser[];
@@ -9,118 +10,45 @@ interface Props {
 }
 
 export function UsersTable({ users, onEdit }: Props) {
-  if (!users.length) {
-    return (
-      <p className="text-sm text-gray-500">
-        No hay usuarios
-      </p>
-    );
-  }
   const { user: currentUser } = useAuth();
 
-  return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border rounded-lg">
-        <thead>
-          <tr className="bg-gray-50 text-left text-sm">
-            <th className="px-4 py-2">Email</th>
-            <th className="px-4 py-2">Contacto</th>
-            <th className="px-4 py-2">Rol</th>
-            <th className="px-4 py-2">Estado</th>
-            <th className="px-4 py-2 text-right">
-              Acciones
-            </th>
-          </tr>
-        </thead>
+  const columns: UserTableColumn<AdminUser>[] = [
+    { key: 'email', header: 'Email', render: (u) => u.email },
+    {
+      key: 'contact_name',
+      header: 'Contacto',
+      render: (u) =>
+        u.contact_name || <span className="text-gray-400 italic">Sin nombre</span>,
+    },
+    {
+      key: 'role',
+      header: 'Rol',
+      render: (u) => <span className="capitalize">{u.global_role ?? u.client_role ?? '—'}</span>,
+    },
+    {
+      key: 'is_active',
+      header: 'Estado',
+      render: (u) =>
+        u.is_active ? (
+          <span className="text-green-600">Activo</span>
+        ) : (
+          <span className="text-red-600">Inactivo</span>
+        ),
+    },
+  ];
 
-        <tbody>
-          {users.map((user) => {
-            const role =
-              user.global_role ??
-              user.client_role ??
-              '—';
+  const actions: UserTableAction<AdminUser>[] = onEdit
+    ? [
+        {
+          label: 'Editar',
+          onClick: onEdit,
+          show: (u) =>
+            currentUser?.global_role === 'root' ||
+            (currentUser?.global_role === 'admin' && u.global_role !== 'root') ||
+            (currentUser?.global_role === 'support' && u.global_role === null),
+        },
+      ]
+    : [];
 
-            return (
-              <tr
-                key={user.id}
-                className="border-t text-sm"
-              >
-                <td className="px-4 py-2">
-                  {user.email}
-                </td>
-
-                <td className="px-4 py-2">
-                  {user.contact_name ? (
-                    user.contact_name
-                  ) : (
-                    <span className="text-gray-400 italic">
-                      Sin nombre
-                    </span>
-                  )}
-                </td>
-
-                <td className="px-4 py-2 capitalize">
-                  {role}
-                </td>
-
-                <td className="px-4 py-2">
-                  {user.is_active ? (
-                    <span className="text-green-600">
-                      Activo
-                    </span>
-                  ) : (
-                    <span className="text-red-600">
-                      Inactivo
-                    </span>
-                  )}
-                </td>
-
-                <td className="px-4 py-2 text-right">
-                {(() => {
-                  if (!onEdit) {
-                    return (
-                      <span className="text-gray-400">
-                        —
-                      </span>
-                    );
-                  }
-
-                  const canEdit =
-                    currentUser?.global_role === 'root' ||
-
-                    (
-                      currentUser?.global_role === 'admin' &&
-                      user.global_role !== 'root'
-                    ) ||
-
-                    (
-                      currentUser?.global_role === 'support' &&
-                      user.global_role === null
-                    );
-
-                  if (!canEdit) {
-                    return (
-                      <span className="text-gray-400">
-                        —
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <button
-                      onClick={() => onEdit(user)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Editar
-                    </button>
-                  );
-                })()}
-              </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <UserTable rows={users} columns={columns} actions={actions} emptyMessage="No hay usuarios" />;
 }
