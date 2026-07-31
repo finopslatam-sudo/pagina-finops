@@ -2,14 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const WORDS = [
-  { text: 'Controla', color: 'text-blue-400' },
-  { text: 'Visualiza', color: 'text-purple-400' },
-  { text: 'Optimiza', color: 'text-emerald-400' },
-  { text: 'Gobierna', color: 'text-amber-400' },
-  { text: 'Maximiza', color: 'text-pink-400' },
-  { text: 'Monitorea', color: 'text-cyan-400' },
-];
+const WORDS = ['Controla', 'Visualiza', 'Optimiza', 'Gobierna', 'Maximiza', 'Monitorea'];
 
 const ROTATE_MS = 2200;
 const FADE_MS = 300;
@@ -36,11 +29,11 @@ export default function HeroHeadline() {
     <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-8 [text-shadow:0_2px_6px_rgba(0,0,0,0.9),0_4px_20px_rgba(0,0,0,0.8)]">
       FinOpsLatam{' '}
       <span
-        className={`inline-block transition-all duration-300 ${word.color} ${
+        className={`inline-block font-black text-blue-800 transition-all duration-300 ${
           visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
         }`}
       >
-        {word.text}
+        {word}
       </span>{' '}
       costos en la nube
     </h1>
