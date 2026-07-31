@@ -1,46 +1,24 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import ServicesSection from './components/ServicesSection';
 import WhyFinOps from './components/WhyFinOps';
 import AlliancesSection from './components/AlliancesSection';
 
-// Componente de contador animado
-function AnimatedCounter({
-  target,
-  suffix = '',
-  duration = 2000,
-}: {
-  target: number;
-  suffix?: string;
-  duration?: number;
-}) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const increment = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 16);
-
-    return () => clearInterval(timer);
-  }, [target, duration]);
-
-  return (
-    <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
-      {suffix}
-      {count}
-      {suffix ? '' : '%'}
-    </span>
-  );
-}
+const PILLARS = [
+  {
+    icon: '📊',
+    title: 'FinOps',
+    text: 'Visibilidad de costos, optimización continua y gobernanza financiera de tu infraestructura en AWS.',
+  },
+  {
+    icon: '⚙️',
+    title: 'DevOps',
+    text: 'Automatización de infraestructura y despliegues, para que la optimización no frene el ritmo de desarrollo.',
+  },
+  {
+    icon: '🗄️',
+    title: 'DataOps',
+    text: 'Datos de costos y uso confiables y consistentes, la base para tomar decisiones financieras acertadas.',
+  },
+];
 
 export default function Home() {
   return (
@@ -98,19 +76,14 @@ export default function Home() {
             <p className="text-gray-600 leading-relaxed text-lg">
               En <span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent font-semibold">FinOpsLatam</span> combinamos experiencia en FinOps, DevOps y DataOps para ayudarte a controlar tus gastos en la nube. Nuestra misión es reducir costos de manera sostenible, sin comprometer la eficiencia de tus servicios.
             </p>
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div className="p-4">
-                <AnimatedCounter target={40} suffix="+" duration={5000} />
-                <div className="text-gray-600">Ahorro en costos</div>
-              </div>
-              <div className="p-4">
-                <AnimatedCounter target={99} duration={5000} />
-                <div className="text-gray-600">Clientes satisfechos</div>
-              </div>
-              <div className="p-4">
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">24/7</span>
-                <div className="text-gray-600">Monitoreo continuo</div>
-              </div>
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {PILLARS.map((p) => (
+                <div key={p.title} className="p-4 text-center sm:text-left">
+                  <div className="text-3xl mb-2">{p.icon}</div>
+                  <div className="font-bold text-gray-900 mb-1">{p.title}</div>
+                  <p className="text-sm text-gray-600 leading-relaxed">{p.text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
