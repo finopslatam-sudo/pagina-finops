@@ -116,33 +116,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CONTACTO */}
-      <section id="contacto" className="px-4 lg:px-6 py-14 lg:py-20 text-center bg-white">
-        <div className="max-w-2xl mx-auto">
-          <h3 className="text-2xl lg:text-4xl font-bold mb-6 text-gray-900">Contacto</h3>
-          <p className="text-gray-600 mb-8 text-lg">
-            ¿Listo para optimizar tus costos en la nube? Contáctanos hoy mismo.
-          </p>
-          
-          <div className="mb-8">
-            <p className="text-gray-700 mb-2">
-              <strong>Correo:</strong> contacto@finopslatam.com
-            </p>
-            <p className="text-gray-700">
-              <strong>WhatsApp:</strong> +56 9 65090121
-            </p>
-          </div>
-
-          <a
-            href="https://wa.me/56965090121"
-            target="_blank"
-            className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
-          >
-            Hablemos por WhatsApp
-          </a>
-        </div>
-      </section>
-
       {/* FOOTER */}
       <footer className="bg-gray-900 text-gray-400 pt-8 border-t border-gray-800">
         <div className="flex justify-center gap-6 pb-6">
