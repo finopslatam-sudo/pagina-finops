@@ -68,6 +68,12 @@ const RESOLUTION: Record<string, string> = {
     "Pausar el clúster Redshift cuando no esté en uso o migrar a Redshift Serverless para pago por consulta.",
   RIGHTSIZING_OPPORTUNITY:
     "Analizar el uso real del recurso y migrar a un tipo o tamaño inferior que cubra la carga de trabajo.",
+  EIP_UNASSOCIATED:
+    "Asociar la Elastic IP a una instancia activa o liberarla (Release) si ya no se necesita, para dejar de pagarla por hora.",
+  EBS_ORPHANED_SNAPSHOT:
+    "Verificar si el snapshot todavía es necesario como respaldo. Si no, eliminarlo para dejar de pagar su almacenamiento.",
+  RDS_ORPHANED_SNAPSHOT:
+    "Verificar si el snapshot todavía es necesario como respaldo. Si no, eliminarlo para dejar de pagar su almacenamiento.",
 };
 
 function getResolution(findingType: string): string {
