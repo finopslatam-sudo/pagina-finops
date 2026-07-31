@@ -33,9 +33,9 @@ export default function HeroHeadline() {
           visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
         }`}
         style={{
-          WebkitTextStroke: '1.5px white',
+          WebkitTextStroke: '1.5px black',
           paintOrder: 'stroke fill',
-          textShadow: '0 0 6px rgba(255,255,255,0.5)',
+          textShadow: '0 0 6px rgba(0,0,0,0.5)',
         }}
       >
         {word}
