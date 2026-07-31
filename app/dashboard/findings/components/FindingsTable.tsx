@@ -74,6 +74,28 @@ const RESOLUTION: Record<string, string> = {
     "Verificar si el snapshot todavía es necesario como respaldo. Si no, eliminarlo para dejar de pagar su almacenamiento.",
   RDS_ORPHANED_SNAPSHOT:
     "Verificar si el snapshot todavía es necesario como respaldo. Si no, eliminarlo para dejar de pagar su almacenamiento.",
+  ELB_NO_TARGETS:
+    "Eliminar el Load Balancer si ya no está en uso, o registrar target groups/instancias si aún es necesario.",
+  ELASTICACHE_NO_BACKUP:
+    "Configurar un Snapshot Retention Limit mayor a 0 en el cluster Redis desde la consola de ElastiCache.",
+  CLOUDFRONT_PRICE_CLASS_ALL:
+    "Cambiar la Price Class de la distribución a 'Solo Norteamérica y Europa' o 'Solo Norteamérica, Europa, Asia y África' si el tráfico no es global.",
+  SAGEMAKER_ENDPOINT_ALWAYS_ON:
+    "Evaluar migrar el endpoint a Serverless Inference o configurar Auto Scaling si el tráfico de inferencia es intermitente.",
+  NOTEBOOK_INSTANCE_RUNNING:
+    "Detener la Notebook Instance desde la consola de SageMaker cuando no esté en uso activo.",
+  AURORA_NO_BACKUP_RETENTION:
+    "Configurar un período de backup retention mayor a 0 días en el cluster Aurora.",
+  ROUTE53_UNUSED_ZONE:
+    "Verificar si la Hosted Zone sigue en uso. Si no, eliminarla para dejar de pagar el costo mensual fijo.",
+  SNS_TOPIC_NO_SUBSCRIPTIONS:
+    "Verificar si el topic todavía es utilizado por alguna integración. Si no, eliminarlo.",
+  SQS_MESSAGE_RETENTION_HIGH:
+    "Revisar si 14 días de retención es necesario para este caso de uso, o reducir el Message Retention Period.",
+  KINESIS_EXTENDED_RETENTION:
+    "Reducir el período de retención del stream a 24 horas si no se requiere replay histórico de los datos.",
+  OPENSEARCH_UNENCRYPTED:
+    "Habilitar Encryption at Rest en el dominio. Requiere recrear el dominio, ya que no puede activarse en uno existente sin migración.",
 };
 
 function getResolution(findingType: string): string {
