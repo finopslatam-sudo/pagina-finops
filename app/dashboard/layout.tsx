@@ -78,7 +78,7 @@ export default function DashboardLayout({
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <img
-                src="/logo2.png"
+                src="/logo2-white.png"
                 alt="FinOpsLatam"
                 className="h-9 w-9 rounded-lg object-contain bg-white/10 p-1"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

@@ -169,9 +169,9 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
             <div className="flex flex-col items-center md:items-start">
               <a href="/">
-                <img 
-                  src="/logo2.png" 
-                  alt="FinOpsLatam Logo" 
+                <img
+                  src="/logo2-white.png"
+                  alt="FinOpsLatam Logo"
                   className="h-12 w-auto mb-4"
                 />
               </a>

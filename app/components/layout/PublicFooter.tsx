@@ -13,7 +13,7 @@ export default function PublicFooter() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start">
             <Link href="/">
-              <img src="/logo2.png" alt="FinOpsLatam Logo" className="h-12 w-auto mb-4" />
+              <img src="/logo2-white.png" alt="FinOpsLatam Logo" className="h-12 w-auto mb-4" />
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
               Expertos en Optimización de Costos en la Nube,

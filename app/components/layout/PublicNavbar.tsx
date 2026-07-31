@@ -83,7 +83,7 @@ export default function PublicNavbar() {
             ========================== */}
             <Link href={user ? '/dashboard' : '/'} className="flex items-center">
               <img
-                src="/logo2.png"
+                src={isHomeHero ? '/logo2-white.png' : '/logo2.png'}
                 alt="FinOpsLatam"
                 className="h-16 sm:h-20 w-auto"
               />
