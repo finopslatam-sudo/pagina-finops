@@ -11,7 +11,6 @@ interface Props {
   onOpenEditUser: (user: ClientUser) => void;
   onDeleteUser: (userId: number) => void;
   onActivateUser: (userId: number) => void;
-  onOpenUpgradeModal: () => void;
 }
 
 function RoleBadge({ role }: { role: string }) {
@@ -36,7 +35,6 @@ export default function UsersTable({
   onOpenEditUser,
   onDeleteUser,
   onActivateUser,
-  onOpenUpgradeModal,
 }: Props) {
   const columns: UserTableColumn<ClientUser>[] = [
     { key: 'contact_name', header: 'Nombre', render: (u) => u.contact_name || '—' },
@@ -91,17 +89,11 @@ export default function UsersTable({
       </div>
 
       {userLimitReached && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
           <div className="text-sm text-amber-800">
             <p className="font-semibold">⚠️ Has alcanzado el límite de usuarios de tu plan.</p>
-            <p>Actualiza tu suscripción para agregar más usuarios y cuentas AWS.</p>
+            <p>Contacta a soporte si necesitas agregar más usuarios.</p>
           </div>
-          <button
-            onClick={onOpenUpgradeModal}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-          >
-            Upgrade Plan
-          </button>
         </div>
       )}
 

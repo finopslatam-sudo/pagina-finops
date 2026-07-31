@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PLANS } from '@/app/lib/plans';
 import type { CreateClientPayload } from '../components/CreateClientModal';
 
 export function useCreateClientForm() {
@@ -12,7 +11,6 @@ export function useCreateClientForm() {
   const [phone, setPhone]             = useState('');
   const [pais, setPais]               = useState('');
   const [isActive, setIsActive]       = useState(true);
-  const [planId, setPlanId]           = useState<number>(PLANS[0].id);
 
   /* ── Owner ── */
   const [ownerEmail, setOwnerEmail]               = useState('');
@@ -38,7 +36,7 @@ export function useCreateClientForm() {
 
   const reset = () => {
     setCompanyName(''); setEmail(''); setContactName(''); setPhone(''); setPais('');
-    setIsActive(true);  setPlanId(PLANS[0].id);
+    setIsActive(true);
     setOwnerEmail('');  setOwnerName(''); setOwnerPassword(''); setOwnerPasswordConfirm('');
     setShowOwnerPass(false); setShowOwnerPass2(false);
     setAddExtraUser(false);
@@ -53,7 +51,6 @@ export function useCreateClientForm() {
   const validate = (): string | null => {
     if (!companyName) return 'El nombre de la empresa es obligatorio';
     if (!email)       return 'El email de la empresa es obligatorio';
-    if (!planId)      return 'Debes seleccionar un plan';
     if (!ownerEmail)  return 'El email del Owner es obligatorio';
     if (!ownerName)   return 'El nombre del Owner es obligatorio';
     if (!ownerPassword || ownerPassword.length < 8)
@@ -79,7 +76,6 @@ export function useCreateClientForm() {
       phone: phone || undefined,
       pais: pais || undefined,
       is_active: isActive,
-      plan_id: planId,
       owner: { email: ownerEmail, contact_name: ownerName, password: ownerPassword, password_confirm: ownerPasswordConfirm },
     };
     if (addExtraUser) {
@@ -94,7 +90,7 @@ export function useCreateClientForm() {
   return {
     /* client */
     companyName, setCompanyName, email, setEmail, contactName, setContactName,
-    phone, setPhone, pais, setPais, isActive, setIsActive, planId, setPlanId,
+    phone, setPhone, pais, setPais, isActive, setIsActive,
     /* owner */
     ownerEmail, setOwnerEmail, ownerName, setOwnerName,
     ownerPassword, setOwnerPassword, ownerPasswordConfirm, setOwnerPasswordConfirm,

@@ -1,18 +1,15 @@
-import { PLANS } from '@/app/lib/plans';
-
 interface Props {
   companyName: string; setCompanyName: (v: string) => void;
   email:       string; setEmail:       (v: string) => void;
   contactName: string; setContactName: (v: string) => void;
   phone:       string; setPhone:       (v: string) => void;
   pais:        string; setPais:        (v: string) => void;
-  planId:      number; setPlanId:      (v: number) => void;
 }
 
 export default function CompanySection({
   companyName, setCompanyName, email, setEmail,
   contactName, setContactName, phone, setPhone,
-  pais, setPais, planId, setPlanId,
+  pais, setPais,
 }: Props) {
   return (
     <>
@@ -30,15 +27,6 @@ export default function CompanySection({
         value={email}
         onChange={e => setEmail(e.target.value)}
       />
-      <select
-        className="w-full px-4 py-2 border rounded-lg mb-3"
-        value={planId}
-        onChange={e => setPlanId(Number(e.target.value))}
-      >
-        {PLANS.map(plan => (
-          <option key={plan.id} value={plan.id}>{plan.name}</option>
-        ))}
-      </select>
       <input
         className="w-full px-4 py-2 border rounded-lg mb-3"
         placeholder="Nombre contacto empresa"

@@ -25,14 +25,6 @@ interface ClientSecurityResponse {
   };
 }
 
-interface UpgradeResponse {
-  data?: {
-    status?: string;
-    requested_plan?: string;
-    message?: string;
-  };
-}
-
 export function useClientAdministration() {
   const { token } = useAuth();
 
@@ -50,12 +42,6 @@ export function useClientAdministration() {
   const [awsAccounts, setAwsAccounts] = useState<number>(0);
   const [awsAccountsLimit, setAwsAccountsLimit] = useState<number>(0);
   const [savingSecurity, setSavingSecurity] = useState(false);
-
-  // Upgrade modal state
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [upgrading, setUpgrading] = useState(false);
-  const [upgradeSuccess, setUpgradeSuccess] = useState(false);
-  const [showProcessingModal, setShowProcessingModal] = useState(false);
 
   // User modal state
   const [showUserModal, setShowUserModal] = useState(false);
@@ -106,52 +92,10 @@ export function useClientAdministration() {
   };
 
   // ── Plan limits ─────────────────────────────────────────────────────────────
+  // Único plan comercial (Enterprise): el límite de usuarios es el mismo para todo cliente.
 
-  let userLimit = 3;
-  if (subscription?.plan_code === "FINOPS_PROFESSIONAL") userLimit = 9;
-  if (subscription?.plan_code === "FINOPS_ENTERPRISE") userLimit = 12;
+  const userLimit = 12;
   const userLimitReached = users.length >= userLimit;
-
-  // ── Upgrade ──────────────────────────────────────────────────────────────────
-
-  const upgradePlan = async (planCode: string) => {
-    try {
-      setUpgrading(true);
-      setShowUpgradeModal(false);
-      setShowProcessingModal(true);
-
-      const res = await apiFetch<UpgradeResponse>("/api/client/subscription/upgrade", {
-        method: "POST",
-        token,
-        body: { plan_code: planCode },
-      });
-
-      if (!res || !res.data || res.data.status !== "pending") {
-        console.error("Unexpected API response:", res);
-        throw new Error("Upgrade request failed");
-      }
-
-      setShowProcessingModal(false);
-      setUpgradeSuccess(true);
-      await loadData();
-    } catch (err: unknown) {
-      console.error(err);
-      setShowProcessingModal(false);
-      const message = getErrorMessage(err, "No se pudo actualizar el plan");
-
-      if (message === "Upgrade request already pending") {
-        alert(
-          "Ya existe una solicitud de upgrade pendiente. Un administrador debe aprobarla antes de solicitar otra."
-        );
-      } else if (message === "Downgrade not allowed") {
-        alert("No es posible cambiar a un plan inferior.");
-      } else {
-        alert("No se pudo actualizar el plan");
-      }
-    } finally {
-      setUpgrading(false);
-    }
-  };
 
   // ── User CRUD ────────────────────────────────────────────────────────────────
 
@@ -304,14 +248,6 @@ export function useClientAdministration() {
     savingSecurity,
     userLimit,
     userLimitReached,
-    // upgrade
-    showUpgradeModal,
-    setShowUpgradeModal,
-    upgrading,
-    upgradeSuccess,
-    setUpgradeSuccess,
-    showProcessingModal,
-    upgradePlan,
     // users table
     openEditUser,
     deleteUser,

@@ -6,58 +6,53 @@ const Check = () => (
 
 const Dash = () => <span className="block text-center text-gray-300 font-bold">—</span>;
 
-const FEATURES: { name: string; f: boolean; p: boolean; e: boolean }[] = [
-  { name: 'AWS Integration',           f: true,  p: true,  e: true  },
-  { name: 'Ticket Support',            f: true,  p: true,  e: true  },
-  { name: 'Cost and account dashboard',f: true,  p: true,  e: true  },
-  { name: 'Findings & Optimization',   f: true,  p: true,  e: true  },
-  { name: 'Risk & Assets',             f: true,  p: true,  e: true  },
-  { name: 'Cost & Financials',         f: true,  p: true,  e: true  },
-  { name: 'Report (PDF, CSV, XLSX)',   f: true,  p: true,  e: true  },
-  { name: 'Finding Report',            f: true,  p: true,  e: true  },
-  { name: 'Executive Report',          f: false, p: true,  e: true  },
-  { name: 'Cost Report',               f: false, p: true,  e: true  },
-  { name: 'Risk Report',               f: false, p: true,  e: true  },
-  { name: 'Resource Report',           f: false, p: true,  e: true  },
-  { name: 'RI & Saving Plans',         f: false, p: true,  e: true  },
-  { name: 'Governance',                f: false, p: true,  e: true  },
-  { name: 'Policies y Alerts',         f: false, p: false, e: true  },
-  { name: 'Project Calculator',        f: false, p: false, e: true  },
-  { name: 'Assistant Bot',             f: false, p: false, e: true  },
+const FEATURES: { name: string; us: boolean; a: boolean; b: boolean }[] = [
+  { name: 'Integración con AWS',                 us: true, a: true,  b: true  },
+  { name: 'Dashboard de costos y cuentas',        us: true, a: true,  b: true  },
+  { name: 'Hallazgos y optimización',             us: true, a: true,  b: false },
+  { name: 'Inventario de recursos y riesgo',      us: true, a: false, b: true  },
+  { name: 'Reportes ejecutivos automatizados',    us: true, a: false, b: false },
+  { name: 'Reportes PDF, CSV y XLSX',             us: true, a: true,  b: false },
+  { name: 'Análisis de RI & Savings Plans',       us: true, a: true,  b: false },
+  { name: 'Gobernanza multi-cuenta',              us: true, a: false, b: false },
+  { name: 'Políticas y alertas automáticas',      us: true, a: false, b: true  },
+  { name: 'Project Calculator (proyección)',      us: true, a: false, b: false },
+  { name: 'Asistente FinOps con IA',              us: true, a: false, b: false },
+  { name: 'Soporte prioritario en español',       us: true, a: false, b: false },
 ];
 
 export default function PlanComparisonTable() {
   return (
     <div>
       <h4 className="text-xl lg:text-2xl font-bold text-center text-gray-900 mb-8">
-        Comparativa de planes
+        FinOps Latam vs. otras herramientas
       </h4>
 
       <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
         <table className="w-full min-w-[560px] text-sm">
           <thead>
             <tr>
-              <th className="text-left px-6 py-4 font-semibold w-1/2 bg-gray-900 text-white rounded-tl-2xl">
+              <th className="text-left px-4 sm:px-6 py-4 font-semibold w-1/2 bg-gray-900 text-white rounded-tl-2xl">
                 Funcionalidad
               </th>
+              <th className="px-4 py-4 font-semibold text-center bg-purple-800 text-white">
+                FinOps Latam
+              </th>
               <th className="px-4 py-4 font-semibold text-center bg-slate-500 text-white">
-                Foundation
+                Herramienta A
               </th>
-              <th className="px-4 py-4 font-semibold text-center bg-blue-700 text-white">
-                Professional
-              </th>
-              <th className="px-4 py-4 font-semibold text-center bg-purple-800 text-white rounded-tr-2xl">
-                Enterprise
+              <th className="px-4 py-4 font-semibold text-center bg-slate-500 text-white rounded-tr-2xl">
+                Herramienta B
               </th>
             </tr>
           </thead>
           <tbody>
             {FEATURES.map((row, i) => (
               <tr key={row.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                <td className="px-6 py-3 text-gray-700 font-medium">{row.name}</td>
-                <td className="px-4 py-3 text-center">{row.f ? <Check /> : <Dash />}</td>
-                <td className="px-4 py-3 text-center bg-blue-50">{row.p ? <Check /> : <Dash />}</td>
-                <td className="px-4 py-3 text-center bg-purple-50">{row.e ? <Check /> : <Dash />}</td>
+                <td className="px-4 sm:px-6 py-3 text-gray-700 font-medium">{row.name}</td>
+                <td className="px-4 py-3 text-center bg-purple-50">{row.us ? <Check /> : <Dash />}</td>
+                <td className="px-4 py-3 text-center">{row.a ? <Check /> : <Dash />}</td>
+                <td className="px-4 py-3 text-center">{row.b ? <Check /> : <Dash />}</td>
               </tr>
             ))}
           </tbody>
@@ -69,7 +64,7 @@ export default function PlanComparisonTable() {
         <a href="https://wa.me/56965090121" target="_blank" className="text-blue-500 hover:underline">
           Contáctanos por WhatsApp
         </a>{' '}
-        y te ayudamos a elegir el plan ideal.
+        y te contamos todo lo que incluye FinOps Enterprise.
       </p>
     </div>
   );

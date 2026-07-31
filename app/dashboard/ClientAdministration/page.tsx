@@ -46,14 +46,6 @@ export default function ClientAdministrationPage() {
     savingSecurity,
     userLimit,
     userLimitReached,
-    // upgrade
-    showUpgradeModal,
-    setShowUpgradeModal,
-    upgrading,
-    upgradeSuccess,
-    setUpgradeSuccess,
-    showProcessingModal,
-    upgradePlan,
     // users table
     openEditUser,
     deleteUser,
@@ -113,17 +105,7 @@ export default function ClientAdministrationPage() {
           onChangePolicy={updateMfaPolicy}
         />
 
-        <SubscriptionCard
-          subscription={subscription}
-          upgrading={upgrading}
-          upgradeSuccess={upgradeSuccess}
-          showUpgradeModal={showUpgradeModal}
-          showProcessingModal={showProcessingModal}
-          onOpenUpgradeModal={() => setShowUpgradeModal(true)}
-          onCloseUpgradeModal={() => setShowUpgradeModal(false)}
-          onCloseUpgradeSuccess={() => setUpgradeSuccess(false)}
-          onUpgradePlan={upgradePlan}
-        />
+        <SubscriptionCard subscription={subscription} />
       </div>
 
       {/* AWS Accounts */}
@@ -138,7 +120,6 @@ export default function ClientAdministrationPage() {
         onOpenEditUser={openEditUser}
         onDeleteUser={deleteUser}
         onActivateUser={activateUser}
-        onOpenUpgradeModal={() => setShowUpgradeModal(true)}
       />
 
       {/* User create/edit modal */}

@@ -17,7 +17,6 @@ export default function ClientsPage() {
     loading,
     error,
     updateClient,
-    changeClientPlan,
     createClient,
     refresh,
   } = useAdminClients();
@@ -74,13 +73,6 @@ export default function ClientsPage() {
               selectedClient.id,
               data
             );
-
-            if (data.plan_id) {
-              await changeClientPlan(
-                selectedClient.id,
-                data.plan_id
-              );
-            }
 
             setSelectedClient(null);
             await refresh();

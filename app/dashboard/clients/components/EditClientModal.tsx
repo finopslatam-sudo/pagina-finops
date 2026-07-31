@@ -6,7 +6,6 @@
 
 import { useState } from 'react';
 import type { AdminClient } from '../hooks/useAdminClients';
-import { PLANS } from '@/app/lib/plans';
 import { useAuth } from '@/app/context/AuthContext';
 
 interface Props {
@@ -19,7 +18,6 @@ interface Props {
     phone?: string;
     pais?: string;
     is_active: boolean;
-    plan_id: number;
   }) => Promise<void>;
 }
 
@@ -44,10 +42,6 @@ export default function EditClientModal({
   const [phone, setPhone] = useState(client.phone ?? '');
   const [pais, setPais] = useState(client.pais ?? '');
   const [isActive, setIsActive] = useState(client.is_active);
-
-  const [planId, setPlanId] = useState(
-    PLANS.find(p => p.name === client.plan)?.id ?? PLANS[0].id
-  );
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -81,7 +75,6 @@ export default function EditClientModal({
         phone: phone || undefined,
         pais: pais || undefined,
         is_active: isActive,
-        plan_id: planId,
       });
 
       setSuccess(true);
@@ -175,18 +168,6 @@ export default function EditClientModal({
           <option>Argentina</option><option>Perú</option><option>Brasil</option>
           <option>Ecuador</option><option>Uruguay</option><option>Bolivia</option>
           <option>Paraguay</option><option>Venezuela</option><option>Otro</option>
-        </select>
-
-        <select
-          value={planId}
-          onChange={e => setPlanId(Number(e.target.value))}
-          className="w-full border rounded px-3 py-2"
-        >
-          {PLANS.map(plan => (
-            <option key={plan.id} value={plan.id}>
-              {plan.name}
-            </option>
-          ))}
         </select>
 
         {/* ACTIVE */}

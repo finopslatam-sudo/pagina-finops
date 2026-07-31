@@ -12,7 +12,6 @@ export type CreateClientPayload = {
   phone?: string;
   pais?: string;
   is_active: boolean;
-  plan_id: number;
   owner: {
     email: string;
     contact_name: string;
@@ -70,7 +69,6 @@ export default function CreateClientModal({ onClose, onCreate }: Props) {
           contactName={form.contactName} setContactName={form.setContactName}
           phone={form.phone}             setPhone={form.setPhone}
           pais={form.pais}               setPais={form.setPais}
-          planId={form.planId}           setPlanId={form.setPlanId}
         />
 
         <OwnerSection

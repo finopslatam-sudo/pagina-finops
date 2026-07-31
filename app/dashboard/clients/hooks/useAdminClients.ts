@@ -40,7 +40,6 @@ export type CreateClientPayload = {
   phone?: string;
   pais?: string;
   is_active: boolean;
-  plan_id: number;
 
   /* OWNER OBLIGATORIO */
   owner: {
