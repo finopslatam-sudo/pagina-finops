@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import ClientProviders from './ClientProviders';
 import PublicNavbar from './components/layout/PublicNavbar';
+import WhatsAppFloatingButton from './components/WhatsAppFloatingButton';
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://www.finopslatam.com';
@@ -116,6 +117,8 @@ export default function RootLayout({
           <PublicNavbar />
 
           <main>{children}</main>
+
+          <WhatsAppFloatingButton />
 
         </ClientProviders>
       </body>
