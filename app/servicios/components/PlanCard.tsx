@@ -6,6 +6,8 @@ export default function PlanCard({
   border,
   button,
   highlight,
+  badge,
+  buttonLabel = 'Contratar Plan',
   onClick,
 }: {
   title: string;
@@ -15,6 +17,8 @@ export default function PlanCard({
   border: string;
   button: string;
   highlight?: boolean;
+  badge?: string | null;
+  buttonLabel?: string;
   onClick: () => void;
 }) {
   return (
@@ -25,18 +29,21 @@ export default function PlanCard({
         transition-transform hover:-translate-y-1
       `}
     >
-      {/* DESCUENTO */}
-      <span className="
-        absolute -top-6 left-1/2 -translate-x-1/2
-        bg-green-600 text-white
-        text-base font-bold
-        px-6 py-2
-        rounded-full
-        shadow-lg
-        tracking-wide
-      ">
-        🎉 20% DCTO
-      </span>
+      {/* BADGE SUPERIOR (descuento u otro destaque, opcional) */}
+      {badge && (
+        <span className="
+          absolute -top-6 left-1/2 -translate-x-1/2
+          bg-green-600 text-white
+          text-base font-bold
+          px-6 py-2
+          rounded-full
+          shadow-lg
+          tracking-wide
+          text-center
+        ">
+          {badge}
+        </span>
+      )}
 
       {/* MÁS ELEGIDO */}
       {highlight && (
@@ -61,7 +68,7 @@ export default function PlanCard({
         onClick={onClick}
         className={`${button} text-white font-semibold py-3 rounded-xl transition hover:opacity-90`}
       >
-        Contratar Plan
+        {buttonLabel}
       </button>
     </div>
   );

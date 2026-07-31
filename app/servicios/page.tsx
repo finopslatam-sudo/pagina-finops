@@ -10,11 +10,13 @@ import { PLAN_SLUGS } from '@/app/pago/constants';
 
 export default function Servicios() {
   const router = useRouter();
-  const [showConsultoriaModal, setShowConsultoriaModal] = useState(false);
+  const [contactService, setContactService] = useState<string | null>(null);
+
+  const CONTACT_ONLY_SERVICES = ["Talento TI", "Consultoría FinOps Estratégica"];
 
   const handleSelectPlan = (planTitle: string) => {
-    if (planTitle === 'Consultoría FinOps Estratégica') {
-      setShowConsultoriaModal(true);
+    if (CONTACT_ONLY_SERVICES.includes(planTitle)) {
+      setContactService(planTitle);
       return;
     }
     const slug = PLAN_SLUGS[planTitle];
@@ -27,84 +29,65 @@ export default function Servicios() {
       {/* HERO */}
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-14 lg:py-20 text-center px-4 lg:px-6">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-          Planes FinOps para cada etapa de crecimiento
+          Un plan FinOps completo, y el equipo para llevarlo a la práctica
         </h1>
         <p className="text-base sm:text-xl text-blue-100 max-w-3xl mx-auto">
-          Gobernanza financiera en la nube, optimización continua de recursos y decisiones estratégicas 
-          basadas en análisis de costos.
+          Gobernanza financiera en la nube con FinOps Enterprise, acompañamiento estratégico
+          y talento TI especializado para tus proyectos de desarrollo, QA y fullstack.
         </p>
       </section>
 
-      {/* PLANES */}
+      {/* SERVICIOS */}
       <section className="px-4 lg:px-6 py-14 lg:py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-
-        <PlanCard
-          title="FinOps Foundation"
-          description="Visibilidad y control financiero cloud."
-          features={[
-            "Integración con AWS (1 cuenta)",
-            "Dashboard de costos, cuentas y servicios",
-            "Hallazgos y recomendaciones de ahorro",
-            "Inventario de recursos y análisis de riesgo",
-            "Costos y financieros (visión general)",
-            "Exportación de reportes (PDF, CSV, XLSX)",
-            "Hasta 3 usuarios",
-            "Soporte estándar",
-          ]}
-          bg="bg-gradient-to-br from-slate-200 via-slate-100 to-white"
-          border="border border-slate-300"
-          button="bg-slate-700"
-          onClick={() => handleSelectPlan("FinOps Foundation")}
-        />
-
-        <PlanCard
-          title="FinOps Professional"
-          description="Optimización activa y decisiones basadas en datos."
-          features={[
-            "Todo Foundation",
-            "Hasta 5 cuentas AWS",
-            "Hasta 9 usuarios",
-            "Optimización avanzada (Findings & Rightsizing)",
-            "Análisis de Savings Plans y Reserved Instances",
-            "Reportes detallados: Cost, Risk y Resource",
-            "Proyección financiera (ROI & Savings)",
-            "Forecast y control presupuestario",
-            "Governance FinOps",
-            "Planes de ahorro (RI & Savings Plans)",
-            "Soporte prioritario",
-          ]}
-          bg="bg-gradient-to-br from-blue-50 to-blue-100"
-          border="border-2 border-blue-600"
-          button="bg-blue-600"
-          highlight
-          onClick={() => handleSelectPlan("FinOps Professional")}
-        />
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
 
         <PlanCard
           title="FinOps Enterprise"
-          description="Gobierno completo y automatización avanzada."
+          description="Gobierno completo y automatización avanzada de tus costos en AWS."
+          badge="🎉 20% DCTO"
           features={[
-            "Todo Professional",
-            "Hasta 10 cuentas AWS",
-            "Hasta 12 usuarios",
+            "Integración con AWS (hasta 10 cuentas)",
+            "Dashboard de costos, hallazgos y optimización",
+            "Inventario de recursos y análisis de riesgo",
             "Policies y alertas automáticas",
-            "Gobernanza avanzada multi-account",
+            "Gobernanza avanzada multi-cuenta",
             "Reportes ejecutivos automatizados",
             "Project Calculator (proyección de costos)",
-            "Asistente FinOps integrado",
-            "Modelo operativo FinOps",
-            "Acompañamiento estratégico continuo",
+            "Asistente FinOps.ia integrado",
+            "Hasta 12 usuarios",
           ]}
           bg="bg-gradient-to-br from-purple-50 to-purple-100"
-          border="border border-purple-300"
+          border="border-2 border-purple-600"
           button="bg-purple-700"
+          highlight
           onClick={() => handleSelectPlan("FinOps Enterprise")}
+        />
+
+        <PlanCard
+          title="Talento TI"
+          description="Profesionales especializados para acompañar los procesos de desarrollo de tu equipo."
+          badge={null}
+          buttonLabel="Solicitar Talento TI"
+          features={[
+            "Desarrolladores Backend y Frontend",
+            "Ingenieros Fullstack",
+            "QA / Testing (manual y automatizado)",
+            "Integración directa con tu equipo y metodología",
+            "Modalidad staff augmentation o por proyecto",
+            "Perfiles seniors validados técnicamente",
+            "Onboarding y seguimiento continuo",
+          ]}
+          bg="bg-gradient-to-br from-blue-50 to-blue-100"
+          border="border border-blue-300"
+          button="bg-blue-700"
+          onClick={() => handleSelectPlan("Talento TI")}
         />
 
         <PlanCard
           title="Consultoría FinOps Estratégica"
           description="Diagnóstico, implementación y acompañamiento especializado en optimización en la nube."
+          badge={null}
+          buttonLabel="Solicitar Propuesta"
           features={[
             "Assessment FinOps completo",
             "Identificación de desperdicio y quick wins",
@@ -121,7 +104,6 @@ export default function Servicios() {
           onClick={() => handleSelectPlan("Consultoría FinOps Estratégica")}
         />
 
-
         </div>
 
         {/* TABLA COMPARATIVA */}
@@ -134,10 +116,10 @@ export default function Servicios() {
 
       <PublicFooter />
 
-      {showConsultoriaModal && (
+      {contactService && (
         <ContractModal
-          plan="Consultoría FinOps Estratégica"
-          onClose={() => setShowConsultoriaModal(false)}
+          plan={contactService}
+          onClose={() => setContactService(null)}
         />
       )}
     </main>
