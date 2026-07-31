@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ServicesSection from './components/ServicesSection';
-import DashboardPreview from './components/DashboardPreview';
+import WhyFinOps from './components/WhyFinOps';
 
 // Componente de contador animado
 function AnimatedCounter({
@@ -83,7 +83,7 @@ export default function Home() {
         </div>
       </section>
 
-      <DashboardPreview />
+      <WhyFinOps />
 
       <ServicesSection />
 
