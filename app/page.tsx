@@ -1,6 +1,7 @@
 import ServicesSection from './components/ServicesSection';
 import WhyFinOps from './components/WhyFinOps';
 import AlliancesSection from './components/AlliancesSection';
+import HeroHeadline from './components/HeroHeadline';
 
 const PILLARS = [
   {
@@ -36,9 +37,7 @@ export default function Home() {
         </video>
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 pb-14 sm:pb-20">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-8 [text-shadow:0_2px_6px_rgba(0,0,0,0.9),0_4px_20px_rgba(0,0,0,0.8)]">
-            Optimización de Costos en la Nube
-          </h1>
+          <HeroHeadline />
 
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <a
