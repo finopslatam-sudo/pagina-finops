@@ -1,5 +1,3 @@
-import { Globe, Flag, Briefcase } from 'lucide-react';
-
 const PORTFOLIO_ITEMS = [
   'Envisioning Workshop',
   'IT Asset Management (ITAM)',
@@ -67,27 +65,11 @@ export default function AlliancesSection() {
 
           {/* DIAGRAMA DE VENN */}
           <div className="flex justify-center">
-            <svg viewBox="0 0 400 380" className="w-full max-w-md" role="img" aria-label="Disciplinas FinOps, T2Bv e ITAM integradas en IT Financial Optimization">
-              <g style={{ mixBlendMode: 'multiply' }}>
-                <circle cx="200" cy="150" r="120" fill="#38bdf8" />
-                <circle cx="140" cy="260" r="120" fill="#2dd4bf" />
-                <circle cx="260" cy="260" r="120" fill="#22c55e" />
-              </g>
-
-              <text x="200" y="105" textAnchor="middle" fill="white" fontSize="22" fontWeight="700">FinOps</text>
-              <text x="105" y="300" textAnchor="middle" fill="#0f172a" fontSize="20" fontWeight="700">T2Bv</text>
-              <text x="295" y="300" textAnchor="middle" fill="white" fontSize="20" fontWeight="700">ITAM</text>
-
-              <foreignObject x="150" y="185" width="36" height="36">
-                <Globe className="w-9 h-9 text-white" strokeWidth={1.75} />
-              </foreignObject>
-              <foreignObject x="214" y="185" width="36" height="36">
-                <Flag className="w-9 h-9 text-white" strokeWidth={1.75} />
-              </foreignObject>
-              <foreignObject x="182" y="248" width="36" height="36">
-                <Briefcase className="w-9 h-9 text-white" strokeWidth={1.75} />
-              </foreignObject>
-            </svg>
+            <img
+              src="/alianza-finops-venn.png"
+              alt="Disciplinas FinOps, T2Bv e ITAM integradas en IT Financial Optimization"
+              className="w-full max-w-md h-auto"
+            />
           </div>
 
         </div>
