@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import ServicesSection from './components/ServicesSection';
 import WhyFinOps from './components/WhyFinOps';
+import AlliancesSection from './components/AlliancesSection';
 
 // Componente de contador animado
 function AnimatedCounter({
@@ -86,6 +87,8 @@ export default function Home() {
       <WhyFinOps />
 
       <ServicesSection />
+
+      <AlliancesSection />
 
       {/* SOBRE MI */}
       <section id="sobre-mi" className="px-4 lg:px-6 py-14 lg:py-20 bg-gray-50">
