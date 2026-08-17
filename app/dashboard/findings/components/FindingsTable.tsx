@@ -135,6 +135,14 @@ const RESOLUTION: Record<string, string> = {
     "Deshabilitar el usuario admin del Container Registry y usar identidades de Azure AD/Managed Identity para autenticarse.",
   ACR_PUBLIC_NETWORK_ACCESS:
     "Restringir el acceso de red del Container Registry con Private Endpoint o reglas de firewall si no es necesario.",
+  VNET_DDOS_PROTECTION_STANDARD_ENABLED:
+    "Revisar si DDoS Protection Standard es realmente necesario, dado su costo fijo mensual elevado. DDoS Protection Basic viene incluido gratis en toda VNet.",
+  VNET_NO_SUBNETS:
+    "Verificar si la Virtual Network sin subnets sigue siendo necesaria. Si es un recurso huérfano, eliminarla.",
+  LOADBALANCER_IDLE_NO_BACKEND:
+    "Registrar destinos en los backend pools del Load Balancer, o eliminarlo si ya no está en uso.",
+  LOADBALANCER_BASIC_SKU_DEPRECATED:
+    "Migrar el Load Balancer de SKU Basic a Standard antes del 30 de septiembre de 2025, fecha en la que Microsoft retira Basic.",
 };
 
 function getResolution(findingType: string): string {
