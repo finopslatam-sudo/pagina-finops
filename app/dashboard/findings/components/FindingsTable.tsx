@@ -155,6 +155,26 @@ const RESOLUTION: Record<string, string> = {
     "Configurar un Daily Cap en el Log Analytics Workspace (Usage and estimated costs > Data Cap) para evitar un pico de costo inesperado.",
   MONITOR_RETENTION_HIGH:
     "Reducir el período de retención del Log Analytics Workspace, o evaluar exportar datos antiguos a un Storage Account más económico.",
+  COSMOSDB_PUBLIC_NETWORK_ACCESS:
+    "Restringir el acceso de red de la cuenta Cosmos DB con Private Endpoint, filtro de VNet o reglas de firewall de IP.",
+  COSMOSDB_MULTI_REGION_REVIEW:
+    "Revisar si todas las regiones configuradas en la cuenta Cosmos DB son necesarias; cada región adicional multiplica el costo de throughput y almacenamiento.",
+  MANAGEDDISK_UNATTACHED:
+    "Crear un snapshot del disco como respaldo y luego eliminarlo. Los discos desconectados siguen generando costo.",
+  MANAGEDDISK_ZRS_REVIEW:
+    "Verificar si la redundancia Zone-Redundant Storage (ZRS) es necesaria para este disco, o si LRS es suficiente y más económico.",
+  PUBLICIP_UNASSOCIATED:
+    "Asociar la Public IP a un recurso activo o liberarla si ya no se necesita.",
+  PUBLICIP_BASIC_SKU_DEPRECATED:
+    "Migrar la Public IP de SKU Basic a Standard antes del 30 de septiembre de 2025, fecha en la que Microsoft retira Basic.",
+  NATGATEWAY_NO_SUBNETS:
+    "Eliminar el NAT Gateway si no hay subnets asociadas y no hay planes de usarlo pronto.",
+  NATGATEWAY_NO_PUBLIC_IP:
+    "Asignar una IP pública al NAT Gateway para que el tráfico saliente funcione correctamente.",
+  FIREWALL_NO_IP_CONFIG:
+    "Completar la configuración de IP del Azure Firewall (Public IP + Virtual Network/Hub), o eliminarlo si ya no está en uso.",
+  FIREWALL_PREMIUM_TIER_REVIEW:
+    "Evaluar si las features Premium (IDPS, inspección TLS) son necesarias, o si el tier Standard es suficiente y más económico.",
 };
 
 function getResolution(findingType: string): string {
