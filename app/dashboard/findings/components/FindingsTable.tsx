@@ -127,6 +127,10 @@ const RESOLUTION: Record<string, string> = {
     "Habilitar 'HTTPS Only' en la configuración de la Function App (Settings > TLS/SSL settings).",
   FUNCTIONS_STOPPED:
     "Verificar si la Function App detenida sigue siendo necesaria, especialmente si usa un plan Premium o dedicado que factura aunque esté detenida.",
+  CONTAINERINSTANCES_PUBLIC_IP_EXPOSED:
+    "Verificar si el Container Group necesita IP pública. Si no, usar una IP privada con VNet integration.",
+  CONTAINERINSTANCES_RESTART_POLICY_ALWAYS:
+    "Revisar si el restart policy 'Always' es intencional. Para jobs puntuales, usar 'OnFailure' o 'Never' evita reinicios y costo indefinido ante una falla.",
 };
 
 function getResolution(findingType: string): string {
