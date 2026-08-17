@@ -143,6 +143,18 @@ const RESOLUTION: Record<string, string> = {
     "Registrar destinos en los backend pools del Load Balancer, o eliminarlo si ya no está en uso.",
   LOADBALANCER_BASIC_SKU_DEPRECATED:
     "Migrar el Load Balancer de SKU Basic a Standard antes del 30 de septiembre de 2025, fecha en la que Microsoft retira Basic.",
+  APPGATEWAY_NO_BACKEND_POOL:
+    "Registrar destinos en los backend pools del Application Gateway, o eliminarlo si ya no está en uso.",
+  APPGATEWAY_AUTOSCALE_DISABLED:
+    "Evaluar migrar a un SKU v2 (Standard_v2/WAF_v2) con autoscaling para pagar solo por la capacidad que realmente se usa.",
+  KEYVAULT_PURGE_PROTECTION_DISABLED:
+    "Habilitar Purge Protection en el Key Vault (Settings > Purge protection). No se puede deshabilitar una vez activado.",
+  KEYVAULT_PUBLIC_NETWORK_ACCESS:
+    "Restringir el acceso de red del Key Vault con Private Endpoint o reglas de firewall (Networking > Firewalls and virtual networks).",
+  MONITOR_UNLIMITED_DAILY_QUOTA:
+    "Configurar un Daily Cap en el Log Analytics Workspace (Usage and estimated costs > Data Cap) para evitar un pico de costo inesperado.",
+  MONITOR_RETENTION_HIGH:
+    "Reducir el período de retención del Log Analytics Workspace, o evaluar exportar datos antiguos a un Storage Account más económico.",
 };
 
 function getResolution(findingType: string): string {
