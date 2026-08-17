@@ -131,6 +131,10 @@ const RESOLUTION: Record<string, string> = {
     "Verificar si el Container Group necesita IP pública. Si no, usar una IP privada con VNet integration.",
   CONTAINERINSTANCES_RESTART_POLICY_ALWAYS:
     "Revisar si el restart policy 'Always' es intencional. Para jobs puntuales, usar 'OnFailure' o 'Never' evita reinicios y costo indefinido ante una falla.",
+  ACR_ADMIN_USER_ENABLED:
+    "Deshabilitar el usuario admin del Container Registry y usar identidades de Azure AD/Managed Identity para autenticarse.",
+  ACR_PUBLIC_NETWORK_ACCESS:
+    "Restringir el acceso de red del Container Registry con Private Endpoint o reglas de firewall si no es necesario.",
 };
 
 function getResolution(findingType: string): string {
