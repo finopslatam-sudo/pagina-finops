@@ -119,6 +119,10 @@ const RESOLUTION: Record<string, string> = {
     "Deshabilitar las cuentas locales del clúster ('Disable local accounts') y forzar autenticación vía Azure AD/Entra ID.",
   AKS_AUTOSCALING_DISABLED:
     "Habilitar el cluster autoscaler en los node pools que no lo tengan, para evitar nodos sobreaprovisionados sin uso.",
+  APPSERVICE_HTTPS_ONLY_DISABLED:
+    "Habilitar 'HTTPS Only' en la configuración del Web App (Settings > TLS/SSL settings).",
+  APPSERVICE_STOPPED:
+    "Verificar si la Web App detenida sigue siendo necesaria. Si el App Service Plan no tiene otras apps activas, eliminarlo para dejar de pagarlo.",
 };
 
 function getResolution(findingType: string): string {
