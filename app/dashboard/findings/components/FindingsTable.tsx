@@ -123,6 +123,10 @@ const RESOLUTION: Record<string, string> = {
     "Habilitar 'HTTPS Only' en la configuración del Web App (Settings > TLS/SSL settings).",
   APPSERVICE_STOPPED:
     "Verificar si la Web App detenida sigue siendo necesaria. Si el App Service Plan no tiene otras apps activas, eliminarlo para dejar de pagarlo.",
+  FUNCTIONS_HTTPS_ONLY_DISABLED:
+    "Habilitar 'HTTPS Only' en la configuración de la Function App (Settings > TLS/SSL settings).",
+  FUNCTIONS_STOPPED:
+    "Verificar si la Function App detenida sigue siendo necesaria, especialmente si usa un plan Premium o dedicado que factura aunque esté detenida.",
 };
 
 function getResolution(findingType: string): string {
