@@ -115,6 +115,10 @@ const RESOLUTION: Record<string, string> = {
     "Restringir el acceso de red del Flexible Server con reglas de firewall/VNet integration, o deshabilitar el acceso público si no es necesario.",
   MYSQL_BACKUP_RETENTION_LOW:
     "Aumentar el período de backup retention a 7 días o más desde la configuración del Flexible Server.",
+  AKS_LOCAL_ACCOUNTS_ENABLED:
+    "Deshabilitar las cuentas locales del clúster ('Disable local accounts') y forzar autenticación vía Azure AD/Entra ID.",
+  AKS_AUTOSCALING_DISABLED:
+    "Habilitar el cluster autoscaler en los node pools que no lo tengan, para evitar nodos sobreaprovisionados sin uso.",
 };
 
 function getResolution(findingType: string): string {
