@@ -111,6 +111,10 @@ const RESOLUTION: Record<string, string> = {
     "Restringir el acceso de red del Flexible Server con reglas de firewall/VNet integration, o deshabilitar el acceso público si no es necesario.",
   POSTGRESQL_BACKUP_RETENTION_LOW:
     "Aumentar el período de backup retention a 7 días o más desde la configuración del Flexible Server.",
+  MYSQL_PUBLIC_NETWORK_ACCESS:
+    "Restringir el acceso de red del Flexible Server con reglas de firewall/VNet integration, o deshabilitar el acceso público si no es necesario.",
+  MYSQL_BACKUP_RETENTION_LOW:
+    "Aumentar el período de backup retention a 7 días o más desde la configuración del Flexible Server.",
 };
 
 function getResolution(findingType: string): string {
