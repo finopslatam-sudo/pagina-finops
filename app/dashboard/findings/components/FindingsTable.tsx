@@ -99,6 +99,10 @@ const RESOLUTION: Record<string, string> = {
     "Habilitar Encryption at Rest en el dominio. Requiere recrear el dominio, ya que no puede activarse en uno existente sin migración.",
   VM_STOPPED_NOT_DEALLOCATED:
     "Detener la VM con 'Stop (Deallocate)' desde Azure Portal/CLI en vez de apagarla solo desde el sistema operativo, para dejar de pagar el cómputo.",
+  STORAGE_PUBLIC_BLOB_ACCESS:
+    "Deshabilitar 'Allow Blob public access' a nivel de Storage Account, salvo que exista una razón explícita para exponer contenedores públicamente.",
+  STORAGE_HTTPS_NOT_ENFORCED:
+    "Habilitar 'Secure transfer required' (HTTPS) en la configuración del Storage Account.",
 };
 
 function getResolution(findingType: string): string {
