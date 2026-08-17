@@ -103,6 +103,10 @@ const RESOLUTION: Record<string, string> = {
     "Deshabilitar 'Allow Blob public access' a nivel de Storage Account, salvo que exista una razón explícita para exponer contenedores públicamente.",
   STORAGE_HTTPS_NOT_ENFORCED:
     "Habilitar 'Secure transfer required' (HTTPS) en la configuración del Storage Account.",
+  SQL_SERVER_PUBLIC_NETWORK_ACCESS:
+    "Restringir el acceso de red del SQL Server con reglas de firewall o un Private Endpoint, o deshabilitar el acceso público si no es necesario.",
+  SQL_SERVER_TLS_OUTDATED:
+    "Actualizar 'Minimum TLS Version' del SQL Server a 1.2 desde Azure Portal (Networking > Connectivity settings).",
 };
 
 function getResolution(findingType: string): string {
