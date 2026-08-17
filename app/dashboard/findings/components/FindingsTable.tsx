@@ -2,6 +2,7 @@
 
 import { Finding } from "../types";
 import { useAuth } from "@/app/context/AuthContext";
+import ProviderBadge from "../../components/ProviderBadge";
 
 interface Props {
   findings: Finding[];
@@ -96,6 +97,8 @@ const RESOLUTION: Record<string, string> = {
     "Reducir el período de retención del stream a 24 horas si no se requiere replay histórico de los datos.",
   OPENSEARCH_UNENCRYPTED:
     "Habilitar Encryption at Rest en el dominio. Requiere recrear el dominio, ya que no puede activarse en uno existente sin migración.",
+  VM_STOPPED_NOT_DEALLOCATED:
+    "Detener la VM con 'Stop (Deallocate)' desde Azure Portal/CLI en vez de apagarla solo desde el sistema operativo, para dejar de pagar el cómputo.",
 };
 
 function getResolution(findingType: string): string {
@@ -124,18 +127,20 @@ export default function FindingsTable({
     <div className="w-full overflow-x-auto">
       <table className="w-full min-w-[800px] bg-white shadow rounded-xl text-sm table-fixed">
         <colgroup>
-          <col className="w-[7%]" />
+          <col className="w-[6%]" />
+          <col className="w-[9%]" />
+          <col className="w-[9%]" />
+          <col className="w-[12%]" />
           <col className="w-[10%]" />
-          <col className="w-[13%]" />
-          <col className="w-[11%]" />
-          <col className="w-[8%]" />
           <col className="w-[7%]" />
-          <col className="w-[7%]" />
-          <col className="w-[18%]" />
+          <col className="w-[6%]" />
+          <col className="w-[6%]" />
+          <col className="w-[16%]" />
           <col className="w-[19%]" />
         </colgroup>
         <thead>
           <tr className="text-left border-b bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+            <th className="px-4 py-3">Provider</th>
             <th className="px-4 py-3">Service</th>
             <th className="px-4 py-3">Account</th>
             <th className="px-4 py-3">Type</th>
@@ -155,6 +160,10 @@ export default function FindingsTable({
               className="hover:bg-gray-50 cursor-pointer transition align-top"
               onClick={() => onRowClick?.(f)}
             >
+              <td className="px-4 py-3">
+                <ProviderBadge provider={f.provider} />
+              </td>
+
               <td className="px-4 py-3 font-medium text-gray-800 truncate">
                 {f.aws_service}
               </td>

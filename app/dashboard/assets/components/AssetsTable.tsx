@@ -1,3 +1,5 @@
+import ProviderBadge from '../../components/ProviderBadge';
+
 type Resource = {
   resource_id:    string;
   service_name:   string;
@@ -6,6 +8,7 @@ type Resource = {
   findings_count: number;
   state?:         { label: string; category: string };
   resource_type:  string;
+  provider?:      'aws' | 'azure';
 };
 
 interface Props {
@@ -43,6 +46,7 @@ export default function AssetsTable({ paginatedResources, filteredResources, pag
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 text-gray-600">
             <tr>
+              <th className="p-4 text-left">Proveedor</th>
               <th className="p-4 text-left">Servicio</th>
               <th className="p-4 text-left">Tipo</th>
               <th className="p-4 text-left">Recurso</th>
@@ -54,6 +58,7 @@ export default function AssetsTable({ paginatedResources, filteredResources, pag
           <tbody>
             {paginatedResources.map(r => (
               <tr key={r.resource_id} className="border-t hover:bg-gray-50 transition">
+                <td className="p-4"><ProviderBadge provider={r.provider} /></td>
                 <td className="p-4 font-semibold">{r.service_name}</td>
                 <td className="p-4 text-gray-600">{r.resource_type}</td>
                 <td className="p-4 font-mono text-xs">{r.resource_id}</td>

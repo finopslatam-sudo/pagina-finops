@@ -17,6 +17,11 @@ interface InventoryResource {
   resource_type: string;
   region: string;
 
+  // Opcional: los endpoints actuales (AWS) no lo envían todavía. Cuando
+  // el inventario incluya cuentas Azure, el backend lo agregará y la UI
+  // ya sabe renderizarlo (ver ProviderBadge).
+  provider?: 'aws' | 'azure';
+
   state: {
     raw: string | null;
     label: string;

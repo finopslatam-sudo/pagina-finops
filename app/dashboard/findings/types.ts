@@ -20,6 +20,10 @@ export interface Finding {
 
   region?: string;
 
+  // Opcional: los endpoints actuales (AWS) no lo envían todavía. Preparado
+  // para cuando el finding engine de Azure quede conectado a este endpoint.
+  provider?: "aws" | "azure";
+
   detected_at?: string;
   created_at?: string;
 }
