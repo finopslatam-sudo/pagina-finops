@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import PlanCard from './components/PlanCard';
 import ContractModal from './components/ContractModal';
 import PlanComparisonTable from '@/app/components/PlanComparisonTable';
+import CloudCoverageTable from '@/app/components/CloudCoverageTable';
 import PublicFooter from '@/app/components/layout/PublicFooter';
 import { PLAN_SLUGS } from '@/app/pago/constants';
 
@@ -109,6 +110,11 @@ export default function Servicios() {
         {/* TABLA COMPARATIVA */}
         <div className="max-w-7xl mx-auto mt-16">
           <PlanComparisonTable />
+        </div>
+
+        {/* COBERTURA MULTI-CLOUD */}
+        <div className="max-w-7xl mx-auto mt-16">
+          <CloudCoverageTable />
         </div>
       </section>
 
