@@ -2,16 +2,29 @@
 
 import { useState, useCallback } from 'react';
 import type { ProjectItem, ServiceConfig } from '../types';
+import { providerOf } from '../types';
 import { calcCost } from '../pricing';
+import { calcAzureCost } from '../azure-pricing';
+import { calcGCPCost } from '../gcp-pricing';
+import type { AzureServiceConfig } from '../azure-types';
+import type { GCPServiceConfig } from '../gcp-types';
 
 let _id = 1;
+
+function resolveCost(config: ServiceConfig): number {
+  const provider = providerOf(config.type);
+  if (provider === 'azure') return calcAzureCost(config as AzureServiceConfig);
+  if (provider === 'gcp') return calcGCPCost(config as GCPServiceConfig);
+  return calcCost(config);
+}
 
 export function useCalculator() {
   const [items, setItems] = useState<ProjectItem[]>([]);
 
   const addItem = useCallback((name: string, config: ServiceConfig) => {
-    const monthlyCost = calcCost(config);
-    setItems(prev => [...prev, { id: String(_id++), name, config, monthlyCost }]);
+    const monthlyCost = resolveCost(config);
+    const provider = providerOf(config.type);
+    setItems(prev => [...prev, { id: String(_id++), name, provider, config, monthlyCost }]);
   }, []);
 
   const removeItem = useCallback((id: string) => {

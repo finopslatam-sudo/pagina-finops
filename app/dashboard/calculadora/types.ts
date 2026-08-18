@@ -1,8 +1,23 @@
-export type ServiceType =
+import type { AzureServiceType, AzureServiceConfig } from './azure-types';
+import { AZURE_SERVICE_LABELS } from './azure-types';
+import type { GCPServiceType, GCPServiceConfig } from './gcp-types';
+import { GCP_SERVICE_LABELS } from './gcp-types';
+
+export type Provider = 'aws' | 'azure' | 'gcp';
+
+export const PROVIDER_LABELS: Record<Provider, { label: string; icon: string }> = {
+  aws:   { label: 'AWS',   icon: '🟠' },
+  azure: { label: 'Azure', icon: '🔷' },
+  gcp:   { label: 'GCP',   icon: '🔴' },
+};
+
+export type AWSServiceType =
   | 'ec2' | 'rds' | 'lambda' | 's3' | 'ebs'
   | 'dynamodb' | 'nat' | 'ecs' | 'cloudwatch';
 
-export const SERVICE_LABELS: Record<ServiceType, {
+export type ServiceType = AWSServiceType | AzureServiceType | GCPServiceType;
+
+export const AWS_SERVICE_LABELS: Record<AWSServiceType, {
   label: string; icon: string; color: string; btnColor: string;
 }> = {
   ec2:        { label: 'EC2 Instances',   icon: '💻', color: 'bg-orange-50 border-orange-200', btnColor: 'bg-orange-500 hover:bg-orange-600' },
@@ -14,6 +29,20 @@ export const SERVICE_LABELS: Record<ServiceType, {
   nat:        { label: 'NAT Gateway',     icon: '🌐', color: 'bg-teal-50 border-teal-200',     btnColor: 'bg-teal-600 hover:bg-teal-700'    },
   ecs:        { label: 'ECS Fargate',     icon: '🐳', color: 'bg-cyan-50 border-cyan-200',     btnColor: 'bg-cyan-600 hover:bg-cyan-700'    },
   cloudwatch: { label: 'CloudWatch Logs', icon: '📋', color: 'bg-purple-50 border-purple-200', btnColor: 'bg-purple-600 hover:bg-purple-700'},
+};
+
+export const SERVICE_LABELS: Record<ServiceType, {
+  label: string; icon: string; color: string; btnColor: string;
+}> = {
+  ...AWS_SERVICE_LABELS,
+  ...AZURE_SERVICE_LABELS,
+  ...GCP_SERVICE_LABELS,
+};
+
+export const SERVICES_BY_PROVIDER: Record<Provider, ServiceType[]> = {
+  aws: Object.keys(AWS_SERVICE_LABELS) as ServiceType[],
+  azure: Object.keys(AZURE_SERVICE_LABELS) as ServiceType[],
+  gcp: Object.keys(GCP_SERVICE_LABELS) as ServiceType[],
 };
 
 export interface EC2Config {
@@ -72,7 +101,7 @@ export interface CloudWatchConfig {
   storageGB: number;
 }
 
-export type ServiceConfig =
+export type AWSServiceConfig =
   | { type: 'ec2';        data: EC2Config        }
   | { type: 'rds';        data: RDSConfig        }
   | { type: 'lambda';     data: LambdaConfig     }
@@ -83,9 +112,18 @@ export type ServiceConfig =
   | { type: 'ecs';        data: ECSConfig        }
   | { type: 'cloudwatch'; data: CloudWatchConfig };
 
+export type ServiceConfig = AWSServiceConfig | AzureServiceConfig | GCPServiceConfig;
+
+export function providerOf(type: ServiceType): Provider {
+  if (type.startsWith('azure_')) return 'azure';
+  if (type.startsWith('gcp_')) return 'gcp';
+  return 'aws';
+}
+
 export interface ProjectItem {
   id: string;
   name: string;
+  provider: Provider;
   config: ServiceConfig;
   monthlyCost: number;
 }

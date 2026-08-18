@@ -1,7 +1,7 @@
 'use client';
 
 import type { ProjectItem } from '../types';
-import { SERVICE_LABELS } from '../types';
+import { SERVICE_LABELS, PROVIDER_LABELS } from '../types';
 
 interface Props {
   items: ProjectItem[];
@@ -42,6 +42,7 @@ export default function ItemList({ items, onRemove }: Props) {
                     <span className="flex items-center gap-1.5">
                       <span>{info?.icon}</span>
                       <span>{info?.label}</span>
+                      <span className="text-xs text-slate-400">{PROVIDER_LABELS[item.provider].icon}</span>
                     </span>
                   </td>
                   <td className="px-5 py-3 text-sm font-semibold text-slate-800 text-right">

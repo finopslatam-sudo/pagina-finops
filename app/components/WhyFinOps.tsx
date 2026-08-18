@@ -67,7 +67,7 @@ export default function WhyFinOps() {
         {/* HEADLINE */}
         <div className="text-center mb-12 lg:mb-16 max-w-3xl mx-auto">
           <h2 className="text-2xl lg:text-4xl font-bold mb-4 text-gray-900">
-            Reducir costos ya no alcanza: hay que saber en qué se gasta cada dólar
+            Reducir costos ya no es suficiente: hay que saber en qué se gasta cada dólar
           </h2>
           <p className="text-gray-600 text-base lg:text-lg leading-relaxed">
             Las empresas que operan con prácticas FinOps maduras no solo gastan menos: toman mejores
