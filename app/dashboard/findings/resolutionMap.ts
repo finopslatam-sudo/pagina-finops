@@ -241,6 +241,28 @@ const RESOLUTION: Record<string, string> = {
     "Configurar una expiración por defecto de tablas en el dataset (Details > Default table expiration) para evitar acumulación indefinida de datos.",
   BIGQUERY_NO_PARTITION_EXPIRATION:
     "Configurar una expiración por defecto de particiones en el dataset si las tablas particionadas no necesitan retener datos indefinidamente.",
+  CDN_PROFILE_NO_ENDPOINTS:
+    "Verificar si el perfil de CDN/Front Door sigue siendo necesario. Si no tiene endpoints activos, eliminarlo para dejar de pagar su tier base.",
+  CDN_HTTP_ALLOWED:
+    "Restringir el endpoint del CDN a solo HTTPS desde su configuración (deshabilitar 'HTTP allowed').",
+  DNS_ZONE_EMPTY:
+    "Verificar si la zona DNS sin registros propios sigue siendo necesaria. Si es huérfana, eliminarla.",
+  DNS_ZONE_PRIVATE_REVIEW:
+    "Confirmar que la zona DNS privada sigue vinculada a las VNets que la necesitan.",
+  SERVICEBUS_NAMESPACE_EMPTY:
+    "Verificar si el namespace de Service Bus sigue siendo necesario. Si no tiene colas ni topics, eliminarlo.",
+  SERVICEBUS_TLS_OUTDATED:
+    "Actualizar la versión mínima de TLS del namespace de Service Bus a 1.2.",
+  CDNBACKEND_NO_BACKENDS:
+    "Verificar si el backend service con Cloud CDN habilitado sigue en uso. Si no tiene backends asociados, eliminarlo.",
+  CDNBACKEND_CACHE_MODE_REVIEW:
+    "Evaluar un modo de cache más agresivo (CACHE_ALL_STATIC) para reducir el tráfico al origen.",
+  LOGGING_RETENTION_HIGH:
+    "Reducir la retención del log bucket o exportar los datos antiguos a Cloud Storage.",
+  LOGGING_BUCKET_NOT_LOCKED:
+    "Habilitar el 'lock' de retención del log bucket para evitar que se reduzca accidentalmente.",
+  SNAPSHOT_ORPHANED:
+    "Verificar si el snapshot todavía es necesario como respaldo. Si el disco de origen ya no existe, eliminarlo para dejar de pagar su almacenamiento.",
 };
 
 export default RESOLUTION;
