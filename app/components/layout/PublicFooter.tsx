@@ -17,7 +17,7 @@ export default function PublicFooter() {
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
               Expertos en Optimización de Costos en la Nube,
-              automatización FinOps y control financiero para AWS.
+              automatización FinOps y control financiero multi-cloud: AWS, Azure y GCP.
             </p>
           </div>
 

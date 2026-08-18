@@ -3,11 +3,14 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Servicios FinOps en Chile y Latinoamérica',
   description:
-    'Planes FinOps para empresas de Chile y LATAM: visibilidad de costos AWS, optimización continua, gobernanza cloud y acompañamiento estratégico.',
+    'Planes FinOps para empresas de Chile y LATAM: visibilidad de costos multi-cloud (AWS, Azure y GCP), optimización continua, gobernanza cloud y acompañamiento estratégico.',
   keywords: [
     'servicios FinOps Chile',
     'planes FinOps',
+    'FinOps multi-cloud',
     'optimización AWS LATAM',
+    'optimización Azure LATAM',
+    'optimización GCP LATAM',
     'gobernanza cloud',
   ],
   alternates: {

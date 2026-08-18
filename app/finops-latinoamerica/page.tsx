@@ -3,13 +3,16 @@ import Link from 'next/link';
 import PublicFooter from '@/app/components/layout/PublicFooter';
 
 export const metadata: Metadata = {
-  title: 'FinOps Latinoamérica: Optimización Cloud para Empresas',
+  title: 'FinOps Latinoamérica: Optimización Multi-Cloud para Empresas',
   description:
-    'Implementación de FinOps en Latinoamérica para optimizar costos AWS, mejorar gobierno financiero cloud y escalar con eficiencia.',
+    'Implementación de FinOps en Latinoamérica para optimizar costos en AWS, Azure y GCP, mejorar gobierno financiero cloud y escalar con eficiencia.',
   keywords: [
     'FinOps Latinoamérica',
     'FinOps LATAM',
     'optimización costos AWS LATAM',
+    'optimización costos Azure LATAM',
+    'optimización costos GCP LATAM',
+    'FinOps multi-cloud LATAM',
     'consultoría FinOps regional',
     'gobierno cloud latinoamerica',
   ],
@@ -17,17 +20,17 @@ export const metadata: Metadata = {
     canonical: '/finops-latinoamerica',
   },
   openGraph: {
-    title: 'FinOps Latinoamérica: Optimización Cloud para Empresas',
+    title: 'FinOps Latinoamérica: Optimización Multi-Cloud para Empresas',
     description:
-      'Acompañamos organizaciones de LATAM para reducir costos cloud, fortalecer gobernanza y escalar AWS con control financiero.',
+      'Acompañamos organizaciones de LATAM para reducir costos cloud, fortalecer gobernanza y escalar en AWS, Azure y GCP con control financiero.',
     url: '/finops-latinoamerica',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FinOps Latinoamérica: Optimización Cloud para Empresas',
+    title: 'FinOps Latinoamérica: Optimización Multi-Cloud para Empresas',
     description:
-      'Acompañamos organizaciones de LATAM para reducir costos cloud, fortalecer gobernanza y escalar AWS con control financiero.',
+      'Acompañamos organizaciones de LATAM para reducir costos cloud, fortalecer gobernanza y escalar en AWS, Azure y GCP con control financiero.',
   },
 };
 
@@ -53,7 +56,7 @@ export default function FinopsLatamPage() {
           </h1>
           <p className="text-blue-100 text-base sm:text-xl max-w-3xl">
             Diseñamos e implementamos prácticas FinOps para empresas de LATAM que necesitan
-            visibilidad de costos, gobernanza financiera y crecimiento sostenible en AWS.
+            visibilidad de costos, gobernanza financiera y crecimiento sostenible en AWS, Azure y GCP.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Link
@@ -105,7 +108,7 @@ export default function FinopsLatamPage() {
             <article className="bg-white rounded-xl border border-gray-200 p-5">
               <h3 className="font-semibold text-lg mb-2">Eficiencia de infraestructura</h3>
               <p className="text-gray-600">
-                Menor desperdicio en recursos y mayor aprovechamiento de inversión en AWS.
+                Menor desperdicio en recursos y mayor aprovechamiento de inversión en AWS, Azure y GCP.
               </p>
             </article>
             <article className="bg-white rounded-xl border border-gray-200 p-5">

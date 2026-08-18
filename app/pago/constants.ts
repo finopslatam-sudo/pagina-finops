@@ -24,7 +24,7 @@ export const PLANS: Record<PlanSlug, PlanInfo> = {
     borderColor: 'border-slate-300',
     badgeBg: 'bg-slate-700',
     features: [
-      'Integración con AWS (1 cuenta)',
+      'Integración con AWS, Azure o GCP (1 cuenta)',
       'Dashboard de costos, cuentas y servicios',
       'Hallazgos y recomendaciones de ahorro',
       'Inventario de recursos y análisis de riesgo',
@@ -45,7 +45,7 @@ export const PLANS: Record<PlanSlug, PlanInfo> = {
     badgeBg: 'bg-blue-600',
     features: [
       'Todo Foundation',
-      'Hasta 5 cuentas AWS',
+      'Hasta 5 cuentas por proveedor (AWS, Azure o GCP)',
       'Hasta 9 usuarios',
       'Optimización avanzada (Findings & Rightsizing)',
       'Análisis de Savings Plans y Reserved Instances',
@@ -64,7 +64,7 @@ export const PLANS: Record<PlanSlug, PlanInfo> = {
     badgeBg: 'bg-purple-700',
     features: [
       'Todo Professional',
-      'Hasta 10 cuentas AWS',
+      'Hasta 10 cuentas por proveedor (AWS, Azure o GCP)',
       'Hasta 12 usuarios',
       'Policies y alertas automáticas',
       'Gobernanza avanzada multi-account',

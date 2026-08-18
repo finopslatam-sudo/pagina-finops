@@ -15,7 +15,7 @@ const organizationSchema = {
   url: SITE_URL,
   logo: LOGO_URL,
   description:
-    'Servicios FinOps para optimización de costos AWS en Chile y Latinoamérica.',
+    'Servicios FinOps multi-cloud (AWS, Azure y GCP) para optimización de costos en Chile y Latinoamérica.',
   sameAs: ['https://www.linkedin.com/company/finopslatam'],
   contactPoint: [
     {
@@ -44,11 +44,14 @@ export const metadata: Metadata = {
     template: '%s | FinOpsLatam',
   },
   description:
-    'Optimización de costos AWS para empresas de Chile y Latinoamérica. Implementamos FinOps, gobierno cloud y reducción de gasto con resultados medibles.',
+    'Optimización de costos multi-cloud (AWS, Azure y GCP) para empresas de Chile y Latinoamérica. Implementamos FinOps, gobierno cloud y reducción de gasto con resultados medibles.',
   keywords: [
     'FinOps Chile',
     'FinOps Latinoamérica',
+    'FinOps multi-cloud',
     'optimización de costos AWS Chile',
+    'optimización de costos Azure',
+    'optimización de costos GCP',
     'reducción de costos cloud',
     'gobierno financiero cloud',
     'Cloud Financial Management',
@@ -65,7 +68,7 @@ export const metadata: Metadata = {
     siteName: 'FinOpsLatam',
     title: 'FinOps Chile y Latinoamérica | FinOpsLatam',
     description:
-      'Optimización de costos AWS para empresas de Chile y Latinoamérica con prácticas FinOps y gobierno cloud.',
+      'Optimización de costos multi-cloud (AWS, Azure y GCP) para empresas de Chile y Latinoamérica con prácticas FinOps y gobierno cloud.',
     images: [
       {
         url: LOGO_URL,
@@ -79,7 +82,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'FinOps Chile y Latinoamérica | FinOpsLatam',
     description:
-      'Optimización de costos AWS para empresas de Chile y Latinoamérica con prácticas FinOps y gobierno cloud.',
+      'Optimización de costos multi-cloud (AWS, Azure y GCP) para empresas de Chile y Latinoamérica con prácticas FinOps y gobierno cloud.',
     images: [LOGO_URL],
   },
   robots: {

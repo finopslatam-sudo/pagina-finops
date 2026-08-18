@@ -7,7 +7,7 @@ const PILLARS = [
   {
     icon: '📊',
     title: 'FinOps',
-    text: 'Visibilidad de costos, optimización continua y gobernanza financiera de tu infraestructura en AWS.',
+    text: 'Visibilidad de costos, optimización continua y gobernanza financiera de tu infraestructura multi-cloud: AWS, Azure y GCP.',
   },
   {
     icon: '⚙️',
@@ -120,8 +120,8 @@ export default function Home() {
                 />
               </a>
               <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
-                Expertos en Optimización de Costos en la Nube, 
-                automatización FinOps y control financiero para AWS.
+                Expertos en Optimización de Costos en la Nube,
+                automatización FinOps y control financiero multi-cloud: AWS, Azure y GCP.
               </p>
             </div>
 

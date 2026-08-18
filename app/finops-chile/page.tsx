@@ -3,12 +3,15 @@ import Link from 'next/link';
 import PublicFooter from '@/app/components/layout/PublicFooter';
 
 export const metadata: Metadata = {
-  title: 'FinOps Chile: Optimización de Costos AWS para Empresas',
+  title: 'FinOps Chile: Optimización de Costos Multi-Cloud para Empresas',
   description:
-    'Servicios de FinOps en Chile para reducir costos AWS, mejorar gobierno cloud y acelerar decisiones financieras con datos confiables.',
+    'Servicios de FinOps en Chile para reducir costos en AWS, Azure y GCP, mejorar gobierno cloud y acelerar decisiones financieras con datos confiables.',
   keywords: [
     'FinOps Chile',
     'optimización de costos AWS Chile',
+    'optimización de costos Azure Chile',
+    'optimización de costos GCP Chile',
+    'FinOps multi-cloud Chile',
     'consultoría FinOps Chile',
     'gobierno cloud Chile',
     'Cloud Financial Management Chile',
@@ -17,17 +20,17 @@ export const metadata: Metadata = {
     canonical: '/finops-chile',
   },
   openGraph: {
-    title: 'FinOps Chile: Optimización de Costos AWS para Empresas',
+    title: 'FinOps Chile: Optimización de Costos Multi-Cloud para Empresas',
     description:
-      'Implementa FinOps en Chile para controlar gasto cloud, aumentar eficiencia y mejorar el ROI de tu operación AWS.',
+      'Implementa FinOps en Chile para controlar gasto cloud, aumentar eficiencia y mejorar el ROI de tu operación en AWS, Azure y GCP.',
     url: '/finops-chile',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FinOps Chile: Optimización de Costos AWS para Empresas',
+    title: 'FinOps Chile: Optimización de Costos Multi-Cloud para Empresas',
     description:
-      'Implementa FinOps en Chile para controlar gasto cloud, aumentar eficiencia y mejorar el ROI de tu operación AWS.',
+      'Implementa FinOps en Chile para controlar gasto cloud, aumentar eficiencia y mejorar el ROI de tu operación en AWS, Azure y GCP.',
   },
 };
 
@@ -38,11 +41,11 @@ export default function FinopsChilePage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <p className="text-blue-200 text-sm sm:text-base mb-3">FinOpsLatam · Especialistas regionales</p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-5">
-            FinOps en Chile para optimizar costos AWS con enfoque de negocio
+            FinOps en Chile para optimizar costos multi-cloud con enfoque de negocio
           </h1>
           <p className="text-blue-100 text-base sm:text-xl max-w-3xl">
             Ayudamos a empresas en Chile a implementar prácticas FinOps para reducir desperdicio cloud,
-            ordenar la gobernanza financiera y tomar mejores decisiones sobre gasto en AWS.
+            ordenar la gobernanza financiera y tomar mejores decisiones sobre gasto en AWS, Azure y GCP.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Link

@@ -4,11 +4,13 @@ import PublicFooter from '@/app/components/layout/PublicFooter';
 export const metadata: Metadata = {
   title: 'Quiénes Somos | FinOps Chile y LATAM',
   description:
-    'Conoce al equipo de FinOpsLatam: especialistas en optimización de costos AWS, FinOps y gobierno cloud para empresas de Chile y Latinoamérica.',
+    'Conoce al equipo de FinOpsLatam: especialistas en optimización de costos multi-cloud (AWS, Azure y GCP), FinOps y gobierno cloud para empresas de Chile y Latinoamérica.',
   keywords: [
     'equipo FinOps Chile',
     'consultores FinOps LATAM',
     'optimización costos AWS',
+    'optimización costos Azure',
+    'optimización costos GCP',
     'gobierno cloud',
   ],
   alternates: {
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Quiénes Somos | FinOps Chile y LATAM',
     description:
-      'Especialistas en FinOps, cloud y data para reducir costos AWS en Chile y Latinoamérica.',
+      'Especialistas en FinOps, cloud y data para reducir costos en AWS, Azure y GCP en Chile y Latinoamérica.',
     url: '/quienes-somos',
     type: 'website',
   },
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Quiénes Somos | FinOps Chile y LATAM',
     description:
-      'Especialistas en FinOps, cloud y data para reducir costos AWS en Chile y Latinoamérica.',
+      'Especialistas en FinOps, cloud y data para reducir costos en AWS, Azure y GCP en Chile y Latinoamérica.',
   },
 };
 
@@ -246,9 +248,9 @@ export default function QuienesSomos() {
                   <span className="text-teal-600 text-lg sm:text-xl">🎓</span>
                 </div>
                 <div>
-                  <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Certificaciones</h4>
+                  <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Expertise Multi-Cloud</h4>
                   <p className="text-gray-600 text-sm sm:text-base">
-                    Equipo certificado en AWS y prácticas FinOps.
+                    Equipo con experiencia en AWS, Azure y GCP, y en prácticas FinOps.
                   </p>
                 </div>
               </div>

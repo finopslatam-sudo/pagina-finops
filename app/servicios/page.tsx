@@ -44,10 +44,10 @@ export default function Servicios() {
 
         <PlanCard
           title="FinOps Enterprise"
-          description="Gobierno completo y automatización avanzada de tus costos en AWS."
+          description="Gobierno completo y automatización avanzada de tus costos multi-cloud: AWS, Azure y GCP."
           badge="🎉 20% DCTO"
           features={[
-            "Integración con AWS (hasta 10 cuentas)",
+            "Integración multi-cloud: AWS, Azure y GCP (hasta 10 cuentas por proveedor)",
             "Dashboard de costos, hallazgos y optimización",
             "Inventario de recursos y análisis de riesgo",
             "Policies y alertas automáticas",

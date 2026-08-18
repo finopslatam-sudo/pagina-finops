@@ -5,7 +5,7 @@ const FAQS = [
   },
   {
     q: '¿Qué información necesitan para realizar la auditoría inicial?',
-    a: 'Solo necesitamos acceso de solo lectura a tus reportes de costos de AWS (CUR) y métricas básicas de uso. No requerimos acceso a tu infraestructura ni datos sensibles. Todo el proceso se realiza bajo estrictos protocolos de seguridad y confidencialidad.',
+    a: 'Solo necesitamos acceso de solo lectura a tus reportes de costos y métricas básicas de uso, ya sea en AWS, Azure o GCP. No requerimos acceso a tu infraestructura ni datos sensibles. Todo el proceso se realiza bajo estrictos protocolos de seguridad y confidencialidad.',
   },
   {
     q: '¿Con que tipo de empresas Trabajan?',

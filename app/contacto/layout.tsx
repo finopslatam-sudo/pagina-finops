@@ -3,10 +3,12 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Contacto FinOps en Chile y LATAM',
   description:
-    'Agenda una consultoría FinOps para optimizar costos AWS en Chile y Latinoamérica. Hablemos de ahorro cloud, gobernanza y eficiencia operativa.',
+    'Agenda una consultoría FinOps para optimizar costos en AWS, Azure y GCP en Chile y Latinoamérica. Hablemos de ahorro cloud, gobernanza y eficiencia operativa.',
   keywords: [
     'contacto FinOps Chile',
     'consultoría AWS Chile',
+    'consultoría Azure Chile',
+    'consultoría GCP Chile',
     'optimización costos cloud LATAM',
   ],
   alternates: {
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Contacto FinOps en Chile y LATAM',
     description:
-      'Agenda una consultoría FinOps para optimizar costos AWS en Chile y Latinoamérica.',
+      'Agenda una consultoría FinOps para optimizar costos en AWS, Azure y GCP en Chile y Latinoamérica.',
     url: '/contacto',
     type: 'website',
   },
@@ -23,7 +25,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Contacto FinOps en Chile y LATAM',
     description:
-      'Agenda una consultoría FinOps para optimizar costos AWS en Chile y Latinoamérica.',
+      'Agenda una consultoría FinOps para optimizar costos en AWS, Azure y GCP en Chile y Latinoamérica.',
   },
 };
 

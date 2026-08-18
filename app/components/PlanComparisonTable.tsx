@@ -13,10 +13,10 @@ type FeatureGroup = { category: string; items: FeatureRow[] };
 
 const FEATURE_GROUPS: FeatureGroup[] = [
   {
-    category: 'Conexión AWS',
+    category: 'Conexión Multi-Cloud',
     items: [
-      { name: 'Conexión segura vía rol IAM (sin credenciales expuestas)', us: true, a: true,  b: true  },
-      { name: 'Hasta 10 cuentas AWS conectadas por cliente',              us: true, a: true,  b: false },
+      { name: 'Conexión segura a AWS, Azure y GCP (sin credenciales expuestas)', us: true, a: true,  b: true  },
+      { name: 'Hasta 10 cuentas por proveedor conectadas por cliente',           us: true, a: true,  b: false },
     ],
   },
   {
