@@ -70,6 +70,16 @@ export function ClientMenuLinks({ user, isFoundation, onClose }: {
         </Link>
       )}
       {user.client_role === 'owner' && (
+        <Link href="/dashboard/azure" className="block px-4 py-3 hover:bg-blue-50" onClick={onClose}>
+          🔷 Azure Integration
+        </Link>
+      )}
+      {user.client_role === 'owner' && (
+        <Link href="/dashboard/gcp" className="block px-4 py-3 hover:bg-blue-50" onClick={onClose}>
+          🔴 GCP Integration
+        </Link>
+      )}
+      {user.client_role === 'owner' && (
         <Link href="/dashboard/ClientAdministration" className="block px-4 py-3 hover:bg-blue-50" onClick={onClose}>
           ⚙️ Organization Settings
         </Link>

@@ -36,6 +36,8 @@ function ClientMenuItems({ onClose, user, isFoundation }: { onClose: () => void;
       {hasFeature(user?.plan_code, 'alertas') && <MenuItem href="/dashboard/alertas" onClick={onClose}>🔔 Policies &amp; Alerts</MenuItem>}
       {hasFeature(user?.plan_code, 'calculadora') && <MenuItem href="/dashboard/calculadora" onClick={onClose}>🧮 Project Calculator</MenuItem>}
       {user?.client_role === 'owner' && <MenuItem href="/dashboard/aws" onClick={onClose}>☁️ AWS Integration</MenuItem>}
+      {user?.client_role === 'owner' && <MenuItem href="/dashboard/azure" onClick={onClose}>🔷 Azure Integration</MenuItem>}
+      {user?.client_role === 'owner' && <MenuItem href="/dashboard/gcp" onClick={onClose}>🔴 GCP Integration</MenuItem>}
       {user?.client_role === 'owner' && <MenuItem href="/dashboard/ClientAdministration" onClick={onClose}>⚙️ Organization Settings</MenuItem>}
       <MenuItem href="/dashboard/soporte" onClick={onClose}>🎫 FinOpsLatam Support</MenuItem>
       <MenuDividerItem href="/perfil" onClick={onClose}>👤 Account</MenuDividerItem>
