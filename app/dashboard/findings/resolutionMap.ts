@@ -217,6 +217,8 @@ const RESOLUTION: Record<string, string> = {
     "Configurar una clave CMEK (Customer-Managed Encryption Key) en el tópico si se requiere control adicional sobre el cifrado.",
   PUBSUB_NO_LABELS:
     "Agregar labels al tópico Pub/Sub para poder atribuir su costo correctamente.",
+  PUBSUB_TOPIC_NO_SUBSCRIPTIONS:
+    "Verificar si el tópico Pub/Sub sigue siendo necesario. Si no tiene suscriptores, los mensajes publicados se pierden; eliminarlo o crear la suscripción faltante.",
   REDIS_BASIC_TIER_REVIEW:
     "Evaluar si la instancia Memorystore necesita alta disponibilidad (tier Standard) o si Basic es suficiente.",
   REDIS_NO_AUTH_NETWORK:
