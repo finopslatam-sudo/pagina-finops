@@ -20,7 +20,7 @@ interface InventoryResource {
   // Opcional: los endpoints actuales (AWS) no lo envían todavía. Cuando
   // el inventario incluya cuentas Azure, el backend lo agregará y la UI
   // ya sabe renderizarlo (ver ProviderBadge).
-  provider?: 'aws' | 'azure';
+  provider?: 'aws' | 'azure' | 'gcp';
 
   state: {
     raw: string | null;

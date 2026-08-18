@@ -1,4 +1,4 @@
-export type CloudProvider = 'aws' | 'azure';
+export type CloudProvider = 'aws' | 'azure' | 'gcp';
 
 interface Props {
   provider?: CloudProvider | null;
@@ -16,12 +16,17 @@ const PROVIDER_STYLES: Record<CloudProvider, { label: string; cls: string; icon:
     cls: 'bg-blue-100 text-blue-700 border border-blue-200',
     icon: '🔷',
   },
+  gcp: {
+    label: 'GCP',
+    cls: 'bg-red-100 text-red-700 border border-red-200',
+    icon: '🔴',
+  },
 };
 
 /**
- * Badge de proveedor cloud (AWS/Azure). `provider` es opcional y por
- * defecto no renderiza nada — así los endpoints que todavía no envían
- * este campo (todo AWS hoy) no cambian visualmente.
+ * Badge de proveedor cloud (AWS/Azure/GCP). `provider` es opcional y
+ * por defecto no renderiza nada — así los endpoints que todavía no
+ * envían este campo (todo AWS hoy) no cambian visualmente.
  */
 export default function ProviderBadge({ provider, className = '' }: Props) {
   if (!provider) return null;

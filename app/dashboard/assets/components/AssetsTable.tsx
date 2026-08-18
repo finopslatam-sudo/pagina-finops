@@ -8,7 +8,7 @@ type Resource = {
   findings_count: number;
   state?:         { label: string; category: string };
   resource_type:  string;
-  provider?:      'aws' | 'azure';
+  provider?:      'aws' | 'azure' | 'gcp';
 };
 
 interface Props {

@@ -22,7 +22,7 @@ export interface Finding {
 
   // Opcional: los endpoints actuales (AWS) no lo envían todavía. Preparado
   // para cuando el finding engine de Azure quede conectado a este endpoint.
-  provider?: "aws" | "azure";
+  provider?: "aws" | "azure" | "gcp";
 
   detected_at?: string;
   created_at?: string;
