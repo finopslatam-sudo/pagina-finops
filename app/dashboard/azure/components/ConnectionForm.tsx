@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { Download, ExternalLink } from "lucide-react";
+import { API_URL } from "@/app/lib/api";
 import { AzureFormState } from "../hooks/useAzureConnection";
 
 interface Props {
@@ -12,20 +12,30 @@ interface Props {
   onValidate: () => void;
 }
 
-const SETUP_SCRIPT = `# 1) Crear el App Registration de solo lectura para FinOpsLatam
-az ad app create --display-name "FinOpsLatam-ReadOnly"
+const TEMPLATE_URL = `${API_URL}/api/client/azure/template`;
 
-# 2) Crear el Service Principal asociado (usa el appId devuelto arriba)
-az ad sp create --id <APP_ID>
-
-# 3) Generar el Client Secret (guárdalo, no se puede recuperar después)
-az ad app credential reset --id <APP_ID> --append
-
-# 4) Dar acceso de solo lectura a la suscripción (rol "Reader")
-az role assignment create \\
-  --assignee <APP_ID> \\
-  --role "Reader" \\
-  --scope "/subscriptions/<SUBSCRIPTION_ID>"`;
+const STEPS = [
+  {
+    title: 'Crea el App Registration',
+    detail: 'portal.azure.com → busca "Registros de aplicaciones" → "Nuevo registro" → nombre "FinOpsLatam-Audit" → tipo de cuenta "Solo este directorio organizativo" → Registrar.',
+  },
+  {
+    title: 'Copia el Tenant ID y el Application (client) ID',
+    detail: 'En la página "Overview" del registro recién creado, copia "Id. de aplicación (cliente)" e "Id. de directorio (inquilino)".',
+  },
+  {
+    title: 'Genera el Client Secret',
+    detail: '"Certificados y secretos" → "Nuevo secreto de cliente" → copia el VALOR inmediatamente (no se vuelve a mostrar).',
+  },
+  {
+    title: 'Copia el Object ID del Service Principal',
+    detail: '"Aplicaciones empresariales" (Enterprise applications) → busca "FinOpsLatam-Audit" → copia su "Id. de objeto". Ojo: es distinto al Id. de objeto del App registration del paso 1.',
+  },
+  {
+    title: 'Da acceso de solo lectura (rol Reader) con la plantilla ARM',
+    detail: 'Descarga la plantilla JSON de abajo → en el portal busca "Implementar una plantilla personalizada" → "Generar plantilla en el editor" → pega el JSON → ámbito "Suscripción" → pega el Object ID del paso 4 como parámetro "principalId" → Revisar y crear.',
+  },
+];
 
 const FIELDS: { key: keyof AzureFormState; label: string; placeholder: string }[] = [
   { key: "subscriptionId", label: "Subscription ID", placeholder: "00000000-0000-0000-0000-000000000000" },
@@ -35,35 +45,53 @@ const FIELDS: { key: keyof AzureFormState; label: string; placeholder: string }[
 ];
 
 export default function ConnectionForm({ form, loading, error, onChange, onValidate }: Props) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyScript = () => {
-    navigator.clipboard.writeText(SETUP_SCRIPT);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleDownloadTemplate = () => {
+    const link = document.createElement("a");
+    link.href = TEMPLATE_URL;
+    link.download = "finopslatam_role_assignment.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
     <div className="space-y-6">
-      {/* Setup script */}
+      {/* Setup steps — sin CLI, todo por el portal de Azure */}
       <div className="bg-blue-50 border border-blue-200 p-6 rounded-2xl">
         <h3 className="font-semibold text-blue-900">1. Crea el acceso de solo lectura en Azure</h3>
         <p className="text-sm mt-2 text-blue-700">
-          Ejecuta este script en Azure Cloud Shell (o en tu terminal con Azure CLI autenticado).
-          Crea un App Registration dedicado, sin acceso de escritura, con el rol{" "}
-          <span className="font-mono">Reader</span> a nivel de suscripción.
+          Todo se hace desde el portal de Azure con clics — no necesitas terminal ni Azure CLI.
         </p>
-        <div className="relative mt-4">
-          <pre className="bg-gray-900 text-gray-100 text-xs sm:text-sm rounded-xl p-4 overflow-x-auto whitespace-pre">
-            {SETUP_SCRIPT}
-          </pre>
+
+        <ol className="mt-4 space-y-3">
+          {STEPS.map((step, i) => (
+            <li key={step.title} className="flex gap-3">
+              <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+                {i + 1}
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-blue-900">{step.title}</p>
+                <p className="text-xs text-blue-700 mt-0.5">{step.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div className="flex flex-col sm:flex-row gap-3 mt-5">
           <button
-            onClick={handleCopyScript}
-            className="absolute top-3 right-3 text-gray-300 hover:text-white transition"
-            aria-label="Copiar script"
+            onClick={handleDownloadTemplate}
+            className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
           >
-            {copied ? <Check size={18} /> : <Copy size={18} />}
+            <Download size={16} /> Descargar plantilla ARM (JSON)
           </button>
+          <a
+            href="https://portal.azure.com/#create/Microsoft.Template"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-white border border-blue-300 text-blue-700 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-blue-100 transition"
+          >
+            <ExternalLink size={16} /> Abrir "Implementar plantilla personalizada"
+          </a>
         </div>
       </div>
 

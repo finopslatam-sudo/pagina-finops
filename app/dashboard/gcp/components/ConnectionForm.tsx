@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { Download, ExternalLink } from "lucide-react";
+import { API_URL } from "@/app/lib/api";
 
 interface Props {
   serviceAccountKey: string;
@@ -11,49 +11,75 @@ interface Props {
   onValidate: () => void;
 }
 
-const SETUP_SCRIPT = `# 1) Crear la Service Account de solo lectura para FinOpsLatam
-gcloud iam service-accounts create finopslatam-readonly \\
-  --display-name="FinOpsLatam Read-Only"
+const TEMPLATE_URL = `${API_URL}/api/client/gcp/template`;
 
-# 2) Dar acceso de solo lectura al proyecto (rol "Viewer")
-gcloud projects add-iam-policy-binding <PROJECT_ID> \\
-  --member="serviceAccount:finopslatam-readonly@<PROJECT_ID>.iam.gserviceaccount.com" \\
-  --role="roles/viewer"
-
-# 3) Generar y descargar la key JSON (guárdala, es la que se pega abajo)
-gcloud iam service-accounts keys create finopslatam-key.json \\
-  --iam-account=finopslatam-readonly@<PROJECT_ID>.iam.gserviceaccount.com`;
+const STEPS = [
+  {
+    title: 'Abre Deployment Manager en tu proyecto',
+    detail: 'console.cloud.google.com/dm → verifica que el proyecto activo (arriba) sea el que quieres conectar → "Crear implementación".',
+  },
+  {
+    title: 'Pega la plantilla YAML',
+    detail: 'Descarga el archivo de abajo, pega su contenido en el editor de "Crear implementación" (reemplaza el ejemplo que trae por defecto) y presiona "Implementar". Esto crea la Service Account y le da el rol Viewer del proyecto automáticamente.',
+  },
+  {
+    title: 'Genera la key JSON de la Service Account',
+    detail: 'IAM y administración → Cuentas de servicio → busca "finopslatam-audit" → pestaña "Claves" → "Agregar clave" → "Crear clave nueva" → tipo JSON → se descarga el archivo.',
+  },
+  {
+    title: 'Pega el contenido del JSON abajo',
+    detail: 'Abre el archivo descargado con un editor de texto y pega todo su contenido en el campo de abajo.',
+  },
+];
 
 export default function ConnectionForm({ serviceAccountKey, loading, error, onChange, onValidate }: Props) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyScript = () => {
-    navigator.clipboard.writeText(SETUP_SCRIPT);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleDownloadTemplate = () => {
+    const link = document.createElement("a");
+    link.href = TEMPLATE_URL;
+    link.download = "finopslatam_role.yaml";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
     <div className="space-y-6">
-      {/* Setup script */}
+      {/* Setup steps — sin CLI, todo por Cloud Console */}
       <div className="bg-red-50 border border-red-200 p-6 rounded-2xl">
         <h3 className="font-semibold text-red-900">1. Crea el acceso de solo lectura en GCP</h3>
         <p className="text-sm mt-2 text-red-700">
-          Ejecuta este script en Cloud Shell (o en tu terminal con gcloud autenticado).
-          Crea una Service Account dedicada, sin acceso de escritura, con el rol{" "}
-          <span className="font-mono">Viewer</span> a nivel de proyecto.
+          Todo se hace desde Cloud Console con clics — no necesitas terminal ni gcloud CLI.
         </p>
-        <div className="relative mt-4">
-          <pre className="bg-gray-900 text-gray-100 text-xs sm:text-sm rounded-xl p-4 overflow-x-auto whitespace-pre">
-            {SETUP_SCRIPT}
-          </pre>
+
+        <ol className="mt-4 space-y-3">
+          {STEPS.map((step, i) => (
+            <li key={step.title} className="flex gap-3">
+              <span className="shrink-0 w-6 h-6 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center">
+                {i + 1}
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-red-900">{step.title}</p>
+                <p className="text-xs text-red-700 mt-0.5">{step.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div className="flex flex-col sm:flex-row gap-3 mt-5">
           <button
-            onClick={handleCopyScript}
-            className="absolute top-3 right-3 text-gray-300 hover:text-white transition"
-            aria-label="Copiar script"
+            onClick={handleDownloadTemplate}
+            className="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
           >
-            {copied ? <Check size={18} /> : <Copy size={18} />}
+            <Download size={16} /> Descargar plantilla (YAML)
           </button>
+          <a
+            href="https://console.cloud.google.com/dm"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-white border border-red-300 text-red-700 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-red-100 transition"
+          >
+            <ExternalLink size={16} /> Abrir Deployment Manager
+          </a>
         </div>
       </div>
 

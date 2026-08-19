@@ -65,18 +65,8 @@ export function ClientMenuLinks({ user, isFoundation, onClose }: {
         </Link>
       )}
       {user.client_role === 'owner' && (
-        <Link href="/dashboard/aws" className="block px-4 py-3 hover:bg-blue-50" onClick={onClose}>
-          ☁️ AWS Integration
-        </Link>
-      )}
-      {user.client_role === 'owner' && (
-        <Link href="/dashboard/azure" className="block px-4 py-3 hover:bg-blue-50" onClick={onClose}>
-          🔷 Azure Integration
-        </Link>
-      )}
-      {user.client_role === 'owner' && (
-        <Link href="/dashboard/gcp" className="block px-4 py-3 hover:bg-blue-50" onClick={onClose}>
-          🔴 GCP Integration
+        <Link href="/dashboard/cloud" className="block px-4 py-3 hover:bg-blue-50" onClick={onClose}>
+          ☁️ Cloud Integrations
         </Link>
       )}
       {user.client_role === 'owner' && (
