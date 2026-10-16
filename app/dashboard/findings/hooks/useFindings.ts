@@ -7,13 +7,14 @@ import { useAwsAccount } from "@/app/dashboard/context/AwsAccountContext";
 import { Finding, FindingsResponse } from "../types";
 
 interface UseFindingsParams {
+  provider?: string;
   page?: number;
   perPage?: number;
   severity?: string;
   status?: string;
   search?: string;
   service?: string;
-  account?: number | "";
+  account?: number | string | "";
   region?: string;
 }
 
@@ -50,6 +51,7 @@ export function useFindings(params: UseFindingsParams) {
       const query = new URLSearchParams({
         page: String(params.page ?? 1),
         per_page: String(params.perPage ?? 20),
+        ...(params.provider && params.provider !== 'all' ? { provider: params.provider } : {}),
         ...(params.severity ? { severity: params.severity } : {}),
         ...(params.status ? { status: params.status } : {}),
         ...(params.search ? { search: params.search } : {}),
@@ -58,7 +60,7 @@ export function useFindings(params: UseFindingsParams) {
         ...(params.region ? { region: params.region } : {}),
       });
 
-      if (selectedAccount) {
+      if (!params.account && selectedAccount) {
         query.append("aws_account_id", String(selectedAccount));
       }
 

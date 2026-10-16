@@ -6,11 +6,12 @@ import { useAuth } from "@/app/context/AuthContext";
 import { FindingsStats } from "../types";
 
 interface UseFindingsStatsParams {
+  provider?: string;
   severity?: string;
   status?: string;
   search?: string;
   service?: string;
-  account?: number | "";
+  account?: number | string | "";
   region?: string;
 }
 
@@ -37,6 +38,7 @@ export function useFindingsStats(params: UseFindingsStatsParams = {}) {
       ===================================================== */
 
       const query = new URLSearchParams({
+        ...(params.provider && params.provider !== 'all' ? { provider: params.provider } : {}),
         ...(params.severity ? { severity: params.severity } : {}),
         ...(params.status ? { status: params.status } : {}),
         ...(params.search ? { search: params.search } : {}),

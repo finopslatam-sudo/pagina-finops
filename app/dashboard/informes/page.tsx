@@ -6,6 +6,7 @@ import { useAwsAccounts } from '@/app/dashboard/hooks/useAwsAccounts';
 import { REPORTS, type ExportFormat, type ReportDef } from './constants';
 import InformesHero from './components/InformesHero';
 import ReportCard from './components/ReportCard';
+import CloudFilterBar from '../components/CloudFilterBar';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
@@ -72,6 +73,8 @@ export default function InformesPage() {
         availableCount={visibleReports.filter(r => r.available).length}
         totalCount={visibleReports.length}
       />
+
+      <CloudFilterBar />
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-3 text-sm flex justify-between">

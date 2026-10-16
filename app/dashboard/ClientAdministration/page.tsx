@@ -9,7 +9,7 @@ import SecurityPolicyCard from "./components/SecurityPolicyCard";
 import SubscriptionCard from "./components/SubscriptionCard";
 import UsersTable from "./components/UsersTable";
 import UserFormModal from "./components/UserFormModal";
-import AwsAccountsCard from "./components/AwsAccountsCard";
+import CloudAccountsCard from "./components/CloudAccountsCard";
 
 interface KpiCardProps {
   title: string;
@@ -108,8 +108,8 @@ export default function ClientAdministrationPage() {
         <SubscriptionCard subscription={subscription} />
       </div>
 
-      {/* AWS Accounts */}
-      <AwsAccountsCard awsAccounts={awsAccounts} awsAccountsLimit={awsAccountsLimit} />
+      {/* Cloud Accounts (AWS, Azure, GCP) */}
+      <CloudAccountsCard />
 
       {/* Users table */}
       <UsersTable

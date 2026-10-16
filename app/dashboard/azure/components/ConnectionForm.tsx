@@ -39,7 +39,7 @@ const STEPS = [
 
 const FIELDS: { key: keyof AzureFormState; label: string; placeholder: string }[] = [
   { key: "subscriptionId", label: "Subscription ID", placeholder: "00000000-0000-0000-0000-000000000000" },
-  { key: "tenantId", label: "Tenant ID", placeholder: "00000000-0000-0000-0000-000000000000" },
+  { key: "tenantId", label: "Tenant ID (INQUILINO)", placeholder: "00000000-0000-0000-0000-000000000000" },
   { key: "appClientId", label: "Application (client) ID", placeholder: "00000000-0000-0000-0000-000000000000" },
   { key: "clientSecret", label: "Client Secret", placeholder: "Valor del secreto generado" },
 ];

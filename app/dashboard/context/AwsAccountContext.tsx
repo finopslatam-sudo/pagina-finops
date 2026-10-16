@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { createContext, useContext } from 'react';
+import { CloudProvider, useCloud } from './CloudContext';
 
 interface AwsAccountContextType {
   selectedAccount: number | null;
@@ -10,30 +10,39 @@ interface AwsAccountContextType {
 
 const AwsAccountContext = createContext<AwsAccountContextType>({
   selectedAccount: null,
-  setSelectedAccount: () => {}
+  setSelectedAccount: () => {},
 });
 
-export function AwsAccountProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [selectedAccount, setSelectedAccountState] = useState<number | null>(null);
+function AwsAccountBridge({ children }: { children: React.ReactNode }) {
+  const { selectedAccountId, setSelectedAccountId, selectedProvider } = useCloud();
 
-  useEffect(() => {
-    setSelectedAccountState(null);
-  }, [pathname]);
+  // Si selectedAccountId es numérico o de AWS, devolverlo como number | null
+  const selectedAccount =
+    selectedAccountId !== null && (selectedProvider === 'all' || selectedProvider === 'aws')
+      ? (typeof selectedAccountId === 'number' ? selectedAccountId : Number(selectedAccountId) || null)
+      : null;
 
   const setSelectedAccount = (id: number | null) => {
-    setSelectedAccountState(id);
+    setSelectedAccountId(id);
   };
 
   return (
     <AwsAccountContext.Provider
       value={{
         selectedAccount,
-        setSelectedAccount
+        setSelectedAccount,
       }}
     >
       {children}
     </AwsAccountContext.Provider>
+  );
+}
+
+export function AwsAccountProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <CloudProvider>
+      <AwsAccountBridge>{children}</AwsAccountBridge>
+    </CloudProvider>
   );
 }
 

@@ -6,6 +6,7 @@ import { AwsAccountProvider } from "./context/AwsAccountContext";
 import FinopsIAChat from "./components/FinopsIA/FinopsIAChat";
 import { useFinopsIA } from "./hooks/useFinopsIA";
 import { useAuth } from "@/app/context/AuthContext";
+import GlobalCloudBar from "./components/GlobalCloudBar";
 
 export default function DashboardLayout({
   children,
@@ -23,8 +24,7 @@ export default function DashboardLayout({
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8 space-y-8">
 
         {/* ================= HEADER GLOBAL ================= */}
-
-        <div className="flex items-center" />
+        <GlobalCloudBar />
 
         {/* ================= CONTENIDO ================= */}
 

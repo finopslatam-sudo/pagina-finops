@@ -1,40 +1,14 @@
 'use client';
 
-import { useAwsAccounts } from '@/app/dashboard/hooks/useAwsAccounts';
-import { useAwsAccount } from '@/app/dashboard/context/AwsAccountContext';
+import CloudFilterBar from './CloudFilterBar';
 
+/**
+ * CloudAccountSelector (anteriormente AwsAccountSelector).
+ * Proporciona visualización de las nubes configuradas (AWS, Azure, GCP),
+ * estado de conexión y filtrado dinámico por cuenta/suscripción/proyecto.
+ */
 export default function AwsAccountSelector() {
+  return <CloudFilterBar />;
+}
 
-  const { accounts } = useAwsAccounts();
-  const { selectedAccount, setSelectedAccount } = useAwsAccount();
-
-  return (
-    <div className="flex items-center gap-3">
-
-      <span className="text-sm text-gray-500">
-        AWS Account
-      </span>
-
-      <select
-        value={selectedAccount ?? ''}
-        onChange={(e) =>
-          setSelectedAccount(
-            e.target.value === ''
-              ? null
-              : Number(e.target.value)
-          )
-        }
-        className="border rounded-lg px-3 py-2 text-sm"
-      >
-        <option value="">All Accounts</option>
-
-        {accounts.map((a: any) => (
-          <option key={a.id} value={a.id}>
-            {a.account_name}
-          </option>
-        ))}
-      </select>
-
-    </div>
-  );
-} 
+export { CloudFilterBar as CloudAccountSelector };

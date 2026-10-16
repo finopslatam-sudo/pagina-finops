@@ -32,6 +32,7 @@ export default function FindingsPage() {
 
   const { data, pages, loading, error, resolveFinding, refetch } = useFindings({
     page,
+    provider: filters.provider,
     severity: filters.severity,
     status: filters.status,
     search: filters.search,
@@ -41,6 +42,7 @@ export default function FindingsPage() {
   });
 
   const { stats, refetch: refetchStats } = useFindingsStats({
+    provider: filters.provider,
     severity: filters.severity,
     status: filters.status,
     search: filters.search,
@@ -96,6 +98,7 @@ export default function FindingsPage() {
       </div>
 
       <FindingsFilters
+        provider={filters.provider}
         severity={filters.severity}
         status={filters.status}
         search={filters.search}

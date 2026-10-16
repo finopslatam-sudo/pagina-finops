@@ -11,7 +11,9 @@ import ExecutiveOverview from './components/ExecutiveOverview';
 import DashboardKPIs from './components/DashboardKPIs';
 import MonthlyCostChart from './components/finance/MonthlyCostChart';
 import FindingsTable from './findings/components/FindingsTable';
-import AwsAccountSelector from './components/AwsAccountSelector';
+import CloudFilterBar from './components/CloudFilterBar';
+import CloudProviderOverview from './components/CloudProviderOverview';
+import { useCloud } from './context/CloudContext';
 
 /* =====================================================
    CLIENT DASHBOARD
@@ -23,6 +25,7 @@ import AwsAccountSelector from './components/AwsAccountSelector';
 export default function ClientDashboard() {
   const router = useRouter();
   const { user, token, isAuthReady, isStaff } = useAuth();
+  const { selectedProvider } = useCloud();
 
   const { data, loading, error } = useDashboard();
   const { data: latestFindings } = useFindings({ page: 1, perPage: 5 });
@@ -52,37 +55,44 @@ export default function ClientDashboard() {
         <BelowFoldSkeleton />
       ) : (
         <>
-          {/* 2. SELECTOR DE CUENTA */}
-          <div className="flex items-center gap-4">
-            <AwsAccountSelector />
-          </div>
+          {/* 2. SELECTOR DE NUBES Y CUENTAS CONFIGURADAS */}
+          <CloudFilterBar />
 
-          {/* 3. KPIs (Financial Snapshot + Operational Metrics) */}
-          <DashboardKPIs data={data} />
+          {/* 3. VISTA CONDICIONAL SEGÚN LA NUBE SELECCIONADA */}
+          {selectedProvider === 'azure' ? (
+            <CloudProviderOverview provider="azure" />
+          ) : selectedProvider === 'gcp' ? (
+            <CloudProviderOverview provider="gcp" />
+          ) : (
+            <>
+              {/* KPIs (Financial Snapshot + Operational Metrics) */}
+              <DashboardKPIs data={data} />
 
-          {/* 4. SERVICIOS ESCANEADOS */}
-          <ServicesScanned data={data} router={router} />
+              {/* SERVICIOS ESCANEADOS */}
+              <ServicesScanned data={data} router={router} />
 
-          {/* 5. TENDENCIA DE COSTOS */}
-          <div className="bg-white border border-blue-200 p-8 lg:p-10 rounded-3xl shadow-sm">
-            <h2 className="text-2xl font-semibold text-slate-800 mb-6">
-              Tendencia de Costos (6 meses)
-            </h2>
-            <MonthlyCostChart
-              data={Array.isArray(data.cost.monthly_cost) ? data.cost.monthly_cost : []}
-            />
-          </div>
+              {/* TENDENCIA DE COSTOS */}
+              <div className="bg-white border border-blue-200 p-8 lg:p-10 rounded-3xl shadow-sm">
+                <h2 className="text-2xl font-semibold text-slate-800 mb-6">
+                  Tendencia de Costos (6 meses)
+                </h2>
+                <MonthlyCostChart
+                  data={Array.isArray(data.cost.monthly_cost) ? data.cost.monthly_cost : []}
+                />
+              </div>
 
-          {/* 6. ÚLTIMOS FINDINGS */}
-          <div className="bg-white border border-blue-200 p-8 lg:p-10 rounded-3xl shadow-sm space-y-6">
-            <h2 className="text-2xl font-semibold text-slate-800">
-              Últimos Findings Detectados
-            </h2>
-            <FindingsTable
-              findings={(latestFindings ?? []).slice(0, 5)}
-              onResolve={() => {}}
-            />
-          </div>
+              {/* ÚLTIMOS FINDINGS */}
+              <div className="bg-white border border-blue-200 p-8 lg:p-10 rounded-3xl shadow-sm space-y-6">
+                <h2 className="text-2xl font-semibold text-slate-800">
+                  Últimos Findings Detectados
+                </h2>
+                <FindingsTable
+                  findings={(latestFindings ?? []).slice(0, 5)}
+                  onResolve={() => {}}
+                />
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
