@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useCloud } from "../context/CloudContext";
 import { PolicyCard } from "./policies";
 import { renderPolicyFields } from "./policyFields";
 
@@ -19,6 +20,7 @@ interface Props {
     period?: string;
     email?: string;
     aws_account_id?: string;
+    provider?: string;
   }) => void;
   policy?: PolicyCard;
   initialValues?: {
@@ -30,19 +32,18 @@ interface Props {
     period?: string;
     aws_account_id?: string;
   };
-  accounts: { id: string; label: string }[];
+  accounts?: { id: string; label: string }[];
   loadingAccounts?: boolean;
 }
 
 type Channel = "email" | "slack" | "teams";
 
-// Fixed periods per policy type — others use windowSize state
 const FIXED_PERIODS: Record<string, string> = {
   "budget-monthly": "monthly",
-  "budget-annual":  "annual",
-  "service-cost":   "monthly",
-  "forecast":       "monthly",
-  "off-hours":      "daily",
+  "budget-annual": "annual",
+  "service-cost": "monthly",
+  "forecast": "monthly",
+  "off-hours": "daily",
 };
 
 export default function PolicyModal({
@@ -51,9 +52,14 @@ export default function PolicyModal({
   onSave,
   policy,
   initialValues,
-  accounts,
   loadingAccounts = false,
 }: Props) {
+  const { clouds, selectedProvider: globalProvider } = useCloud();
+
+  const [provider, setProvider] = useState<"all" | "aws" | "azure" | "gcp">(
+    globalProvider !== "all" ? globalProvider : "all"
+  );
+
   const initialChannel =
     initialValues?.channel === "slack" || initialValues?.channel === "teams"
       ? initialValues.channel
@@ -76,10 +82,32 @@ export default function PolicyModal({
     initialPeriod
   );
 
-  const accountOptions = useMemo(
-    () => [{ id: "all", label: "Todas las cuentas" }, ...accounts],
-    [accounts]
-  );
+  const accountOptions = useMemo(() => {
+    let list: { id: string; label: string }[] = [];
+    if (provider === "aws") {
+      list = clouds.aws.accounts.map(a => ({ id: String(a.id), label: `${a.name} (${a.identifier})` }));
+    } else if (provider === "azure") {
+      list = clouds.azure.accounts.map(a => ({ id: String(a.id), label: `${a.name} (${a.identifier})` }));
+    } else if (provider === "gcp") {
+      list = clouds.gcp.accounts.map(a => ({ id: String(a.id), label: `${a.name} (${a.identifier})` }));
+    } else {
+      list = [
+        ...clouds.aws.accounts.map(a => ({ id: String(a.id), label: `[AWS] ${a.name} (${a.identifier})` })),
+        ...clouds.azure.accounts.map(a => ({ id: String(a.id), label: `[Azure] ${a.name} (${a.identifier})` })),
+        ...clouds.gcp.accounts.map(a => ({ id: String(a.id), label: `[GCP] ${a.name} (${a.identifier})` })),
+      ];
+    }
+    const defaultLabel =
+      provider === "azure"
+        ? "Todas las suscripciones Azure"
+        : provider === "gcp"
+        ? "Todos los proyectos GCP"
+        : provider === "aws"
+        ? "Todas las cuentas AWS"
+        : "Todas las cuentas (Multi-cloud)";
+
+    return [{ id: "all", label: defaultLabel }, ...list];
+  }, [clouds, provider]);
 
   if (!open || !policy) return null;
 
@@ -92,8 +120,7 @@ export default function PolicyModal({
     const accountLabel =
       resolvedAccountId === "all"
         ? "Todas las cuentas"
-        : accountOptions.find((a) => a.id === resolvedAccountId)?.label ||
-          "Cuenta seleccionada";
+        : accountOptions.find((a) => a.id === resolvedAccountId)?.label || "Cuenta seleccionada";
     const destination =
       channel === "email"
         ? email || "Sin correo configurado"
@@ -115,13 +142,14 @@ export default function PolicyModal({
       period,
       email: email || undefined,
       aws_account_id: resolvedAccountId === "all" ? undefined : resolvedAccountId,
+      provider: provider === "all" ? undefined : provider,
     });
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-xl rounded-2xl bg-white shadow-2xl p-6 space-y-4 max-h-[80vh] overflow-y-auto flex flex-col">
+      <div className="w-full max-w-xl rounded-2xl bg-white shadow-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -136,6 +164,39 @@ export default function PolicyModal({
           >
             ×
           </button>
+        </div>
+
+        {/* Cloud Provider Filter */}
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-slate-800">Proveedor Cloud</p>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { id: "all", label: "Todas", icon: "🌐" },
+              { id: "aws", label: "AWS", icon: "🟠" },
+              { id: "azure", label: "Azure", icon: "🔷" },
+              { id: "gcp", label: "GCP", icon: "🔴" },
+            ].map((p) => {
+              const isSelected = provider === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => {
+                    setProvider(p.id as any);
+                    setAccountId("all");
+                  }}
+                  className={`flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-semibold border transition ${
+                    isSelected
+                      ? "border-sky-500 bg-sky-50 text-sky-800 shadow-sm ring-1 ring-sky-400"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                  }`}
+                >
+                  <span>{p.icon}</span>
+                  <span>{p.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Channel selector */}

@@ -39,30 +39,27 @@ export default function ClientDashboard() {
   if (error) return <p className="text-red-500 p-6">{error}</p>;
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 lg:space-y-12">
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         1. EXECUTIVE OVERVIEW — visible inmediatamente
-            muestra skeleton interno mientras carga
+         1. SELECTOR DE NUBES Y CUENTAS CONFIGURADAS
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <ExecutiveOverview data={data} loading={loading} />
+      <CloudFilterBar />
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         El resto aparece una vez que la API responde
+         2. VISTA CONDICIONAL SEGÚN LA NUBE SELECCIONADA
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-
-      {loading || !data ? (
-        <BelowFoldSkeleton />
+      {selectedProvider === 'azure' ? (
+        <CloudProviderOverview provider="azure" />
+      ) : selectedProvider === 'gcp' ? (
+        <CloudProviderOverview provider="gcp" />
       ) : (
         <>
-          {/* 2. SELECTOR DE NUBES Y CUENTAS CONFIGURADAS */}
-          <CloudFilterBar />
+          {/* EXECUTIVE OVERVIEW */}
+          <ExecutiveOverview data={data} loading={loading} />
 
-          {/* 3. VISTA CONDICIONAL SEGÚN LA NUBE SELECCIONADA */}
-          {selectedProvider === 'azure' ? (
-            <CloudProviderOverview provider="azure" />
-          ) : selectedProvider === 'gcp' ? (
-            <CloudProviderOverview provider="gcp" />
+          {loading || !data ? (
+            <BelowFoldSkeleton />
           ) : (
             <>
               {/* KPIs (Financial Snapshot + Operational Metrics) */}

@@ -60,7 +60,8 @@ export function useFindings(params: UseFindingsParams) {
         ...(params.region ? { region: params.region } : {}),
       });
 
-      if (!params.account && selectedAccount) {
+      const isAwsOrAll = !params.provider || params.provider === 'all' || params.provider === 'aws';
+      if (!params.account && selectedAccount && isAwsOrAll) {
         query.append("aws_account_id", String(selectedAccount));
       }
 
@@ -100,6 +101,7 @@ export function useFindings(params: UseFindingsParams) {
   }, [
     params.page,
     params.perPage,
+    params.provider,
     params.severity,
     params.status,
     params.search,

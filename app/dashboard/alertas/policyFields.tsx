@@ -44,7 +44,7 @@ function AccountSelect({
       </select>
       {!loadingAccounts && accountOptions.length === 1 && (
         <p className="text-xs text-amber-600">
-          No hay cuentas disponibles. Conecta una cuenta AWS primero.
+          No hay cuentas o suscripciones disponibles. Conecta una cuenta en Integraciones Cloud primero.
         </p>
       )}
     </div>

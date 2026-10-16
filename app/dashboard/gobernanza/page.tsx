@@ -1,9 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useDashboard } from '../hooks/useDashboard';
+import { useCloud } from '../context/CloudContext';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
-import AwsAccountSelector from '../components/AwsAccountSelector';
+import CloudFilterBar from '../components/CloudFilterBar';
 import { useSnapshots } from '../hooks/useSnapshots';
 
 import GobernanzaHero from './components/GobernanzaHero';
@@ -18,6 +20,7 @@ import GobernanzaSkeleton from './components/GobernanzaSkeleton';
 
 export default function GobernanzaPage() {
   const { data, loading } = useDashboard();
+  const { selectedProvider } = useCloud();
   const { user } = useAuth();
   const { latest, trend } = useSnapshots();
 
@@ -27,45 +30,67 @@ export default function GobernanzaPage() {
 
   if (loading || !data) return <GobernanzaSkeleton />;
 
-  const gov  = data.governance;
+  const gov = data.governance;
   const risk = data.risk;
   const exec = data.executive_summary;
-  const roi  = data.roi_projection;
-  const f    = data.findings;
+  const roi = data.roi_projection;
+  const f = data.findings;
 
-  const resolvedPct      = f.total > 0 ? Math.round((f.resolved / f.total) * 100) : 0;
+  const resolvedPct = f.total > 0 ? Math.round((f.resolved / f.total) * 100) : 0;
   const priorityServices = Array.isArray(data.priority_services) ? data.priority_services : [];
-  const severityData     = [
-    { name: 'HIGH',   value: f.high },
+  const severityData = [
+    { name: 'HIGH', value: f.high },
     { name: 'MEDIUM', value: f.medium },
-    { name: 'LOW',    value: f.low },
-  ].filter(d => d.value > 0);
+    { name: 'LOW', value: f.low },
+  ].filter((d) => d.value > 0);
+
+  const isAzure = selectedProvider === 'azure';
+  const isGcp = selectedProvider === 'gcp';
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-10">
-
       <GobernanzaHero data={data} latest={latest} trend={trend} />
 
-      <div className="flex items-center gap-4">
-        <AwsAccountSelector />
-      </div>
+      <CloudFilterBar />
 
-      <GobernanzaKPIs gov={gov} risk={risk} exec={exec} f={f} />
+      {isAzure || isGcp ? (
+        <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center space-y-4 shadow-sm">
+          <div className="text-4xl">{isAzure ? '🔷' : '🔴'}</div>
+          <h2 className="text-xl font-bold text-slate-800">
+            Métricas de gobernanza no disponibles para {isAzure ? 'Microsoft Azure' : 'Google Cloud Platform'}
+          </h2>
+          <p className="text-sm text-slate-500 max-w-lg mx-auto">
+            Las métricas de cumplimiento, remediación y postura de riesgo consolidadas en esta sección corresponden al entorno AWS. Puedes auditar las mejores prácticas y hallazgos de {isAzure ? 'Azure' : 'GCP'} en la sección de Findings e Integraciones.
+          </p>
+          <div className="pt-2">
+            <Link
+              href={isAzure ? '/dashboard/azure' : '/dashboard/gcp'}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition"
+            >
+              <span>Ver integración de {isAzure ? 'Azure' : 'GCP'}</span>
+              <span>→</span>
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <>
+          <GobernanzaKPIs gov={gov} risk={risk} exec={exec} f={f} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <ComplianceCard gov={gov} />
-        <SeverityDonut f={f} severityData={severityData} />
-      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <ComplianceCard gov={gov} />
+            <SeverityDonut f={f} severityData={severityData} />
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <RemediationCard f={f} risk={risk} resolvedPct={resolvedPct} />
-        <ExecutiveSummaryCard exec={exec} resourcesAffected={data.resources_affected} />
-      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <RemediationCard f={f} risk={risk} resolvedPct={resolvedPct} />
+            <ExecutiveSummaryCard exec={exec} resourcesAffected={data.resources_affected} />
+          </div>
 
-      <RoiProjection roi={roi} risk={risk} gov={gov} />
+          <RoiProjection roi={roi} risk={risk} gov={gov} />
 
-      <PriorityServicesCard services={priorityServices} />
-
+          <PriorityServicesCard services={priorityServices} />
+        </>
+      )}
     </div>
   );
 }

@@ -78,6 +78,7 @@ export function useFindingsStats(params: UseFindingsStatsParams = {}) {
   }, [
     token,
     isAuthReady,
+    params.provider,
     params.severity,
     params.status,
     params.search,

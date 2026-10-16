@@ -61,6 +61,8 @@ interface InventoryHealth {
   unknown: number;
 }
 
+import { useCloud } from '../context/CloudContext';
+
 /* =====================================================
    HOOK
 ===================================================== */
@@ -69,6 +71,7 @@ export function useInventory(page: number = 1, perPage: number = 50) {
 
   const { token, isAuthReady } = useAuth();
   const { selectedAccount } = useAwsAccount();
+  const { selectedProvider, selectedAccountId } = useCloud();
 
   const [data, setData] = useState<InventoryResponse | null>(null);
   const [servicesMeta, setServicesMeta] = useState<InventoryServices | null>(null);
@@ -88,7 +91,13 @@ export function useInventory(page: number = 1, perPage: number = 50) {
 
         let endpoint = `/api/client/inventory?page=${page}&per_page=${perPage}`;
 
-        if (selectedAccount) {
+        if (selectedProvider && selectedProvider !== 'all') {
+          endpoint += `&provider=${selectedProvider}`;
+        }
+
+        if (selectedAccountId) {
+          endpoint += `&account_id=${selectedAccountId}`;
+        } else if (selectedAccount && (!selectedProvider || selectedProvider === 'all' || selectedProvider === 'aws')) {
           endpoint += `&aws_account_id=${selectedAccount}`;
         }
 
@@ -146,7 +155,7 @@ export function useInventory(page: number = 1, perPage: number = 50) {
 
     fetchInventory();
 
-  }, [isAuthReady, token, page, perPage, selectedAccount]);
+  }, [isAuthReady, token, page, perPage, selectedAccount, selectedProvider, selectedAccountId]);
 
   return { data, servicesMeta, healthMeta, loading, error };
 }

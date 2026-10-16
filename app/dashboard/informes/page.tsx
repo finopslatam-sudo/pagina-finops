@@ -1,38 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { useAwsAccounts } from '@/app/dashboard/hooks/useAwsAccounts';
+import { useCloud } from '../context/CloudContext';
 import { REPORTS, type ExportFormat, type ReportDef } from './constants';
 import InformesHero from './components/InformesHero';
-import ReportCard from './components/ReportCard';
+import ReportCard, { type ReportAccountOption } from './components/ReportCard';
 import CloudFilterBar from '../components/CloudFilterBar';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
-/* ─── page ──────────────────────────────────────────────── */
-
 export default function InformesPage() {
   const { token, isAuthReady, isFoundation, isProfessional, isEnterprise } = useAuth();
-  const { accounts, loading: loadingAccounts } = useAwsAccounts();
+  const { clouds, selectedProvider, loading: loadingCloud } = useCloud();
 
   const currentPlan = isFoundation ? 'foundation' : isProfessional ? 'professional' : isEnterprise ? 'enterprise' : null;
   const visibleReports = currentPlan
     ? REPORTS.filter(r => r.allowedPlans.includes(currentPlan))
     : REPORTS;
 
-  /* estado de carga/error global */
-  const [loadingKey, setLoadingKey]   = useState<string | null>(null);
-  const [error,      setError]        = useState<string | null>(null);
-  const [success,    setSuccess]      = useState<string | null>(null);
+  const [loadingKey, setLoadingKey] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  /* cuenta seleccionada por informe: { [reportId]: accountId | null } */
-  const [selectedAccounts, setSelectedAccounts] = useState<Record<string, number | null>>({});
+  const [selectedAccounts, setSelectedAccounts] = useState<Record<string, number | string | null>>({});
 
-  const setAccount = (reportId: string, value: number | null) =>
+  const setAccount = (reportId: string, value: number | string | null) =>
     setSelectedAccounts(prev => ({ ...prev, [reportId]: value }));
 
-  /* descarga */
+  const availableAccounts: ReportAccountOption[] = useMemo(() => {
+    if (selectedProvider === 'aws') {
+      return clouds.aws.accounts.map(a => ({ id: a.id, name: a.name, identifier: a.identifier, provider: 'aws' as const }));
+    }
+    if (selectedProvider === 'azure') {
+      return clouds.azure.accounts.map(a => ({ id: a.id, name: a.name, identifier: a.identifier, provider: 'azure' as const }));
+    }
+    if (selectedProvider === 'gcp') {
+      return clouds.gcp.accounts.map(a => ({ id: a.id, name: a.name, identifier: a.identifier, provider: 'gcp' as const }));
+    }
+    return [
+      ...clouds.aws.accounts.map(a => ({ id: a.id, name: `[AWS] ${a.name}`, identifier: a.identifier, provider: 'aws' as const })),
+      ...clouds.azure.accounts.map(a => ({ id: a.id, name: `[Azure] ${a.name}`, identifier: a.identifier, provider: 'azure' as const })),
+      ...clouds.gcp.accounts.map(a => ({ id: a.id, name: `[GCP] ${a.name}`, identifier: a.identifier, provider: 'gcp' as const })),
+    ];
+  }, [clouds, selectedProvider]);
+
   const handleExport = async (report: ReportDef, format: ExportFormat) => {
     if (!isAuthReady || !token) { setError('Inicia sesión para exportar informes.'); return; }
     if (!report.endpoint) return;
@@ -44,7 +56,11 @@ export default function InformesPage() {
 
     try {
       const accountId = selectedAccounts[report.id] ?? null;
-      const qs = accountId ? `?account_id=${accountId}` : '';
+      const params = new URLSearchParams();
+      if (accountId) params.set('account_id', String(accountId));
+      if (selectedProvider && selectedProvider !== 'all') params.set('provider', selectedProvider);
+      const qs = params.toString() ? `?${params.toString()}` : '';
+
       const res = await fetch(`${API_URL}${report.endpoint}/${format}${qs}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
@@ -52,9 +68,9 @@ export default function InformesPage() {
       if (!res.ok) throw new Error(`Error ${res.status}`);
 
       const blob = await res.blob();
-      const url  = window.URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
       a.download = `informe-${report.id}.${format}`;
       a.click();
       window.URL.revokeObjectURL(url);
@@ -68,7 +84,6 @@ export default function InformesPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 space-y-8 lg:space-y-10">
-
       <InformesHero
         availableCount={visibleReports.filter(r => r.available).length}
         totalCount={visibleReports.length}
@@ -94,9 +109,10 @@ export default function InformesPage() {
           <ReportCard
             key={report.id}
             report={report}
-            accounts={accounts}
-            loadingAccounts={loadingAccounts}
+            accounts={availableAccounts}
+            loadingAccounts={loadingCloud}
             selectedAccount={selectedAccounts[report.id] ?? null}
+            selectedProvider={selectedProvider}
             loadingKey={loadingKey}
             onSelectAccount={setAccount}
             onExport={handleExport}
@@ -108,12 +124,11 @@ export default function InformesPage() {
         <p className="font-semibold text-slate-700 mb-1">📌 Nota sobre los informes</p>
         <p>
           Todos los informes se generan en tiempo real con los datos más recientes de tu entorno cloud.
-          Los datos de costos provienen directamente de AWS Cost Explorer y son actualizados cada 24 horas.
+          Los datos de costos provienen directamente de Cost Explorer y son actualizados continuamente.
           Los informes en formato PDF son adecuados para presentaciones ejecutivas y auditorías.
           Para análisis de datos, utiliza los formatos CSV o XLSX.
         </p>
       </div>
-
     </div>
   );
 }

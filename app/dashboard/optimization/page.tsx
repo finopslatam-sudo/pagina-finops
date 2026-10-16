@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { hasFeature } from '@/app/lib/hasFeature';
 import { apiFetch } from '@/app/lib/api';
+import Link from 'next/link';
 import { useAwsAccount } from '../context/AwsAccountContext';
+import { useCloud } from '../context/CloudContext';
 import { useDashboard } from '../hooks/useDashboard';
-import AwsAccountSelector from '../components/AwsAccountSelector';
+import CloudFilterBar from '../components/CloudFilterBar';
 import { formatUSD } from '@/app/lib/finopsFormat';
 import {
   KpiCard, Section, CoverageBar, CoverageRow,
@@ -50,6 +52,7 @@ function overallStatus(ri: RIResponse | null, sp: SPResponse | null): { label: s
 export default function OptimizationPage() {
   const { token, user } = useAuth();
   const { selectedAccount } = useAwsAccount();
+  const { selectedProvider } = useCloud();
   const { data: dash } = useDashboard();
 
   const [ri,             setRI]             = useState<RIResponse | null>(null);
@@ -129,12 +132,31 @@ export default function OptimizationPage() {
         </p>
       </div>
 
-      {/* ── ACCOUNT FILTER ── */}
-      <div className="flex items-center gap-4">
-        <AwsAccountSelector />
-      </div>
+      {/* ── CLOUD FILTER ── */}
+      <CloudFilterBar />
 
-      {/* ── KPI CARDS ── */}
+      {selectedProvider === 'azure' || selectedProvider === 'gcp' ? (
+        <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center space-y-4 shadow-sm">
+          <div className="text-4xl">{selectedProvider === 'azure' ? '🔷' : '🔴'}</div>
+          <h2 className="text-xl font-bold text-slate-800">
+            Estrategia de compromisos no aplicable a {selectedProvider === 'azure' ? 'Microsoft Azure' : 'Google Cloud Platform'}
+          </h2>
+          <p className="text-sm text-slate-500 max-w-lg mx-auto">
+            Los compromisos de Reserved Instances (RI) y Savings Plans (SP) analizados en esta sección corresponden al modelo de adquisición de Amazon Web Services (AWS). No existen compromisos registrados para la nube seleccionada.
+          </p>
+          <div className="pt-2">
+            <Link
+              href={selectedProvider === 'azure' ? '/dashboard/azure' : '/dashboard/gcp'}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition"
+            >
+              <span>Ver integración de {selectedProvider === 'azure' ? 'Azure' : 'GCP'}</span>
+              <span>→</span>
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* ── KPI CARDS ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
 
         <KpiCard
@@ -226,6 +248,8 @@ export default function OptimizationPage() {
 
         </div>
       </Section>
+      </>
+      )}
 
     </div>
   );

@@ -1,15 +1,22 @@
 'use client';
 
 import { FORMAT_CONFIG, type ExportFormat, type ReportDef } from '../constants';
-import type { AwsAccount } from '@/app/dashboard/hooks/useAwsAccounts';
+
+export interface ReportAccountOption {
+  id: number | string;
+  name: string;
+  identifier?: string;
+  provider?: 'aws' | 'azure' | 'gcp';
+}
 
 interface ReportCardProps {
   report: ReportDef;
-  accounts: AwsAccount[];
+  accounts: ReportAccountOption[];
   loadingAccounts: boolean;
-  selectedAccount: number | null;
+  selectedAccount: number | string | null;
+  selectedProvider?: string;
   loadingKey: string | null;
-  onSelectAccount: (reportId: string, value: number | null) => void;
+  onSelectAccount: (reportId: string, value: number | string | null) => void;
   onExport: (report: ReportDef, format: ExportFormat) => void;
 }
 
@@ -18,11 +25,19 @@ export default function ReportCard({
   accounts,
   loadingAccounts,
   selectedAccount,
+  selectedProvider = 'all',
   loadingKey,
   onSelectAccount,
   onExport,
 }: ReportCardProps) {
-  const selectedAccountName = accounts.find(a => a.id === selectedAccount)?.account_name;
+  const selectedAccountName = accounts.find(a => String(a.id) === String(selectedAccount))?.name;
+
+  const accountTypeLabel =
+    selectedProvider === 'azure'
+      ? 'Suscripción Azure'
+      : selectedProvider === 'gcp'
+      ? 'Proyecto GCP'
+      : 'Cuenta Cloud';
 
   return (
     <div className={`border rounded-3xl overflow-hidden shadow-sm ${report.available ? '' : 'opacity-75'}`}>
@@ -52,39 +67,41 @@ export default function ReportCard({
           <div className="flex items-center gap-2">
             <span className="text-base">☁️</span>
             <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
-              Cuenta AWS
+              {accountTypeLabel}
             </p>
           </div>
           <p className="text-xs text-slate-400">
-            Selecciona para qué cuenta deseas generar este informe.
+            Selecciona para qué {accountTypeLabel.toLowerCase()} deseas generar este informe.
           </p>
           {loadingAccounts ? (
             <div className="h-9 bg-slate-100 rounded-xl animate-pulse" />
           ) : (
             <select
               value={selectedAccount ?? ''}
-              onChange={e => onSelectAccount(report.id, e.target.value === '' ? null : Number(e.target.value))}
+              onChange={e => onSelectAccount(report.id, e.target.value === '' ? null : e.target.value)}
               disabled={!report.available}
               className={`w-full border rounded-xl px-3 py-2 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ${
                 !report.available ? 'opacity-50 cursor-not-allowed' : 'hover:border-slate-400'
               }`}
             >
-              <option value="">🌐 Todas las cuentas</option>
+              <option value="">
+                🌐 Todas las {selectedProvider === 'azure' ? 'suscripciones Azure' : selectedProvider === 'gcp' ? 'proyectos GCP' : 'cuentas'}
+              </option>
               {accounts.map(a => (
-                <option key={a.id} value={a.id}>
-                  {a.account_name}
+                <option key={`${a.provider ?? 'acc'}-${a.id}`} value={a.id}>
+                  {a.name} {a.identifier ? `(${a.identifier})` : ''}
                 </option>
               ))}
             </select>
           )}
           {selectedAccount && (
             <p className="text-xs text-blue-600 font-medium">
-              ✓ Informe filtrado para: <span className="font-semibold">{selectedAccountName}</span>
+              ✓ Filtrado para: <span className="font-semibold">{selectedAccountName}</span>
             </p>
           )}
           {!selectedAccount && (
             <p className="text-xs text-slate-400">
-              El informe incluirá datos consolidados de todas las cuentas conectadas.
+              El informe incluirá datos de las cuentas seleccionadas.
             </p>
           )}
         </div>
@@ -108,32 +125,24 @@ export default function ReportCard({
             Formatos de descarga
           </p>
           <div className="flex flex-wrap gap-2">
-            {report.formats.map(fmt => {
-              const cfg = FORMAT_CONFIG[fmt];
-              const key = `${report.id}-${fmt}`;
-              const isLoading = loadingKey === key;
+            {report.formats.map(format => {
+              const cfg = FORMAT_CONFIG[format];
+              const isLoading = loadingKey === `${report.id}-${format}`;
               return (
                 <button
-                  key={fmt}
-                  onClick={() => report.available && onExport(report, fmt)}
+                  key={format}
+                  onClick={() => onExport(report, format)}
                   disabled={!report.available || isLoading}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition ${
-                    report.available
-                      ? cfg.color
-                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                  } ${isLoading ? 'opacity-60 cursor-wait' : ''}`}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition shadow-sm ${cfg.color} ${
+                    !report.available || isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  {isLoading ? <span className="animate-spin">⏳</span> : <span>{cfg.icon}</span>}
-                  {isLoading ? 'Generando...' : `Descargar ${cfg.label}`}
+                  <span>{isLoading ? '⏳' : cfg.icon}</span>
+                  <span>{isLoading ? 'Generando...' : cfg.label}</span>
                 </button>
               );
             })}
           </div>
-          {!report.available && (
-            <p className="text-xs text-slate-400 mt-2">
-              Este informe estará disponible en la próxima versión de la plataforma.
-            </p>
-          )}
         </div>
       </div>
     </div>

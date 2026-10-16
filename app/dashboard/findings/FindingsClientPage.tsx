@@ -20,15 +20,19 @@ import ScanSuccessModal from './components/ScanSuccessModal';
 import { Finding } from './types';
 import { apiFetch } from '@/app/lib/api';
 import { useAuth } from '@/app/context/AuthContext';
+import { useCloud } from '@/app/dashboard/context/CloudContext';
 
 export default function FindingsPage() {
   const { token, isAuthReady } = useAuth();
+  const { selectedProvider } = useCloud();
   const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
   const [lastScan, setLastScan] = useState<string | null>(null);
 
-  const filters = useFindingsFilters();
+  const filters = useFindingsFilters({
+    provider: selectedProvider !== 'all' ? selectedProvider : ''
+  });
 
   const { data, pages, loading, error, resolveFinding, refetch } = useFindings({
     page,
@@ -115,7 +119,25 @@ export default function FindingsPage() {
         {loading ? (
           <div className="text-center py-16 text-slate-500">Cargando findings...</div>
         ) : data.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">No se encontraron findings con los filtros aplicados.</div>
+          <div className="text-center py-16 space-y-3">
+            <div className="text-4xl">
+              {filters.provider === 'azure' ? '🔷' : filters.provider === 'gcp' ? '🔴' : '🔎'}
+            </div>
+            <p className="text-base font-semibold text-slate-700">
+              {filters.provider === 'azure'
+                ? 'No existen hallazgos ni recomendaciones asociadas a la nube Microsoft Azure'
+                : filters.provider === 'gcp'
+                ? 'No existen hallazgos ni recomendaciones asociadas a la nube Google Cloud Platform'
+                : filters.account
+                ? 'No existen hallazgos asociados a la cuenta seleccionada'
+                : 'No se encontraron hallazgos con los filtros aplicados'}
+            </p>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              {filters.provider === 'azure' || filters.provider === 'gcp'
+                ? 'Ejecuta un escaneo para analizar los recursos de esta nube y detectar oportunidades de optimización.'
+                : 'Prueba modificando los filtros de búsqueda o ejecutando un nuevo escaneo de infraestructura.'}
+            </p>
+          </div>
         ) : (
           <FindingsTable findings={data} onResolve={handleResolve} onRowClick={setSelectedFinding} />
         )}
